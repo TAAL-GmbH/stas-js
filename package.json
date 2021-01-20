@@ -1,0 +1,29 @@
+{
+  "name": "stas-js",
+  "version": "1.0.0",
+  "description": "This library will create various types of STAS token transactions that add token functionality to the BSV blockchain.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "standard"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ordishs/go-stas.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ordishs/go-stas/issues"
+  },
+  "homepage": "https://github.com/ordishs/go-stas#readme",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "bsv": "^1.5.4",
+    "stas-js": "github:ordishs/stas-js"
+  },
+  "devDependencies": {
+    "standard": "^16.0.3"
+  }
+}
