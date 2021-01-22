@@ -63,7 +63,8 @@ const {
       vout: 1,
       scriptPubKey: contractTx.vout[1].scriptPubKey.hex,
       amount: contractTx.vout[1].value
-    }]
+    }],
+    1 // STAS version
   )
   const issueTxid = await broadcast(issueHex)
   console.log(`Issue TX:        ${issueTxid}`)
