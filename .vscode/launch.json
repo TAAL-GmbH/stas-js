@@ -12,6 +12,15 @@
       "args": [],
       "console": "internalConsole",
       "outputCapture": "std"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "lifecycleV2",
+      "program": "${workspaceFolder}/lifecycleV2.test.js",
+      "args": [],
+      "console": "internalConsole",
+      "outputCapture": "std"
     }
   ]
 }
