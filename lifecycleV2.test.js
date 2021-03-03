@@ -50,8 +50,11 @@ const {
   console.log(`Contract TX:     ${contractTxid}`)
   const contractTx = await getTransaction(contractTxid)
 
+  const destinationKeys = [alicePrivateKey.publicKey, bobPrivateKey.publicKey]
+
   const issueHex = issue(
     issuerPrivateKey,
+    destinationKeys,
     {
       txid: contractTxid,
       vout: 0,
@@ -70,21 +73,23 @@ const {
   console.log(`Issue TX:        ${issueTxid}`)
   const issueTx = await getTransaction(issueTxid)
 
+  const issueOutFundingVout = issueTx.vout.length - 1
+
   const transferHex = transfer(
-    issuerPrivateKey,
+    bobPrivateKey,
     issuerPrivateKey.publicKey,
     {
-      txid: issueTxid,
-      vout: 0,
-      scriptPubKey: issueTx.vout[0].scriptPubKey.hex,
-      amount: issueTx.vout[0].value
-    },
-    alicePrivateKey.publicKey,
-    [{
       txid: issueTxid,
       vout: 1,
       scriptPubKey: issueTx.vout[1].scriptPubKey.hex,
       amount: issueTx.vout[1].value
+    },
+    alicePrivateKey.publicKey,
+    [{
+      txid: issueTxid,
+      vout: issueOutFundingVout,
+      scriptPubKey: issueTx.vout[issueOutFundingVout].scriptPubKey.hex,
+      amount: issueTx.vout[issueOutFundingVout].value
     }],
     issuerPrivateKey
   )
