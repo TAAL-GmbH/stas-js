@@ -16,9 +16,14 @@ const {
 } = require('./index').utils
 
 ;(async () => {
+  // const issuerPrivateKeyWif = 'KxvmdF516cqjAykqpyn4aYy6xkYuG4ffkMpraiYEhme6gdtkojSG'
+  // const issuerPrivateKey = bsv.PrivateKey.fromString(issuerPrivateKeyWif)
   const issuerPrivateKey = bsv.PrivateKey()
+
   const alicePrivateKey = bsv.PrivateKey()
+  const aliceAddr = alicePrivateKey.toAddress().toString()
   const bobPrivateKey = bsv.PrivateKey()
+  const bobAddr = bobPrivateKey.toAddress().toString()
 
   const utxos = await getFundsFromFaucet(issuerPrivateKey.toAddress('testnet').toString())
 
@@ -50,11 +55,11 @@ const {
   console.log(`Contract TX:     ${contractTxid}`)
   const contractTx = await getTransaction(contractTxid)
 
-  const destinationKeys = [alicePrivateKey.publicKey, bobPrivateKey.publicKey]
+  const destinationAddresses = [aliceAddr, bobAddr]
 
   const issueHex = issue(
     issuerPrivateKey,
-    destinationKeys,
+    destinationAddresses,
     {
       txid: contractTxid,
       vout: 0,
@@ -82,7 +87,7 @@ const {
       scriptPubKey: issueTx.vout[1].scriptPubKey.hex,
       amount: issueTx.vout[1].value
     },
-    alicePrivateKey.publicKey,
+    aliceAddr,
     [{
       txid: issueTxid,
       vout: 2,
@@ -107,9 +112,9 @@ const {
       scriptPubKey: transferTx.vout[0].scriptPubKey.hex,
       amount: transferTx.vout[0].value
     },
-    bobPrivateKey.publicKey,
+    bobAddr,
     bobAmount,
-    alicePrivateKey.publicKey,
+    aliceAddr,
     aliceAmount,
     [{
       txid: transferTxid,
@@ -132,7 +137,7 @@ const {
       scriptPubKey: splitTx.vout[0].scriptPubKey.hex,
       amount: splitTx.vout[0].value
     },
-    alicePrivateKey.publicKey,
+    aliceAddr,
     splitTx.vout[0].value / 2,
     [{
       txid: splitTxid,

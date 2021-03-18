@@ -17,8 +17,12 @@ const {
 
 ;(async () => {
   const issuerPrivateKey = bsv.PrivateKey()
+
   const alicePrivateKey = bsv.PrivateKey()
+  const aliceAddr = alicePrivateKey.toAddress().toString()
+
   const bobPrivateKey = bsv.PrivateKey()
+  const bobAddr = bobPrivateKey.toAddress().toString()
 
   const utxos = await getFundsFromFaucet(issuerPrivateKey.toAddress('testnet').toString())
 
@@ -50,11 +54,11 @@ const {
   console.log(`Contract TX:     ${contractTxid}`)
   const contractTx = await getTransaction(contractTxid)
 
-  const destinationKeys = [alicePrivateKey.publicKey, bobPrivateKey.publicKey]
+  const destinationAddresses = [aliceAddr, bobAddr]
 
   const issueHex = issue(
     issuerPrivateKey,
-    destinationKeys,
+    destinationAddresses,
     {
       txid: contractTxid,
       vout: 0,
@@ -84,7 +88,7 @@ const {
       scriptPubKey: issueTx.vout[1].scriptPubKey.hex,
       amount: issueTx.vout[1].value
     },
-    alicePrivateKey.publicKey,
+    aliceAddr,
     [{
       txid: issueTxid,
       vout: issueOutFundingVout,
@@ -110,9 +114,9 @@ const {
       scriptPubKey: transferTx.vout[0].scriptPubKey.hex,
       amount: transferTx.vout[0].value
     },
-    bobPrivateKey.publicKey,
+    bobAddr,
     bobAmount1,
-    bobPrivateKey.publicKey,
+    bobAddr,
     bobAmount2,
     [{
       txid: transferTxid,
@@ -140,7 +144,7 @@ const {
       tx: splitTxObj,
       vout: 1
     }],
-    alicePrivateKey.publicKey,
+    aliceAddr,
     {
       txid: splitTxid,
       vout: 2,
