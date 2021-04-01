@@ -9,5 +9,6 @@ stas.split = require('./lib/split')
 stas.redeemSplit = require('./lib/redeemSplit')
 stas.redeem = require('./lib/redeem')
 stas.merge = require('./lib/merge')
+stas.mergeSplit = require('./lib/mergeSplit')
 
 stas.utils = require('./lib/utils')

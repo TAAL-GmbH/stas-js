@@ -6,6 +6,7 @@ const {
   transfer,
   split,
   merge,
+  mergeSplit,
   redeem
 } = require('./index')
 
@@ -158,8 +159,11 @@ const {
   console.log(`Merge TX:        ${mergeTxid}`)
   const mergeTx = await getTransaction(mergeTxid)
 
-  // Alice wants to redeem the money from bob...
-  const redeemHex = redeem(
+  // Split again - both payable to Alice...
+  const aliceAmount1 = mergeTx.vout[0].value / 2
+  const aliceAmount2 = mergeTx.vout[0].value - aliceAmount1
+
+  const splitHex2 = split(
     alicePrivateKey,
     issuerPrivateKey.publicKey,
     {
@@ -168,11 +172,76 @@ const {
       scriptPubKey: mergeTx.vout[0].scriptPubKey.hex,
       amount: mergeTx.vout[0].value
     },
+    aliceAddr,
+    aliceAmount1,
+    aliceAddr,
+    aliceAmount2,
     [{
       txid: mergeTxid,
       vout: 1,
       scriptPubKey: mergeTx.vout[1].scriptPubKey.hex,
       amount: mergeTx.vout[1].value
+    }],
+    issuerPrivateKey
+  )
+  const splitTxid2 = await broadcast(splitHex2)
+  console.log(`Split TX2:       ${splitTxid2}`)
+  const splitTx2 = await getTransaction(splitTxid2)
+
+  // Now mergeSplit
+  const splitTxObj2 = new bsv.Transaction(splitHex2)
+
+  const aliceAmountSatoshis = Math.floor(splitTx2.vout[0].value * 1e8) / 2
+  const bobAmountSatoshis = Math.floor(splitTx2.vout[0].value * 1e8) + Math.floor(splitTx2.vout[1].value * 1e8) - aliceAmountSatoshis
+
+  const mergeSplitHex = mergeSplit(
+    alicePrivateKey,
+    issuerPrivateKey.publicKey,
+    [{
+      tx: splitTxObj2,
+      scriptPubKey: splitTx2.vout[0].scriptPubKey.hex,
+      vout: 0,
+      amount: splitTx2.vout[0].value
+    },
+    {
+      tx: splitTxObj2,
+      scriptPubKey: splitTx2.vout[1].scriptPubKey.hex,
+      vout: 1,
+      amount: splitTx2.vout[1].value
+
+    }],
+    aliceAddr,
+    aliceAmountSatoshis,
+    bobAddr,
+    bobAmountSatoshis,
+    {
+      txid: splitTxid2,
+      vout: 2,
+      scriptPubKey: splitTx2.vout[2].scriptPubKey.hex,
+      amount: splitTx2.vout[2].value
+    },
+    issuerPrivateKey
+  )
+
+  const mergeSplitTxid = await broadcast(mergeSplitHex)
+  console.log(`MergeSplit TX:   ${mergeSplitTxid}`)
+  const mergeSplitTx = await getTransaction(mergeSplitTxid)
+
+  // Alice wants to redeem the money from bob...
+  const redeemHex = redeem(
+    alicePrivateKey,
+    issuerPrivateKey.publicKey,
+    {
+      txid: mergeSplitTxid,
+      vout: 0,
+      scriptPubKey: mergeSplitTx.vout[0].scriptPubKey.hex,
+      amount: mergeSplitTx.vout[0].value
+    },
+    [{
+      txid: mergeSplitTxid,
+      vout: 2,
+      scriptPubKey: mergeSplitTx.vout[2].scriptPubKey.hex,
+      amount: mergeSplitTx.vout[2].value
     }],
     issuerPrivateKey
   )
