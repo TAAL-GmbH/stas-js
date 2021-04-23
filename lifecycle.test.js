@@ -55,11 +55,21 @@ const {
   console.log(`Contract TX:     ${contractTxid}`)
   const contractTx = await getTransaction(contractTxid)
 
-  const destinationAddresses = [aliceAddr, bobAddr]
-
+  const issueInfo = [
+    {
+      addr: aliceAddr,
+      satoshis: 4000
+      // data: 'test'
+    },
+    {
+      addr: bobAddr,
+      satoshis: 6000
+      // data: 'test'
+    }
+  ]
   const issueHex = issue(
     issuerPrivateKey,
-    destinationAddresses,
+    issueInfo,
     {
       txid: contractTxid,
       vout: 0,
@@ -72,6 +82,7 @@ const {
       scriptPubKey: contractTx.vout[1].scriptPubKey.hex,
       amount: contractTx.vout[1].value
     }],
+    'test', // data
     1 // STAS version
   )
   const issueTxid = await broadcast(issueHex)
@@ -100,8 +111,16 @@ const {
   console.log(`Transfer TX:     ${transferTxid}`)
   const transferTx = await getTransaction(transferTxid)
 
-  const bobAmount = transferTx.vout[0].value / 2
-  const aliceAmount = transferTx.vout[0].value - bobAmount
+  const bobAmount1 = transferTx.vout[0].value / 4
+  const bobAmount2 = transferTx.vout[0].value / 4
+  const aliceAmount1 = transferTx.vout[0].value / 4
+  const aliceAmount2 = transferTx.vout[0].value - bobAmount1 - bobAmount2 - aliceAmount1
+
+  const splitDestinations = []
+  splitDestinations[0] = { address: bobAddr, amount: bobAmount1 }
+  splitDestinations[1] = { address: aliceAddr, amount: aliceAmount1 }
+  splitDestinations[2] = { address: bobAddr, amount: bobAmount2 }
+  splitDestinations[3] = { address: aliceAddr, amount: aliceAmount2 }
 
   const splitHex = split(
     alicePrivateKey,
@@ -112,10 +131,7 @@ const {
       scriptPubKey: transferTx.vout[0].scriptPubKey.hex,
       amount: transferTx.vout[0].value
     },
-    bobAddr,
-    bobAmount,
-    aliceAddr,
-    aliceAmount,
+    splitDestinations,
     [{
       txid: transferTxid,
       vout: 1,
@@ -128,6 +144,12 @@ const {
   console.log(`Split TX:        ${splitTxid}`)
   const splitTx = await getTransaction(splitTxid)
 
+  const rsBobAmount = splitTx.vout[0].value / 3
+  const rsAliceAmount1 = splitTx.vout[0].value / 3
+  const rSplitDestinations = []
+  rSplitDestinations[0] = { address: bobAddr, amount: rsBobAmount }
+  rSplitDestinations[1] = { address: aliceAddr, amount: rsAliceAmount1 }
+
   const redeemSplitHex = redeemSplit(
     bobPrivateKey,
     issuerPrivateKey.publicKey,
@@ -137,13 +159,12 @@ const {
       scriptPubKey: splitTx.vout[0].scriptPubKey.hex,
       amount: splitTx.vout[0].value
     },
-    aliceAddr,
-    splitTx.vout[0].value / 2,
+    rSplitDestinations,
     [{
       txid: splitTxid,
-      vout: 2,
-      scriptPubKey: splitTx.vout[2].scriptPubKey.hex,
-      amount: splitTx.vout[2].value
+      vout: 4,
+      scriptPubKey: splitTx.vout[4].scriptPubKey.hex,
+      amount: splitTx.vout[4].value
     }],
     issuerPrivateKey
   )
@@ -157,15 +178,15 @@ const {
     issuerPrivateKey.publicKey,
     {
       txid: redeemSplitTxid,
-      vout: 1,
-      scriptPubKey: redeemSplitTx.vout[1].scriptPubKey.hex,
-      amount: redeemSplitTx.vout[1].value
-    },
-    [{
-      txid: redeemSplitTxid,
       vout: 2,
       scriptPubKey: redeemSplitTx.vout[2].scriptPubKey.hex,
       amount: redeemSplitTx.vout[2].value
+    },
+    [{
+      txid: redeemSplitTxid,
+      vout: 3,
+      scriptPubKey: redeemSplitTx.vout[3].scriptPubKey.hex,
+      amount: redeemSplitTx.vout[3].value
     }],
     issuerPrivateKey
   )

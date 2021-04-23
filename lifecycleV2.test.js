@@ -55,11 +55,22 @@ const {
   console.log(`Contract TX:     ${contractTxid}`)
   const contractTx = await getTransaction(contractTxid)
 
-  const destinationAddresses = [aliceAddr, bobAddr]
+  const issueInfo = [
+    {
+      addr: aliceAddr,
+      satoshis: 7000,
+      data: 'test'
+    },
+    {
+      addr: bobAddr,
+      satoshis: 3000,
+      data: 'test'
+    }
+  ]
 
   const issueHex = issue(
     issuerPrivateKey,
-    destinationAddresses,
+    issueInfo,
     {
       txid: contractTxid,
       vout: 0,
@@ -72,6 +83,7 @@ const {
       scriptPubKey: contractTx.vout[1].scriptPubKey.hex,
       amount: contractTx.vout[1].value
     }],
+    'test2', // data
     2 // STAS version
   )
   const issueTxid = await broadcast(issueHex)
@@ -105,6 +117,9 @@ const {
   // Split tokens into 2 - both payable to Bob...
   const bobAmount1 = transferTx.vout[0].value / 2
   const bobAmount2 = transferTx.vout[0].value - bobAmount1
+  const splitDestinations = []
+  splitDestinations[0] = { address: bobAddr, amount: bobAmount1 }
+  splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
 
   const splitHex = split(
     alicePrivateKey,
@@ -115,10 +130,7 @@ const {
       scriptPubKey: transferTx.vout[0].scriptPubKey.hex,
       amount: transferTx.vout[0].value
     },
-    bobAddr,
-    bobAmount1,
-    bobAddr,
-    bobAmount2,
+    splitDestinations,
     [{
       txid: transferTxid,
       vout: 1,
@@ -163,6 +175,10 @@ const {
   const aliceAmount1 = mergeTx.vout[0].value / 2
   const aliceAmount2 = mergeTx.vout[0].value - aliceAmount1
 
+  const split2Destinations = []
+  split2Destinations[0] = { address: aliceAddr, amount: aliceAmount1 }
+  split2Destinations[1] = { address: aliceAddr, amount: aliceAmount2 }
+
   const splitHex2 = split(
     alicePrivateKey,
     issuerPrivateKey.publicKey,
@@ -172,10 +188,7 @@ const {
       scriptPubKey: mergeTx.vout[0].scriptPubKey.hex,
       amount: mergeTx.vout[0].value
     },
-    aliceAddr,
-    aliceAmount1,
-    aliceAddr,
-    aliceAmount2,
+    split2Destinations,
     [{
       txid: mergeTxid,
       vout: 1,
