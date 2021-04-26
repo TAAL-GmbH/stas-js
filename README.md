@@ -8,8 +8,9 @@ This library will create various types of STAS token transactions that add token
 2. Issue: This will spend the contract transaction and create a new P2STAS UTXO.
 3. Transfer: This spends a P2STAS UTXO and allocates it to a new destination P2STAS UTXO.
 4. Split: This spends a P2STAS UTXO and allocates it to 2 different P2STAS UTXOs.
-5. RedeemSplit: This spends a P2STAS UTXO and allocates some of the tokens to a standard P2PKH UTXO and the remainder to a destination P2STAS UTXO. The P2PKH destination must be the redemption public key hash.
-6. Redeem: This spends a P2STAS UTXO and creates a standard P2PKH of the full amount. The P2PKH destination must be the redemption public key hash.
+5. Merge: This merges 2 P2STAS inputs. Only available in Version 2. Can only merge if the in transactions have less than 3 outputs. (including the change)
+6. RedeemSplit: This spends a P2STAS UTXO and allocates some of the tokens to a standard P2PKH UTXO and the remainder to a destination P2STAS UTXO. The P2PKH destination must be the redemption public key hash.
+7. Redeem: This spends a P2STAS UTXO and creates a standard P2PKH of the full amount. The P2PKH destination must be the redemption public key hash.
 
 
 *Please note that the ```utils.js``` file is not needed to build STAS tokens: it contains tools to help interaction with Taal's private testing network, Taalnet.*
