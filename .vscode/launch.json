@@ -4,6 +4,7 @@
   // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
+
     {
       "type": "node",
       "request": "launch",
@@ -18,6 +19,15 @@
       "request": "launch",
       "name": "lifecycleV2",
       "program": "${workspaceFolder}/lifecycleV2.test.js",
+      "args": [],
+      "console": "internalConsole",
+      "outputCapture": "std"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "lifecycleV2 NFT",
+      "program": "${workspaceFolder}/lifecycleV2.nft.test.js",
       "args": [],
       "console": "internalConsole",
       "outputCapture": "std"

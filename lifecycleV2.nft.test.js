@@ -83,7 +83,7 @@ const {
       scriptPubKey: contractTx.vout[1].scriptPubKey.hex,
       amount: contractTx.vout[1].value
     }],
-    true, // isSplittable
+    false, // isSplittable
     2 // STAS version
   )
   const issueTxid = await broadcast(issueHex)
@@ -139,126 +139,11 @@ const {
     }],
     issuerPrivateKey
   )
-  const splitTxid = await broadcast(splitHex)
-  console.log(`Split TX:        ${splitTxid}`)
-  const splitTx = await getTransaction(splitTxid)
-
-  // Now let's merge the last split back together
-  const splitTxObj = new bsv.Transaction(splitHex)
-
-  const mergeHex = merge(
-    bobPrivateKey,
-    issuerPrivateKey.publicKey,
-    [{
-      tx: splitTxObj,
-      vout: 0
-    },
-    {
-      tx: splitTxObj,
-      vout: 1
-    }],
-    aliceAddr,
-    {
-      txid: splitTxid,
-      vout: 2,
-      scriptPubKey: splitTx.vout[2].scriptPubKey.hex,
-      amount: splitTx.vout[2].value
-    },
-    issuerPrivateKey
-  )
-
-  const mergeTxid = await broadcast(mergeHex)
-  console.log(`Merge TX:        ${mergeTxid}`)
-  const mergeTx = await getTransaction(mergeTxid)
-
-  // Split again - both payable to Alice...
-  const aliceAmount1 = mergeTx.vout[0].value / 2
-  const aliceAmount2 = mergeTx.vout[0].value - aliceAmount1
-
-  const split2Destinations = []
-  split2Destinations[0] = { address: aliceAddr, amount: aliceAmount1 }
-  split2Destinations[1] = { address: aliceAddr, amount: aliceAmount2 }
-
-  const splitHex2 = split(
-    alicePrivateKey,
-    issuerPrivateKey.publicKey,
-    {
-      txid: mergeTxid,
-      vout: 0,
-      scriptPubKey: mergeTx.vout[0].scriptPubKey.hex,
-      amount: mergeTx.vout[0].value
-    },
-    split2Destinations,
-    [{
-      txid: mergeTxid,
-      vout: 1,
-      scriptPubKey: mergeTx.vout[1].scriptPubKey.hex,
-      amount: mergeTx.vout[1].value
-    }],
-    issuerPrivateKey
-  )
-  const splitTxid2 = await broadcast(splitHex2)
-  console.log(`Split TX2:       ${splitTxid2}`)
-  const splitTx2 = await getTransaction(splitTxid2)
-
-  // Now mergeSplit
-  const splitTxObj2 = new bsv.Transaction(splitHex2)
-
-  const aliceAmountSatoshis = Math.floor(splitTx2.vout[0].value * 1e8) / 2
-  const bobAmountSatoshis = Math.floor(splitTx2.vout[0].value * 1e8) + Math.floor(splitTx2.vout[1].value * 1e8) - aliceAmountSatoshis
-
-  const mergeSplitHex = mergeSplit(
-    alicePrivateKey,
-    issuerPrivateKey.publicKey,
-    [{
-      tx: splitTxObj2,
-      scriptPubKey: splitTx2.vout[0].scriptPubKey.hex,
-      vout: 0,
-      amount: splitTx2.vout[0].value
-    },
-    {
-      tx: splitTxObj2,
-      scriptPubKey: splitTx2.vout[1].scriptPubKey.hex,
-      vout: 1,
-      amount: splitTx2.vout[1].value
-
-    }],
-    aliceAddr,
-    aliceAmountSatoshis,
-    bobAddr,
-    bobAmountSatoshis,
-    {
-      txid: splitTxid2,
-      vout: 2,
-      scriptPubKey: splitTx2.vout[2].scriptPubKey.hex,
-      amount: splitTx2.vout[2].value
-    },
-    issuerPrivateKey
-  )
-
-  const mergeSplitTxid = await broadcast(mergeSplitHex)
-  console.log(`MergeSplit TX:   ${mergeSplitTxid}`)
-  const mergeSplitTx = await getTransaction(mergeSplitTxid)
-
-  // Alice wants to redeem the money from bob...
-  const redeemHex = redeem(
-    alicePrivateKey,
-    issuerPrivateKey.publicKey,
-    {
-      txid: mergeSplitTxid,
-      vout: 0,
-      scriptPubKey: mergeSplitTx.vout[0].scriptPubKey.hex,
-      amount: mergeSplitTx.vout[0].value
-    },
-    [{
-      txid: mergeSplitTxid,
-      vout: 2,
-      scriptPubKey: mergeSplitTx.vout[2].scriptPubKey.hex,
-      amount: mergeSplitTx.vout[2].value
-    }],
-    issuerPrivateKey
-  )
-  const redeemTxid = await broadcast(redeemHex)
-  console.log(`Redeem TX:       ${redeemTxid}`)
-  // const redeem1Tx = await getTransaction(redeem1Txid)
+  try {
+    await broadcast(splitHex)
+  } catch (e) {
+    console.log("Correct behaviour. Couldn't split")
+    return
+  }
+  console.log('Error: was able to split NFT')
 })()
