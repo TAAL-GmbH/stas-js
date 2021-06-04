@@ -4,10 +4,7 @@ const {
   contract,
   issue,
   transfer,
-  split,
-  merge,
-  mergeSplit,
-  redeem
+  split
 } = require('./index')
 
 const {
