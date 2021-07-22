@@ -26,7 +26,7 @@ const {
   const bobPrivateKey = bsv.PrivateKey()
   const bobAddr = bobPrivateKey.toAddress().toString()
 
-  const utxos = await getFundsFromFaucet(issuerPrivateKey.toAddress('testnet').toString())
+  const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress('testnet').toString())
 
   const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
 
@@ -48,7 +48,9 @@ const {
 
   const contractHex = contract(
     issuerPrivateKey,
-    utxos, // we always need an input so the contract must be funded
+    contractUtxos, // we always need an input so the contract must be funded
+    null,
+    null,
     schema,
     10000
   )
@@ -84,6 +86,7 @@ const {
       scriptPubKey: contractTx.vout[0].scriptPubKey.hex,
       amount: contractTx.vout[0].value
     },
+    null,
     null,
     true, // isSplittable
     2 // STAS version

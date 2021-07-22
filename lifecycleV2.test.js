@@ -18,6 +18,7 @@ const {
 
 ;(async () => {
   const issuerPrivateKey = bsv.PrivateKey()
+  const fundingPrivateKey = bsv.PrivateKey()
 
   const alicePrivateKey = bsv.PrivateKey()
   const aliceAddr = alicePrivateKey.toAddress().toString()
@@ -25,7 +26,8 @@ const {
   const bobPrivateKey = bsv.PrivateKey()
   const bobAddr = bobPrivateKey.toAddress().toString()
 
-  const utxos = await getFundsFromFaucet(issuerPrivateKey.toAddress('testnet').toString())
+  const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress('testnet').toString())
+  const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress('testnet').toString())
 
   const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
 
@@ -45,9 +47,12 @@ const {
     tickerSymbol: 'TAALT'
   }
 
+  // change goes back to the fundingPrivateKey
   const contractHex = contract(
     issuerPrivateKey,
-    utxos,
+    contractUtxos,
+    fundingUtxos,
+    fundingPrivateKey,
     schema,
     10000
   )
@@ -83,6 +88,7 @@ const {
       scriptPubKey: contractTx.vout[1].scriptPubKey.hex,
       amount: contractTx.vout[1].value
     }],
+    fundingPrivateKey,
     true, // isSplittable
     2 // STAS version
   )
@@ -108,7 +114,7 @@ const {
       scriptPubKey: issueTx.vout[issueOutFundingVout].scriptPubKey.hex,
       amount: issueTx.vout[issueOutFundingVout].value
     }],
-    issuerPrivateKey
+    fundingPrivateKey
   )
   const transferTxid = await broadcast(transferHex)
   console.log(`Transfer TX:     ${transferTxid}`)
@@ -137,7 +143,7 @@ const {
       scriptPubKey: transferTx.vout[1].scriptPubKey.hex,
       amount: transferTx.vout[1].value
     }],
-    issuerPrivateKey
+    fundingPrivateKey
   )
   const splitTxid = await broadcast(splitHex)
   console.log(`Split TX:        ${splitTxid}`)
@@ -164,7 +170,7 @@ const {
       scriptPubKey: splitTx.vout[2].scriptPubKey.hex,
       amount: splitTx.vout[2].value
     },
-    issuerPrivateKey
+    fundingPrivateKey
   )
 
   const mergeTxid = await broadcast(mergeHex)
@@ -195,7 +201,7 @@ const {
       scriptPubKey: mergeTx.vout[1].scriptPubKey.hex,
       amount: mergeTx.vout[1].value
     }],
-    issuerPrivateKey
+    fundingPrivateKey
   )
   const splitTxid2 = await broadcast(splitHex2)
   console.log(`Split TX2:       ${splitTxid2}`)
@@ -233,7 +239,7 @@ const {
       scriptPubKey: splitTx2.vout[2].scriptPubKey.hex,
       amount: splitTx2.vout[2].value
     },
-    issuerPrivateKey
+    fundingPrivateKey
   )
 
   const mergeSplitTxid = await broadcast(mergeSplitHex)
@@ -256,7 +262,7 @@ const {
       scriptPubKey: mergeSplitTx.vout[2].scriptPubKey.hex,
       amount: mergeSplitTx.vout[2].value
     }],
-    issuerPrivateKey
+    fundingPrivateKey
   )
   const redeemTxid = await broadcast(redeemHex)
   console.log(`Redeem TX:       ${redeemTxid}`)

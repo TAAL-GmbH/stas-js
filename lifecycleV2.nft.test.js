@@ -15,6 +15,7 @@ const {
 
 ;(async () => {
   const issuerPrivateKey = bsv.PrivateKey()
+  const fundingPrivateKey = bsv.PrivateKey()
 
   const alicePrivateKey = bsv.PrivateKey()
   const aliceAddr = alicePrivateKey.toAddress().toString()
@@ -22,7 +23,8 @@ const {
   const bobPrivateKey = bsv.PrivateKey()
   const bobAddr = bobPrivateKey.toAddress().toString()
 
-  const utxos = await getFundsFromFaucet(issuerPrivateKey.toAddress('testnet').toString())
+  const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress('testnet').toString())
+  const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress('testnet').toString())
 
   const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
 
@@ -44,7 +46,9 @@ const {
 
   const contractHex = contract(
     issuerPrivateKey,
-    utxos,
+    contractUtxos,
+    fundingUtxos,
+    fundingPrivateKey,
     schema,
     10000
   )
@@ -80,6 +84,7 @@ const {
       scriptPubKey: contractTx.vout[1].scriptPubKey.hex,
       amount: contractTx.vout[1].value
     }],
+    fundingPrivateKey,
     false, // isSplittable
     2 // STAS version
   )
@@ -105,7 +110,7 @@ const {
       scriptPubKey: issueTx.vout[issueOutFundingVout].scriptPubKey.hex,
       amount: issueTx.vout[issueOutFundingVout].value
     }],
-    issuerPrivateKey
+    fundingPrivateKey
   )
   const transferTxid = await broadcast(transferHex)
   console.log(`Transfer TX:     ${transferTxid}`)
@@ -134,7 +139,7 @@ const {
       scriptPubKey: transferTx.vout[1].scriptPubKey.hex,
       amount: transferTx.vout[1].value
     }],
-    issuerPrivateKey
+    fundingPrivateKey
   )
   try {
     await broadcast(splitHex)

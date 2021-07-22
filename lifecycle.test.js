@@ -19,13 +19,15 @@ const {
   // const issuerPrivateKeyWif = 'KxvmdF516cqjAykqpyn4aYy6xkYuG4ffkMpraiYEhme6gdtkojSG'
   // const issuerPrivateKey = bsv.PrivateKey.fromString(issuerPrivateKeyWif)
   const issuerPrivateKey = bsv.PrivateKey()
+  const fundingPrivateKey = bsv.PrivateKey()
 
   const alicePrivateKey = bsv.PrivateKey()
   const aliceAddr = alicePrivateKey.toAddress().toString()
   const bobPrivateKey = bsv.PrivateKey()
   const bobAddr = bobPrivateKey.toAddress().toString()
 
-  const utxos = await getFundsFromFaucet(issuerPrivateKey.toAddress('testnet').toString())
+  const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress('testnet').toString())
+  const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress('testnet').toString())
 
   const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
 
@@ -47,7 +49,9 @@ const {
 
   const contractHex = contract(
     issuerPrivateKey,
-    utxos,
+    contractUtxos,
+    fundingUtxos,
+    fundingPrivateKey,
     schema,
     10000
   )
@@ -82,6 +86,7 @@ const {
       scriptPubKey: contractTx.vout[1].scriptPubKey.hex,
       amount: contractTx.vout[1].value
     }],
+    fundingPrivateKey,
     true, // isSplittable
     1 // STAS version
   )
@@ -105,7 +110,7 @@ const {
       scriptPubKey: issueTx.vout[2].scriptPubKey.hex,
       amount: issueTx.vout[2].value
     }],
-    issuerPrivateKey
+    fundingPrivateKey
   )
   const transferTxid = await broadcast(transferHex)
   console.log(`Transfer TX:     ${transferTxid}`)
@@ -138,7 +143,7 @@ const {
       scriptPubKey: transferTx.vout[1].scriptPubKey.hex,
       amount: transferTx.vout[1].value
     }],
-    issuerPrivateKey
+    fundingPrivateKey
   )
   const splitTxid = await broadcast(splitHex)
   console.log(`Split TX:        ${splitTxid}`)
@@ -166,7 +171,7 @@ const {
       scriptPubKey: splitTx.vout[4].scriptPubKey.hex,
       amount: splitTx.vout[4].value
     }],
-    issuerPrivateKey
+    fundingPrivateKey
   )
   const redeemSplitTxid = await broadcast(redeemSplitHex)
   console.log(`RedeemSplit TX:  ${redeemSplitTxid}`)
@@ -188,7 +193,7 @@ const {
       scriptPubKey: redeemSplitTx.vout[3].scriptPubKey.hex,
       amount: redeemSplitTx.vout[3].value
     }],
-    issuerPrivateKey
+    fundingPrivateKey
   )
   const redeem1Txid = await broadcast(redeem1Hex)
   console.log(`Redeem 1 TX:     ${redeem1Txid}`)
@@ -210,7 +215,7 @@ const {
       scriptPubKey: redeem1Tx.vout[1].scriptPubKey.hex,
       amount: redeem1Tx.vout[1].value
     }],
-    issuerPrivateKey
+    fundingPrivateKey
   )
   const redeem2Txid = await broadcast(redeem2Hex)
   console.log(`Redeem 2 TX:     ${redeem2Txid}`)
