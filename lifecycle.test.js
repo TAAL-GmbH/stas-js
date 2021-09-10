@@ -30,21 +30,44 @@ const {
   const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress('testnet').toString())
 
   const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
+  const supply = 10000
+  const symbol = 'TAALT'
 
   const schema = {
-    schemaId: 'Schema STAS Coupon',
-    tokenName: 'TAALT',
+    name: 'Taal Token',
     tokenId: publicKeyHash,
-    tokenDescription: 'Example token on private Taalnet',
-    issuerName: 'Taal Technologies SEZC',
-    issuerCountry: 'CYM',
-    issuerLegalForm: 'Limited Liability Public Company',
-    issuerEmail: 'info@taal.com',
-    issuerWebsite: 'https://taal.com',
-    terms: '© 2020 TAAL TECHNOLOGIES SEZC\nALL RIGHTS RESERVED. ANY USE OF THIS SOFTWARE IS SUBJECT TO TERMS AND CONDITIONS OF LICENSE. USE OF THIS SOFTWARE WITHOUT LICENSE CONSTITUTES INFRINGEMENT OF INTELLECTUAL PROPERTY. FOR LICENSE DETAILS OF THE SOFTWARE, PLEASE REFER TO: www.taal.com/stas-token-license-agreement',
-    governingLaw: 'Cayman Islands Law',
-    icon: 'https://www.taal.com/wp-content/themes/taal_v2/img/favicon/favicon-96x96.png',
-    tickerSymbol: 'TAALT'
+    protocolId: 'To be decided',
+    symbol: symbol,
+    description: 'Example token on private Taalnet',
+    image: 'https://www.taal.com/wp-content/themes/taal_v2/img/favicon/favicon-96x96.png',
+    totalSupply: supply,
+    decimals: 0,
+    satsPerToken: 1,
+    properties: {
+      legal: {
+        terms: '© 2020 TAAL TECHNOLOGIES SEZC\nALL RIGHTS RESERVED. ANY USE OF THIS SOFTWARE IS SUBJECT TO TERMS AND CONDITIONS OF LICENSE. USE OF THIS SOFTWARE WITHOUT LICENSE CONSTITUTES INFRINGEMENT OF INTELLECTUAL PROPERTY. FOR LICENSE DETAILS OF THE SOFTWARE, PLEASE REFER TO: www.taal.com/stas-token-license-agreement',
+        licenceId: '1234'
+      },
+      issuer: {
+        organisation: 'Taal Technologies SEZC',
+        legalForm: 'Limited Liability Public Company',
+        governingLaw: 'CA',
+        mailingAddress: '',
+        issuerCountry: 'CYM',
+        jurisdiction: '',
+        email: 'info@taal.com'
+      },
+      meta: {
+        schemaId: 'token1',
+        website: 'https://taal.com',
+        legal: {
+          terms: ''
+        },
+        media: {
+          type: 'mp4'
+        }
+      }
+    }
   }
 
   const contractHex = contract(
@@ -53,7 +76,7 @@ const {
     fundingUtxos,
     fundingPrivateKey,
     schema,
-    10000
+    supply
   )
   const contractTxid = await broadcast(contractHex)
   console.log(`Contract TX:     ${contractTxid}`)
