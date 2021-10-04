@@ -101,12 +101,12 @@ const {
       scriptPubKey: contractTx.vout[0].scriptPubKey.hex,
       amount: contractTx.vout[0].value
     },
-    [{
+    {
       txid: contractTxid,
       vout: 1,
       scriptPubKey: contractTx.vout[1].scriptPubKey.hex,
       amount: contractTx.vout[1].value
-    }],
+    },
     fundingPrivateKey,
     false, // isSplittable
     2 // STAS version
@@ -127,12 +127,12 @@ const {
       amount: issueTx.vout[1].value
     },
     aliceAddr,
-    [{
+    {
       txid: issueTxid,
       vout: issueOutFundingVout,
       scriptPubKey: issueTx.vout[issueOutFundingVout].scriptPubKey.hex,
       amount: issueTx.vout[issueOutFundingVout].value
-    }],
+    },
     fundingPrivateKey
   )
   const transferTxid = await broadcast(transferHex)
@@ -156,12 +156,12 @@ const {
       amount: transferTx.vout[0].value
     },
     splitDestinations,
-    [{
+    {
       txid: transferTxid,
       vout: 1,
       scriptPubKey: transferTx.vout[1].scriptPubKey.hex,
       amount: transferTx.vout[1].value
-    }],
+    },
     fundingPrivateKey
   )
   try {

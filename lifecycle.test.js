@@ -103,12 +103,12 @@ const {
       scriptPubKey: contractTx.vout[0].scriptPubKey.hex,
       amount: contractTx.vout[0].value
     },
-    [{
+    {
       txid: contractTxid,
       vout: 1,
       scriptPubKey: contractTx.vout[1].scriptPubKey.hex,
       amount: contractTx.vout[1].value
-    }],
+    },
     fundingPrivateKey,
     true, // isSplittable
     1 // STAS version
@@ -127,12 +127,12 @@ const {
       amount: issueTx.vout[1].value
     },
     aliceAddr,
-    [{
+    {
       txid: issueTxid,
       vout: 2,
       scriptPubKey: issueTx.vout[2].scriptPubKey.hex,
       amount: issueTx.vout[2].value
-    }],
+    },
     fundingPrivateKey
   )
   const transferTxid = await broadcast(transferHex)
@@ -160,12 +160,12 @@ const {
       amount: transferTx.vout[0].value
     },
     splitDestinations,
-    [{
+    {
       txid: transferTxid,
       vout: 1,
       scriptPubKey: transferTx.vout[1].scriptPubKey.hex,
       amount: transferTx.vout[1].value
-    }],
+    },
     fundingPrivateKey
   )
   const splitTxid = await broadcast(splitHex)
@@ -188,12 +188,12 @@ const {
       amount: splitTx.vout[0].value
     },
     rSplitDestinations,
-    [{
+    {
       txid: splitTxid,
       vout: 4,
       scriptPubKey: splitTx.vout[4].scriptPubKey.hex,
       amount: splitTx.vout[4].value
-    }],
+    },
     fundingPrivateKey
   )
   const redeemSplitTxid = await broadcast(redeemSplitHex)
@@ -210,12 +210,12 @@ const {
       scriptPubKey: redeemSplitTx.vout[2].scriptPubKey.hex,
       amount: redeemSplitTx.vout[2].value
     },
-    [{
+    {
       txid: redeemSplitTxid,
       vout: 3,
       scriptPubKey: redeemSplitTx.vout[3].scriptPubKey.hex,
       amount: redeemSplitTx.vout[3].value
-    }],
+    },
     fundingPrivateKey
   )
   const redeem1Txid = await broadcast(redeem1Hex)
@@ -232,12 +232,12 @@ const {
       scriptPubKey: splitTx.vout[1].scriptPubKey.hex,
       amount: splitTx.vout[1].value
     },
-    [{
+    {
       txid: redeem1Txid,
       vout: 1,
       scriptPubKey: redeem1Tx.vout[1].scriptPubKey.hex,
       amount: redeem1Tx.vout[1].value
-    }],
+    },
     fundingPrivateKey
   )
   const redeem2Txid = await broadcast(redeem2Hex)

@@ -105,12 +105,12 @@ const {
       scriptPubKey: contractTx.vout[0].scriptPubKey.hex,
       amount: contractTx.vout[0].value
     },
-    [{
+    {
       txid: contractTxid,
       vout: 1,
       scriptPubKey: contractTx.vout[1].scriptPubKey.hex,
       amount: contractTx.vout[1].value
-    }],
+    },
     fundingPrivateKey,
     true, // isSplittable
     2 // STAS version
@@ -131,12 +131,12 @@ const {
       amount: issueTx.vout[1].value
     },
     aliceAddr,
-    [{
+    {
       txid: issueTxid,
       vout: issueOutFundingVout,
       scriptPubKey: issueTx.vout[issueOutFundingVout].scriptPubKey.hex,
       amount: issueTx.vout[issueOutFundingVout].value
-    }],
+    },
     fundingPrivateKey
   )
   const transferTxid = await broadcast(transferHex)
@@ -160,12 +160,12 @@ const {
       amount: transferTx.vout[0].value
     },
     splitDestinations,
-    [{
+    {
       txid: transferTxid,
       vout: 1,
       scriptPubKey: transferTx.vout[1].scriptPubKey.hex,
       amount: transferTx.vout[1].value
-    }],
+    },
     fundingPrivateKey
   )
   const splitTxid = await broadcast(splitHex)
@@ -218,12 +218,12 @@ const {
       amount: mergeTx.vout[0].value
     },
     split2Destinations,
-    [{
+    {
       txid: mergeTxid,
       vout: 1,
       scriptPubKey: mergeTx.vout[1].scriptPubKey.hex,
       amount: mergeTx.vout[1].value
-    }],
+    },
     fundingPrivateKey
   )
   const splitTxid2 = await broadcast(splitHex2)
@@ -279,12 +279,12 @@ const {
       scriptPubKey: mergeSplitTx.vout[0].scriptPubKey.hex,
       amount: mergeSplitTx.vout[0].value
     },
-    [{
+    {
       txid: mergeSplitTxid,
       vout: 2,
       scriptPubKey: mergeSplitTx.vout[2].scriptPubKey.hex,
       amount: mergeSplitTx.vout[2].value
-    }],
+    },
     fundingPrivateKey
   )
   const redeemTxid = await broadcast(redeemHex)
