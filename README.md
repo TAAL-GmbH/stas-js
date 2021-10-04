@@ -20,7 +20,7 @@ There is a file called ```lifecycle.test.js``` that exercises a full lifecycle o
 
 ```sh
 npm install
-node lifecycle.js
+node lifecycleV2.js
 ```
 
 which will produce a series of transactions:
