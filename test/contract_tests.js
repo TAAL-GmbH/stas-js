@@ -30,9 +30,10 @@ const {
         contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress('testnet').toString())
         fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress('testnet').toString())
         publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
-        schema = utils.schema(publicKeyHash, symbol, supply)
         supply = 10000
         symbol = 'TAALT'
+        schema = utils.schema(publicKeyHash, symbol, supply)
+
     });
 
    it("Successful Contract Broadcast", async function(){
