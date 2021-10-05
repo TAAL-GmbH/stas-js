@@ -95,26 +95,31 @@ const {
       data: 'two'
     }
   ]
-
-  const issueHex = issue(
-    issuerPrivateKey,
-    issueInfo,
-    {
-      txid: contractTxid,
-      vout: 0,
-      scriptPubKey: contractTx.vout[0].scriptPubKey.hex,
-      amount: contractTx.vout[0].value
-    },
-    {
-      txid: contractTxid,
-      vout: 1,
-      scriptPubKey: contractTx.vout[1].scriptPubKey.hex,
-      amount: contractTx.vout[1].value
-    },
-    fundingPrivateKey,
-    true, // isSplittable
-    2 // STAS version
-  )
+  let issueHex
+  try {
+    issueHex = issue(
+      issuerPrivateKey,
+      issueInfo,
+      {
+        txid: contractTxid,
+        vout: 0,
+        scriptPubKey: contractTx.vout[0].scriptPubKey.hex,
+        amount: contractTx.vout[0].value
+      },
+      {
+        txid: contractTxid,
+        vout: 1,
+        scriptPubKey: contractTx.vout[1].scriptPubKey.hex,
+        amount: contractTx.vout[1].value
+      },
+      fundingPrivateKey,
+      true, // isSplittable
+      2 // STAS version
+    )
+  } catch (e) {
+    console.log('error issuing token', e)
+    return
+  }
   const issueTxid = await broadcast(issueHex)
   console.log(`Issue TX:        ${issueTxid}`)
   const issueTx = await getTransaction(issueTxid)
