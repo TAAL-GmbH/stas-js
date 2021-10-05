@@ -24,14 +24,7 @@ const {
 
    beforeEach(async function() {
 
-        issuerPrivateKey = bsv.PrivateKey()
-        fundingPrivateKey = bsv.PrivateKey()
-        contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress('testnet').toString())
-        fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress('testnet').toString())
-        publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
-        supply = 10000
-        symbol = 'TAALT'
-        schema = utils.schema(publicKeyHash, symbol, supply)
+          await setup()
     });
 
    it("Successful Contract Broadcast", async function(){
@@ -320,4 +313,18 @@ const {
             expect(e.message).to.eql('Some Error')
        }
    })
+
+
+   async function setup(){
+
+        issuerPrivateKey = bsv.PrivateKey()
+        fundingPrivateKey = bsv.PrivateKey()
+        contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress('testnet').toString())
+        fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress('testnet').toString())
+        publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
+        supply = 10000
+        symbol = 'TAALT'
+        schema = utils.schema(publicKeyHash, symbol, supply)
+
+   }
 

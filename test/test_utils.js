@@ -1,7 +1,7 @@
 
-module.exports = {
 
-    schema: function(pkHash, symbol, supply){
+
+   function schema(pkHash, symbol, supply){
      const schema = {
         name: 'Taal Token',
         tokenId: `${pkHash}`,
@@ -40,4 +40,9 @@ module.exports = {
       }
   return schema
   }
+
+
+
+  module.exports = {
+  schema
  }
