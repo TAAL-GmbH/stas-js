@@ -27,28 +27,7 @@ const {
 
    beforeEach(async function() {
 
-        const bobPrivateKey = bsv.PrivateKey()
-        const alicePrivateKey = bsv.PrivateKey()
-        const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress('testnet').toString())
-        const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress('testnet').toString())
-        const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
-        symbol = 'TAALT'
-        supply = 10000
-        schema = utils.schema(publicKeyHash, symbol, supply)
-        aliceAddr = alicePrivateKey.toAddress().toString()
-        bobAddr = bobPrivateKey.toAddress().toString()
-
-        const contractHex = contract(
-           issuerPrivateKey,
-           contractUtxos,
-           fundingUtxos,
-           fundingPrivateKey,
-           schema,
-           supply
-        )
-        contractTxid = await broadcast(contractHex)
-        contractTx = await getTransaction(contractTxid)
-
+        await setup() //set up contract
     });
 
    it("Successful Issue Token With Split", async function(){
@@ -59,8 +38,8 @@ const {
             getContractUtxo(),
             getPaymentUtxo(),
             fundingPrivateKey,
-            true, // isSplittable
-            2 // STAS version
+            true,
+            2
           )
           const issueTxid = await broadcast(issueHex)
           const tokenId = await getToken(issueTxid)
@@ -148,29 +127,6 @@ const {
 
 
 
-   it("Incorrect Funding Private Key Throws Error!!!!!!!!!!!!!!", async function(){
-
-        const incorrectPrivateKey = bsv.PrivateKey()
-        const issueHex = issue(
-               issuerPrivateKey,
-               getIssueInfo(),
-               getContractUtxo(),
-               getPaymentUtxo(),
-               incorrectPrivateKey,
-               true, // isSplittable
-               2 // STAS version
-             )
-          try {
-               await broadcast(issueHex)
-               assert(false)
-          } catch (e) {
-               expect(e).to.be.instanceOf(Error)
-               expect(e.message).to.eql('Request failed with status code 400')
-          }
-   })
-
-
-
    it("Incorrect Issuer Address Throws Error", async function(){
 
         const incorrectPrivateKey = bsv.PrivateKey()
@@ -193,8 +149,8 @@ const {
                getContractUtxo(),
                getPaymentUtxo(),
                incorrectPrivateKey,
-               true, // isSplittable
-               2 // STAS version
+               true,
+               2
              )
           try {
                await broadcast(issueHex)
@@ -228,8 +184,8 @@ const {
                getContractUtxo(),
                getPaymentUtxo(),
                incorrectPrivateKey,
-               true, // isSplittable
-               2 // STAS version
+               true,
+               2
              )
           try {
                await broadcast(issueHex)
@@ -239,6 +195,44 @@ const {
                expect(e.message).to.eql('Request failed with status code 400')
           }
    })
+
+//'Checksum mismatch' - Error could be more specific
+   it("Address Validation", async function(){
+
+        const incorrectPrivateKey = bsv.PrivateKey()
+        const invalidAddr = '2MSCReQT9E4GpxuK1K7uyD5qF1EmznXjkr' //all addresses start with 1
+        console.log(bobAddr)
+        issueInfo = [
+                          {
+                            addr: invalidAddr,
+                            satoshis: 7000,
+                            data: 'one'
+                          },
+                          {
+                            addr: aliceAddr,
+                            satoshis: 3000,
+                            data: 'two'
+                          }
+                     ]
+
+       try {
+            const issueHex = issue(
+                   issuerPrivateKey,
+                   issueInfo,
+                   getContractUtxo(),
+                   getPaymentUtxo(),
+                   incorrectPrivateKey,
+                   true,
+                   2
+             )
+               assert(false)
+          } catch (e) {
+               expect(e).to.be.instanceOf(Error)
+               expect(e.message).to.eql('Some Validation Error')
+          }
+   })
+
+
 
 
 //Needs fixed - log produced but no error thrown by issue function
@@ -263,8 +257,8 @@ const {
                 getContractUtxo(),
                 getPaymentUtxo(),
                 fundingPrivateKey,
-                true, // isSplittable
-                2 // STAS version
+                true,
+                2
           )
                assert(false)
           } catch (e) {
@@ -296,8 +290,8 @@ const {
                 getContractUtxo(),
                 getPaymentUtxo(),
                 fundingPrivateKey,
-                true, // isSplittable
-                2 // STAS version
+                true,
+                2
           )
                assert(false)
           } catch (e) {
@@ -316,8 +310,8 @@ const {
                 getContractUtxo(),
                 getPaymentUtxo(),
                 fundingPrivateKey,
-                true, // isSplittable
-                2 // STAS version
+                true,
+                2
           )
                assert(false)
           } catch (e) {
@@ -337,8 +331,8 @@ const {
                 [],
                 getPaymentUtxo(),
                 fundingPrivateKey,
-                true, // isSplittable
-                2 // STAS version
+                true,
+                2
           )
                assert(false)
           } catch (e) {
@@ -358,8 +352,8 @@ const {
                 getContractUtxo(),
                 [],
                 fundingPrivateKey,
-                true, // isSplittable
-                2 // STAS version
+                true,
+                2
           )
                assert(false)
           } catch (e) {
@@ -367,8 +361,6 @@ const {
                expect(e.message).to.eql('Some Error')
           }
    })
-
-
 
 
 
@@ -427,4 +419,31 @@ const {
                         data: 'two'
                       }
                   ]
+  }
+
+
+  async function setup(){
+
+        const bobPrivateKey = bsv.PrivateKey()
+        const alicePrivateKey = bsv.PrivateKey()
+        const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress('testnet').toString())
+        const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress('testnet').toString())
+        const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
+        symbol = 'TAALT'
+        supply = 10000
+        schema = utils.schema(publicKeyHash, symbol, supply)
+        aliceAddr = alicePrivateKey.toAddress().toString()
+        bobAddr = bobPrivateKey.toAddress().toString()
+
+        const contractHex = contract(
+           issuerPrivateKey,
+           contractUtxos,
+           fundingUtxos,
+           fundingPrivateKey,
+           schema,
+           supply
+        )
+        contractTxid = await broadcast(contractHex)
+        contractTx = await getTransaction(contractTxid)
+
   }
