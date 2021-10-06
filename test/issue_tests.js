@@ -1,4 +1,4 @@
-const expect = require("chai").expect
+const expect = require('chai').expect
 const assert = require('chai').assert
 const utils = require('./test_utils')
 const chai = require('chai')
@@ -18,20 +18,18 @@ const {
 
 const issuerPrivateKey = bsv.PrivateKey()
 const fundingPrivateKey = bsv.PrivateKey()
-var contractTx
-var contractTxid
-var issueInfo
-var aliceAddr
-var bobAddr
-var symbol
+let contractTx
+let contractTxid
+let issueInfo
+let aliceAddr
+let bobAddr
+let symbol
 
 beforeEach(async function () {
+  await setup() // set up contract
+})
 
-  await setup() //set up contract
-});
-
-it("Successful Issue Token With Split", async function () {
-
+it('Successful Issue Token With Split', async function () {
   const issueHex = issue(
     issuerPrivateKey,
     getIssueInfo(),
@@ -55,9 +53,7 @@ it("Successful Issue Token With Split", async function () {
   expect(response.data.token.symbol).to.equal(symbol)
 })
 
-
-it("Successful Issue Token Non Split", async function () {
-
+it('Successful Issue Token Non Split', async function () {
   const issueHex = issue(
     issuerPrivateKey,
     getIssueInfo(),
@@ -79,12 +75,9 @@ it("Successful Issue Token Non Split", async function () {
     }
   })
   expect(response.data.token.symbol).to.equal(symbol)
-
 })
 
-
-it("Incorrect Issue Private Key Throws Error", async function () {
-
+it('Incorrect Issue Private Key Throws Error', async function () {
   const incorrectPrivateKey = bsv.PrivateKey()
   const issueHex = issue(
     incorrectPrivateKey,
@@ -104,8 +97,7 @@ it("Incorrect Issue Private Key Throws Error", async function () {
   }
 })
 
-it("Incorrect Funding Private Key Throws Error", async function () {
-
+it('Incorrect Funding Private Key Throws Error', async function () {
   const incorrectPrivateKey = bsv.PrivateKey()
   const issueHex = issue(
     issuerPrivateKey,
@@ -125,10 +117,7 @@ it("Incorrect Funding Private Key Throws Error", async function () {
   }
 })
 
-
-
-it("Incorrect Issuer Address Throws Error", async function () {
-
+it('Incorrect Issuer Address Throws Error', async function () {
   const incorrectPrivateKey = bsv.PrivateKey()
   const incorrectAddr = incorrectPrivateKey.toAddress().toString()
   issueInfo = [
@@ -161,9 +150,7 @@ it("Incorrect Issuer Address Throws Error", async function () {
   }
 })
 
-
-it("Incorrect Redemption Address Throws Error", async function () {
-
+it('Incorrect Redemption Address Throws Error', async function () {
   const incorrectPrivateKey = bsv.PrivateKey()
   const incorrectAddr = incorrectPrivateKey.toAddress().toString()
   issueInfo = [
@@ -196,11 +183,10 @@ it("Incorrect Redemption Address Throws Error", async function () {
   }
 })
 
-//'Checksum mismatch' - Error could be more specific
-it("Address Validation", async function () {
-
+// 'Checksum mismatch' - Error could be more specific
+it('Address Validation', async function () {
   const incorrectPrivateKey = bsv.PrivateKey()
-  const invalidAddr = '2MSCReQT9E4GpxuK1K7uyD5qF1EmznXjkr' //all addresses start with 1
+  const invalidAddr = '2MSCReQT9E4GpxuK1K7uyD5qF1EmznXjkr' // all addresses start with 1
   console.log(bobAddr)
   issueInfo = [
     {
@@ -216,7 +202,7 @@ it("Address Validation", async function () {
   ]
 
   try {
-    const issueHex = issue(
+    issue(
       issuerPrivateKey,
       issueInfo,
       getContractUtxo(),
@@ -232,12 +218,8 @@ it("Address Validation", async function () {
   }
 })
 
-
-
-
-//Needs fixed - log produced but no error thrown by issue function
-it("Issue with Incorrect Balance Throws Error", async function () {
-
+// Needs fixed - log produced but no error thrown by issue function
+it('Issue with Incorrect Balance Throws Error', async function () {
   issueInfo = [
     {
       addr: aliceAddr,
@@ -251,7 +233,7 @@ it("Issue with Incorrect Balance Throws Error", async function () {
     }
   ]
   try {
-    const issueHex = issue(
+    issue(
       issuerPrivateKey,
       issueInfo,
       getContractUtxo(),
@@ -267,10 +249,8 @@ it("Issue with Incorrect Balance Throws Error", async function () {
   }
 })
 
-
-//some validation required
-it("Issue with appended data throws error", async function () {
-
+// some validation required
+it('Issue with appended data throws error', async function () {
   issueInfo = [
     {
       addr: aliceAddr,
@@ -284,7 +264,7 @@ it("Issue with appended data throws error", async function () {
     }
   ]
   try {
-    const issueHex = issue(
+    issue(
       issuerPrivateKey,
       issueInfo,
       getContractUtxo(),
@@ -300,11 +280,9 @@ it("Issue with appended data throws error", async function () {
   }
 })
 
-
-it("Empty Issue Info Throws Error", async function () {
-
+it('Empty Issue Info Throws Error', async function () {
   try {
-    const issueHex = issue(
+    issue(
       issuerPrivateKey,
       [],
       getContractUtxo(),
@@ -320,12 +298,10 @@ it("Empty Issue Info Throws Error", async function () {
   }
 })
 
-
-//needs fixed
-it("Empty Contract UTXO Info Throws Error", async function () {
-
+// needs fixed
+it('Empty Contract UTXO Info Throws Error', async function () {
   try {
-    const issueHex = issue(
+    issue(
       issuerPrivateKey,
       getIssueInfo(),
       [],
@@ -341,12 +317,10 @@ it("Empty Contract UTXO Info Throws Error", async function () {
   }
 })
 
-
-//needs fixed
-it("Empty Payment UTXO Info Throws Error", async function () {
-
+// needs fixed
+it('Empty Payment UTXO Info Throws Error', async function () {
   try {
-    const issueHex = issue(
+    issue(
       issuerPrivateKey,
       getIssueInfo(),
       getContractUtxo(),
@@ -362,10 +336,7 @@ it("Empty Payment UTXO Info Throws Error", async function () {
   }
 })
 
-
-
-async function getToken(txid) {
-
+async function getToken (txid) {
   const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/tx/hash/' + txid
   const response = await axios({
     method: 'get',
@@ -383,9 +354,7 @@ async function getToken(txid) {
   return tokenId
 }
 
-
-function getContractUtxo() {
-
+function getContractUtxo () {
   return {
     txid: contractTxid,
     vout: 0,
@@ -394,8 +363,7 @@ function getContractUtxo() {
   }
 }
 
-function getPaymentUtxo() {
-
+function getPaymentUtxo () {
   return {
     txid: contractTxid,
     vout: 1,
@@ -404,9 +372,7 @@ function getPaymentUtxo() {
   }
 }
 
-
-function getIssueInfo() {
-
+function getIssueInfo () {
   return [
     {
       addr: aliceAddr,
@@ -421,9 +387,7 @@ function getIssueInfo() {
   ]
 }
 
-
-async function setup() {
-
+async function setup () {
   const bobPrivateKey = bsv.PrivateKey()
   const alicePrivateKey = bsv.PrivateKey()
   const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress('testnet').toString())
@@ -445,5 +409,4 @@ async function setup() {
   )
   contractTxid = await broadcast(contractHex)
   contractTx = await getTransaction(contractTxid)
-
 }

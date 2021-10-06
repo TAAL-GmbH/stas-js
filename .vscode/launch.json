@@ -52,5 +52,23 @@
       "console": "internalConsole",
       "outputCapture": "std"
     },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "mainnet test",
+      "program": "${workspaceFolder}/mainnet.test.js",
+      "args": [],
+      "console": "internalConsole",
+      "outputCapture": "std"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "mainnet issue test",
+      "program": "${workspaceFolder}/mainnet.issue.test.js",
+      "args": [],
+      "console": "internalConsole",
+      "outputCapture": "std"
+    },
   ]
 }
