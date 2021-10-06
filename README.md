@@ -28,6 +28,13 @@ which will produce a series of transactions:
 ```
 contract -> issue -> transfer -> split -> redeem split -> redeem.
 ```
+There are various mocha tests located in test folder.  
+Files ending _tests contain multiple general tests per function (eg contract_tests.js contains contract tests)
+Files with specific names contain tests targeting a specific test case (eg mergeInvalidStasToken.js)
+```sh
+npm test contract_tests.js //run specific test file
+npm test //run all tests
+```
 
 All transactions are submitted to Taalnet, a private BSV blockchain that is maintained for testing STAS tokens.  All tokens created can be viewed at https://taalnet.whatsonchain.com/tokens
 
