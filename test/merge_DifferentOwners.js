@@ -19,91 +19,91 @@ const {
   broadcast
 } = require('../index').utils
 
-  const issuerPrivateKey = bsv.PrivateKey()
-  const fundingPrivateKey = bsv.PrivateKey()
-  const alicePrivateKey = bsv.PrivateKey()
-  const aliceAddr = alicePrivateKey.toAddress().toString()
-  const bobPrivateKey = bsv.PrivateKey()
-  const bobAddr = bobPrivateKey.toAddress().toString()
-  const supply = 10000
-  const symbol = 'TAALT'
-  var splitTxid
-  var splitTx
+const issuerPrivateKey = bsv.PrivateKey()
+const fundingPrivateKey = bsv.PrivateKey()
+const alicePrivateKey = bsv.PrivateKey()
+const aliceAddr = alicePrivateKey.toAddress().toString()
+const bobPrivateKey = bsv.PrivateKey()
+const bobAddr = bobPrivateKey.toAddress().toString()
+const supply = 10000
+const symbol = 'TAALT'
+var splitTxid
+var splitTx
 
 
-   it("Attempt To Merge Token with Different Owners Via SDK Throws Error", async function(){
+it("Attempt To Merge Token with Different Owners Via SDK Throws Error", async function () {
 
 
-    const validSplitTxObj = await validToken()
-    const invalidSplitTxObj = await invalidToken()
+  const validSplitTxObj = await validToken()
+  const invalidSplitTxObj = await invalidToken()
 
-   try{
+  try {
     const mergeHex = merge(
-        bobPrivateKey,
-        issuerPrivateKey.publicKey,
-        [{
-          tx: validSplitTxObj,
-          vout: 0
-        },
-        {
-          tx: invalidSplitTxObj,
-          vout: 1
-        }],
-        aliceAddr,
-        {
-          txid: splitTxid,
-          vout: 2,
-          scriptPubKey: splitTx.vout[2].scriptPubKey.hex,
-          amount: splitTx.vout[2].value
-        },
-        fundingPrivateKey
+      bobPrivateKey,
+      issuerPrivateKey.publicKey,
+      [{
+        tx: validSplitTxObj,
+        vout: 0
+      },
+      {
+        tx: invalidSplitTxObj,
+        vout: 1
+      }],
+      aliceAddr,
+      {
+        txid: splitTxid,
+        vout: 2,
+        scriptPubKey: splitTx.vout[2].scriptPubKey.hex,
+        amount: splitTx.vout[2].value
+      },
+      fundingPrivateKey
     )
-   }catch(e){
-           expect(e).to.be.instanceOf(Error)
-           expect(e.message).to.eql('This function only merges STAS tokens with the same owner')
-      }
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('This function only merges STAS tokens with the same owner')
+  }
 })
 
-   it("Attempt To Merge Token with Different Owners Without SDK Validation Throws Error", async function(){
+it("Attempt To Merge Token with Different Owners Without SDK Validation Throws Error", async function () {
 
 
-    const validSplitTxObj = await validToken()
-    const invalidSplitTxObj = await invalidToken()
+  const validSplitTxObj = await validToken()
+  const invalidSplitTxObj = await invalidToken()
 
 
-    const mergeHex = mergeUtil.mergeWithoutValidation(
-        bobPrivateKey,
-        issuerPrivateKey.publicKey,
-        [{
-          tx: validSplitTxObj,
-          vout: 0
-        },
-        {
-          tx: invalidSplitTxObj,
-          vout: 1
-        }],
-        aliceAddr,
-        {
-          txid: splitTxid,
-          vout: 2,
-          scriptPubKey: splitTx.vout[2].scriptPubKey.hex,
-          amount: splitTx.vout[2].value
-        },
-        fundingPrivateKey
-    )
-    try{
-            await broadcast(mergeHex)
-   }catch(e){
-           expect(e).to.be.instanceOf(Error)
-           expect(e.message).to.eql('Request failed with status code 400')
-      }
+  const mergeHex = mergeUtil.mergeWithoutValidation(
+    bobPrivateKey,
+    issuerPrivateKey.publicKey,
+    [{
+      tx: validSplitTxObj,
+      vout: 0
+    },
+    {
+      tx: invalidSplitTxObj,
+      vout: 1
+    }],
+    aliceAddr,
+    {
+      txid: splitTxid,
+      vout: 2,
+      scriptPubKey: splitTx.vout[2].scriptPubKey.hex,
+      amount: splitTx.vout[2].value
+    },
+    fundingPrivateKey
+  )
+  try {
+    await broadcast(mergeHex)
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Request failed with status code 400')
+  }
 })
 
 
 
 
 
-async function validToken(){
+async function validToken() {
 
   const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress('testnet').toString())
   const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress('testnet').toString())
@@ -227,17 +227,17 @@ async function validToken(){
 
 
 
- async function invalidToken(){
+async function invalidToken() {
 
- const issuerPrivateKey = bsv.PrivateKey()
- const newPk = bsv.PrivateKey()
+  const issuerPrivateKey = bsv.PrivateKey()
+  const newPk = bsv.PrivateKey()
 
   const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress('testnet').toString())
   const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress('testnet').toString())
 
   const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(newPk.publicKey.toBuffer()).toString('hex')
 
-    schema = utils.schema(publicKeyHash, symbol, supply)
+  schema = utils.schema(publicKeyHash, symbol, supply)
 
   // change goes back to the fundingPrivateKey
   const contractHex = contract(
@@ -350,4 +350,4 @@ async function validToken(){
   const splitTxObj = new bsv.Transaction(splitHex)
   return splitTxObj
 
- }
+}

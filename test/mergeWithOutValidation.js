@@ -20,7 +20,7 @@ const {
 
 // merge will take 2 existing STAS UTXOs and combine them and assign the single UTXO to another address.
 // The tokenOwnerPrivateKey must own the existing STAS UTXOs, the payment UTXOs and will be the owner of the change, if any.
-function mergeWithoutValidation (tokenOwnerPrivateKey, contractPublicKey, mergeUtxos, destinationAddr, paymentUtxo, paymentsPrivateKey) {
+function mergeWithoutValidation(tokenOwnerPrivateKey, contractPublicKey, mergeUtxos, destinationAddr, paymentUtxo, paymentsPrivateKey) {
   // const BN = bsv.crypto.BN
   const isZeroFee = (paymentUtxo === null)
 
@@ -86,20 +86,20 @@ function mergeWithoutValidation (tokenOwnerPrivateKey, contractPublicKey, mergeU
       let s
       if (isZeroFee) {
         s = numberToLESM(stasAmount) + ' ' + destinationPubkeyHash +
-        ' ' + 'OP_FALSE OP_FALSE' +
-        ' ' + 'OP_FALSE OP_FALSE' +
-        ' ' + `OP_${mergeUtxos[1].vout}` +
-        ' ' + mergeUtxos[1].piece + ' ' + `OP_${mergeUtxos[1].numberOfPieces}` +
-        ' ' + preimage +
-        ' ' + sigASM + ' ' + tokenOwnerPrivateKey.publicKey.toString('hex')
+          ' ' + 'OP_FALSE OP_FALSE' +
+          ' ' + 'OP_FALSE OP_FALSE' +
+          ' ' + `OP_${mergeUtxos[1].vout}` +
+          ' ' + mergeUtxos[1].piece + ' ' + `OP_${mergeUtxos[1].numberOfPieces}` +
+          ' ' + preimage +
+          ' ' + sigASM + ' ' + tokenOwnerPrivateKey.publicKey.toString('hex')
       } else {
         s = numberToLESM(stasAmount) + ' ' + destinationPubkeyHash +
-        ' ' + numberToLESM(tx.outputs[1].satoshis) + ' ' + paymentPubKeyHash +
-        ' ' + `OP_${paymentUtxo.vout}` + ' ' + reversedFundingTXID +
-        ' ' + `OP_${mergeUtxos[1].vout}` +
-        ' ' + mergeUtxos[1].piece + ' ' + `OP_${mergeUtxos[1].numberOfPieces}` +
-        ' ' + preimage +
-        ' ' + sigASM + ' ' + tokenOwnerPrivateKey.publicKey.toString('hex')
+          ' ' + numberToLESM(tx.outputs[1].satoshis) + ' ' + paymentPubKeyHash +
+          ' ' + `OP_${paymentUtxo.vout}` + ' ' + reversedFundingTXID +
+          ' ' + `OP_${mergeUtxos[1].vout}` +
+          ' ' + mergeUtxos[1].piece + ' ' + `OP_${mergeUtxos[1].numberOfPieces}` +
+          ' ' + preimage +
+          ' ' + sigASM + ' ' + tokenOwnerPrivateKey.publicKey.toString('hex')
       }
 
       tx.inputs[0].setScript(bsv.Script.fromASM(s))
@@ -109,20 +109,20 @@ function mergeWithoutValidation (tokenOwnerPrivateKey, contractPublicKey, mergeU
       let s
       if (isZeroFee) {
         s = numberToLESM(stasAmount) + ' ' + destinationPubkeyHash +
-        ' ' + 'OP_FALSE OP_FALSE' +
-        ' ' + 'OP_FALSE OP_FALSE' +
-        ' ' + `OP_${mergeUtxos[0].vout}` +
-        ' ' + mergeUtxos[0].piece + ' ' + `OP_${mergeUtxos[0].numberOfPieces}` +
-        ' ' + preimageMerge +
-        ' ' + sigASM + ' ' + tokenOwnerPrivateKey.publicKey.toString('hex')
+          ' ' + 'OP_FALSE OP_FALSE' +
+          ' ' + 'OP_FALSE OP_FALSE' +
+          ' ' + `OP_${mergeUtxos[0].vout}` +
+          ' ' + mergeUtxos[0].piece + ' ' + `OP_${mergeUtxos[0].numberOfPieces}` +
+          ' ' + preimageMerge +
+          ' ' + sigASM + ' ' + tokenOwnerPrivateKey.publicKey.toString('hex')
       } else {
         s = numberToLESM(stasAmount) + ' ' + destinationPubkeyHash +
-        ' ' + numberToLESM(tx.outputs[1].satoshis) + ' ' + paymentPubKeyHash +
-        ' ' + `OP_${paymentUtxo.vout}` + ' ' + reversedFundingTXID +
-        ' ' + `OP_${mergeUtxos[0].vout}` +
-        ' ' + mergeUtxos[0].piece + ' ' + `OP_${mergeUtxos[0].numberOfPieces}` +
-        ' ' + preimageMerge +
-        ' ' + sigASM + ' ' + tokenOwnerPrivateKey.publicKey.toString('hex')
+          ' ' + numberToLESM(tx.outputs[1].satoshis) + ' ' + paymentPubKeyHash +
+          ' ' + `OP_${paymentUtxo.vout}` + ' ' + reversedFundingTXID +
+          ' ' + `OP_${mergeUtxos[0].vout}` +
+          ' ' + mergeUtxos[0].piece + ' ' + `OP_${mergeUtxos[0].numberOfPieces}` +
+          ' ' + preimageMerge +
+          ' ' + sigASM + ' ' + tokenOwnerPrivateKey.publicKey.toString('hex')
       }
 
       tx.inputs[1].setScript(bsv.Script.fromASM(s))
@@ -136,7 +136,7 @@ function mergeWithoutValidation (tokenOwnerPrivateKey, contractPublicKey, mergeU
   return tx.serialize(true)
 }
 
-function handleChangeForMerge (tx, extraDataBytes, publicKey) {
+function handleChangeForMerge(tx, extraDataBytes, publicKey) {
   // In this implementation, we will always add a change output...
 
   // Create a change output. The satoshi amount will be updated after we calculate the fees.
@@ -191,6 +191,6 @@ function handleChangeForMerge (tx, extraDataBytes, publicKey) {
   tx.outputs[tx.outputs.length - 1].satoshis = satoshis - fee
 }
 
-  module.exports = {
+module.exports = {
   mergeWithoutValidation
- }
+}
