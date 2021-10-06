@@ -99,7 +99,7 @@ const {
        }
    })
 
-//needs fixed
+
    it("Null Contract UTXO Throws Error", async function(){
 
        try {
@@ -165,7 +165,7 @@ const {
           assert(false)
        } catch (e) {
             expect(e).to.be.instanceOf(Error)
-            expect(e.message).to.eql('Cannot read property  of null')
+            expect(e.message).to.eql('Cannot read property of null')
        }
    })
 
