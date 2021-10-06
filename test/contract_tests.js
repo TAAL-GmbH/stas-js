@@ -93,7 +93,6 @@ it('Null Issuer Public Key Throws Error', async function () {
   }
 })
 
-// needs fixed
 it('Null Contract UTXO Throws Error', async function () {
   try {
     contract(
@@ -140,7 +139,6 @@ it('Null Funding Private Key Throws Error', async function () {
   }
 })
 
-// needs fixed
 it('Null Schema Throws Error', async function () {
   try {
     contract(
@@ -192,7 +190,6 @@ it('Negative Supply Throws Error', async function () {
   }
 })
 
-// needs fixed
 it('Zero Supply Throws Error', async function () {
   try {
     contract(
@@ -275,7 +272,7 @@ it('Empty Array Contract UTXO Throw Error', async function () {
 })
 
 // Payment UTXO can be null in which case it's treated as a zero fee transaction.
-it('Empty Array Payment UTXO Throw Error', async function () {
+it('Empty Array Payment UTXO Successful', async function () {
   try {
     contract(
       issuerPrivateKey,

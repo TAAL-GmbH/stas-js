@@ -218,7 +218,6 @@ it('Address Validation', async function () {
   }
 })
 
-// Needs fixed - log produced but no error thrown by issue function
 it('Issue with Incorrect Balance Throws Error', async function () {
   issueInfo = [
     {
@@ -298,7 +297,7 @@ it('Empty Issue Info Throws Error', async function () {
   }
 })
 
-// needs fixed
+// needs fixed - current error 'total out amount 10000 must equal total in amount NaN''
 it('Empty Contract UTXO Info Throws Error', async function () {
   try {
     issue(
@@ -317,7 +316,6 @@ it('Empty Contract UTXO Info Throws Error', async function () {
   }
 })
 
-// needs fixed
 it('Empty Payment UTXO Info Throws Error', async function () {
   try {
     issue(
@@ -332,11 +330,11 @@ it('Empty Payment UTXO Info Throws Error', async function () {
     assert(false)
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Some Error')
+    expect(e.message).to.eql('Invalid Argument: Output satoshis is not a natural number')
   }
 })
 
-async function getToken (txid) {
+async function getToken(txid) {
   const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/tx/hash/' + txid
   const response = await axios({
     method: 'get',
@@ -354,7 +352,7 @@ async function getToken (txid) {
   return tokenId
 }
 
-function getContractUtxo () {
+function getContractUtxo() {
   return {
     txid: contractTxid,
     vout: 0,
@@ -363,7 +361,7 @@ function getContractUtxo () {
   }
 }
 
-function getPaymentUtxo () {
+function getPaymentUtxo() {
   return {
     txid: contractTxid,
     vout: 1,
@@ -372,7 +370,7 @@ function getPaymentUtxo () {
   }
 }
 
-function getIssueInfo () {
+function getIssueInfo() {
   return [
     {
       addr: aliceAddr,
@@ -387,7 +385,7 @@ function getIssueInfo () {
   ]
 }
 
-async function setup () {
+async function setup() {
   const bobPrivateKey = bsv.PrivateKey()
   const alicePrivateKey = bsv.PrivateKey()
   const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress('testnet').toString())
