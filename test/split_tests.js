@@ -35,7 +35,6 @@ beforeEach(async function () {
 
 it("Successful Split Into Two Tokens", async function () {
 
-    // Split tokens into 2 - both payable to Bob...
     const bobAmount1 = transferTx.vout[0].value / 2
     const bobAmount2 = transferTx.vout[0].value - bobAmount1
     const splitDestinations = []
@@ -45,9 +44,9 @@ it("Successful Split Into Two Tokens", async function () {
     const splitHex = split(
         alicePrivateKey,
         issuerPrivateKey.publicKey,
-        getStasUtxo(),
+        utils.getUtxo(transferTxid, transferTx, 0),
         splitDestinations,
-        getPaymentUtxoOut(),
+        utils.getUtxo(transferTxid, transferTx, 1),
         fundingPrivateKey
     )
     const splitTxid = await broadcast(splitHex)
@@ -69,9 +68,9 @@ it("Successful Split Into Four Tokens", async function () {
     const splitHex = split(
         alicePrivateKey,
         issuerPrivateKey.publicKey,
-        getStasUtxo(),
+        utils.getUtxo(transferTxid, transferTx, 0),
         splitDestinations,
-        getPaymentUtxoOut(),
+        utils.getUtxo(transferTxid, transferTx, 1),
         fundingPrivateKey
     )
     const splitTxid = await broadcast(splitHex)
@@ -93,9 +92,9 @@ it("Splitting Into Too Many Tokens Throws Error", async function () {
         const splitHex = split(
             alicePrivateKey,
             issuerPrivateKey.publicKey,
-            getStasUtxo(),
+            utils.getUtxo(transferTxid, transferTx, 0),
             splitDestinations,
-            getPaymentUtxoOut(),
+            utils.getUtxo(transferTxid, transferTx, 1),
             fundingPrivateKey
         )
         assert(false)
@@ -116,9 +115,9 @@ it("No Split Completes Successfully", async function () {
     const splitHex = split(
         alicePrivateKey,
         issuerPrivateKey.publicKey,
-        getStasUtxo(),
+        utils.getUtxo(transferTxid, transferTx, 0),
         splitDestinations,
-        getPaymentUtxoOut(),
+        utils.getUtxo(transferTxid, transferTx, 1),
         fundingPrivateKey
     )
     const splitTxid = await broadcast(splitHex)
@@ -136,9 +135,9 @@ it("Add Too Little To Split Throws Error", async function () {
     const splitHex = split(
         alicePrivateKey,
         issuerPrivateKey.publicKey,
-        getStasUtxo(),
+        utils.getUtxo(transferTxid, transferTx, 0),
         splitDestinations,
-        getPaymentUtxoOut(),
+        utils.getUtxo(transferTxid, transferTx, 1),
         fundingPrivateKey
     )
     try {
@@ -159,9 +158,9 @@ it("Add Too Much To Split Throws Error", async function () {
     const splitHex = split(
         alicePrivateKey,
         issuerPrivateKey.publicKey,
-        getStasUtxo(),
+        utils.getUtxo(transferTxid, transferTx, 0),
         splitDestinations,
-        getPaymentUtxoOut(),
+        utils.getUtxo(transferTxid, transferTx, 1),
         fundingPrivateKey
     )
     try {
@@ -186,9 +185,9 @@ it("Incorrect Owner Private Key Throws Error", async function () {
     const splitHex = split(
         incorrectPrivateKey,
         issuerPrivateKey.publicKey,
-        getStasUtxo(),
+        utils.getUtxo(transferTxid, transferTx, 0),
         splitDestinations,
-        getPaymentUtxoOut(),
+        utils.getUtxo(transferTxid, transferTx, 1),
         fundingPrivateKey
     )
     try {
@@ -212,9 +211,9 @@ it("Incorrect Payments Private Key Throws Error", async function () {
     const splitHex = split(
         issuerPrivateKey,
         issuerPrivateKey.publicKey,
-        getStasUtxo(),
+        utils.getUtxo(transferTxid, transferTx, 0),
         splitDestinations,
-        getPaymentUtxoOut(),
+        utils.getUtxo(transferTxid, transferTx, 1),
         incorrectPrivateKey
     )
     try {
@@ -238,9 +237,9 @@ it("Incorrect Contract Public Key Throws Error", async function () {
     const splitHex = split(
         issuerPrivateKey,
         incorrectPrivateKey.publicKey,
-        getStasUtxo(),
+        utils.getUtxo(transferTxid, transferTx, 0),
         splitDestinations,
-        getPaymentUtxoOut(),
+        utils.getUtxo(transferTxid, transferTx, 1),
         fundingPrivateKey
     )
     try {
@@ -269,64 +268,34 @@ async function setup() {
         schema,
         supply
     )
-    contractTxid = await broadcast(contractHex)
-    contractTx = await getTransaction(contractTxid)
+    const contractTxid = await broadcast(contractHex)
+    const contractTx = await getTransaction(contractTxid)
 
     const issueHex = issue(
         issuerPrivateKey,
-        getIssueInfo(),
-        getContractUtxo(),
-        getPaymentUtxo(),
+        utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+        utils.getUtxo(contractTxid, contractTx, 0),
+        utils.getUtxo(contractTxid, contractTx, 1),
         fundingPrivateKey,
         true,
         2
     )
-    issueTxid = await broadcast(issueHex)
-    issueTx = await getTransaction(issueTxid)
+    const issueTxid = await broadcast(issueHex)
+    const issueTx = await getTransaction(issueTxid)
 
     const issueOutFundingVout = issueTx.vout.length - 1
 
     const transferHex = transfer(
         bobPrivateKey,
         issuerPrivateKey.publicKey,
-        {
-            txid: issueTxid,
-            vout: 1,
-            scriptPubKey: issueTx.vout[1].scriptPubKey.hex,
-            amount: issueTx.vout[1].value
-        },
+        utils.getUtxo(issueTxid, issueTx, 1),
         aliceAddr,
-        {
-            txid: issueTxid,
-            vout: issueOutFundingVout,
-            scriptPubKey: issueTx.vout[issueOutFundingVout].scriptPubKey.hex,
-            amount: issueTx.vout[issueOutFundingVout].value
-        },
+        utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
         fundingPrivateKey
     )
     transferTxid = await broadcast(transferHex)
     console.log(`Transfer TX:     ${transferTxid}`)
     transferTx = await getTransaction(transferTxid)
-}
-
-
-
-async function getToken(txid) {
-
-    const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/tx/hash/' + txid
-    const response = await axios({
-        method: 'get',
-        url,
-        auth: {
-            username: 'taal_private',
-            password: 'dotheT@@l007'
-        }
-    })
-
-    const temp = response.data.vout[0].scriptPubKey.asm
-    const split = temp.split('OP_RETURN')[1]
-    const tokenId = split.split(' ')[1]
-    return tokenId
 }
 
 
@@ -353,62 +322,4 @@ async function countNumOfTokens(txid, isThereAFee) {
     else
         return count
 
-}
-
-
-function getContractUtxo() {
-
-    return {
-        txid: contractTxid,
-        vout: 0,
-        scriptPubKey: contractTx.vout[0].scriptPubKey.hex,
-        amount: contractTx.vout[0].value
-    }
-}
-
-function getPaymentUtxo() {
-
-    return {
-        txid: contractTxid,
-        vout: 1,
-        scriptPubKey: contractTx.vout[1].scriptPubKey.hex,
-        amount: contractTx.vout[1].value
-    }
-}
-
-
-function getIssueInfo() {
-
-    return [
-        {
-            addr: aliceAddr,
-            satoshis: 7000,
-            data: 'one'
-        },
-        {
-            addr: bobAddr,
-            satoshis: 3000,
-            data: 'two'
-        }
-    ]
-}
-
-function getStasUtxo() {
-
-    return {
-        txid: transferTxid,
-        vout: 0,
-        scriptPubKey: transferTx.vout[0].scriptPubKey.hex,
-        amount: transferTx.vout[0].value
-    }
-}
-
-function getPaymentUtxoOut() {
-
-    return {
-        txid: transferTxid,
-        vout: 1,
-        scriptPubKey: transferTx.vout[1].scriptPubKey.hex,
-        amount: transferTx.vout[1].value
-    }
 }

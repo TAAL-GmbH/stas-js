@@ -38,21 +38,9 @@ it("Successful Merge After Split into 2 Addresses", async function () {
     const mergeHex = merge(
         bobPrivateKey,
         issuerPrivateKey.publicKey,
-        [{
-            tx: splitTxObj,
-            vout: 0
-        },
-        {
-            tx: splitTxObj,
-            vout: 1
-        }],
+        utils.getMergeUtxo(splitTxObj),
         aliceAddr,
-        {
-            txid: splitTxid,
-            vout: 2,
-            scriptPubKey: splitTx.vout[2].scriptPubKey.hex,
-            amount: splitTx.vout[2].value
-        },
+        utils.getUtxo(splitTxid, splitTx, 2),
         fundingPrivateKey
     )
 
@@ -66,14 +54,7 @@ it("Successful Merge With No Fee", async function () {
     const mergeHex = merge(
         bobPrivateKey,
         issuerPrivateKey.publicKey,
-        [{
-            tx: splitTxObj,
-            vout: 0
-        },
-        {
-            tx: splitTxObj,
-            vout: 1
-        }],
+        utils.getMergeUtxo(splitTxObj),
         aliceAddr,
         null,
         fundingPrivateKey
@@ -90,14 +71,7 @@ it("Successful Merge With No Fee Empty Array", async function () {
     const mergeHex = merge(
         bobPrivateKey,
         issuerPrivateKey.publicKey,
-        [{
-            tx: splitTxObj,
-            vout: 0
-        },
-        {
-            tx: splitTxObj,
-            vout: 1
-        }],
+        utils.getMergeUtxo(splitTxObj),
         aliceAddr,
         [],
         fundingPrivateKey
@@ -116,21 +90,9 @@ it("Incorrect Owner Private Key Throws Error", async function () {
     const mergeHex = merge(
         incorrectPrivateKey,
         issuerPrivateKey.publicKey,
-        [{
-            tx: splitTxObj,
-            vout: 0
-        },
-        {
-            tx: splitTxObj,
-            vout: 1
-        }],
+        utils.getMergeUtxo(splitTxObj),
         aliceAddr,
-        {
-            txid: splitTxid,
-            vout: 2,
-            scriptPubKey: splitTx.vout[2].scriptPubKey.hex,
-            amount: splitTx.vout[2].value
-        },
+        utils.getUtxo(splitTxid, splitTx, 2),
         fundingPrivateKey
     )
     try {
@@ -150,21 +112,8 @@ it("Incorrect Funding Private Key Throws Error", async function () {
     const mergeHex = merge(
         bobPrivateKey,
         issuerPrivateKey.publicKey,
-        [{
-            tx: splitTxObj,
-            vout: 0
-        },
-        {
-            tx: splitTxObj,
-            vout: 1
-        }],
-        aliceAddr,
-        {
-            txid: splitTxid,
-            vout: 2,
-            scriptPubKey: splitTx.vout[2].scriptPubKey.hex,
-            amount: splitTx.vout[2].value
-        },
+        utils.getMergeUtxo(splitTxObj),
+        utils.getUtxo(splitTxid, splitTx, 2),
         incorrectPrivateKey
     )
     try {
@@ -184,21 +133,9 @@ it("Incorrect Contract Public Key Throws Error", async function () {
     const mergeHex = merge(
         bobPrivateKey,
         incorrectPrivateKey.publicKey,
-        [{
-            tx: splitTxObj,
-            vout: 0
-        },
-        {
-            tx: splitTxObj,
-            vout: 1
-        }],
+        utils.getMergeUtxo(splitTxObj),
         aliceAddr,
-        {
-            txid: splitTxid,
-            vout: 2,
-            scriptPubKey: splitTx.vout[2].scriptPubKey.hex,
-            amount: splitTx.vout[2].value
-        },
+        utils.getUtxo(splitTxid, splitTx, 2),
         fundingPrivateKey
     )
     try {
@@ -213,32 +150,27 @@ it("Incorrect Contract Public Key Throws Error", async function () {
 it("Attempt to Merge More Than 2 Tokens", async function () {
 
     await setupWithSplit() //contract, issue then split
-    
+
     try {
-    const mergeHex = merge(
-        bobPrivateKey,
-        issuerPrivateKey.publicKey,
-        [{
-            tx: splitTxObj,
-            vout: 0
-        },
-        {
-            tx: splitTxObj,
-            vout: 1
-        },
-        {
-            tx: splitTxObj,
-            vout: 2
-        }],
-        aliceAddr,
-        {
-            txid: splitTxid,
-            vout: 2,
-            scriptPubKey: splitTx.vout[2].scriptPubKey.hex,
-            amount: splitTx.vout[2].value
-        },
-        fundingPrivateKey
-    )
+        const mergeHex = merge(
+            bobPrivateKey,
+            issuerPrivateKey.publicKey,
+            [{
+                tx: splitTxObj,
+                vout: 0
+            },
+            {
+                tx: splitTxObj,
+                vout: 1
+            },
+            {
+                tx: splitTxObj,
+                vout: 2
+            }],
+            aliceAddr,
+            utils.getUtxo(splitTxid, splitTx, 2),
+            fundingPrivateKey
+        )
         assert(false)
     } catch (e) {
         expect(e).to.be.instanceOf(Error)
@@ -249,24 +181,19 @@ it("Attempt to Merge More Than 2 Tokens", async function () {
 it("Attempt to Merge Less Than Two  Tokens", async function () {
 
     await setupWithSplit() //contract, issue then split
-    
+
     try {
-    const mergeHex = merge(
-        bobPrivateKey,
-        issuerPrivateKey.publicKey,
-        [{
-            tx: splitTxObj,
-            vout: 0
-        }],
-        aliceAddr,
-        {
-            txid: splitTxid,
-            vout: 2,
-            scriptPubKey: splitTx.vout[2].scriptPubKey.hex,
-            amount: splitTx.vout[2].value
-        },
-        fundingPrivateKey
-    )
+        const mergeHex = merge(
+            bobPrivateKey,
+            issuerPrivateKey.publicKey,
+            [{
+                tx: splitTxObj,
+                vout: 0
+            }],
+            aliceAddr,
+            utils.getUtxo(splitTxid, splitTx, 2),
+            fundingPrivateKey
+        )
         assert(false)
     } catch (e) {
         expect(e).to.be.instanceOf(Error)
@@ -297,9 +224,9 @@ async function setupWithOutSplit() {
 
     const issueHex = issue(
         issuerPrivateKey,
-        getIssueInfo(),
-        getContractUtxo(),
-        getPaymentUtxo(),
+        utils.getIssueInfo(bobAddr, 7000, aliceAddr, 3000),
+        utils.getUtxo(contractTxid, contractTx, 0),
+        utils.getUtxo(contractTxid, contractTx, 1),
         fundingPrivateKey,
         true,
         2
@@ -356,9 +283,9 @@ async function setupWithSplit() {
 
     const issueHex = issue(
         issuerPrivateKey,
-        getIssueInfo(),
-        getContractUtxo(),
-        getPaymentUtxo(),
+        utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+        utils.getUtxo(contractTxid, contractTx, 0),
+        utils.getUtxo(contractTxid, contractTx, 1),
         fundingPrivateKey,
         true,
         2
@@ -371,19 +298,9 @@ async function setupWithSplit() {
     const transferHex = transfer(
         bobPrivateKey,
         issuerPrivateKey.publicKey,
-        {
-            txid: issueTxid,
-            vout: 1,
-            scriptPubKey: issueTx.vout[1].scriptPubKey.hex,
-            amount: issueTx.vout[1].value
-        },
+        utils.getUtxo(issueTxid, issueTx, 1),
         aliceAddr,
-        {
-            txid: issueTxid,
-            vout: issueOutFundingVout,
-            scriptPubKey: issueTx.vout[issueOutFundingVout].scriptPubKey.hex,
-            amount: issueTx.vout[issueOutFundingVout].value
-        },
+        utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
         fundingPrivateKey
     )
     const transferTxid = await broadcast(transferHex)
@@ -398,127 +315,13 @@ async function setupWithSplit() {
     const splitHex = split(
         alicePrivateKey,
         issuerPrivateKey.publicKey,
-        {
-            txid: transferTxid,
-            vout: 0,
-            scriptPubKey: transferTx.vout[0].scriptPubKey.hex,
-            amount: transferTx.vout[0].value
-        },
+        utils.getUtxo(transferTxid, transferTx, 0),
         splitDestinations,
-        {
-            txid: transferTxid,
-            vout: 1,
-            scriptPubKey: transferTx.vout[1].scriptPubKey.hex,
-            amount: transferTx.vout[1].value
-        },
+        utils.getUtxo(transferTxid, transferTx, 1),
         fundingPrivateKey
     )
     splitTxid = await broadcast(splitHex)
     console.log(`Split TX:        ${splitTxid}`)
     splitTx = await getTransaction(splitTxid)
     splitTxObj = new bsv.Transaction(splitHex)
-}
-
-
-
-async function getToken(txid) {
-
-    const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/tx/hash/' + txid
-    const response = await axios({
-        method: 'get',
-        url,
-        auth: {
-            username: 'taal_private',
-            password: 'dotheT@@l007'
-        }
-    })
-
-    const temp = response.data.vout[0].scriptPubKey.asm
-    const split = temp.split('OP_RETURN')[1]
-    const tokenId = split.split(' ')[1]
-    return tokenId
-}
-
-
-async function countNumOfTokens(txid, isThereAFee) {
-
-    const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/tx/hash/' + txid
-    const response = await axios({
-        method: 'get',
-        url,
-        auth: {
-            username: 'taal_private',
-            password: 'dotheT@@l007'
-        }
-    })
-
-    let count = 0
-    for (var i = 0; i < response.data.vout.length; i++) {
-        if (response.data.vout[i].value != null) {
-            count++
-        }
-    }
-    if (isThereAFee == true) //output decreased by 1 if fees charged
-        return count - 1
-    else
-        return count
-
-}
-
-
-function getContractUtxo() {
-
-    return {
-        txid: contractTxid,
-        vout: 0,
-        scriptPubKey: contractTx.vout[0].scriptPubKey.hex,
-        amount: contractTx.vout[0].value
-    }
-}
-
-function getPaymentUtxo() {
-
-    return {
-        txid: contractTxid,
-        vout: 1,
-        scriptPubKey: contractTx.vout[1].scriptPubKey.hex,
-        amount: contractTx.vout[1].value
-    }
-}
-
-
-function getIssueInfo() {
-
-    return [
-        {
-            addr: aliceAddr,
-            satoshis: 7000,
-            data: 'one'
-        },
-        {
-            addr: bobAddr,
-            satoshis: 3000,
-            data: 'two'
-        }
-    ]
-}
-
-function getStasUtxo() {
-
-    return {
-        txid: transferTxid,
-        vout: 0,
-        scriptPubKey: transferTx.vout[0].scriptPubKey.hex,
-        amount: transferTx.vout[0].value
-    }
-}
-
-function getPaymentUtxoOut() {
-
-    return {
-        txid: transferTxid,
-        vout: 1,
-        scriptPubKey: transferTx.vout[1].scriptPubKey.hex,
-        amount: transferTx.vout[1].value
-    }
 }

@@ -42,7 +42,48 @@ function schema(pkHash, symbol, supply) {
 }
 
 
+function getIssueInfo(addr1, sat1, addr2, sat2) {
+  return [
+    {
+      addr: addr1,
+      satoshis: sat1,
+      data: 'one'
+    },
+    {
+      addr: addr2,
+      satoshis: sat2,
+      data: 'two'
+    }
+  ]
+}
+
+
+function getUtxo(txid, tx, vout) {
+  return {
+    txid: txid,
+    vout: vout,
+    scriptPubKey: tx.vout[vout].scriptPubKey.hex,
+    amount: tx.vout[vout].value
+  }
+}
+
+
+function getMergeUtxo(splitTxObj) {
+
+  return [{
+      tx: splitTxObj,
+      vout: 0
+  },
+  {
+      tx: splitTxObj,
+      vout: 1
+  }]
+}
+
 
 module.exports = {
-  schema
+  schema,
+  getIssueInfo,
+  getUtxo,
+  getMergeUtxo
 }
