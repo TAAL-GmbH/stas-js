@@ -32,9 +32,9 @@ beforeEach(async function () {
 it('Successful Issue Token With Split', async function () {
   const issueHex = issue(
     issuerPrivateKey,
-    getIssueInfo(),
-    getContractUtxo(),
-    getPaymentUtxo(),
+    utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+    utils.getUtxo(contractTxid, contractTx, 0),
+    utils.getUtxo(contractTxid, contractTx, 1),
     fundingPrivateKey,
     true,
     2
@@ -56,9 +56,9 @@ it('Successful Issue Token With Split', async function () {
 it('Successful Issue Token Non Split', async function () {
   const issueHex = issue(
     issuerPrivateKey,
-    getIssueInfo(),
-    getContractUtxo(),
-    getPaymentUtxo(),
+    utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+    utils.getUtxo(contractTxid, contractTx, 0),
+    utils.getUtxo(contractTxid, contractTx, 1),
     fundingPrivateKey,
     false,
     2
@@ -81,9 +81,9 @@ it('Incorrect Issue Private Key Throws Error', async function () {
   const incorrectPrivateKey = bsv.PrivateKey()
   const issueHex = issue(
     incorrectPrivateKey,
-    getIssueInfo(),
-    getContractUtxo(),
-    getPaymentUtxo(),
+    utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+    utils.getUtxo(contractTxid, contractTx, 0),
+    utils.getUtxo(contractTxid, contractTx, 1),
     fundingPrivateKey,
     true,
     2
@@ -101,9 +101,9 @@ it('Incorrect Funding Private Key Throws Error', async function () {
   const incorrectPrivateKey = bsv.PrivateKey()
   const issueHex = issue(
     issuerPrivateKey,
-    getIssueInfo(),
-    getContractUtxo(),
-    getPaymentUtxo(),
+    utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+    utils.getUtxo(contractTxid, contractTx, 0),
+    utils.getUtxo(contractTxid, contractTx, 1),
     incorrectPrivateKey,
     true,
     2
@@ -120,23 +120,12 @@ it('Incorrect Funding Private Key Throws Error', async function () {
 it('Incorrect Issuer Address Throws Error', async function () {
   const incorrectPrivateKey = bsv.PrivateKey()
   const incorrectAddr = incorrectPrivateKey.toAddress().toString()
-  issueInfo = [
-    {
-      addr: incorrectAddr,
-      satoshis: 7000,
-      data: 'one'
-    },
-    {
-      addr: bobAddr,
-      satoshis: 3000,
-      data: 'two'
-    }
-  ]
+
   const issueHex = issue(
     issuerPrivateKey,
-    issueInfo,
-    getContractUtxo(),
-    getPaymentUtxo(),
+    utils.getIssueInfo(incorrectAddr, 7000, bobAddr, 3000),
+    utils.getUtxo(contractTxid, contractTx, 0),
+    utils.getUtxo(contractTxid, contractTx, 1),
     incorrectPrivateKey,
     true,
     2
@@ -153,23 +142,12 @@ it('Incorrect Issuer Address Throws Error', async function () {
 it('Incorrect Redemption Address Throws Error', async function () {
   const incorrectPrivateKey = bsv.PrivateKey()
   const incorrectAddr = incorrectPrivateKey.toAddress().toString()
-  issueInfo = [
-    {
-      addr: bobAddr,
-      satoshis: 7000,
-      data: 'one'
-    },
-    {
-      addr: incorrectAddr,
-      satoshis: 3000,
-      data: 'two'
-    }
-  ]
+
   const issueHex = issue(
     issuerPrivateKey,
-    issueInfo,
-    getContractUtxo(),
-    getPaymentUtxo(),
+    utils.getIssueInfo(aliceAddr, 7000, incorrectAddr, 3000),
+    utils.getUtxo(contractTxid, contractTx, 0),
+    utils.getUtxo(contractTxid, contractTx, 1),
     incorrectPrivateKey,
     true,
     2
@@ -187,26 +165,13 @@ it('Incorrect Redemption Address Throws Error', async function () {
 it('Address Validation', async function () {
   const incorrectPrivateKey = bsv.PrivateKey()
   const invalidAddr = '2MSCReQT9E4GpxuK1K7uyD5qF1EmznXjkr' // all addresses start with 1
-  console.log(bobAddr)
-  issueInfo = [
-    {
-      addr: invalidAddr,
-      satoshis: 7000,
-      data: 'one'
-    },
-    {
-      addr: aliceAddr,
-      satoshis: 3000,
-      data: 'two'
-    }
-  ]
 
   try {
     issue(
       issuerPrivateKey,
-      issueInfo,
-      getContractUtxo(),
-      getPaymentUtxo(),
+      utils.getIssueInfo(invalidAddr, 7000, bobAddr, 3000),
+      utils.getUtxo(contractTxid, contractTx, 0),
+      utils.getUtxo(contractTxid, contractTx, 1),
       incorrectPrivateKey,
       true,
       2
@@ -219,24 +184,13 @@ it('Address Validation', async function () {
 })
 
 it('Issue with Incorrect Balance Throws Error', async function () {
-  issueInfo = [
-    {
-      addr: aliceAddr,
-      satoshis: 0,
-      data: 'one'
-    },
-    {
-      addr: bobAddr,
-      satoshis: 0,
-      data: 'two'
-    }
-  ]
+
   try {
     issue(
       issuerPrivateKey,
-      issueInfo,
-      getContractUtxo(),
-      getPaymentUtxo(),
+      utils.getIssueInfo(aliceAddr, 0, bobAddr, 0),
+      utils.getUtxo(contractTxid, contractTx, 0),
+      utils.getUtxo(contractTxid, contractTx, 1),
       fundingPrivateKey,
       true,
       2
@@ -266,8 +220,8 @@ it('Issue with appended data throws error', async function () {
     issue(
       issuerPrivateKey,
       issueInfo,
-      getContractUtxo(),
-      getPaymentUtxo(),
+      utils.getUtxo(contractTxid, contractTx, 0),
+      utils.getUtxo(contractTxid, contractTx, 1),
       fundingPrivateKey,
       true,
       2
@@ -284,8 +238,8 @@ it('Empty Issue Info Throws Error', async function () {
     issue(
       issuerPrivateKey,
       [],
-      getContractUtxo(),
-      getPaymentUtxo(),
+      utils.getUtxo(contractTxid, contractTx, 0),
+      utils.getUtxo(contractTxid, contractTx, 1),
       fundingPrivateKey,
       true,
       2
@@ -302,9 +256,9 @@ it('Empty Contract UTXO Info Throws Error', async function () {
   try {
     issue(
       issuerPrivateKey,
-      getIssueInfo(),
+      utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
       [],
-      getPaymentUtxo(),
+      utils.getUtxo(contractTxid, contractTx, 1),
       fundingPrivateKey,
       true,
       2
@@ -320,8 +274,8 @@ it('Empty Payment UTXO Info Throws Error', async function () {
   try {
     issue(
       issuerPrivateKey,
-      getIssueInfo(),
-      getContractUtxo(),
+      utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+      utils.getUtxo(contractTxid, contractTx, 0),
       [],
       fundingPrivateKey,
       true,
@@ -348,41 +302,7 @@ async function getToken(txid) {
   const temp = response.data.vout[0].scriptPubKey.asm
   const split = temp.split('OP_RETURN')[1]
   const tokenId = split.split(' ')[1]
-  console.log(tokenId)
   return tokenId
-}
-
-function getContractUtxo() {
-  return {
-    txid: contractTxid,
-    vout: 0,
-    scriptPubKey: contractTx.vout[0].scriptPubKey.hex,
-    amount: contractTx.vout[0].value
-  }
-}
-
-function getPaymentUtxo() {
-  return {
-    txid: contractTxid,
-    vout: 1,
-    scriptPubKey: contractTx.vout[1].scriptPubKey.hex,
-    amount: contractTx.vout[1].value
-  }
-}
-
-function getIssueInfo() {
-  return [
-    {
-      addr: aliceAddr,
-      satoshis: 7000,
-      data: 'one'
-    },
-    {
-      addr: bobAddr,
-      satoshis: 3000,
-      data: 'two'
-    }
-  ]
 }
 
 async function setup() {

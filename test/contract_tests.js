@@ -18,8 +18,8 @@ let fundingPrivateKey
 let contractUtxos
 let fundingUtxos
 let publicKeyHash
-let supply
-let symbol
+let supply = 10000
+let symbol = 'TAALT'
 let schema
 
 beforeEach(async function () {
@@ -294,7 +294,5 @@ async function setup () {
   contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress('testnet').toString())
   fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress('testnet').toString())
   publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
-  supply = 10000
-  symbol = 'TAALT'
   schema = utils.schema(publicKeyHash, symbol, supply)
 }

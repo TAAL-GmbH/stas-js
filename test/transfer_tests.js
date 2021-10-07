@@ -21,8 +21,6 @@ const issuerPrivateKey = bsv.PrivateKey()
 const fundingPrivateKey = bsv.PrivateKey()
 const bobPrivateKey = bsv.PrivateKey()
 const alicePrivateKey = bsv.PrivateKey()
-let contractTx
-let contractTxid
 let aliceAddr
 let bobAddr
 let symbol
@@ -42,15 +40,13 @@ it("Successful Transfer With Fee", async function () {
   const transferHex = transfer(
     bobPrivateKey,
     issuerPrivateKey.publicKey,
-    getStasUtxo(),
+    utils.getUtxo(issueTxid, issueTx, 1),
     aliceAddr,
-    getPaymentUtxoOut(issueOutFundingVout),
+    utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
     fundingPrivateKey
   )
   const transferTxid = await broadcast(transferHex)
-  console.log(transferTxid)
   const tokenId = await getToken(transferTxid)
-  console.log(tokenId)
   const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/token/' + tokenId + '/TAALT'
   const response = await axios({
     method: 'get',
@@ -72,7 +68,7 @@ it("Successful No Fee Transfer", async function () {
   const transferHex = transfer(
     bobPrivateKey,
     issuerPrivateKey.publicKey,
-    getStasUtxo(),
+    utils.getUtxo(issueTxid, issueTx, 1),
     aliceAddr,
     null,
     fundingPrivateKey
@@ -103,7 +99,7 @@ it("Successful No Fee Transfer Payment UTXO Empty Array", async function () {
   const transferHex = transfer(
     bobPrivateKey,
     issuerPrivateKey.publicKey,
-    getStasUtxo(),
+    utils.getUtxo(issueTxid, issueTx, 1),
     aliceAddr,
     [],
     fundingPrivateKey
@@ -135,9 +131,9 @@ it("Transfer With Invalid Issuer PK Throws Error", async function () {
   const transferHex = transfer(
     incorrectPK,
     issuerPrivateKey.publicKey,
-    getStasUtxo(),
+    utils.getUtxo(issueTxid, issueTx, 1),
     aliceAddr,
-    getPaymentUtxoOut(issueOutFundingVout),
+    utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
     fundingPrivateKey
   )
   try {
@@ -157,9 +153,9 @@ it("Transfer With Invalid Funding PK Throws Error", async function () {
   const transferHex = transfer(
     bobPrivateKey,
     issuerPrivateKey.publicKey,
-    getStasUtxo(),
+    utils.getUtxo(issueTxid, issueTx, 1),
     aliceAddr,
-    getPaymentUtxoOut(issueOutFundingVout),
+    utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
     incorrectPK
   )
   try {
@@ -179,7 +175,7 @@ it("Transfer With Invalid Contract Public Key Throws Error", async function () {
   const transferHex = transfer(
     bobPrivateKey,
     incorrectPrivateKey.publicKey,
-    getStasUtxo(),
+    utils.getUtxo(issueTxid, issueTx, 1),
     aliceAddr,
     {
       txid: issueTxid,
@@ -209,9 +205,9 @@ it("Address Validation - Incorrect Starting Char", async function () {
     const transferHex = transfer(
       incorrectPK,
       issuerPrivateKey.publicKey,
-      getStasUtxo(),
+      utils.getUtxo(issueTxid, issueTx, 1),
       invalidAddr,
-      getPaymentUtxoOut(issueOutFundingVout),
+      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
       fundingPrivateKey
     )
     assert(false)
@@ -232,9 +228,9 @@ it("Address Validation - Too Few Chars", async function () {
     const transferHex = transfer(
       incorrectPK,
       issuerPrivateKey.publicKey,
-      getStasUtxo(),
+      utils.getUtxo(issueTxid, issueTx, 1),
       invalidAddr,
-      getPaymentUtxoOut(issueOutFundingVout),
+      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
       fundingPrivateKey
     )
     assert(false)
@@ -255,9 +251,9 @@ it("Address Validation - Too May Chars", async function () {
     const transferHex = transfer(
       incorrectPK,
       issuerPrivateKey.publicKey,
-      getStasUtxo(),
+      utils.getUtxo(issueTxid, issueTx, 1),
       invalidAddr,
-      getPaymentUtxoOut(issueOutFundingVout),
+      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
       fundingPrivateKey
     )
     assert(false)
@@ -282,7 +278,7 @@ it("Incorrect STAS UTXO Amount Throws Error", async function () {
       amount: 0.0001
     },
     aliceAddr,
-    getPaymentUtxoOut(issueOutFundingVout),
+    utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
     fundingPrivateKey
   )
   try {
@@ -302,7 +298,7 @@ it("Incorrect Payment UTXO Amount Throws Error", async function () {
   const transferHex = transfer(
     bobPrivateKey,
     issuerPrivateKey.publicKey,
-    getStasUtxo(),
+    utils.getUtxo(issueTxid, issueTx, 1),
     aliceAddr,
     {
       txid: issueTxid,
@@ -320,9 +316,6 @@ it("Incorrect Payment UTXO Amount Throws Error", async function () {
     expect(e.message).to.eql('Request failed with status code 400')
   }
 })
-
-
-
 
 
 
@@ -345,14 +338,14 @@ async function setup() {
     schema,
     supply
   )
-  contractTxid = await broadcast(contractHex)
-  contractTx = await getTransaction(contractTxid)
+  const contractTxid = await broadcast(contractHex)
+  const contractTx = await getTransaction(contractTxid)
 
   const issueHex = issue(
     issuerPrivateKey,
-    getIssueInfo(),
-    getContractUtxo(),
-    getPaymentUtxo(),
+    utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+    utils.getUtxo(contractTxid, contractTx, 0),
+    utils.getUtxo(contractTxid, contractTx, 1),
     fundingPrivateKey,
     true,
     2
@@ -399,62 +392,4 @@ async function areFeesProcessed(txid) {
     return true
   else
     return false
-}
-
-
-function getContractUtxo() {
-
-  return {
-    txid: contractTxid,
-    vout: 0,
-    scriptPubKey: contractTx.vout[0].scriptPubKey.hex,
-    amount: contractTx.vout[0].value
-  }
-}
-
-function getPaymentUtxo() {
-
-  return {
-    txid: contractTxid,
-    vout: 1,
-    scriptPubKey: contractTx.vout[1].scriptPubKey.hex,
-    amount: contractTx.vout[1].value
-  }
-}
-
-
-function getIssueInfo() {
-
-  return [
-    {
-      addr: aliceAddr,
-      satoshis: 7000,
-      data: 'one'
-    },
-    {
-      addr: bobAddr,
-      satoshis: 3000,
-      data: 'two'
-    }
-  ]
-}
-
-function getStasUtxo() {
-
-  return {
-    txid: issueTxid,
-    vout: 1,
-    scriptPubKey: issueTx.vout[1].scriptPubKey.hex,
-    amount: issueTx.vout[1].value
-  }
-}
-
-function getPaymentUtxoOut(issueOutFundingVout) {
-
-  return {
-    txid: issueTxid,
-    vout: issueOutFundingVout,
-    scriptPubKey: issueTx.vout[issueOutFundingVout].scriptPubKey.hex,
-    amount: issueTx.vout[issueOutFundingVout].value
-  }
 }
