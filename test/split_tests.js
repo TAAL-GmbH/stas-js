@@ -321,5 +321,4 @@ async function countNumOfTokens(txid, isThereAFee) {
         return count - 1
     else
         return count
-
 }

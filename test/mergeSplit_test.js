@@ -104,8 +104,7 @@ it("Incorrect Satoshi Merge Amount Throws Error", async function () {
 
     const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * 1e8) / 2
     const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * 1e8) + Math.floor(splitTx.vout[1].value * 1e8) - aliceAmountSatoshis
-    console.log(splitTx.vout[0].value)
-    console.log(splitTx.vout[1].value)
+    
     const mergeSplitHex = mergeSplit(
         alicePrivateKey,
         issuerPrivateKey.publicKey,
@@ -131,7 +130,6 @@ it("Incorrect Satoshi Merge Amount Throws Error", async function () {
     )
     const mergeSplitTxid = await broadcast(mergeSplitHex)
     console.log(`MergeSplit TX:   ${mergeSplitTxid}`)
-    const mergeSplitTx = await getTransaction(mergeSplitTxid)
 })
 
 it("Incorrect Destination 1 Satoshi Amount", async function () {
