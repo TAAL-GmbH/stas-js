@@ -1,4 +1,4 @@
-
+const axios = require('axios')
 
 
 function schema(pkHash, symbol, supply) {
@@ -71,13 +71,29 @@ function getUtxo(txid, tx, vout) {
 function getMergeUtxo(splitTxObj) {
 
   return [{
-      tx: splitTxObj,
-      vout: 0
+    tx: splitTxObj,
+    vout: 0
   },
   {
-      tx: splitTxObj,
-      vout: 1
+    tx: splitTxObj,
+    vout: 1
   }]
+}
+
+
+async function getVoutAmount(txid, vout) {
+
+  const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/tx/hash/' + txid
+  const response = await axios({
+    method: 'get',
+    url,
+    auth: {
+      username: 'taal_private',
+      password: 'dotheT@@l007'
+    }
+  })
+
+  return response.data.vout[vout].value
 }
 
 
@@ -85,5 +101,6 @@ module.exports = {
   schema,
   getIssueInfo,
   getUtxo,
-  getMergeUtxo
+  getMergeUtxo,
+  getVoutAmount
 }

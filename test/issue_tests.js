@@ -161,28 +161,6 @@ it('Incorrect Redemption Address Throws Error', async function () {
   }
 })
 
-// 'Checksum mismatch' - Error could be more specific
-it('Address Validation', async function () {
-  const incorrectPrivateKey = bsv.PrivateKey()
-  const invalidAddr = '2MSCReQT9E4GpxuK1K7uyD5qF1EmznXjkr' // all addresses start with 1
-  // addresses start with a 1 on mainnet but not on other chains.
-
-  try {
-    issue(
-      issuerPrivateKey,
-      utils.getIssueInfo(invalidAddr, 7000, bobAddr, 3000),
-      utils.getUtxo(contractTxid, contractTx, 0),
-      utils.getUtxo(contractTxid, contractTx, 1),
-      incorrectPrivateKey,
-      true,
-      2
-    )
-    assert(false)
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Some Validation Error')
-  }
-})
 
 it('Issue with Incorrect Balance Throws Error', async function () {
   try {
@@ -252,7 +230,7 @@ it('Empty Issue Info Throws Error', async function () {
   }
 })
 
-// needs fixed - current error 'total out amount 10000 must equal total in amount NaN''
+
 it('Empty Contract UTXO Info Throws Error', async function () {
   try {
     issue(
@@ -267,7 +245,7 @@ it('Empty Contract UTXO Info Throws Error', async function () {
     assert(false)
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Some Error')
+    expect(e.message).to.eql('contractUtxo is invalid')
   }
 })
 
