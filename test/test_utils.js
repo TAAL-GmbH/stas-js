@@ -126,6 +126,23 @@ async function getTokenResponse(tokenId){
  return response.data
 }
 
+ async function areFeesProcessed(txid, vout) {
+
+  const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/tx/hash/' + txid
+  const response = await axios({
+    method: 'get',
+    url,
+    auth: {
+      username: 'taal_private',
+      password: 'dotheT@@l007'
+    }
+  })
+
+  if (response.data.vout[vout] != null)
+    return true
+  else
+    return false
+}
 
 module.exports = {
   schema,
@@ -134,5 +151,6 @@ module.exports = {
   getMergeUtxo,
   getVoutAmount,
   getToken,
-  getTokenResponse
+  getTokenResponse,
+  areFeesProcessed
 }

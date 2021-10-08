@@ -26,7 +26,7 @@ beforeEach(async function () {
   await setup()
 })
 
-it('Successful Contract Broadcast', async function () {
+it('Successful Contract With Fees', async function () {
   const contractHex = contract(
     issuerPrivateKey,
     contractUtxos,
@@ -35,7 +35,43 @@ it('Successful Contract Broadcast', async function () {
     schema,
     supply
   )
-  await broadcast(contractHex)
+  const contractTxid = await broadcast(contractHex)
+  console.log(contractTxid)
+  let amount = await utils.getVoutAmount(contractTxid, 0)
+  expect(amount).to.equal(supply / 100000000)
+  expect(await utils.areFeesProcessed(contractTxid, 1)).to.be.true
+})
+
+it('Successful Contract No Fees', async function () {
+  const contractHex = contract(
+    issuerPrivateKey,
+    contractUtxos,
+    null,
+    fundingPrivateKey,
+    schema,
+    supply
+  )
+  const contractTxid = await broadcast(contractHex)
+  console.log(contractTxid)
+  let amount = await utils.getVoutAmount(contractTxid, 0)
+  expect(amount).to.equal(supply / 100000000)
+  expect(await utils.areFeesProcessed(contractTxid, 1)).to.be.false
+
+})
+
+it('Successful Contract No Fees Empty Arrays', async function () {
+  const contractHex = contract(
+    issuerPrivateKey,
+    contractUtxos,
+    [],
+    fundingPrivateKey,
+    schema,
+    supply
+  )
+  const contractTxid = await broadcast(contractHex)
+  let amount = await utils.getVoutAmount(contractTxid, 0)
+  expect(amount).to.equal(supply / 100000000)
+  expect(await utils.areFeesProcessed(contractTxid, 1)).to.be.false
 })
 
 it('Duplicate Private Keys Throws Error', async function () {
