@@ -1,4 +1,4 @@
-const expect = require("chai").expect
+const expect = require('chai').expect
 const utils = require('./test_utils')
 const bsv = require('bsv')
 const axios = require('axios')
@@ -14,26 +14,24 @@ const {
   broadcast
 } = require('../index').utils
 
-var issuerPrivateKey = bsv.PrivateKey()
-var fundingPrivateKey = bsv.PrivateKey()
-var contractTx
-var contractTxid
-var issueInfo
-var aliceAddr
-var bobAddr
+const issuerPrivateKey = bsv.PrivateKey()
+const fundingPrivateKey = bsv.PrivateKey()
+let contractTx
+let contractTxid
+let aliceAddr
+let bobAddr
 
-//We create contract with incorrect public key hash
+// We create contract with incorrect public key hash
 beforeEach(async function () {
-
-  var incorrectPrivateKey = bsv.PrivateKey()
-  var bobPrivateKey = bsv.PrivateKey()
-  var alicePrivateKey = bsv.PrivateKey()
-  var contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress('testnet').toString())
-  var fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress('testnet').toString())
-  var publicKeyHash = bsv.crypto.Hash.sha256ripemd160(incorrectPrivateKey.publicKey.toBuffer()).toString('hex')
-  var symbol = 'TAALT'
-  var supply = 10000
-  schema = utils.schema(publicKeyHash, symbol, supply)
+  const incorrectPrivateKey = bsv.PrivateKey()
+  const bobPrivateKey = bsv.PrivateKey()
+  const alicePrivateKey = bsv.PrivateKey()
+  const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress('testnet').toString())
+  const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress('testnet').toString())
+  const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(incorrectPrivateKey.publicKey.toBuffer()).toString('hex')
+  const symbol = 'TAALT'
+  const supply = 10000
+  const schema = utils.schema(publicKeyHash, symbol, supply)
   aliceAddr = alicePrivateKey.toAddress().toString()
   bobAddr = bobPrivateKey.toAddress().toString()
 
@@ -47,12 +45,10 @@ beforeEach(async function () {
   )
   contractTxid = await broadcast(contractHex)
   contractTx = await getTransaction(contractTxid)
+})
 
-});
-
-//null returned from API call - error handling required
-it("Attempt to issue invalid token", async function () {
-
+// null returned from API call - error handling required
+it('Attempt to issue invalid token', async function () {
   const issueHex = issue(
     issuerPrivateKey,
     issueInfo(),
@@ -64,23 +60,23 @@ it("Attempt to issue invalid token", async function () {
   )
   const issueTxid = await broadcast(issueHex)
   const tokenId = await getToken(issueTxid)
-
   const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/token/' + tokenId + '/TAALT'
-  const response = await axios({
-    method: 'get',
-    url,
-    auth: {
-      username: 'taal_private',
-      password: 'dotheT@@l007'
-    }
-  })
-  expect(response).to.equal("Some Error")
-
+  try {
+    await axios({
+      method: 'get',
+      url,
+      auth: {
+        username: 'taal_private',
+        password: 'dotheT@@l007'
+      }
+    })
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Request failed with status code 404')
+  }
 })
 
-
-async function getToken(txid) {
-
+async function getToken (txid) {
   const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/tx/hash/' + txid
   const response = await axios({
     method: 'get',
@@ -91,16 +87,14 @@ async function getToken(txid) {
     }
   })
 
-  var temp = response.data.vout[0].scriptPubKey.asm
-  var split = temp.split('OP_RETURN')[1]
-  var tokenId = split.split(' ')[1]
-  console.log(tokenId)
+  const temp = response.data.vout[0].scriptPubKey.asm
+  const split = temp.split('OP_RETURN')[1]
+  const tokenId = split.split(' ')[1]
+  console.log('tokenId', tokenId)
   return tokenId
 }
 
-
-function contractUtxo() {
-
+function contractUtxo () {
   return {
     txid: contractTxid,
     vout: 0,
@@ -109,8 +103,7 @@ function contractUtxo() {
   }
 }
 
-function paymentUtxo() {
-
+function paymentUtxo () {
   return {
     txid: contractTxid,
     vout: 1,
@@ -119,8 +112,7 @@ function paymentUtxo() {
   }
 }
 
-function issueInfo() {
-
+function issueInfo () {
   return [
     {
       addr: aliceAddr,
