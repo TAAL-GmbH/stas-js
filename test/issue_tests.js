@@ -165,6 +165,7 @@ it('Incorrect Redemption Address Throws Error', async function () {
 it('Address Validation', async function () {
   const incorrectPrivateKey = bsv.PrivateKey()
   const invalidAddr = '2MSCReQT9E4GpxuK1K7uyD5qF1EmznXjkr' // all addresses start with 1
+  // addresses start with a 1 on mainnet but not on other chains.
 
   try {
     issue(
@@ -184,7 +185,6 @@ it('Address Validation', async function () {
 })
 
 it('Issue with Incorrect Balance Throws Error', async function () {
-
   try {
     issue(
       issuerPrivateKey,
@@ -203,6 +203,7 @@ it('Issue with Incorrect Balance Throws Error', async function () {
 })
 
 // some validation required
+// there is no invalid data.
 it('Issue with appended data throws error', async function () {
   issueInfo = [
     {
@@ -288,7 +289,7 @@ it('Empty Payment UTXO Info Throws Error', async function () {
   }
 })
 
-async function getToken(txid) {
+async function getToken (txid) {
   const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/tx/hash/' + txid
   const response = await axios({
     method: 'get',
@@ -305,7 +306,7 @@ async function getToken(txid) {
   return tokenId
 }
 
-async function setup() {
+async function setup () {
   const bobPrivateKey = bsv.PrivateKey()
   const alicePrivateKey = bsv.PrivateKey()
   const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress('testnet').toString())
