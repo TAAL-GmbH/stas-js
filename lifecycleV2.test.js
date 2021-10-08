@@ -13,7 +13,8 @@ const {
 const {
   getTransaction,
   getFundsFromFaucet,
-  broadcast
+  broadcast,
+  SATS_PER_BITCOIN
 } = require('./index').utils
 
 ;(async () => {
@@ -238,8 +239,8 @@ const {
   // Now mergeSplit
   const splitTxObj2 = new bsv.Transaction(splitHex2)
 
-  const aliceAmountSatoshis = Math.floor(splitTx2.vout[0].value * 1e8) / 2
-  const bobAmountSatoshis = Math.floor(splitTx2.vout[0].value * 1e8) + Math.floor(splitTx2.vout[1].value * 1e8) - aliceAmountSatoshis
+  const aliceAmountSatoshis = Math.floor(splitTx2.vout[0].value * SATS_PER_BITCOIN) / 2
+  const bobAmountSatoshis = Math.floor(splitTx2.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx2.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
 
   const mergeSplitHex = mergeSplit(
     alicePrivateKey,

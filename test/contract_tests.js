@@ -18,8 +18,8 @@ let fundingPrivateKey
 let contractUtxos
 let fundingUtxos
 let publicKeyHash
-let supply = 10000
-let symbol = 'TAALT'
+const supply = 10000
+const symbol = 'TAALT'
 let schema
 
 beforeEach(async function () {
@@ -79,6 +79,7 @@ it('Duplicate UTXOS Throws Error', async function () {
 it('Null Issuer Public Key Throws Error', async function () {
   try {
     contract(
+
       null,
       contractUtxos,
       fundingUtxos,
