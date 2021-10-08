@@ -92,8 +92,38 @@ async function getVoutAmount(txid, vout) {
       password: 'dotheT@@l007'
     }
   })
-
   return response.data.vout[vout].value
+}
+
+async function getToken (txid) {
+  const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/tx/hash/' + txid
+  const response = await axios({
+    method: 'get',
+    url,
+    auth: {
+      username: 'taal_private',
+      password: 'dotheT@@l007'
+    }
+  })
+
+  const temp = response.data.vout[0].scriptPubKey.asm
+  const split = temp.split('OP_RETURN')[1]
+  const tokenId = split.split(' ')[1]
+  return tokenId
+}
+
+async function getTokenResponse(tokenId){
+
+  const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/token/' + tokenId + '/TAALT'
+  const response = await axios({
+    method: 'get',
+    url,
+    auth: {
+      username: 'taal_private',
+      password: 'dotheT@@l007'
+    }
+  })
+ return response.data
 }
 
 
@@ -102,5 +132,7 @@ module.exports = {
   getIssueInfo,
   getUtxo,
   getMergeUtxo,
-  getVoutAmount
+  getVoutAmount,
+  getToken,
+  getTokenResponse
 }

@@ -40,7 +40,7 @@ it('Successful Issue Token With Split', async function () {
     2
   )
   const issueTxid = await broadcast(issueHex)
-  const tokenId = await getToken(issueTxid)
+  const tokenId = await utils.getToken(issueTxid)
   const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/token/' + tokenId + '/TAALT'
   const response = await axios({
     method: 'get',
@@ -64,7 +64,7 @@ it('Successful Issue Token Non Split', async function () {
     2
   )
   const issueTxid = await broadcast(issueHex)
-  const tokenId = await getToken(issueTxid)
+  const tokenId = await utils.getToken(issueTxid)
   const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/token/' + tokenId + '/TAALT'
   const response = await axios({
     method: 'get',
@@ -267,22 +267,6 @@ it('Empty Payment UTXO Info Throws Error', async function () {
   }
 })
 
-async function getToken (txid) {
-  const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/tx/hash/' + txid
-  const response = await axios({
-    method: 'get',
-    url,
-    auth: {
-      username: 'taal_private',
-      password: 'dotheT@@l007'
-    }
-  })
-
-  const temp = response.data.vout[0].scriptPubKey.asm
-  const split = temp.split('OP_RETURN')[1]
-  const tokenId = split.split(' ')[1]
-  return tokenId
-}
 
 async function setup () {
   const bobPrivateKey = bsv.PrivateKey()
