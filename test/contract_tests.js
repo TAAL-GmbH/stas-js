@@ -115,7 +115,6 @@ it('Duplicate UTXOS Throws Error', async function () {
 it('Null Issuer Public Key Throws Error', async function () {
   try {
     contract(
-
       null,
       contractUtxos,
       fundingUtxos,
@@ -135,6 +134,28 @@ it('Null Contract UTXO Throws Error', async function () {
     contract(
       issuerPrivateKey,
       null,
+      fundingUtxos,
+      fundingPrivateKey,
+      schema,
+      supply
+    )
+    assert(false)
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('ContractUtxos is invalid')
+  }
+})
+
+it('Non Array Contract UTXO Throws Error', async function () {
+  try {
+    contract(
+      issuerPrivateKey,
+      {
+        txid: '562c4afa4c14a1f01f960f9d79d1e90d0ffa4eac6e9d42c272454e93b8fad8e6',
+        vout: 0,
+        scriptPubKey: '76a914ddfa3b4a86af8e0dce6644db696114b585675eff88ac',
+        amount: 0.01
+      },
       fundingUtxos,
       fundingPrivateKey,
       schema,
@@ -290,7 +311,6 @@ it('Invalid Payment UTXO Throw Error', async function () {
   }
 })
 
-// needs fixed
 it('Empty Array Contract UTXO Throw Error', async function () {
   try {
     contract(
@@ -307,25 +327,24 @@ it('Empty Array Contract UTXO Throw Error', async function () {
     expect(e.message).to.eql('ContractUtxos is invalid')
   }
 })
-
-// Payment UTXO can be null in which case it's treated as a zero fee transaction.
+//needs fixed
 it('Empty Array Payment UTXO Successful', async function () {
-  try {
-    contract(
-      issuerPrivateKey,
-      contractUtxos,
-      [],
-      fundingPrivateKey,
-      schema,
-      supply
-    )
-    assert(true)
-  } catch (e) {
-    assert(false)
-  }
+  const contractHex = contract(
+    issuerPrivateKey,
+    contractUtxos,
+    fundingUtxos,
+    [],
+    schema,
+    supply
+  )
+  const contractTxid = await broadcast(contractHex)
+  console.log(contractTxid)
+  let amount = await utils.getVoutAmount(contractTxid, 0)
+  expect(amount).to.equal(supply / 100000000)
+  expect(await utils.areFeesProcessed(contractTxid, 1)).to.be.false;
 })
 
-async function setup () {
+async function setup() {
   issuerPrivateKey = bsv.PrivateKey()
   fundingPrivateKey = bsv.PrivateKey()
   contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress('testnet').toString())

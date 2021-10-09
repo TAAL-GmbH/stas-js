@@ -31,12 +31,11 @@ it("Full Life Cycle Test", async function () {
   const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress('testnet').toString())
   const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress('testnet').toString())
   const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
-  const supply = 100000
+  const supply = 10000
   const symbol = 'TAALT'
 
   const schema = utils.schema(publicKeyHash, symbol, supply)
 
-  // change goes back to the fundingPrivateKey
   const contractHex = contract(
     issuerPrivateKey,
     contractUtxos,
@@ -61,7 +60,7 @@ it("Full Life Cycle Test", async function () {
       utils.getUtxo(contractTxid, contractTx, 0),
       utils.getUtxo(contractTxid, contractTx, 1),
       fundingPrivateKey,
-      true,
+      false,
       2
     )
   } catch (e) {
@@ -111,92 +110,24 @@ it("Full Life Cycle Test", async function () {
     utils.getUtxo(transferTxid, transferTx, 1),
     fundingPrivateKey
   )
-  const splitTxid = await broadcast(splitHex)
-  console.log(`Split TX:        ${splitTxid}`)
-  const splitTx = await getTransaction(splitTxid)
-  expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000015)
-  expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000015)
 
-  // Now let's merge the last split back together
-  const splitTxObj = new bsv.Transaction(splitHex)
+  try {
+    await broadcast(splitHex)
+    assert(false)
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Request failed with status code 400')
+  }
 
-  const mergeHex = merge(
+  const redeemHex = redeem(
     bobPrivateKey,
     issuerPrivateKey.publicKey,
-    utils.getMergeUtxo(splitTxObj),
-    aliceAddr,
-    utils.getUtxo(splitTxid, splitTx, 2),
-    fundingPrivateKey
-  )
-
-  const mergeTxid = await broadcast(mergeHex)
-  console.log(`Merge TX:        ${mergeTxid}`)
-  const mergeTx = await getTransaction(mergeTxid)
-  expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00003)
-  const tokenIdMerge = await utils.getToken(issueTxid)
-  let responseMerge = await utils.getTokenResponse(tokenIdMerge)
-  console.log(responseMerge.token)
-  expect(responseMerge.token.symbol).to.equal(symbol)
-  expect(responseMerge.token.contract_txs).to.contain(contractTxid)
-  expect(responseMerge.token.issuance_txs).to.contain(issueTxid)
-
-  // Split again - both payable to Alice...
-  const aliceAmount1 = mergeTx.vout[0].value / 2
-  const aliceAmount2 = mergeTx.vout[0].value - aliceAmount1
-
-  const split2Destinations = []
-  split2Destinations[0] = { address: aliceAddr, amount: aliceAmount1 }
-  split2Destinations[1] = { address: aliceAddr, amount: aliceAmount2 }
-
-  const splitHex2 = split(
-    alicePrivateKey,
-    issuerPrivateKey.publicKey,
-    utils.getUtxo(mergeTxid, mergeTx, 0),
-    split2Destinations,
-    utils.getUtxo(mergeTxid, mergeTx, 1),
-    fundingPrivateKey
-  )
-  const splitTxid2 = await broadcast(splitHex2)
-  console.log(`Split TX2:       ${splitTxid2}`)
-  const splitTx2 = await getTransaction(splitTxid2)
-  expect(await utils.getVoutAmount(splitTxid2, 0)).to.equal(0.000015)
-  expect(await utils.getVoutAmount(splitTxid2, 1)).to.equal(0.000015)
-
-  // Now mergeSplit
-  const splitTxObj2 = new bsv.Transaction(splitHex2)
-
-  const aliceAmountSatoshis = Math.floor(splitTx2.vout[0].value * 1e8) / 2
-  const bobAmountSatoshis = Math.floor(splitTx2.vout[0].value * 1e8) + Math.floor(splitTx2.vout[1].value * 1e8) - aliceAmountSatoshis
-
-  const mergeSplitHex = mergeSplit(
-    alicePrivateKey,
-    issuerPrivateKey.publicKey,
-    utils.getMergeSplitUtxo(splitTxObj, splitTx),
-    aliceAddr,
-    aliceAmountSatoshis,
-    bobAddr,
-    bobAmountSatoshis,
-    utils.getUtxo(splitTxid, splitTx, 2),
-    fundingPrivateKey
-  )
-
-  const mergeSplitTxid = await broadcast(mergeSplitHex)
-  console.log(`MergeSplit TX:   ${mergeSplitTxid}`)
-  const mergeSplitTx = await getTransaction(mergeSplitTxid)
-  expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075)
-  expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
-
-
-  // Alice wants to redeem the money from bob...
-  const redeemHex = redeem(
-    alicePrivateKey,
-    issuerPrivateKey.publicKey,
-    utils.getUtxo(mergeSplitTxid, mergeSplitTx, 0),
-    utils.getUtxo(mergeSplitTxid, mergeSplitTx, 2),
+    utils.getUtxo(transferTxid, transferTx, 0),
+    utils.getUtxo(transferTxid, transferTx, 1),
     fundingPrivateKey
   )
   const redeemTxid = await broadcast(redeemHex)
   console.log(`Redeem TX:       ${redeemTxid}`)
-  expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.0000075)
+ expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00003)
 
 })

@@ -47,7 +47,7 @@ beforeEach(async function () {
   contractTx = await getTransaction(contractTxid)
 })
 
-// null returned from API call - error handling required
+
 it('Attempt to issue invalid token', async function () {
   const issueHex = issue(
     issuerPrivateKey,
@@ -55,8 +55,8 @@ it('Attempt to issue invalid token', async function () {
     contractUtxo(),
     paymentUtxo(),
     fundingPrivateKey,
-    true, // isSplittable
-    2 // STAS version
+    true, 
+    2 
   )
   const issueTxid = await broadcast(issueHex)
   const tokenId = await getToken(issueTxid)
