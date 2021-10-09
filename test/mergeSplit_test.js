@@ -40,7 +40,7 @@ it('Successful MergeSplit', async function () {
   const mergeSplitHex = mergeSplit(
     alicePrivateKey,
     issuerPrivateKey.publicKey,
-    getMergeUtxo(),
+    utils.getMergeSplitUtxo(splitTxObj, splitTx),
     aliceAddr,
     aliceAmountSatoshis,
     bobAddr,
@@ -60,7 +60,7 @@ it('Successful MergeSplit No Fees', async function () {
   const mergeSplitHex = mergeSplit(
     alicePrivateKey,
     issuerPrivateKey.publicKey,
-    getMergeUtxo(),
+    utils.getMergeSplitUtxo(splitTxObj, splitTx),
     aliceAddr,
     aliceAmountSatoshis,
     bobAddr,
@@ -81,7 +81,7 @@ it('Successful MergeSplit No Fees Empty Array', async function () {
   const mergeSplitHex = mergeSplit(
     alicePrivateKey,
     issuerPrivateKey.publicKey,
-    getMergeUtxo(),
+    utils.getMergeSplitUtxo(splitTxObj, splitTx),
     aliceAddr,
     aliceAmountSatoshis,
     bobAddr,
@@ -135,7 +135,7 @@ it('Incorrect Destination 1 Satoshi Amount', async function () {
   const mergeSplitHex = mergeSplit(
     alicePrivateKey,
     issuerPrivateKey.publicKey,
-    getMergeUtxo(),
+    utils.getMergeSplitUtxo(splitTxObj, splitTx),
     aliceAddr,
     100,
     bobAddr,
@@ -161,7 +161,7 @@ it('Incorrect Destination 2 Satoshi Amount', async function () {
   const mergeSplitHex = mergeSplit(
     alicePrivateKey,
     issuerPrivateKey.publicKey,
-    getMergeUtxo(),
+    utils.getMergeSplitUtxo(splitTxObj, splitTx),
     aliceAddr,
     aliceAmountSatoshis,
     bobAddr,
@@ -188,7 +188,7 @@ it('Incorrect Owner Private Key Throws Error', async function () {
   const mergeSplitHex = mergeSplit(
     incorrectPrivateKey,
     issuerPrivateKey.publicKey,
-    getMergeUtxo(),
+    utils.getMergeSplitUtxo(splitTxObj, splitTx),
     aliceAddr,
     aliceAmountSatoshis,
     bobAddr,
@@ -215,7 +215,7 @@ it('Incorrect Payments Private Key Throws Error', async function () {
   const mergeSplitHex = mergeSplit(
     issuerPrivateKey,
     issuerPrivateKey.publicKey,
-    getMergeUtxo(),
+    utils.getMergeSplitUtxo(splitTxObj, splitTx),
     aliceAddr,
     aliceAmountSatoshis,
     bobAddr,
@@ -242,7 +242,7 @@ it('Incorrect Contract Public Key Throws Error', async function () {
   const mergeSplitHex = mergeSplit(
     issuerPrivateKey,
     incorrectPrivateKey.publicKey,
-    getMergeUtxo(),
+    utils.getMergeSplitUtxo(splitTxObj, splitTx),
     aliceAddr,
     aliceAmountSatoshis,
     bobAddr,
@@ -344,7 +344,7 @@ it('Invalid Address Destination Address 1 Throws Error', async function () {
     const mergeSplitHex = mergeSplit(
       issuerPrivateKey,
       issuerPrivateKey.publicKey,
-      getMergeUtxo(),
+      utils.getMergeSplitUtxo(splitTxObj, splitTx),
       invalidAddr,
       aliceAmountSatoshis,
       bobAddr,
@@ -370,7 +370,7 @@ it('Invalid Address Destination Address 2 Throws Error', async function () {
     const mergeSplitHex = mergeSplit(
       issuerPrivateKey,
       issuerPrivateKey.publicKey,
-      getMergeUtxo(),
+        utils.getMergeSplitUtxo(splitTxObj, splitTx),
       aliceAddr,
       aliceAmountSatoshis,
       invalidAddr,
@@ -469,39 +469,13 @@ async function setup () {
   const splitHex2 = split(
     alicePrivateKey,
     issuerPrivateKey.publicKey,
-    {
-      txid: mergeTxid,
-      vout: 0,
-      scriptPubKey: mergeTx.vout[0].scriptPubKey.hex,
-      amount: mergeTx.vout[0].value
-    },
+    utils.getUtxo(mergeTxid, mergeTx, 0),
     split2Destinations,
-    {
-      txid: mergeTxid,
-      vout: 1,
-      scriptPubKey: mergeTx.vout[1].scriptPubKey.hex,
-      amount: mergeTx.vout[1].value
-    },
+    utils.getUtxo(mergeTxid, mergeTx, 1),
     fundingPrivateKey
   )
   splitTxid = await broadcast(splitHex2)
   splitTx = await getTransaction(splitTxid)
 
   splitTxObj = new bsv.Transaction(splitHex2)
-}
-
-function getMergeUtxo () {
-  return [{
-    tx: splitTxObj,
-    scriptPubKey: splitTx.vout[0].scriptPubKey.hex,
-    vout: 0,
-    amount: splitTx.vout[0].value
-  },
-  {
-    tx: splitTxObj,
-    scriptPubKey: splitTx.vout[1].scriptPubKey.hex,
-    vout: 1,
-    amount: splitTx.vout[1].value
-
-  }]
 }

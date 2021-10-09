@@ -170,29 +170,12 @@ it("Full Life Cycle Test", async function () {
   const mergeSplitHex = mergeSplit(
     alicePrivateKey,
     issuerPrivateKey.publicKey,
-    [{
-      tx: splitTxObj2,
-      scriptPubKey: splitTx2.vout[0].scriptPubKey.hex,
-      vout: 0,
-      amount: splitTx2.vout[0].value
-    },
-    {
-      tx: splitTxObj2,
-      scriptPubKey: splitTx2.vout[1].scriptPubKey.hex,
-      vout: 1,
-      amount: splitTx2.vout[1].value
-
-    }],
+    utils.getMergeSplitUtxo(splitTxObj, splitTx),
     aliceAddr,
     aliceAmountSatoshis,
     bobAddr,
     bobAmountSatoshis,
-    {
-      txid: splitTxid2,
-      vout: 2,
-      scriptPubKey: splitTx2.vout[2].scriptPubKey.hex,
-      amount: splitTx2.vout[2].value
-    },
+    utils.getUtxo(splitTxid, splitTx, 2),
     fundingPrivateKey
   )
 
