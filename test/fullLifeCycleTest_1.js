@@ -31,7 +31,7 @@ it("Full Life Cycle Test", async function () {
   const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress('testnet').toString())
   const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress('testnet').toString())
   const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
-  const supply = 100000
+  const supply = 10000
   const symbol = 'TAALT'
 
   const schema = utils.schema(publicKeyHash, symbol, supply)

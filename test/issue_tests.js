@@ -230,6 +230,96 @@ it('Empty Issue Info Throws Error', async function () {
   }
 })
 
+it('Invalid Issue Address (Too Short) throws error', async function () {
+  issueInfo = [
+    {
+      addr: '1bc1qxy2kgdygjrsqtzq2',
+      satoshis: 7000,
+      data: 'One'
+    },
+    {
+      addr: bobAddr,
+      satoshis: 3000,
+      data: 'Two'
+    }
+  ]
+  try {
+    issue(
+      issuerPrivateKey,
+      issueInfo,
+      utils.getUtxo(contractTxid, contractTx, 0),
+      utils.getUtxo(contractTxid, contractTx, 1),
+      fundingPrivateKey,
+      true,
+      2
+    )
+    assert(false)
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Invalid Address string provided')
+  }
+})
+//throwing a 'Checksum mismatch' error - if i am reading code correctly it should validate address first 
+//and trigger > ADDRESS_MAX_LENGTH  error
+it('Invalid Issue Address (Too Long) throws error', async function () {
+  issueInfo = [
+    {
+      addr: '1zP1eP5QGefi2DMPTfTL5SLmv7DivfNabc1qxymv7',
+      satoshis: 7000,
+      data: 'One'
+    },
+    {
+      addr: bobAddr,
+      satoshis: 3000,
+      data: 'Two'
+    }
+  ]
+  try {
+    issue(
+      issuerPrivateKey,
+      issueInfo,
+      utils.getUtxo(contractTxid, contractTx, 0),
+      utils.getUtxo(contractTxid, contractTx, 1),
+      fundingPrivateKey,
+      true,
+      2
+    )
+    assert(false)
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Some Error')
+  }
+})
+
+
+it('Non Array Issue Info Throws Error', async function () {
+  try {
+    issue(
+      issuerPrivateKey,
+      {
+        addr: bobAddr,
+        satoshis: 7000,
+        data: 'one'
+      },
+      {
+        addr: aliceAddr,
+        satoshis: 3000,
+        data: 'two'
+      },
+      utils.getUtxo(contractTxid, contractTx, 0),
+      utils.getUtxo(contractTxid, contractTx, 1),
+      fundingPrivateKey,
+      true,
+      2
+    )
+    assert(false)
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('issueInfo is invalid')
+  }
+})
+
+
 
 it('Empty Contract UTXO Info Throws Error', async function () {
   try {
@@ -268,7 +358,7 @@ it('Empty Payment UTXO Info Throws Error', async function () {
 })
 
 
-async function setup () {
+async function setup() {
   const bobPrivateKey = bsv.PrivateKey()
   const alicePrivateKey = bsv.PrivateKey()
   const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress('testnet').toString())
