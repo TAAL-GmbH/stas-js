@@ -31,7 +31,7 @@ let splitTxid
 let splitTx
 let splitTxObj
 
-it('Successful MergeSplit', async function () {
+it('Successful MergeSplit With Fees', async function () {
   await setup() // contract, issue, transfer then split
 
   const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
@@ -48,7 +48,10 @@ it('Successful MergeSplit', async function () {
     utils.getUtxo(splitTxid, splitTx, 2),
     fundingPrivateKey
   )
-  await broadcast(mergeSplitHex)
+  const mergeSplitTxid = await broadcast(mergeSplitHex)
+  expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075)
+  expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
+  expect(await utils.areFeesProcessed(mergeSplitTxid, 2)).to.be.true
 })
 
 it('Successful MergeSplit No Fees', async function () {
@@ -68,7 +71,10 @@ it('Successful MergeSplit No Fees', async function () {
     null,
     fundingPrivateKey
   )
-  await broadcast(mergeSplitHex)
+  const mergeSplitTxid = await broadcast(mergeSplitHex)
+  expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075)
+  expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
+  expect(await utils.areFeesProcessed(mergeSplitTxid, 2)).to.be.false
 })
 
 // needs fixed
@@ -92,7 +98,7 @@ it('Successful MergeSplit No Fees Empty Array', async function () {
   await broadcast(mergeSplitHex)
 })
 
-// investigate - this should fail?
+// Should fail as token amount has been changed?
 it('Incorrect Satoshi Merge Amount Throws Error', async function () {
   await setup() // contract, issue, transfer then split
 
@@ -106,7 +112,7 @@ it('Incorrect Satoshi Merge Amount Throws Error', async function () {
       tx: splitTxObj,
       scriptPubKey: splitTx.vout[0].scriptPubKey.hex,
       vout: 0,
-      amount: 1
+      amount: 1000
     },
     {
       tx: splitTxObj,
@@ -122,8 +128,14 @@ it('Incorrect Satoshi Merge Amount Throws Error', async function () {
     utils.getUtxo(splitTxid, splitTx, 2),
     fundingPrivateKey
   )
-  const mergeSplitTxid = await broadcast(mergeSplitHex)
-  console.log(`MergeSplit TX:   ${mergeSplitTxid}`)
+  try {
+    await broadcast(mergeSplitHex)
+    assert(false)
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Request failed with status code 400')
+  }
+
 })
 
 it('Incorrect Destination 1 Satoshi Amount', async function () {

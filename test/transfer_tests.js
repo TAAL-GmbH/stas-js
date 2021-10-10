@@ -165,30 +165,6 @@ it("Transfer With Invalid Contract Public Key Throws Error", async function () {
   }
 })
 
-//'Checksum mismatch' - Error could be more specific
-it("Address Validation - Incorrect Starting Char", async function () {
-
-  const issueOutFundingVout = issueTx.vout.length - 1
-  const incorrectPK = bsv.PrivateKey()
-  const invalidAddr = '2MSCReQT9E4GpxuK1K7uyD5qF1EmznXjkr' //all addresses start with 1
-
-  try {
-    const transferHex = transfer(
-      incorrectPK,
-      issuerPrivateKey.publicKey,
-      utils.getUtxo(issueTxid, issueTx, 1),
-      invalidAddr,
-      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-      fundingPrivateKey
-    )
-    assert(false)
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Some Validation error')
-  }
-})
-
-
 it("Address Validation - Too Few Chars", async function () {
 
   const issueOutFundingVout = issueTx.vout.length - 1
