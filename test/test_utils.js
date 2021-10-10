@@ -1,5 +1,6 @@
 const axios = require('axios')
 const { completeSTASUnlockingScript } = require('../lib/stas')
+require('dotenv').config()
 
 
 function schema(pkHash, symbol, supply) {
@@ -106,8 +107,8 @@ async function getVoutAmount(txid, vout) {
     method: 'get',
     url,
     auth: {
-      username: 'taal_private',
-      password: 'dotheT@@l007'
+      username: process.env.USERNAME,
+      password: process.env.PASSWORD
     }
   })
   return response.data.vout[vout].value
@@ -119,8 +120,8 @@ async function getToken(txid) {
     method: 'get',
     url,
     auth: {
-      username: 'taal_private',
-      password: 'dotheT@@l007'
+      username: process.env.USERNAME,
+      password: process.env.PASSWORD
     }
   })
 
@@ -137,8 +138,8 @@ async function getTokenResponse(tokenId) {
     method: 'get',
     url,
     auth: {
-      username: 'taal_private',
-      password: 'dotheT@@l007'
+      username: process.env.USERNAME,
+      password: process.env.PASSWORD
     }
   })
 
@@ -152,8 +153,8 @@ async function areFeesProcessed(txid, vout) {
     method: 'get',
     url,
     auth: {
-      username: 'taal_private',
-      password: 'dotheT@@l007'
+      username: process.env.USERNAME,
+      password: process.env.PASSWORD
     }
   })
 

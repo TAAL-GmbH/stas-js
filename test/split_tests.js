@@ -1,9 +1,9 @@
 const expect = require("chai").expect
 const assert = require('chai').assert
 const utils = require('./test_utils')
-const chai = require('chai')
 const axios = require('axios')
 const bsv = require('bsv')
+require('dotenv').config()
 
 const {
     contract,
@@ -418,8 +418,8 @@ async function countNumOfTokens(txid, isThereAFee) {
         method: 'get',
         url,
         auth: {
-            username: 'taal_private',
-            password: 'dotheT@@l007'
+            username: process.env.USERNAME,
+            password: process.env.PASSWORD
         }
     })
 
