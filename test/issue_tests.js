@@ -29,7 +29,7 @@ beforeEach(async function () {
   await setup() // set up contract
 })
 
-it('Successful Issue Token With Split', async function () {
+it('Successful Issue Token With Split And Fee', async function () {
   const issueHex = issue(
     issuerPrivateKey,
     utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
@@ -41,16 +41,13 @@ it('Successful Issue Token With Split', async function () {
   )
   const issueTxid = await broadcast(issueHex)
   const tokenId = await utils.getToken(issueTxid)
-  const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/token/' + tokenId + '/TAALT'
-  const response = await axios({
-    method: 'get',
-    url,
-    auth: {
-      username: 'taal_private',
-      password: 'dotheT@@l007'
-    }
-  })
-  expect(response.data.token.symbol).to.equal(symbol)
+  let response = await utils.getTokenResponse(tokenId)
+  expect(response.token.symbol).to.equal(symbol)
+  expect(response.token.contract_txs).to.contain(contractTxid)
+  expect(response.token.issuance_txs).to.contain(issueTxid)
+  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
+  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
+  expect(await utils.areFeesProcessed(issueTxid, 2)).to.be.false
 })
 
 it('Successful Issue Token Non Split', async function () {
@@ -65,17 +62,57 @@ it('Successful Issue Token Non Split', async function () {
   )
   const issueTxid = await broadcast(issueHex)
   const tokenId = await utils.getToken(issueTxid)
-  const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/token/' + tokenId + '/TAALT'
-  const response = await axios({
-    method: 'get',
-    url,
-    auth: {
-      username: 'taal_private',
-      password: 'dotheT@@l007'
-    }
-  })
+  let response = await utils.getTokenResponse(tokenId)
   expect(response.data.token.symbol).to.equal(symbol)
+  expect(response.token.contract_txs).to.contain(contractTxid)
+  expect(response.token.issuance_txs).to.contain(issueTxid)
+  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
+  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
 })
+
+it('Successful Issue Token With Split No Fee', async function () {
+  const issueHex = issue(
+    issuerPrivateKey,
+    utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+    utils.getUtxo(contractTxid, contractTx, 0),
+    null,
+    null,
+    true,
+    2
+  )
+  const issueTxid = await broadcast(issueHex)
+  const tokenId = await utils.getToken(issueTxid)
+  let response = await utils.getTokenResponse(tokenId)
+  expect(response.token.symbol).to.equal(symbol)
+  expect(response.token.contract_txs).to.contain(contractTxid)
+  expect(response.token.issuance_txs).to.contain(issueTxid)
+  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
+  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
+  expect(await utils.areFeesProcessed(issueTxid, 2)).to.be.false
+})
+
+//needs fixed
+it('Successful Issue Token With Split No Fee Empty Array', async function () {
+  const issueHex = issue(
+    issuerPrivateKey,
+    utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+    utils.getUtxo(contractTxid, contractTx, 0),
+    [],
+    null,
+    true,
+    2
+  )
+  const issueTxid = await broadcast(issueHex)
+  const tokenId = await utils.getToken(issueTxid)
+  let response = await utils.getTokenResponse(tokenId)
+  expect(response.token.symbol).to.equal(symbol)
+  expect(response.token.contract_txs).to.contain(contractTxid)
+  expect(response.token.issuance_txs).to.contain(issueTxid)
+  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
+  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
+  expect(await utils.areFeesProcessed(issueTxid, 2)).to.be.false
+})
+
 
 it('Incorrect Issue Private Key Throws Error', async function () {
   const incorrectPrivateKey = bsv.PrivateKey()

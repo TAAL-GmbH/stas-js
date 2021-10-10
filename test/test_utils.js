@@ -1,4 +1,5 @@
 const axios = require('axios')
+const { completeSTASUnlockingScript } = require('../lib/stas')
 
 
 function schema(pkHash, symbol, supply) {
@@ -112,7 +113,7 @@ async function getVoutAmount(txid, vout) {
   return response.data.vout[vout].value
 }
 
-async function getToken (txid) {
+async function getToken(txid) {
   const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/tx/hash/' + txid
   const response = await axios({
     method: 'get',
@@ -129,7 +130,7 @@ async function getToken (txid) {
   return tokenId
 }
 
-async function getTokenResponse(tokenId){
+async function getTokenResponse(tokenId) {
 
   const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/token/' + tokenId + '/TAALT'
   const response = await axios({
@@ -140,10 +141,11 @@ async function getTokenResponse(tokenId){
       password: 'dotheT@@l007'
     }
   })
- return response.data
+
+  return response
 }
 
- async function areFeesProcessed(txid, vout) {
+async function areFeesProcessed(txid, vout) {
 
   const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/tx/hash/' + txid
   const response = await axios({

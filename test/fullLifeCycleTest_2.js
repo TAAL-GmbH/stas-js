@@ -20,6 +20,7 @@ const {
 
 
 //token issue is intermittingly failing - Tx broadcast is successful but token is not issuing - see line 79
+//Life Cycle Test with different supply
 it("Full Life Cycle Test", async function () {
 
   const issuerPrivateKey = bsv.PrivateKey()

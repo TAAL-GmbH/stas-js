@@ -46,18 +46,12 @@ it("Successful Transfer With Fee", async function () {
     fundingPrivateKey
   )
   const transferTxid = await broadcast(transferHex)
-  const tokenId = await getToken(transferTxid)
-  const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/token/' + tokenId + '/TAALT'
-  const response = await axios({
-    method: 'get',
-    url,
-    auth: {
-      username: 'taal_private',
-      password: 'dotheT@@l007'
-    }
-  })
+  console.log(transferTxid)
+  const tokenId = await utils.getToken(issueTxid)
+  let response = await utils.getTokenResponse(tokenId) //tokengeneration is failing intermittingly 
   expect(response.data.token.symbol).to.equal(symbol)
-  expect(await areFeesProcessed(transferTxid)).to.be.true
+  expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
+  expect(await utils.areFeesProcessed(transferTxid, 1)).to.be.true
 })
 
 
@@ -71,24 +65,14 @@ it("Successful No Fee Transfer", async function () {
     utils.getUtxo(issueTxid, issueTx, 1),
     aliceAddr,
     null,
-    fundingPrivateKey
+    null
   )
   const transferTxid = await broadcast(transferHex)
-  console.log(transferTxid)
-
-  const tokenId = await getToken(transferTxid)
-  console.log(tokenId)
-  const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/token/' + tokenId + '/TAALT'
-  const response = await axios({
-    method: 'get',
-    url,
-    auth: {
-      username: 'taal_private',
-      password: 'dotheT@@l007'
-    }
-  })
+  const tokenId = await utils.getToken(issueTxid)
+  let response = await utils.getTokenResponse(tokenId)
   expect(response.data.token.symbol).to.equal(symbol)
-  expect(await areFeesProcessed(transferTxid)).to.be.false
+  expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
+  expect(await utils.areFeesProcessed(transferTxid, 1)).to.be.false
 })
 
 //should empty array be accepted as no fees?
@@ -102,24 +86,16 @@ it("Successful No Fee Transfer Payment UTXO Empty Array", async function () {
     utils.getUtxo(issueTxid, issueTx, 1),
     aliceAddr,
     [],
-    fundingPrivateKey
+    null
   )
   const transferTxid = await broadcast(transferHex)
   console.log(transferTxid)
 
-  const tokenId = await getToken(transferTxid)
-  console.log(tokenId)
-  const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/token/' + tokenId + '/TAALT'
-  const response = await axios({
-    method: 'get',
-    url,
-    auth: {
-      username: 'taal_private',
-      password: 'dotheT@@l007'
-    }
-  })
+  const tokenId = await utils.getToken(issueTxid)
+  let response = await utils.getTokenResponse(tokenId)
   expect(response.data.token.symbol).to.equal(symbol)
-  expect(await areFeesProcessed(transferTxid)).to.be.false
+  expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
+  expect(await utils.areFeesProcessed(transferTxid, 1)).to.be.false
 })
 
 
@@ -177,12 +153,7 @@ it("Transfer With Invalid Contract Public Key Throws Error", async function () {
     incorrectPrivateKey.publicKey,
     utils.getUtxo(issueTxid, issueTx, 1),
     aliceAddr,
-    {
-      txid: issueTxid,
-      vout: issueOutFundingVout,
-      scriptPubKey: issueTx.vout[issueOutFundingVout].scriptPubKey.hex,
-      amount: issueTx.vout[issueOutFundingVout].value
-    },
+    utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
     fundingPrivateKey
   )
   try {
@@ -240,7 +211,7 @@ it("Address Validation - Too Few Chars", async function () {
   }
 })
 
-//needs fixed - throwing 'Checksum mismatch' 
+//needs fixed - throwing 'Checksum mismatch'  - can we validate address similar to issue?
 it("Address Validation - Too May Chars", async function () {
 
   const issueOutFundingVout = issueTx.vout.length - 1
@@ -353,43 +324,4 @@ async function setup() {
   issueTxid = await broadcast(issueHex)
   issueTx = await getTransaction(issueTxid)
 
-}
-
-
-
-async function getToken(txid) {
-
-  const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/tx/hash/' + txid
-  const response = await axios({
-    method: 'get',
-    url,
-    auth: {
-      username: 'taal_private',
-      password: 'dotheT@@l007'
-    }
-  })
-
-  const temp = response.data.vout[0].scriptPubKey.asm
-  const split = temp.split('OP_RETURN')[1]
-  const tokenId = split.split(' ')[1]
-  return tokenId
-}
-
-
-async function areFeesProcessed(txid) {
-
-  const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/tx/hash/' + txid
-  const response = await axios({
-    method: 'get',
-    url,
-    auth: {
-      username: 'taal_private',
-      password: 'dotheT@@l007'
-    }
-  })
-
-  if (response.data.vout[1] != null)
-    return true
-  else
-    return false
 }

@@ -31,7 +31,7 @@ let splitTxObj
 
 
 
-it("Successful Merge After Split into 2 Addresses", async function () {
+it("Successful Merge After Split into 2 Addresses With Fee", async function () {
 
     await setupWithSplit() //contract, issue then split
 
@@ -43,8 +43,15 @@ it("Successful Merge After Split into 2 Addresses", async function () {
         utils.getUtxo(splitTxid, splitTx, 2),
         fundingPrivateKey
     )
-
     const mergeTxid = await broadcast(mergeHex)
+    expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00003)
+    const tokenIdMerge = await utils.getToken(mergeTxid)
+    let response = await utils.getTokenResponse(tokenIdMerge)
+    expect(response.data.token.symbol).to.equal('TAALT')
+    expect(response.data.token.contract_txs).to.contain(contractTxid)
+    expect(response.data.token.issuance_txs).to.contain(issueTxid)
+    expect(await utils.areFeesProcessed(mergeTxid, 1)).to.be.true
+    
 })
 
 it("Successful Merge With No Fee", async function () {
@@ -59,8 +66,14 @@ it("Successful Merge With No Fee", async function () {
         null,
         fundingPrivateKey
     )
-
     const mergeTxid = await broadcast(mergeHex)
+    expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00003)
+    const tokenIdMerge = await utils.getToken(mergeTxid)
+    let response = await utils.getTokenResponse(tokenIdMerge)
+    expect(response.data.token.symbol).to.equal('TAALT')
+    expect(response.data.token.contract_txs).to.contain(contractTxid)
+    expect(response.data.token.issuance_txs).to.contain(issueTxid)
+    expect(await utils.areFeesProcessed(mergeTxid, 1)).to.be.false
 })
 
 //needs fixed
@@ -78,6 +91,13 @@ it("Successful Merge With No Fee Empty Array", async function () {
     )
 
     const mergeTxid = await broadcast(mergeHex)
+    expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00003)
+    const tokenIdMerge = await utils.getToken(mergeTxid)
+    let response = await utils.getTokenResponse(tokenIdMerge)
+    expect(response.data.token.symbol).to.equal('TAALT')
+    expect(response.data.token.contract_txs).to.contain(contractTxid)
+    expect(response.data.token.issuance_txs).to.contain(issueTxid)
+    expect(await utils.areFeesProcessed(mergeTxid, 1)).to.be.false
 })
 
 
@@ -113,6 +133,7 @@ it("Incorrect Funding Private Key Throws Error", async function () {
         bobPrivateKey,
         issuerPrivateKey.publicKey,
         utils.getMergeUtxo(splitTxObj),
+        aliceAddr,
         utils.getUtxo(splitTxid, splitTx, 2),
         incorrectPrivateKey
     )

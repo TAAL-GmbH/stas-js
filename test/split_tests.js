@@ -33,7 +33,7 @@ beforeEach(async function () {
 });
 
 
-it("Successful Split Into Two Tokens", async function () {
+it("Successful Split Into Two Tokens With Fee", async function () {
 
     const bobAmount1 = transferTx.vout[0].value / 2
     const bobAmount2 = transferTx.vout[0].value - bobAmount1
@@ -50,9 +50,13 @@ it("Successful Split Into Two Tokens", async function () {
         fundingPrivateKey
     )
     const splitTxid = await broadcast(splitHex)
+    console.log(bobAddr)
+    console.log(splitTxid)
     let noOfTokens = await countNumOfTokens(splitTxid, true)
     expect(splitDestinations).to.have.length(noOfTokens) //ensure that tx output contains 2 values
-
+    expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000015)
+    expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000015)
+    expect(await utils.areFeesProcessed(splitTxid, 2)).to.be.true
 })
 
 
@@ -76,6 +80,64 @@ it("Successful Split Into Four Tokens", async function () {
     const splitTxid = await broadcast(splitHex)
     let noOfTokens = await countNumOfTokens(splitTxid, true)
     expect(splitDestinations).to.have.length(noOfTokens) //ensure that tx output contains 4 values
+    expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.0000075)
+    expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.0000075)
+    expect(await utils.getVoutAmount(splitTxid, 2)).to.equal(0.0000075)
+    expect(await utils.getVoutAmount(splitTxid, 3)).to.equal(0.0000075)
+
+})
+
+it("Successful Split Into Two Tokens With No Fee", async function () {
+
+    const bobAmount1 = transferTx.vout[0].value / 2
+    const bobAmount2 = transferTx.vout[0].value - bobAmount1
+    const splitDestinations = []
+    splitDestinations[0] = { address: bobAddr, amount: bobAmount1 }
+    splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
+
+    const splitHex = split(
+        alicePrivateKey,
+        issuerPrivateKey.publicKey,
+        utils.getUtxo(transferTxid, transferTx, 0),
+        splitDestinations,
+        null,
+        null
+    )
+    const splitTxid = await broadcast(splitHex)
+    console.log(bobAddr)
+    console.log(splitTxid)
+    let noOfTokens = await countNumOfTokens(splitTxid, false)
+    expect(splitDestinations).to.have.length(noOfTokens) //ensure that tx output contains 2 values
+    expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000015)
+    expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000015)
+    expect(await utils.areFeesProcessed(splitTxid, 2)).to.be.false
+})
+
+//needs fixed
+it("Successful Split Into Two Tokens With No Fee Empty Array", async function () {
+
+    const bobAmount1 = transferTx.vout[0].value / 2
+    const bobAmount2 = transferTx.vout[0].value - bobAmount1
+    const splitDestinations = []
+    splitDestinations[0] = { address: bobAddr, amount: bobAmount1 }
+    splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
+
+    const splitHex = split(
+        alicePrivateKey,
+        issuerPrivateKey.publicKey,
+        utils.getUtxo(transferTxid, transferTx, 0),
+        splitDestinations,
+        [],
+        null
+    )
+    const splitTxid = await broadcast(splitHex)
+    console.log(bobAddr)
+    console.log(splitTxid)
+    let noOfTokens = await countNumOfTokens(splitTxid, false)
+    expect(splitDestinations).to.have.length(noOfTokens) //ensure that tx output contains 2 values
+    expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000015)
+    expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000015)
+    expect(await utils.areFeesProcessed(splitTxid, 2)).to.be.false
 })
 
 
@@ -172,7 +234,58 @@ it("Add Too Much To Split Throws Error", async function () {
     }
 })
 
+//throwing a 'Checksum mismatch' error - if i am reading code correctly it should validate address first 
+//and trigger > ADDRESS_MAX_LENGTH  error
+it("Address Too Long Throws Error", async function () {
 
+    const bobAmount1 = transferTx.vout[0].value / 2
+    const bobAmount2 = transferTx.vout[0].value - bobAmount1
+    console.log(bobAddr)
+    const splitDestinations = []
+    splitDestinations[0] = { address: '1LF2wNCBT9dp5jN7fa6xSAaUGjJ5Pyz5VGaUG', amount: bobAmount1 }
+    splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
+    const incorrectPrivateKey = bsv.PrivateKey()
+    try {
+    const splitHex = split(
+        incorrectPrivateKey,
+        issuerPrivateKey.publicKey,
+        utils.getUtxo(transferTxid, transferTx, 0),
+        splitDestinations,
+        utils.getUtxo(transferTxid, transferTx, 1),
+        fundingPrivateKey
+    )
+        assert(false)
+    } catch (e) {
+        expect(e).to.be.instanceOf(Error)
+        expect(e.message).to.eql('Invalid Address')
+    }
+})
+
+//needs fixed
+it("Address Too Short Throws Error", async function () {
+
+    const bobAmount1 = transferTx.vout[0].value / 2
+    const bobAmount2 = transferTx.vout[0].value - bobAmount1
+    console.log(bobAddr)
+    const splitDestinations = []
+    splitDestinations[0] = { address: '1LF2wNCBT9dp5jN7fa6xSAaU', amount: bobAmount1 }
+    splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
+    const incorrectPrivateKey = bsv.PrivateKey()
+    try {
+    const splitHex = split(
+        incorrectPrivateKey,
+        issuerPrivateKey.publicKey,
+        utils.getUtxo(transferTxid, transferTx, 0),
+        splitDestinations,
+        utils.getUtxo(transferTxid, transferTx, 1),
+        fundingPrivateKey
+    )
+        assert(false)
+    } catch (e) {
+        expect(e).to.be.instanceOf(Error)
+        expect(e.message).to.eql('Invalid Address string provided')
+    }
+})
 it("Incorrect Owner Private Key Throws Error", async function () {
 
     const bobAmount1 = transferTx.vout[0].value / 2
@@ -294,7 +407,6 @@ async function setup() {
         fundingPrivateKey
     )
     transferTxid = await broadcast(transferHex)
-    console.log(`Transfer TX:     ${transferTxid}`)
     transferTx = await getTransaction(transferTxid)
 }
 
