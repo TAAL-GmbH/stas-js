@@ -1,5 +1,5 @@
 const expect = require("chai").expect
-const utils = require('./test_utils')
+const utils = require('./utils/test_utils')
 const bsv = require('bsv')
 
 const {
@@ -15,7 +15,8 @@ const {
 const {
   getTransaction,
   getFundsFromFaucet,
-  broadcast
+  broadcast,
+  SATS_PER_BITCOIN
 } = require('../index').utils
 
 
@@ -133,12 +134,11 @@ it("Full Life Cycle Test", async function () {
   console.log(`Merge TX:        ${mergeTxid}`)
   const mergeTx = await getTransaction(mergeTxid)
   expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00003)
-  const tokenIdMerge = await utils.getToken(issueTxid)
-  let responseMerge = await utils.getTokenResponse(tokenIdMerge)
-  console.log(responseMerge.token)
-  expect(responseMerge.token.symbol).to.equal(symbol)
-  expect(responseMerge.token.contract_txs).to.contain(contractTxid)
-  expect(responseMerge.token.issuance_txs).to.contain(issueTxid)
+  // const tokenIdMerge = await utils.getToken(issueTxid)
+  // let responseMerge = await utils.getTokenResponse(tokenIdMerge)
+  // expect(responseMerge.token.symbol).to.equal(symbol)
+  // expect(responseMerge.token.contract_txs).to.contain(contractTxid)
+  // expect(responseMerge.token.issuance_txs).to.contain(issueTxid)
 
   // Split again - both payable to Alice...
   const aliceAmount1 = mergeTx.vout[0].value / 2
@@ -165,18 +165,18 @@ it("Full Life Cycle Test", async function () {
   // Now mergeSplit
   const splitTxObj2 = new bsv.Transaction(splitHex2)
 
-  const aliceAmountSatoshis = Math.floor(splitTx2.vout[0].value * 1e8) / 2
-  const bobAmountSatoshis = Math.floor(splitTx2.vout[0].value * 1e8) + Math.floor(splitTx2.vout[1].value * 1e8) - aliceAmountSatoshis
+  const aliceAmountSatoshis = Math.floor(splitTx2.vout[0].value * SATS_PER_BITCOIN) / 2
+  const bobAmountSatoshis = Math.floor(splitTx2.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx2.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
 
   const mergeSplitHex = mergeSplit(
     alicePrivateKey,
     issuerPrivateKey.publicKey,
-    utils.getMergeSplitUtxo(splitTxObj, splitTx),
+    utils.getMergeSplitUtxo(splitTxObj2, splitTx2),
     aliceAddr,
     aliceAmountSatoshis,
     bobAddr,
     bobAmountSatoshis,
-    utils.getUtxo(splitTxid, splitTx, 2),
+    utils.getUtxo(splitTxid2, splitTx2, 2),
     fundingPrivateKey
   )
 

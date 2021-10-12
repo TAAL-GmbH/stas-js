@@ -1,6 +1,6 @@
 const expect = require("chai").expect
 const assert = require('chai').assert
-const utils = require('./test_utils')
+const utils = require('./utils/test_utils')
 const chai = require('chai')
 const axios = require('axios')
 const bsv = require('bsv')

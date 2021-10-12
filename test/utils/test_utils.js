@@ -1,5 +1,5 @@
 const axios = require('axios')
-const { completeSTASUnlockingScript } = require('../lib/stas')
+const { completeSTASUnlockingScript } = require('../../lib/stas')
 require('dotenv').config()
 
 

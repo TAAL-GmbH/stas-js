@@ -1,6 +1,6 @@
 const expect = require('chai').expect
 const assert = require('chai').assert
-const utils = require('./test_utils')
+const utils = require('./utils/test_utils')
 const axios = require('axios')
 const bsv = require('bsv')
 require('dotenv').config()
@@ -8,10 +8,6 @@ require('dotenv').config()
 const {
   contract,
   issue,
-  transfer,
-  split,
-  merge,
-  mergeSplit,
   redeem
 } = require('../index')
 

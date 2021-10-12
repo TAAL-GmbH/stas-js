@@ -2,7 +2,7 @@ const bsv = require('bsv')
 const {
   Varint
 } = bsv.encoding
-const preimageFn = require('./../lib/preimage')
+const preimageFn = require('../../lib/preimage')
 const {
   getStasScript,
   getVersion,
@@ -10,13 +10,13 @@ const {
   sighash,
   P2PKH_UNLOCKING_SCRIPT_BYTES,
   isSplittable
-} = require('./../lib/stas')
+} = require('../../lib/stas')
 const {
   numberToLESM,
   replaceAll,
   addressToPubkeyhash,
   reverseEndian
-} = require('./../lib/utils')
+} = require('../../lib/utils')
 
 // merge will take 2 existing STAS UTXOs and combine them and assign the single UTXO to another address.
 // The tokenOwnerPrivateKey must own the existing STAS UTXOs, the payment UTXOs and will be the owner of the change, if any.

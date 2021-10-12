@@ -1,5 +1,6 @@
 const expect = require("chai").expect
-const utils = require('./test_utils')
+const assert = require('chai').assert
+const utils = require('./utils/test_utils')
 const bsv = require('bsv')
 
 const {
@@ -15,7 +16,7 @@ const {
 
 
 
-it("Full Life Cycle Test", async function () {
+it("Attempt to Issue Token With Incorrect Public Key Hash Fails", async function () {
 
     const issuerPrivateKey = bsv.PrivateKey()
     const fundingPrivateKey = bsv.PrivateKey()
@@ -61,8 +62,11 @@ it("Full Life Cycle Test", async function () {
     const issueTxid = await broadcast(issueHex)
     const tokenId = await utils.getToken(issueTxid)
 
+    //Token Issuance Fails
     try {
         await utils.getTokenResponse(tokenId)
+        assert(false)
+        return
     } catch (e) {
         expect(e).to.be.instanceOf(Error)
         expect(e.message).to.eql('Request failed with status code 404')

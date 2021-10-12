@@ -1,9 +1,8 @@
 const expect = require("chai").expect
-const utils = require('./test_utils')
+const utils = require('./utils/test_utils')
 const chai = require('chai')
-const chaiAsPromised = require('chai-as-promised')
 const bsv = require('bsv')
-const mergeUtil = require('./mergeWithoutValidation')
+const mergeUtil = require('./utils/mergeWithoutValidation')
 
 const {
   contract,
