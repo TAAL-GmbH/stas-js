@@ -1,8 +1,6 @@
 const expect = require('chai').expect
 const assert = require('chai').assert
 const utils = require('./test_utils')
-const chai = require('chai')
-const axios = require('axios')
 const bsv = require('bsv')
 
 const {
@@ -96,46 +94,6 @@ it('Successful MergeSplit No Fees Empty Array', async function () {
     fundingPrivateKey
   )
   await broadcast(mergeSplitHex)
-})
-
-// Should fail as token amount has been changed?
-it('Incorrect Satoshi Merge Amount Throws Error', async function () {
-  await setup() // contract, issue, transfer then split
-
-  const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
-  const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
-
-  const mergeSplitHex = mergeSplit(
-    alicePrivateKey,
-    issuerPrivateKey.publicKey,
-    [{
-      tx: splitTxObj,
-      scriptPubKey: splitTx.vout[0].scriptPubKey.hex,
-      vout: 0,
-      amount: 1000
-    },
-    {
-      tx: splitTxObj,
-      scriptPubKey: splitTx.vout[1].scriptPubKey.hex,
-      vout: 1,
-      amount: splitTx.vout[1].value
-
-    }],
-    aliceAddr,
-    aliceAmountSatoshis,
-    bobAddr,
-    bobAmountSatoshis,
-    utils.getUtxo(splitTxid, splitTx, 2),
-    fundingPrivateKey
-  )
-  try {
-    await broadcast(mergeSplitHex)
-    assert(false)
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Request failed with status code 400')
-  }
-
 })
 
 it('Incorrect Destination 1 Satoshi Amount', async function () {

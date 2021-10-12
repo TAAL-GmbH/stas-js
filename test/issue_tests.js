@@ -32,13 +32,14 @@ beforeEach(async function () {
 it('Successful Issue Token With Split And Fee', async function () {
   const issueHex = issue(
     issuerPrivateKey,
-    utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+    utils.getIssueInfo(aliceAddr, 5000, bobAddr, 3000),
     utils.getUtxo(contractTxid, contractTx, 0),
     utils.getUtxo(contractTxid, contractTx, 1),
     fundingPrivateKey,
     true,
     2
   )
+  console.log(issueHex)
   const issueTxid = await broadcast(issueHex)
   const tokenId = await utils.getToken(issueTxid)
   let response = await utils.getTokenResponse(tokenId)
@@ -198,8 +199,7 @@ it('Incorrect Redemption Address Throws Error', async function () {
   }
 })
 
-
-it('Issue with Incorrect Balance Throws Error', async function () {
+it('Issue with Incorrect Balance (Less Than) Throws Error', async function () {
   try {
     issue(
       issuerPrivateKey,
@@ -213,9 +213,29 @@ it('Issue with Incorrect Balance Throws Error', async function () {
     assert(false)
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('total out amount 13000 must equal total in amount 10000')
+  }
+})
+
+it('Issue with Incorrect Balance (More Than) Throws Error', async function () {
+  try {
+    issue(
+      issuerPrivateKey,
+      utils.getIssueInfo(aliceAddr, 10000, bobAddr, 3000),
+      utils.getUtxo(contractTxid, contractTx, 0),
+      utils.getUtxo(contractTxid, contractTx, 1),
+      fundingPrivateKey,
+      true,
+      2
+    )
+    assert(false)
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
     expect(e.message).to.eql('total out amount 0 must equal total in amount 10000')
   }
 })
+
+
 
 // some validation required
 // there is no invalid data.
