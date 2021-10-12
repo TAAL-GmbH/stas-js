@@ -87,14 +87,11 @@ function getMergeSplitUtxo(splitTxObj, splitTx) {
     tx: splitTxObj,
     scriptPubKey: splitTx.vout[0].scriptPubKey.hex,
     vout: 0,
-    amount: splitTx.vout[0].value
   },
   {
     tx: splitTxObj,
     scriptPubKey: splitTx.vout[1].scriptPubKey.hex,
     vout: 1,
-    amount: splitTx.vout[1].value
-
   }]
 }
 

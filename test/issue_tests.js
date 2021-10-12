@@ -47,7 +47,7 @@ it('Successful Issue Token With Split And Fee', async function () {
   expect(response.data.token.issuance_txs).to.contain(issueTxid)
   expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
   expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
-  expect(await utils.areFeesProcessed(issueTxid, 2)).to.be.false
+  expect(await utils.areFeesProcessed(issueTxid, 2)).to.be.true
 })
 
 it('Successful Issue Token Non Split', async function () {
