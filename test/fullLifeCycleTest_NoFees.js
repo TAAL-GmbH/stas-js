@@ -42,7 +42,6 @@ it("Full Life Cycle Test With No Fees", async function () {
     supply
   )
   const contractTxid = await broadcast(contractHex)
-  console.log(`Contract TX:     ${contractTxid}`)
   const contractTx = await getTransaction(contractTxid)
   let amount = await utils.getVoutAmount(contractTxid, 0)
   expect(amount).to.equal(supply / 100000000)
@@ -65,7 +64,6 @@ it("Full Life Cycle Test With No Fees", async function () {
     return
   }
   const issueTxid = await broadcast(issueHex)
-  console.log(`Issue TX:        ${issueTxid}`)
   const issueTx = await getTransaction(issueTxid)
   // const tokenId = await utils.getToken(issueTxid)
   // let response = await utils.getTokenResponse(tokenId)
@@ -74,9 +72,7 @@ it("Full Life Cycle Test With No Fees", async function () {
   // expect(response.token.issuance_txs).to.contain(issueTxid)
   expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
   expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
-
-
-  const issueOutFundingVout = issueTx.vout.length - 1
+  expect(await utils.areFeesProcessed(issueTxid, 2)).to.be.false;
 
   const transferHex = transfer(
     bobPrivateKey,
@@ -87,7 +83,6 @@ it("Full Life Cycle Test With No Fees", async function () {
     null
   )
   const transferTxid = await broadcast(transferHex)
-  console.log(`Transfer TX:     ${transferTxid}`)
   const transferTx = await getTransaction(transferTxid)
   expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
 
@@ -108,10 +103,10 @@ it("Full Life Cycle Test With No Fees", async function () {
     null
   )
   const splitTxid = await broadcast(splitHex)
-  console.log(`Split TX:        ${splitTxid}`)
   const splitTx = await getTransaction(splitTxid)
   expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000015)
   expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000015)
+  expect(await utils.areFeesProcessed(splitTxid, 2)).to.be.false;
 
   // Now let's merge the last split back together
   const splitTxObj = new bsv.Transaction(splitHex)
@@ -126,7 +121,6 @@ it("Full Life Cycle Test With No Fees", async function () {
   )
 
   const mergeTxid = await broadcast(mergeHex)
-  console.log(`Merge TX:        ${mergeTxid}`)
   const mergeTx = await getTransaction(mergeTxid)
   expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00003)
   // const tokenIdMerge = await utils.getToken(issueTxid)
@@ -153,10 +147,10 @@ it("Full Life Cycle Test With No Fees", async function () {
     null
   )
   const splitTxid2 = await broadcast(splitHex2)
-  console.log(`Split TX2:       ${splitTxid2}`)
   const splitTx2 = await getTransaction(splitTxid2)
   expect(await utils.getVoutAmount(splitTxid2, 0)).to.equal(0.000015)
   expect(await utils.getVoutAmount(splitTxid2, 1)).to.equal(0.000015)
+  expect(await utils.areFeesProcessed(splitTxid2, 2)).to.be.false;
 
   // Now mergeSplit
   const splitTxObj2 = new bsv.Transaction(splitHex2)
@@ -167,19 +161,7 @@ it("Full Life Cycle Test With No Fees", async function () {
   const mergeSplitHex = mergeSplit(
     alicePrivateKey,
     issuerPrivateKey.publicKey,
-    [{
-      tx: splitTxObj2,
-      scriptPubKey: splitTx2.vout[0].scriptPubKey.hex,
-      vout: 0,
-      amount: splitTx2.vout[0].value
-    },
-    {
-      tx: splitTxObj2,
-      scriptPubKey: splitTx2.vout[1].scriptPubKey.hex,
-      vout: 1,
-      amount: splitTx2.vout[1].value
-
-    }],
+    utils.getMergeSplitUtxo(splitTxObj2, splitTx2),
     aliceAddr,
     aliceAmountSatoshis,
     bobAddr,
@@ -189,10 +171,10 @@ it("Full Life Cycle Test With No Fees", async function () {
   )
 
   const mergeSplitTxid = await broadcast(mergeSplitHex)
-  console.log(`MergeSplit TX:   ${mergeSplitTxid}`)
   const mergeSplitTx = await getTransaction(mergeSplitTxid)
   expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075)
   expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
+  expect(await utils.areFeesProcessed(mergeSplitTxid, 2)).to.be.false;
 
 
   // Alice wants to redeem the money from bob...
@@ -204,6 +186,6 @@ it("Full Life Cycle Test With No Fees", async function () {
     null
   )
   const redeemTxid = await broadcast(redeemHex)
-  console.log(`Redeem TX:       ${redeemTxid}`)
   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.0000075)
+  expect(await utils.areFeesProcessed(redeemTxid, 1)).to.be.false;
 })
