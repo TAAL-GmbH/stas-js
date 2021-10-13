@@ -1,9 +1,8 @@
 const expect = require("chai").expect
 const assert = require('chai').assert
 const utils = require('./utils/test_utils')
-const chai = require('chai')
-const axios = require('axios')
 const bsv = require('bsv')
+const mergeUtil = require('./utils/mergeWithoutValidation')
 
 const {
     contract,
@@ -29,11 +28,12 @@ let splitTxid
 let splitTx
 let splitTxObj
 
+beforeEach(async function () {
 
+    await setup()
+  })
 
 it("Successful Merge After Split into 2 Addresses With Fee", async function () {
-
-    await setupWithSplit() //contract, issue then split
 
     const mergeHex = merge(
         bobPrivateKey,
@@ -44,7 +44,7 @@ it("Successful Merge After Split into 2 Addresses With Fee", async function () {
         fundingPrivateKey
     )
     const mergeTxid = await broadcast(mergeHex)
-    expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00003)
+    expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007)
     const tokenIdMerge = await utils.getToken(mergeTxid)
     let response = await utils.getTokenResponse(tokenIdMerge)
     expect(response.data.token.symbol).to.equal('TAALT')
@@ -56,8 +56,6 @@ it("Successful Merge After Split into 2 Addresses With Fee", async function () {
 
 it("Successful Merge With No Fee", async function () {
 
-    await setupWithSplit() //contract, issue then split
-
     const mergeHex = merge(
         bobPrivateKey,
         issuerPrivateKey.publicKey,
@@ -67,7 +65,7 @@ it("Successful Merge With No Fee", async function () {
         fundingPrivateKey
     )
     const mergeTxid = await broadcast(mergeHex)
-    expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00003)
+    expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007)
     const tokenIdMerge = await utils.getToken(mergeTxid)
     let response = await utils.getTokenResponse(tokenIdMerge)
     expect(response.data.token.symbol).to.equal('TAALT')
@@ -79,8 +77,6 @@ it("Successful Merge With No Fee", async function () {
 //needs fixed
 it("Successful Merge With No Fee Empty Array", async function () {
 
-    await setupWithSplit() //contract, issue then split
-
     const mergeHex = merge(
         bobPrivateKey,
         issuerPrivateKey.publicKey,
@@ -91,7 +87,7 @@ it("Successful Merge With No Fee Empty Array", async function () {
     )
 
     const mergeTxid = await broadcast(mergeHex)
-    expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00003)
+    expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007)
     const tokenIdMerge = await utils.getToken(mergeTxid)
     let response = await utils.getTokenResponse(tokenIdMerge)
     expect(response.data.token.symbol).to.equal('TAALT')
@@ -101,11 +97,9 @@ it("Successful Merge With No Fee Empty Array", async function () {
 })
 
 
-
 it("Incorrect Owner Private Key Throws Error", async function () {
 
     const incorrectPrivateKey = bsv.PrivateKey()
-    await setupWithSplit() //contract, issue then split
 
     const mergeHex = merge(
         incorrectPrivateKey,
@@ -118,6 +112,7 @@ it("Incorrect Owner Private Key Throws Error", async function () {
     try {
         await broadcast(mergeHex)
         assert(false)
+        return
     } catch (e) {
         expect(e).to.be.instanceOf(Error)
         expect(e.message).to.eql('Request failed with status code 400')
@@ -127,7 +122,6 @@ it("Incorrect Owner Private Key Throws Error", async function () {
 it("Incorrect Funding Private Key Throws Error", async function () {
 
     const incorrectPrivateKey = bsv.PrivateKey()
-    await setupWithSplit() //contract, issue then split
 
     const mergeHex = merge(
         bobPrivateKey,
@@ -140,6 +134,7 @@ it("Incorrect Funding Private Key Throws Error", async function () {
     try {
         await broadcast(mergeHex)
         assert(false)
+        return
     } catch (e) {
         expect(e).to.be.instanceOf(Error)
         expect(e.message).to.eql('Request failed with status code 400')
@@ -149,7 +144,6 @@ it("Incorrect Funding Private Key Throws Error", async function () {
 it("Incorrect Contract Public Key Throws Error", async function () {
 
     const incorrectPrivateKey = bsv.PrivateKey()
-    await setupWithSplit() //contract, issue then split
 
     const mergeHex = merge(
         bobPrivateKey,
@@ -162,6 +156,7 @@ it("Incorrect Contract Public Key Throws Error", async function () {
     try {
         await broadcast(mergeHex)
         assert(false)
+        return
     } catch (e) {
         expect(e).to.be.instanceOf(Error)
         expect(e.message).to.eql('Request failed with status code 400')
@@ -169,8 +164,6 @@ it("Incorrect Contract Public Key Throws Error", async function () {
 })
 
 it("Attempt to Merge More Than 2 Tokens", async function () {
-
-    await setupWithSplit() //contract, issue then split
 
     try {
         const mergeHex = merge(
@@ -193,15 +186,46 @@ it("Attempt to Merge More Than 2 Tokens", async function () {
             fundingPrivateKey
         )
         assert(false)
+        return
     } catch (e) {
         expect(e).to.be.instanceOf(Error)
         expect(e.message).to.eql('This function can only merge exactly 2 STAS tokens')
     }
 })
 
-it("Attempt to Merge Less Than Two  Tokens", async function () {
+it("Attempt to Merge More Than 2 Tokens Without SDK Validation", async function () {
 
-    await setupWithSplit() //contract, issue then split
+   
+        const mergeHex = mergeUtil.mergeWithoutValidation(
+            bobPrivateKey,
+            issuerPrivateKey.publicKey,
+            [{
+                tx: splitTxObj,
+                vout: 0
+            },
+            {
+                tx: splitTxObj,
+                vout: 1
+            },
+            {
+                tx: splitTxObj,
+                vout: 2
+            }],
+            aliceAddr,
+            utils.getUtxo(splitTxid, splitTx, 2),
+            fundingPrivateKey
+        )
+        try {
+        await broadcast(mergeHex)
+        assert(false)
+        return
+    } catch (e) {
+        expect(e).to.be.instanceOf(Error)
+        expect(e.message).to.eql('Request failed with status code 400')
+    }
+})
+
+it("Attempt to Merge Less Than Two  Tokens", async function () {
 
     try {
         const mergeHex = merge(
@@ -216,73 +240,15 @@ it("Attempt to Merge Less Than Two  Tokens", async function () {
             fundingPrivateKey
         )
         assert(false)
+        return
     } catch (e) {
         expect(e).to.be.instanceOf(Error)
         expect(e.message).to.eql('This function can only merge exactly 2 STAS tokens')
     }
 })
 
-//refactor
-async function setupWithOutSplit() {
 
-    const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress('testnet').toString())
-    const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress('testnet').toString())
-    const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
-    const symbol = 'TAALT'
-    const supply = 10000
-    const schema = utils.schema(publicKeyHash, symbol, supply)
-
-    const contractHex = contract(
-        issuerPrivateKey,
-        contractUtxos,
-        fundingUtxos,
-        fundingPrivateKey,
-        schema,
-        supply
-    )
-    contractTxid = await broadcast(contractHex)
-    contractTx = await getTransaction(contractTxid)
-
-    const issueHex = issue(
-        issuerPrivateKey,
-        utils.getIssueInfo(bobAddr, 7000, aliceAddr, 3000),
-        utils.getUtxo(contractTxid, contractTx, 0),
-        utils.getUtxo(contractTxid, contractTx, 1),
-        fundingPrivateKey,
-        true,
-        2
-    )
-    issueTxid = await broadcast(issueHex)
-    issueTx = await getTransaction(issueTxid)
-
-    const issueOutFundingVout = issueTx.vout.length - 1
-
-    const transferHex = transfer(
-        bobPrivateKey,
-        issuerPrivateKey.publicKey,
-        {
-            txid: issueTxid,
-            vout: 1,
-            scriptPubKey: issueTx.vout[1].scriptPubKey.hex,
-            amount: issueTx.vout[1].value
-        },
-        aliceAddr,
-        {
-            txid: issueTxid,
-            vout: issueOutFundingVout,
-            scriptPubKey: issueTx.vout[issueOutFundingVout].scriptPubKey.hex,
-            amount: issueTx.vout[issueOutFundingVout].value
-        },
-        fundingPrivateKey
-    )
-    const transferTxid = await broadcast(transferHex)
-    const transferTx = await getTransaction(transferTxid)
-}
-
-
-
-
-async function setupWithSplit() {
+async function setup() {
 
     const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress('testnet').toString())
     const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress('testnet').toString())
@@ -316,19 +282,8 @@ async function setupWithSplit() {
 
     const issueOutFundingVout = issueTx.vout.length - 1
 
-    const transferHex = transfer(
-        bobPrivateKey,
-        issuerPrivateKey.publicKey,
-        utils.getUtxo(issueTxid, issueTx, 1),
-        aliceAddr,
-        utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-        fundingPrivateKey
-    )
-    const transferTxid = await broadcast(transferHex)
-    const transferTx = await getTransaction(transferTxid)
-
-    const bobAmount1 = transferTx.vout[0].value / 2
-    const bobAmount2 = transferTx.vout[0].value - bobAmount1
+    const bobAmount1 = issueTx.vout[0].value / 2
+    const bobAmount2 = issueTx.vout[0].value - bobAmount1
     const splitDestinations = []
     splitDestinations[0] = { address: bobAddr, amount: bobAmount1 }
     splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
@@ -336,13 +291,12 @@ async function setupWithSplit() {
     const splitHex = split(
         alicePrivateKey,
         issuerPrivateKey.publicKey,
-        utils.getUtxo(transferTxid, transferTx, 0),
+        utils.getUtxo(issueTxid, issueTx, 0),
         splitDestinations,
-        utils.getUtxo(transferTxid, transferTx, 1),
+        utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
         fundingPrivateKey
     )
     splitTxid = await broadcast(splitHex)
-    console.log(`Split TX:        ${splitTxid}`)
     splitTx = await getTransaction(splitTxid)
     splitTxObj = new bsv.Transaction(splitHex)
 }
