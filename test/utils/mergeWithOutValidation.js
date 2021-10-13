@@ -18,9 +18,13 @@ const {
   reverseEndian
 } = require('../../lib/utils')
 
+const config = require('../config')
+
+const { app: { sats, perByte } } = config
+
 // merge will take 2 existing STAS UTXOs and combine them and assign the single UTXO to another address.
 // The tokenOwnerPrivateKey must own the existing STAS UTXOs, the payment UTXOs and will be the owner of the change, if any.
-function mergeWithoutValidation(tokenOwnerPrivateKey, contractPublicKey, mergeUtxos, destinationAddr, paymentUtxo, paymentsPrivateKey) {
+function mergeWithoutValidation (tokenOwnerPrivateKey, contractPublicKey, mergeUtxos, destinationAddr, paymentUtxo, paymentsPrivateKey) {
   // const BN = bsv.crypto.BN
   const isZeroFee = (paymentUtxo === null)
 
@@ -136,7 +140,7 @@ function mergeWithoutValidation(tokenOwnerPrivateKey, contractPublicKey, mergeUt
   return tx.serialize(true)
 }
 
-function handleChangeForMerge(tx, extraDataBytes, publicKey) {
+function handleChangeForMerge (tx, extraDataBytes, publicKey) {
   // In this implementation, we will always add a change output...
 
   // Create a change output. The satoshi amount will be updated after we calculate the fees.
@@ -182,9 +186,6 @@ function handleChangeForMerge(tx, extraDataBytes, publicKey) {
       satoshis += input.output.satoshis
     }
   })
-
-  const sats = 500
-  const perByte = 1000
 
   const fee = Math.ceil(txSizeInBytes * sats / perByte)
 

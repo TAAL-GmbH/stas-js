@@ -15,6 +15,10 @@ This library will create various types of STAS token transactions that add token
 
 *Please note that the ```utils.js``` file is not needed to build STAS tokens: it contains tools to help interaction with Taal's private testing network, Taalnet.*
 
+## Fees
+
+The mining fee is set in the config.js file. The default is currently 500 sats per 1000 bytes which is 0.5 sats per kb. Change the sats to whatever you expect to pay.
+
 ## Testing
 There is a file called ```lifecycle.test.js``` that exercises a full lifecycle of a STAS token.
 
