@@ -26,6 +26,7 @@ let bobAddr
 let symbol
 
 beforeEach(async function () {
+
   await setup() // set up contract
 })
 
@@ -81,11 +82,11 @@ it('Successful Issue Token With Split No Fee', async function () {
     2
   )
   const issueTxid = await broadcast(issueHex)
-  // const tokenId = await utils.getToken(issueTxid) //token issuance currently delayed
-  // let response = await utils.getTokenResponse(tokenId)
-  // expect(response.token.symbol).to.equal(symbol)
-  // expect(response.token.contract_txs).to.contain(contractTxid)
-  // expect(response.token.issuance_txs).to.contain(issueTxid)
+  const tokenId = await utils.getToken(issueTxid) //token issuance currently delayed
+  let response = await utils.getTokenResponse(tokenId)
+  expect(response.token.symbol).to.equal(symbol)
+  expect(response.token.contract_txs).to.contain(contractTxid)
+  expect(response.token.issuance_txs).to.contain(issueTxid)
   expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
   expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
   expect(await utils.areFeesProcessed(issueTxid, 2)).to.be.false
@@ -410,6 +411,33 @@ it('Empty Payment UTXO Info Throws Error', async function () {
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
     expect(e.message).to.eql('Invalid Argument: Output satoshis is not a natural number')
+  }
+})
+
+
+it('Increase Contract UTXO Amount Throws Error (when matching info amounts)', async function () {
+
+  const issueHex = issue(
+    issuerPrivateKey,
+    utils.getIssueInfo(aliceAddr, 700000, bobAddr, 300000),
+    {
+      txid: contractTxid,
+      vout: 0,
+      scriptPubKey: contractTx.vout[0].scriptPubKey.hex,
+      amount: 0.01
+    },
+    utils.getUtxo(contractTxid, contractTx, 1),
+    fundingPrivateKey,
+    true,
+    2
+  )
+  try {
+    await broadcast(issueHex)
+    assert(false)
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Request failed with status code 400')
   }
 })
 
