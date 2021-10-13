@@ -24,25 +24,8 @@ const {
   broadcast
 } = require('../index').utils
 
-const issuerPrivateKey = bsv.PrivateKey()
-const fundingPrivateKey = bsv.PrivateKey()
-const bobPrivateKey = bsv.PrivateKey()
-const alicePrivateKey = bsv.PrivateKey()
-var contractTx
-var contractTxid
-var issueInfo
-var aliceAddr
-var bobAddr
-var symbol
-var issueTxid
-var issueTx
 
-beforeEach(async function () {
-
-
-});
-
-
+//Work In Progress
 it("Merge Invalid Token", async function () {
 
   const issuerPrivateKey = bsv.PrivateKey()
@@ -101,7 +84,6 @@ it("Merge Invalid Token", async function () {
     }
   }
 
-  // change goes back to the fundingPrivateKey
   const contractHex = contract(
     issuerPrivateKey,
     contractUtxos,
@@ -155,29 +137,10 @@ it("Merge Invalid Token", async function () {
   console.log(`Issue TX:        ${issueTxid}`)
   const issueTx = await getTransaction(issueTxid)
 
-  // const bobAmount1 = issueTx.vout[0].value / 2
-  // const bobAmount2 = issueTx.vout[0].value - bobAmount1
-  // const splitDestinations = []
-  // splitDestinations[0] = { address: bobAddr, amount: bobAmount1 }
-  // splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
-
-  // const splitHex = split(
-  //     alicePrivateKey,
-  //     issuerPrivateKey.publicKey,
-  //     utils.getUtxo(issueTxid, issueTx, 0),
-  //     splitDestinations,
-  //     utils.getUtxo(issueTxid, issueTx, 2),
-  //     fundingPrivateKey
-  // )
-  // const splitTxid = await broadcast(splitHex)
-  // console.log(`Split TX:        ${splitTxid}`)
-  // const splitTx = await getTransaction(splitTxid)
-
-  // Now let's merge the last split back together
   const splitTxObj1 = new bsv.Transaction(issueHex)
 
 
-  //======================================================
+
 
   invalidTxUtxo = invalidTxUtxo[0]
   const tx = new bsv.Transaction()
@@ -189,15 +152,11 @@ it("Merge Invalid Token", async function () {
   }))
   tx.sign(invalidTxUtxoPK)
 
-  //console.log(tx.serialize(true))
 
   const txId = await broadcast(tx.serialize(true))
   const txOut = await getTransaction(txId)
 
   const splitTxObj2 = new bsv.Transaction(tx.serialize(true))
-
-
-  //===================================
 
   const mergeHex = mergeUtil.mergeWithoutValidation(
     alicePrivateKey,
@@ -220,10 +179,9 @@ it("Merge Invalid Token", async function () {
     fundingPrivateKey
   )
 
-    console.log(mergeHex)
-   //const mergeTxid = await broadcast(mergeHex)
-  // console.log(`Merge TX:        ${mergeTxid}`)
-  // const mergeTx = await getTransaction(mergeTxid)
+
+    await broadcast(mergeHex)
+
 
 
 
