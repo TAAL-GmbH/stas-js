@@ -18,7 +18,7 @@ const {
   reverseEndian
 } = require('../../lib/utils')
 
-const config = require('../config')
+const config = require('../../config')
 
 const { app: { sats, perByte } } = config
 

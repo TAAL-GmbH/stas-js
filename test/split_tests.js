@@ -134,7 +134,6 @@ it("Successful Split Into Two Tokens With No Fee Empty Array", async function ()
     expect(await utils.areFeesProcessed(splitTxid, 2)).to.be.false
 })
 
-
 it("Splitting Into Too Many Tokens Throws Error", async function () {
 
     const bobAmount = issueTx.vout[0].value / 5
@@ -160,8 +159,6 @@ it("Splitting Into Too Many Tokens Throws Error", async function () {
     }
 })
 
-
-
 it("No Split Completes Successfully", async function () {
 
     const bobAmount = issueTx.vout[0].value
@@ -181,30 +178,6 @@ it("No Split Completes Successfully", async function () {
     expect(splitDestinations).to.have.length(noOfTokens) //ensure that tx output contains 1 
 })
 
-
-it("Add Too Little To Split Throws Error", async function () {
-
-    const bobAmount = issueTx.vout[0].value / 2
-    const splitDestinations = []
-    splitDestinations[0] = { address: bobAddr, amount: bobAmount }
-
-    const splitHex = split(
-        alicePrivateKey,
-        issuerPrivateKey.publicKey,
-        utils.getUtxo(issueTxid, issueTx, 0),
-        splitDestinations,
-        utils.getUtxo(issueTxid, issueTx, 2),
-        fundingPrivateKey
-    )
-    try {
-        await broadcast(splitHex)
-        assert(false)
-        return
-    } catch (e) {
-        expect(e).to.be.instanceOf(Error)
-        expect(e.message).to.eql('Request failed with status code 400')
-    }
-})
 
 it("Add Too Much To Split Throws Error", async function () {
 
@@ -254,11 +227,10 @@ it("Address Too Long Throws Error", async function () {
         return
     } catch (e) {
         expect(e).to.be.instanceOf(Error)
-        expect(e.message).to.eql('Invalid Address')
+        expect(e.message).to.eql('Invalid Address string provided')
     }
 })
 
-//needs fixed
 it("Address Too Short Throws Error", async function () {
 
     const bobAmount1 = issueTx.vout[0].value / 2
