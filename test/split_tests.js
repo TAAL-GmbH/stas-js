@@ -24,8 +24,8 @@ const bobPrivateKey = bsv.PrivateKey()
 const alicePrivateKey = bsv.PrivateKey()
 const bobAddr = bobPrivateKey.toAddress().toString()
 const aliceAddr = alicePrivateKey.toAddress().toString()
-let transferTxid
-let transferTx
+let issueTxid
+let issueTx
 
 beforeEach(async function () {
 
@@ -35,8 +35,8 @@ beforeEach(async function () {
 
 it("Successful Split Into Two Tokens With Fee", async function () {
 
-    const bobAmount1 = transferTx.vout[0].value / 2
-    const bobAmount2 = transferTx.vout[0].value - bobAmount1
+    const bobAmount1 = issueTx.vout[0].value / 2
+    const bobAmount2 = issueTx.vout[0].value - bobAmount1
     const splitDestinations = []
     splitDestinations[0] = { address: bobAddr, amount: bobAmount1 }
     splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
@@ -44,25 +44,23 @@ it("Successful Split Into Two Tokens With Fee", async function () {
     const splitHex = split(
         alicePrivateKey,
         issuerPrivateKey.publicKey,
-        utils.getUtxo(transferTxid, transferTx, 0),
+        utils.getUtxo(issueTxid, issueTx, 0),
         splitDestinations,
-        utils.getUtxo(transferTxid, transferTx, 1),
+        utils.getUtxo(issueTxid, issueTx, 2),
         fundingPrivateKey
     )
     const splitTxid = await broadcast(splitHex)
-    console.log(bobAddr)
-    console.log(splitTxid)
     let noOfTokens = await countNumOfTokens(splitTxid, true)
     expect(splitDestinations).to.have.length(noOfTokens) //ensure that tx output contains 2 values
-    expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000015)
-    expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000015)
+    expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035)
+    expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000035)
     expect(await utils.areFeesProcessed(splitTxid, 2)).to.be.true
 })
 
 
 it("Successful Split Into Four Tokens", async function () {
 
-    const bobAmount = transferTx.vout[0].value / 4
+    const bobAmount = issueTx.vout[0].value / 4
     const splitDestinations = []
     splitDestinations[0] = { address: bobAddr, amount: bobAmount }
     splitDestinations[1] = { address: bobAddr, amount: bobAmount }
@@ -72,25 +70,25 @@ it("Successful Split Into Four Tokens", async function () {
     const splitHex = split(
         alicePrivateKey,
         issuerPrivateKey.publicKey,
-        utils.getUtxo(transferTxid, transferTx, 0),
+        utils.getUtxo(issueTxid, issueTx, 0),
         splitDestinations,
-        utils.getUtxo(transferTxid, transferTx, 1),
+        utils.getUtxo(issueTxid, issueTx, 2),
         fundingPrivateKey
     )
     const splitTxid = await broadcast(splitHex)
     let noOfTokens = await countNumOfTokens(splitTxid, true)
     expect(splitDestinations).to.have.length(noOfTokens) //ensure that tx output contains 4 values
-    expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.0000075)
-    expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.0000075)
-    expect(await utils.getVoutAmount(splitTxid, 2)).to.equal(0.0000075)
-    expect(await utils.getVoutAmount(splitTxid, 3)).to.equal(0.0000075)
+    expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.0000175)
+    expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.0000175)
+    expect(await utils.getVoutAmount(splitTxid, 2)).to.equal(0.0000175)
+    expect(await utils.getVoutAmount(splitTxid, 3)).to.equal(0.0000175)
 
 })
 
 it("Successful Split Into Two Tokens With No Fee", async function () {
 
-    const bobAmount1 = transferTx.vout[0].value / 2
-    const bobAmount2 = transferTx.vout[0].value - bobAmount1
+    const bobAmount1 = issueTx.vout[0].value / 2
+    const bobAmount2 = issueTx.vout[0].value - bobAmount1
     const splitDestinations = []
     splitDestinations[0] = { address: bobAddr, amount: bobAmount1 }
     splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
@@ -98,26 +96,24 @@ it("Successful Split Into Two Tokens With No Fee", async function () {
     const splitHex = split(
         alicePrivateKey,
         issuerPrivateKey.publicKey,
-        utils.getUtxo(transferTxid, transferTx, 0),
+        utils.getUtxo(issueTxid, issueTx, 0),
         splitDestinations,
         null,
         null
     )
     const splitTxid = await broadcast(splitHex)
-    console.log(bobAddr)
-    console.log(splitTxid)
     let noOfTokens = await countNumOfTokens(splitTxid, false)
     expect(splitDestinations).to.have.length(noOfTokens) //ensure that tx output contains 2 values
-    expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000015)
-    expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000015)
+    expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035)
+    expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000035)
     expect(await utils.areFeesProcessed(splitTxid, 2)).to.be.false
 })
 
 //needs fixed
 it("Successful Split Into Two Tokens With No Fee Empty Array", async function () {
 
-    const bobAmount1 = transferTx.vout[0].value / 2
-    const bobAmount2 = transferTx.vout[0].value - bobAmount1
+    const bobAmount1 = issueTx.vout[0].value / 2
+    const bobAmount2 = issueTx.vout[0].value - bobAmount1
     const splitDestinations = []
     splitDestinations[0] = { address: bobAddr, amount: bobAmount1 }
     splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
@@ -125,25 +121,23 @@ it("Successful Split Into Two Tokens With No Fee Empty Array", async function ()
     const splitHex = split(
         alicePrivateKey,
         issuerPrivateKey.publicKey,
-        utils.getUtxo(transferTxid, transferTx, 0),
+        utils.getUtxo(issueTxid, issueTx, 0),
         splitDestinations,
         [],
         null
     )
     const splitTxid = await broadcast(splitHex)
-    console.log(bobAddr)
-    console.log(splitTxid)
     let noOfTokens = await countNumOfTokens(splitTxid, false)
     expect(splitDestinations).to.have.length(noOfTokens) //ensure that tx output contains 2 values
-    expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000015)
-    expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000015)
+    expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035)
+    expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000035)
     expect(await utils.areFeesProcessed(splitTxid, 2)).to.be.false
 })
 
 
 it("Splitting Into Too Many Tokens Throws Error", async function () {
 
-    const bobAmount = transferTx.vout[0].value / 5
+    const bobAmount = issueTx.vout[0].value / 5
     const splitDestinations = []
     splitDestinations[0] = { address: bobAddr, amount: bobAmount }
     splitDestinations[1] = { address: bobAddr, amount: bobAmount }
@@ -154,9 +148,9 @@ it("Splitting Into Too Many Tokens Throws Error", async function () {
         const splitHex = split(
             alicePrivateKey,
             issuerPrivateKey.publicKey,
-            utils.getUtxo(transferTxid, transferTx, 0),
+            utils.getUtxo(issueTxid, issueTx, 0),
             splitDestinations,
-            utils.getUtxo(transferTxid, transferTx, 1),
+            utils.getUtxo(issueTxid, issueTx, 2),
             fundingPrivateKey
         )
         assert(false)
@@ -170,16 +164,16 @@ it("Splitting Into Too Many Tokens Throws Error", async function () {
 
 it("No Split Completes Successfully", async function () {
 
-    const bobAmount = transferTx.vout[0].value
+    const bobAmount = issueTx.vout[0].value
     const splitDestinations = []
     splitDestinations[0] = { address: bobAddr, amount: bobAmount }
 
     const splitHex = split(
         alicePrivateKey,
         issuerPrivateKey.publicKey,
-        utils.getUtxo(transferTxid, transferTx, 0),
+        utils.getUtxo(issueTxid, issueTx, 0),
         splitDestinations,
-        utils.getUtxo(transferTxid, transferTx, 1),
+        utils.getUtxo(issueTxid, issueTx, 2),
         fundingPrivateKey
     )
     const splitTxid = await broadcast(splitHex)
@@ -190,21 +184,22 @@ it("No Split Completes Successfully", async function () {
 
 it("Add Too Little To Split Throws Error", async function () {
 
-    const bobAmount = transferTx.vout[0].value / 2
+    const bobAmount = issueTx.vout[0].value / 2
     const splitDestinations = []
     splitDestinations[0] = { address: bobAddr, amount: bobAmount }
 
     const splitHex = split(
         alicePrivateKey,
         issuerPrivateKey.publicKey,
-        utils.getUtxo(transferTxid, transferTx, 0),
+        utils.getUtxo(issueTxid, issueTx, 0),
         splitDestinations,
-        utils.getUtxo(transferTxid, transferTx, 1),
+        utils.getUtxo(issueTxid, issueTx, 2),
         fundingPrivateKey
     )
     try {
         await broadcast(splitHex)
         assert(false)
+        return
     } catch (e) {
         expect(e).to.be.instanceOf(Error)
         expect(e.message).to.eql('Request failed with status code 400')
@@ -213,21 +208,22 @@ it("Add Too Little To Split Throws Error", async function () {
 
 it("Add Too Much To Split Throws Error", async function () {
 
-    const bobAmount = transferTx.vout[0].value * 2
+    const bobAmount = issueTx.vout[0].value * 2
     const splitDestinations = []
     splitDestinations[0] = { address: bobAddr, amount: bobAmount }
 
     const splitHex = split(
         alicePrivateKey,
         issuerPrivateKey.publicKey,
-        utils.getUtxo(transferTxid, transferTx, 0),
+        utils.getUtxo(issueTxid, issueTx, 0),
         splitDestinations,
-        utils.getUtxo(transferTxid, transferTx, 1),
+        utils.getUtxo(issueTxid, issueTx, 2),
         fundingPrivateKey
     )
     try {
         await broadcast(splitHex)
         assert(false)
+        return
     } catch (e) {
         expect(e).to.be.instanceOf(Error)
         expect(e.message).to.eql('Request failed with status code 400')
@@ -238,8 +234,8 @@ it("Add Too Much To Split Throws Error", async function () {
 //and trigger > ADDRESS_MAX_LENGTH  error
 it("Address Too Long Throws Error", async function () {
 
-    const bobAmount1 = transferTx.vout[0].value / 2
-    const bobAmount2 = transferTx.vout[0].value - bobAmount1
+    const bobAmount1 = issueTx.vout[0].value / 2
+    const bobAmount2 = issueTx.vout[0].value - bobAmount1
     console.log(bobAddr)
     const splitDestinations = []
     splitDestinations[0] = { address: '1LF2wNCBT9dp5jN7fa6xSAaUGjJ5Pyz5VGaUG', amount: bobAmount1 }
@@ -249,12 +245,13 @@ it("Address Too Long Throws Error", async function () {
     const splitHex = split(
         incorrectPrivateKey,
         issuerPrivateKey.publicKey,
-        utils.getUtxo(transferTxid, transferTx, 0),
+        utils.getUtxo(issueTxid, issueTx, 0),
         splitDestinations,
-        utils.getUtxo(transferTxid, transferTx, 1),
+        utils.getUtxo(issueTxid, issueTx, 2),
         fundingPrivateKey
     )
         assert(false)
+        return
     } catch (e) {
         expect(e).to.be.instanceOf(Error)
         expect(e.message).to.eql('Invalid Address')
@@ -264,8 +261,8 @@ it("Address Too Long Throws Error", async function () {
 //needs fixed
 it("Address Too Short Throws Error", async function () {
 
-    const bobAmount1 = transferTx.vout[0].value / 2
-    const bobAmount2 = transferTx.vout[0].value - bobAmount1
+    const bobAmount1 = issueTx.vout[0].value / 2
+    const bobAmount2 = issueTx.vout[0].value - bobAmount1
     console.log(bobAddr)
     const splitDestinations = []
     splitDestinations[0] = { address: '1LF2wNCBT9dp5jN7fa6xSAaU', amount: bobAmount1 }
@@ -275,12 +272,13 @@ it("Address Too Short Throws Error", async function () {
     const splitHex = split(
         incorrectPrivateKey,
         issuerPrivateKey.publicKey,
-        utils.getUtxo(transferTxid, transferTx, 0),
+        utils.getUtxo(issueTxid, issueTx, 0),
         splitDestinations,
-        utils.getUtxo(transferTxid, transferTx, 1),
+        utils.getUtxo(issueTxid, issueTx, 2),
         fundingPrivateKey
     )
         assert(false)
+        return
     } catch (e) {
         expect(e).to.be.instanceOf(Error)
         expect(e.message).to.eql('Invalid Address string provided')
@@ -288,8 +286,8 @@ it("Address Too Short Throws Error", async function () {
 })
 it("Incorrect Owner Private Key Throws Error", async function () {
 
-    const bobAmount1 = transferTx.vout[0].value / 2
-    const bobAmount2 = transferTx.vout[0].value - bobAmount1
+    const bobAmount1 = issueTx.vout[0].value / 2
+    const bobAmount2 = issueTx.vout[0].value - bobAmount1
     const splitDestinations = []
     splitDestinations[0] = { address: bobAddr, amount: bobAmount1 }
     splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
@@ -298,14 +296,15 @@ it("Incorrect Owner Private Key Throws Error", async function () {
     const splitHex = split(
         incorrectPrivateKey,
         issuerPrivateKey.publicKey,
-        utils.getUtxo(transferTxid, transferTx, 0),
+        utils.getUtxo(issueTxid, issueTx, 0),
         splitDestinations,
-        utils.getUtxo(transferTxid, transferTx, 1),
+        utils.getUtxo(issueTxid, issueTx, 2),
         fundingPrivateKey
     )
     try {
         await broadcast(splitHex)
         assert(false)
+        return
     } catch (e) {
         expect(e).to.be.instanceOf(Error)
         expect(e.message).to.eql('Request failed with status code 400')
@@ -314,8 +313,8 @@ it("Incorrect Owner Private Key Throws Error", async function () {
 
 it("Incorrect Payments Private Key Throws Error", async function () {
 
-    const bobAmount1 = transferTx.vout[0].value / 2
-    const bobAmount2 = transferTx.vout[0].value - bobAmount1
+    const bobAmount1 = issueTx.vout[0].value / 2
+    const bobAmount2 = issueTx.vout[0].value - bobAmount1
     const splitDestinations = []
     splitDestinations[0] = { address: bobAddr, amount: bobAmount1 }
     splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
@@ -324,14 +323,15 @@ it("Incorrect Payments Private Key Throws Error", async function () {
     const splitHex = split(
         issuerPrivateKey,
         issuerPrivateKey.publicKey,
-        utils.getUtxo(transferTxid, transferTx, 0),
+        utils.getUtxo(issueTxid, issueTx, 0),
         splitDestinations,
-        utils.getUtxo(transferTxid, transferTx, 1),
+        utils.getUtxo(issueTxid, issueTx, 2),
         incorrectPrivateKey
     )
     try {
         await broadcast(splitHex)
         assert(false)
+        return
     } catch (e) {
         expect(e).to.be.instanceOf(Error)
         expect(e.message).to.eql('Request failed with status code 400')
@@ -340,8 +340,8 @@ it("Incorrect Payments Private Key Throws Error", async function () {
 
 it("Incorrect Contract Public Key Throws Error", async function () {
 
-    const bobAmount1 = transferTx.vout[0].value / 2
-    const bobAmount2 = transferTx.vout[0].value - bobAmount1
+    const bobAmount1 = issueTx.vout[0].value / 2
+    const bobAmount2 = issueTx.vout[0].value - bobAmount1
     const splitDestinations = []
     splitDestinations[0] = { address: bobAddr, amount: bobAmount1 }
     splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
@@ -350,14 +350,15 @@ it("Incorrect Contract Public Key Throws Error", async function () {
     const splitHex = split(
         issuerPrivateKey,
         incorrectPrivateKey.publicKey,
-        utils.getUtxo(transferTxid, transferTx, 0),
+        utils.getUtxo(issueTxid, issueTx, 0),
         splitDestinations,
-        utils.getUtxo(transferTxid, transferTx, 1),
+        utils.getUtxo(issueTxid, issueTx, 2),
         fundingPrivateKey
     )
     try {
         await broadcast(splitHex)
         assert(false)
+        return
     } catch (e) {
         expect(e).to.be.instanceOf(Error)
         expect(e.message).to.eql('Request failed with status code 400')
@@ -393,21 +394,21 @@ async function setup() {
         true,
         2
     )
-    const issueTxid = await broadcast(issueHex)
-    const issueTx = await getTransaction(issueTxid)
+     issueTxid = await broadcast(issueHex)
+     issueTx = await getTransaction(issueTxid)
 
-    const issueOutFundingVout = issueTx.vout.length - 1
+    // const issueOutFundingVout = issueTx.vout.length - 1
 
-    const transferHex = transfer(
-        bobPrivateKey,
-        issuerPrivateKey.publicKey,
-        utils.getUtxo(issueTxid, issueTx, 1),
-        aliceAddr,
-        utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-        fundingPrivateKey
-    )
-    transferTxid = await broadcast(transferHex)
-    transferTx = await getTransaction(transferTxid)
+    // const transferHex = transfer(
+    //     bobPrivateKey,
+    //     issuerPrivateKey.publicKey,
+    //     utils.getUtxo(issueTxid, issueTx, 1),
+    //     aliceAddr,
+    //     utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
+    //     fundingPrivateKey
+    // )
+    // transferTxid = await broadcast(transferHex)
+    // transferTx = await getTransaction(transferTxid)
 }
 
 
