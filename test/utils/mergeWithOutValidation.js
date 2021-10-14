@@ -1,4 +1,5 @@
 const bsv = require('bsv')
+require('dotenv').config()
 const {
   Varint
 } = bsv.encoding
@@ -18,9 +19,6 @@ const {
   reverseEndian
 } = require('../../lib/utils')
 
-const config = require('../../config')
-
-const { app: { sats, perByte } } = config
 
 // merge will take 2 existing STAS UTXOs and combine them and assign the single UTXO to another address.
 // The tokenOwnerPrivateKey must own the existing STAS UTXOs, the payment UTXOs and will be the owner of the change, if any.
@@ -187,7 +185,7 @@ function handleChangeForMerge (tx, extraDataBytes, publicKey) {
     }
   })
 
-  const fee = Math.ceil(txSizeInBytes * sats / perByte)
+  const fee = Math.ceil(txSizeInBytes * process.env.SATS / process.env.PERBYTE)
 
   tx.outputs[tx.outputs.length - 1].satoshis = satoshis - fee
 }
