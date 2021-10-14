@@ -3,6 +3,7 @@ const assert = require('chai').assert
 const utils = require('./utils/test_utils')
 const bsv = require('bsv')
 const issueUtil = require('./utils/issueWithoutValidation')
+require('dotenv').config()
 
 
 const {
@@ -101,14 +102,14 @@ it("Attempt to Issue Less Tokens Than Supply", async function () {
 async function setup() {
     const bobPrivateKey = bsv.PrivateKey()
     const alicePrivateKey = bsv.PrivateKey()
-    const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress('testnet').toString())
-    const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress('testnet').toString())
+    const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
+    const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
     const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
     symbol = 'TAALT'
     supply = 10000
     schema = utils.schema(publicKeyHash, symbol, supply)
-    aliceAddr = alicePrivateKey.toAddress().toString()
-    bobAddr = bobPrivateKey.toAddress().toString()
+    aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
+    bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
 
     const contractHex = contract(
         issuerPrivateKey,

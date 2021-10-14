@@ -3,6 +3,7 @@ const utils = require('./utils/test_utils')
 const chai = require('chai')
 const bsv = require('bsv')
 const mergeUtil = require('./utils/mergeWithoutValidation')
+require('dotenv').config()
 
 const {
   contract,
@@ -104,9 +105,8 @@ it("Attempt To Merge Token with Different Owners Without SDK Validation Throws E
 
 async function validToken() {
 
-  const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress('testnet').toString())
-  const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress('testnet').toString())
-
+  const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
+  const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
   const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
 
   schema = utils.schema(publicKeyHash, symbol, supply)
@@ -231,8 +231,8 @@ async function invalidToken() {
   const issuerPrivateKey = bsv.PrivateKey()
   const newPk = bsv.PrivateKey()
 
-  const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress('testnet').toString())
-  const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress('testnet').toString())
+  const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
+  const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
 
   const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(newPk.publicKey.toBuffer()).toString('hex')
 

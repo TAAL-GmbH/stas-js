@@ -2,6 +2,7 @@ const expect = require('chai').expect
 const assert = require('chai').assert
 const utils = require('./utils/test_utils')
 const bsv = require('bsv')
+require('dotenv').config()
 
 const {
   contract,
@@ -23,8 +24,8 @@ const issuerPrivateKey = bsv.PrivateKey()
 const fundingPrivateKey = bsv.PrivateKey()
 const bobPrivateKey = bsv.PrivateKey()
 const alicePrivateKey = bsv.PrivateKey()
-const bobAddr = bobPrivateKey.toAddress().toString()
-const aliceAddr = alicePrivateKey.toAddress().toString()
+const bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
+const aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
 let splitTxid
 let splitTx
 let splitTxObj
@@ -356,8 +357,8 @@ it('Invalid Address Destination Address 2 Throws Error', async function () {
 })
 
 async function setup () {
-  const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress('testnet').toString())
-  const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress('testnet').toString())
+  const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
+  const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
   const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
   const symbol = 'TAALT'
   const supply = 10000

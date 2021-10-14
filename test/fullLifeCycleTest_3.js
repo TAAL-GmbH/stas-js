@@ -1,7 +1,6 @@
 const expect = require("chai").expect
 const utils = require('./utils/test_utils')
 const bsv = require('bsv')
-require('dotenv').config()
 
 const {
   contract,
@@ -21,22 +20,21 @@ const {
 } = require('../index').utils
 
 
-//token issue is intermittingly failing - Tx broadcast is successful but token is not issuing - see line 79
-it("Full Life Cycle Test", async function () {
+it("Full Life Cycle Test With Decimals", async function () {
 
   const issuerPrivateKey = bsv.PrivateKey()
   const fundingPrivateKey = bsv.PrivateKey()
   const alicePrivateKey = bsv.PrivateKey()
-  const aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
+  const aliceAddr = alicePrivateKey.toAddress().toString()
   const bobPrivateKey = bsv.PrivateKey()
-  const bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
-  const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
-  const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
+  const bobAddr = bobPrivateKey.toAddress().toString()
+  const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress('testnet').toString())
+  const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress('testnet').toString())
   const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
-  const supply = 10000
+  const supply = 500000
   const symbol = 'TAALT'
 
-  const schema = utils.schema(publicKeyHash, symbol, supply)
+  const schema = schemaWithDecimal(publicKeyHash, symbol, supply, 2)
 
   // change goes back to the fundingPrivateKey
   const contractHex = contract(
@@ -54,12 +52,11 @@ it("Full Life Cycle Test", async function () {
   expect(amount).to.equal(supply / 100000000)
   expect(await utils.areFeesProcessed(contractTxid, 1)).to.be.true
 
-
   let issueHex
   try {
     issueHex = issue(
       issuerPrivateKey,
-      utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+      utils.getIssueInfo(aliceAddr, 400000, bobAddr, 100000),
       utils.getUtxo(contractTxid, contractTx, 0),
       utils.getUtxo(contractTxid, contractTx, 1),
       fundingPrivateKey,
@@ -74,14 +71,13 @@ it("Full Life Cycle Test", async function () {
   console.log(`Issue TX:        ${issueTxid}`)
   const issueTx = await getTransaction(issueTxid)
   const tokenId = await utils.getToken(issueTxid)
-  // let response = await utils.getTokenResponse(tokenId)  //token issuance currently delayed
-  // expect(response.token.symbol).to.equal(symbol) 
-  // expect(response.token.contract_txs).to.contain(contractTxid)
-  // expect(response.token.issuance_txs).to.contain(issueTxid)
-  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
-  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+  let response = await utils.getTokenResponse(tokenId)
+  expect(response.token.symbol).to.equal(symbol)  //token issue is intermittingly failing 
+  expect(response.token.contract_txs).to.contain(contractTxid)
+  expect(response.token.issuance_txs).to.contain(issueTxid)
+  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.004)
+  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.001)
+
 
   const issueOutFundingVout = issueTx.vout.length - 1
 
@@ -96,7 +92,7 @@ it("Full Life Cycle Test", async function () {
   const transferTxid = await broadcast(transferHex)
   console.log(`Transfer TX:     ${transferTxid}`)
   const transferTx = await getTransaction(transferTxid)
-  expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
+  expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.001)
 
 
   // Split tokens into 2 - both payable to Bob...
@@ -117,8 +113,8 @@ it("Full Life Cycle Test", async function () {
   const splitTxid = await broadcast(splitHex)
   console.log(`Split TX:        ${splitTxid}`)
   const splitTx = await getTransaction(splitTxid)
-  expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000015)
-  expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000015)
+  expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.0005)
+  expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.0005)
 
   // Now let's merge the last split back together
   const splitTxObj = new bsv.Transaction(splitHex)
@@ -135,12 +131,13 @@ it("Full Life Cycle Test", async function () {
   const mergeTxid = await broadcast(mergeHex)
   console.log(`Merge TX:        ${mergeTxid}`)
   const mergeTx = await getTransaction(mergeTxid)
-  expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00003)
-  // const tokenIdMerge = await utils.getToken(issueTxid)
-  // let responseMerge = await utils.getTokenResponse(tokenIdMerge)
-  // expect(responseMerge.token.symbol).to.equal(symbol)
-  // expect(responseMerge.token.contract_txs).to.contain(contractTxid)
-  // expect(responseMerge.token.issuance_txs).to.contain(issueTxid)
+  expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.001)
+  const tokenIdMerge = await utils.getToken(issueTxid)
+  let responseMerge = await utils.getTokenResponse(tokenIdMerge)
+  console.log(responseMerge.token)
+  expect(responseMerge.token.symbol).to.equal(symbol)
+  expect(responseMerge.token.contract_txs).to.contain(contractTxid)
+  expect(responseMerge.token.issuance_txs).to.contain(issueTxid)
 
   // Split again - both payable to Alice...
   const aliceAmount1 = mergeTx.vout[0].value / 2
@@ -161,8 +158,8 @@ it("Full Life Cycle Test", async function () {
   const splitTxid2 = await broadcast(splitHex2)
   console.log(`Split TX2:       ${splitTxid2}`)
   const splitTx2 = await getTransaction(splitTxid2)
-  expect(await utils.getVoutAmount(splitTxid2, 0)).to.equal(0.000015)
-  expect(await utils.getVoutAmount(splitTxid2, 1)).to.equal(0.000015)
+  expect(await utils.getVoutAmount(splitTxid2, 0)).to.equal(0.0005)
+  expect(await utils.getVoutAmount(splitTxid2, 1)).to.equal(0.0005)
 
   // Now mergeSplit
   const splitTxObj2 = new bsv.Transaction(splitHex2)
@@ -185,8 +182,8 @@ it("Full Life Cycle Test", async function () {
   const mergeSplitTxid = await broadcast(mergeSplitHex)
   console.log(`MergeSplit TX:   ${mergeSplitTxid}`)
   const mergeSplitTx = await getTransaction(mergeSplitTxid)
-  expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075)
-  expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
+  expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.00025)
+  expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.00075)
 
 
   // Alice wants to redeem the money from bob...
@@ -199,6 +196,47 @@ it("Full Life Cycle Test", async function () {
   )
   const redeemTxid = await broadcast(redeemHex)
   console.log(`Redeem TX:       ${redeemTxid}`)
-  expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.0000075)
+  expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00025)
 
 })
+
+
+function schemaWithDecimal(pkHash, symbol, supply, decimal) {
+    const schema = {
+      name: 'Taal Token',
+      tokenId: `${pkHash}`,
+      protocolId: 'To be decided',
+      symbol: symbol,
+      description: 'Example token on private Taalnet',
+      image: 'https://www.taal.com/wp-content/themes/taal_v2/img/favicon/favicon-96x96.png',
+      totalSupply: supply,
+      decimals: decimal,
+      satsPerToken: 1,
+      properties: {
+        legal: {
+          terms: '© 2020 TAAL TECHNOLOGIES SEZC\nALL RIGHTS RESERVED. ANY USE OF THIS SOFTWARE IS SUBJECT TO TERMS AND CONDITIONS OF LICENSE. USE OF THIS SOFTWARE WITHOUT LICENSE CONSTITUTES INFRINGEMENT OF INTELLECTUAL PROPERTY. FOR LICENSE DETAILS OF THE SOFTWARE, PLEASE REFER TO: www.taal.com/stas-token-license-agreement',
+          licenceId: '1234'
+        },
+        issuer: {
+          organisation: 'Taal Technologies SEZC',
+          legalForm: 'Limited Liability Public Company',
+          governingLaw: 'CA',
+          mailingAddress: '1 Volcano Stret, Canada',
+          issuerCountry: 'CYM',
+          jurisdiction: '',
+          email: 'info@taal.com'
+        },
+        meta: {
+          schemaId: 'token1',
+          website: 'https://taal.com',
+          legal: {
+            terms: 'blah blah'
+          },
+          media: {
+            type: 'mp4'
+          }
+        }
+      }
+    }
+    return schema
+  }

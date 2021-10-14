@@ -2,6 +2,7 @@ const expect = require("chai").expect
 const assert = require('chai').assert
 const utils = require('./utils/test_utils')
 const bsv = require('bsv')
+require('dotenv').config()
 
 const {
     contract,
@@ -22,11 +23,11 @@ it("Attempt to Issue Token With Incorrect Public Key Hash Fails", async function
     const fundingPrivateKey = bsv.PrivateKey()
     const incorrectPrivateKey = bsv.PrivateKey()
     const alicePrivateKey = bsv.PrivateKey()
-    const aliceAddr = alicePrivateKey.toAddress().toString()
+    const aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
     const bobPrivateKey = bsv.PrivateKey()
-    const bobAddr = bobPrivateKey.toAddress().toString()
-    const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress('testnet').toString())
-    const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress('testnet').toString())
+    const bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
+    const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
+    const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
     const incorrectPublicKeyHash = bsv.crypto.Hash.sha256ripemd160(incorrectPrivateKey.publicKey.toBuffer()).toString('hex')
     const supply = 10000
     const symbol = 'TAALT'

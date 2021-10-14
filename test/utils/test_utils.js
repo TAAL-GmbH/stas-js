@@ -161,6 +161,22 @@ async function areFeesProcessed(txid, vout) {
     return false
 }
 
+
+async function getTokenBalance(address) {
+
+  const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/address/' + address + '/tokens'
+  const response = await axios({
+    method: 'get',
+    url,
+    auth: {
+      username: process.env.USERNAME,
+      password: process.env.PASSWORD
+    }
+  })
+
+  return response.data.tokens[0].balance
+}
+
 module.exports = {
   schema,
   getIssueInfo,
@@ -170,5 +186,6 @@ module.exports = {
   getVoutAmount,
   getToken,
   getTokenResponse,
-  areFeesProcessed
+  areFeesProcessed,
+  getTokenBalance 
 }

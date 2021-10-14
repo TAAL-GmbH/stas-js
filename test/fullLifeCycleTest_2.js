@@ -1,6 +1,7 @@
 const expect = require("chai").expect
 const utils = require('./utils/test_utils')
 const bsv = require('bsv')
+require('dotenv').config()
 
 const {
   contract,
@@ -27,11 +28,11 @@ it("Full Life Cycle Test", async function () {
   const issuerPrivateKey = bsv.PrivateKey()
   const fundingPrivateKey = bsv.PrivateKey()
   const alicePrivateKey = bsv.PrivateKey()
-  const aliceAddr = alicePrivateKey.toAddress().toString()
+  const aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
   const bobPrivateKey = bsv.PrivateKey()
-  const bobAddr = bobPrivateKey.toAddress().toString()
-  const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress('testnet').toString())
-  const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress('testnet').toString())
+  const bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
+  const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
+  const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
   const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
   const supply = 500000
   const symbol = 'TAALT'
@@ -79,6 +80,8 @@ it("Full Life Cycle Test", async function () {
   // expect(response.token.issuance_txs).to.contain(issueTxid)
   expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.004)
   expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.001)
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
 
 
   const issueOutFundingVout = issueTx.vout.length - 1

@@ -22,8 +22,8 @@ const issuerPrivateKey = bsv.PrivateKey()
 const fundingPrivateKey = bsv.PrivateKey()
 const bobPrivateKey = bsv.PrivateKey()
 const alicePrivateKey = bsv.PrivateKey()
-const bobAddr = bobPrivateKey.toAddress().toString()
-const aliceAddr = alicePrivateKey.toAddress().toString()
+const bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
+const aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
 let issueTxid
 let issueTx
 
@@ -339,8 +339,8 @@ it("Incorrect Contract Public Key Throws Error", async function () {
 
 async function setup() {
 
-    const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress('testnet').toString())
-    const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress('testnet').toString())
+    const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
+    const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
     const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
     const symbol = 'TAALT'
     const supply = 10000
@@ -368,19 +368,6 @@ async function setup() {
     )
      issueTxid = await broadcast(issueHex)
      issueTx = await getTransaction(issueTxid)
-
-    // const issueOutFundingVout = issueTx.vout.length - 1
-
-    // const transferHex = transfer(
-    //     bobPrivateKey,
-    //     issuerPrivateKey.publicKey,
-    //     utils.getUtxo(issueTxid, issueTx, 1),
-    //     aliceAddr,
-    //     utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-    //     fundingPrivateKey
-    // )
-    // transferTxid = await broadcast(transferHex)
-    // transferTx = await getTransaction(transferTxid)
 }
 
 

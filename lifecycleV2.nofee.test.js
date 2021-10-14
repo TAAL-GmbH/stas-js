@@ -1,4 +1,5 @@
 const bsv = require('bsv')
+require('dotenv').config()
 
 const {
   contract,
@@ -22,12 +23,12 @@ const {
   const issuerPrivateKey = bsv.PrivateKey()
 
   const alicePrivateKey = bsv.PrivateKey()
-  const aliceAddr = alicePrivateKey.toAddress().toString()
+  const aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
 
   const bobPrivateKey = bsv.PrivateKey()
-  const bobAddr = bobPrivateKey.toAddress().toString()
+  const bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
 
-  const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress('testnet').toString())
+  const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
 
   const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
   const supply = 10000

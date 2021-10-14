@@ -1,6 +1,7 @@
 const expect = require("chai").expect
 const utils = require('./utils/test_utils')
 const bsv = require('bsv')
+require('dotenv').config()
 
 const {
   contract,
@@ -23,10 +24,10 @@ it("Full Life Cycle Test With No Fees", async function () {
 
   const issuerPrivateKey = bsv.PrivateKey()
   const alicePrivateKey = bsv.PrivateKey()
-  const aliceAddr = alicePrivateKey.toAddress().toString()
+  const aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
   const bobPrivateKey = bsv.PrivateKey()
-  const bobAddr = bobPrivateKey.toAddress().toString()
-  const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress('testnet').toString())
+  const bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
+  const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
   const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
   const supply = 10000
   const symbol = 'TAALT'

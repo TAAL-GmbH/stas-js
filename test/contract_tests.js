@@ -2,6 +2,7 @@ const expect = require('chai').expect
 const assert = require('chai').assert
 const utils = require('./utils/test_utils')
 const bsv = require('bsv')
+require('dotenv').config()
 
 const {
   contract
@@ -344,10 +345,11 @@ it('Empty Array Payment UTXO Successful', async function () {
 })
 
 async function setup() {
+
   issuerPrivateKey = bsv.PrivateKey()
   fundingPrivateKey = bsv.PrivateKey()
-  contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress('testnet').toString())
-  fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress('testnet').toString())
+  contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
+  fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
   publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
   schema = utils.schema(publicKeyHash, symbol, supply)
 }
