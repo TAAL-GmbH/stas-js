@@ -1,11 +1,14 @@
 const bsv = require('bsv')
 const {
-  DEFAULT_FEES,
   P2PKH_UNLOCKING_SCRIPT_BYTES,
   getStasScript,
   sighash
 } = require('../../lib/stas')
 const { addressToPubkeyhash, SATS_PER_BITCOIN } = require('../../lib/utils')
+
+const config = require('../config')
+const { app: { sats, perByte } } = config
+
 // the minimum length of a bitcoin address
 const ADDRESS_MIN_LENGTH = 26
 // the maximum length of a bitcoin address
@@ -15,7 +18,7 @@ const ADDRESS_MAX_LENGTH = 35
 // privateKey that can spend the contract, issueInfo contains the addresses, satoshis and extra data to issue to
 // contractUtxo is the contract output, paymentUtxo pay sthe fees for the issue transaction
 // version can be 2 only
-//Validation checks removed to test STAS directly 
+// Validation checks removed to test STAS directly
 function issueWithoutValiation (privateKey, issueInfo, contractUtxo, paymentUtxo, paymentPrivateKey, isSplittable, version) {
   if (!isIssueInfoValid(issueInfo)) {
     throw new Error('issueInfo is invalid')
@@ -27,7 +30,6 @@ function issueWithoutValiation (privateKey, issueInfo, contractUtxo, paymentUtxo
   // if the payment UTXO is null then we treat this as a zero fee transaction
   const isZeroFee = (paymentUtxo === null)
 
- 
   const totalOutSats = issueInfo.reduce((a, b) => a + b.satoshis, 0)
 
   // create a new transaction
@@ -66,7 +68,7 @@ function issueWithoutValiation (privateKey, issueInfo, contractUtxo, paymentUtxo
     const changeScript = bsv.Script.fromASM(`OP_DUP OP_HASH160 ${paymentPubKeyHash} OP_EQUALVERIFY OP_CHECKSIG`)
     // Calculate the change amount
     const txSize = (tx.serialize(true).length / 2) + 1 + 8 + changeScript.toBuffer().length + (tx.inputs.length * P2PKH_UNLOCKING_SCRIPT_BYTES)
-    const fee = Math.ceil(txSize * DEFAULT_FEES[0].miningFee.satoshis / DEFAULT_FEES[0].miningFee.bytes)
+    const fee = Math.ceil(txSize * sats / perByte)
 
     tx.addOutput(new bsv.Transaction.Output({
       script: changeScript,
@@ -125,5 +127,5 @@ function isUtxoValid (utxo) {
 }
 
 module.exports = {
-    issueWithoutValiation
-  }
+  issueWithoutValiation
+}
