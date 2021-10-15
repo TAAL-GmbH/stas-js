@@ -23,22 +23,21 @@ const {
 
 //token issue is intermittingly failing - Tx broadcast is successful but token is not issuing - see line 79
 it("Full Life Cycle Test", async function () {
-
   const issuerPrivateKey = bsv.PrivateKey()
   const fundingPrivateKey = bsv.PrivateKey()
+
   const alicePrivateKey = bsv.PrivateKey()
   const aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
+
   const bobPrivateKey = bsv.PrivateKey()
   const bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
+
   const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
   const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
+
   const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
   const supply = 10000
   const symbol = 'TAALT'
-
-  console.log(aliceAddr)
-  console.log(bobAddr)
-
   const schema = utils.schema(publicKeyHash, symbol, supply)
 
   // change goes back to the fundingPrivateKey
@@ -53,40 +52,30 @@ it("Full Life Cycle Test", async function () {
   const contractTxid = await broadcast(contractHex)
   console.log(`Contract TX:     ${contractTxid}`)
   const contractTx = await getTransaction(contractTxid)
-  let amount = await utils.getVoutAmount(contractTxid, 0)
-  expect(amount).to.equal(supply / 100000000)
-  expect(await utils.areFeesProcessed(contractTxid, 1)).to.be.true
 
-
-  let issueHex
-  try {
-    issueHex = issue(
-      issuerPrivateKey,
-      utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
-      utils.getUtxo(contractTxid, contractTx, 0),
-      utils.getUtxo(contractTxid, contractTx, 1),
-      fundingPrivateKey,
-      true,
-      2
-    )
-  } catch (e) {
-    console.log('error issuing token', e)
-    return
-  }
+  const issueHex = issue(
+    issuerPrivateKey,
+    utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+    utils.getUtxo(contractTxid, contractTx, 0),
+    utils.getUtxo(contractTxid, contractTx, 1),
+    fundingPrivateKey,
+    true,
+    2
+  )
   const issueTxid = await broadcast(issueHex)
-  console.log(`Issue TX:        ${issueTxid}`)
   const issueTx = await getTransaction(issueTxid)
   const tokenId = await utils.getToken(issueTxid)
-  // let response = await utils.getTokenResponse(tokenId)  //token issuance currently delayed
-  // expect(response.token.symbol).to.equal(symbol) 
-  // expect(response.token.contract_txs).to.contain(contractTxid)
-  // expect(response.token.issuance_txs).to.contain(issueTxid)
+  console.log(`Token ID:        ${tokenId}`)
+  let response = await utils.getTokenResponse(tokenId)  //token issuance fails intermittingly
+  expect(response.symbol).to.equal(symbol) 
+  expect(response.contract_txs).to.contain(contractTxid)
+  expect(response.issuance_txs).to.contain(issueTxid)
   expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
   expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
   console.log("Alice Balance "   + await utils.getTokenBalance(aliceAddr))
   console.log("Bob Balance "   + await utils.getTokenBalance(bobAddr))
-  // expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
-  // expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
 
   const issueOutFundingVout = issueTx.vout.length - 1
 
