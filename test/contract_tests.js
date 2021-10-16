@@ -213,7 +213,7 @@ it('Null Schema Throws Error', async function () {
     expect(e.message).to.eql('Schema is null')
   }
 })
-
+//needs fixed
 it('Null Supply Throws Error', async function () {
   try {
     contract(
@@ -227,10 +227,10 @@ it('Null Supply Throws Error', async function () {
     assert(false)
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Invalid Argument: Output satoshis is not a natural number')
+    expect(e.message).to.eql('Token satoshis is Not a natural number')
   }
 })
-
+//needs fixed
 it('Negative Supply Throws Error', async function () {
   try {
     contract(
@@ -244,7 +244,7 @@ it('Negative Supply Throws Error', async function () {
     assert(false)
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Invalid Argument: Output satoshis is not a natural number')
+    expect(e.message).to.eql('Token satoshis is Not a natural number')
   }
 })
 

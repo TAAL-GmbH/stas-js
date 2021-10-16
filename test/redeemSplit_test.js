@@ -25,7 +25,6 @@ const bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
 const aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
 let issueTxid
 let issueTx
-
 //broadcast failing for all tests- 16: mandatory-script-verify-flag-failed (Script failed an OP_VERIFY operation)
 
 beforeEach(async function () {
@@ -35,44 +34,48 @@ beforeEach(async function () {
 
 it('Successful RedeemSplit With Fees', async function () {
 
-  const bobAmount1 = issueTx.vout[0].value / 2
-  const bobAmount2 = issueTx.vout[0].value - bobAmount1
-  const splitDestinations = []
-  splitDestinations[0] = { address: bobAddr, amount: bobAmount1 }
-  splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
-  const issueOutFundingVout = issueTx.vout.length - 1
+  const rsBobAmount = issueTx.vout[0].value / 3
+  const rsAliceAmount1 = issueTx.vout[0].value / 3
+  const rSplitDestinations = []
+  rSplitDestinations[0] = { address: bobAddr, amount: rsBobAmount }
+  rSplitDestinations[1] = { address: aliceAddr, amount: rsAliceAmount1 }
 
-  const redeemHex = redeemSplit(
+  const redeemSplitHex = redeemSplit(
     alicePrivateKey,
     issuerPrivateKey.publicKey,
     utils.getUtxo(issueTxid, issueTx, 0),
-    splitDestinations,
-    utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
+    rSplitDestinations,
+    utils.getUtxo(issueTxid, issueTx, 2),
     fundingPrivateKey
   )
-  console.log(redeemHex)
-  const redeemSplitTxid = await broadcast(redeemHex)
+  const redeemTxid = await broadcast(redeemSplitHex)
+  expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00002334)
+  expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.00002333)
+  expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.00002333)
+  expect(await utils.areFeesProcessed(redeemTxid, 3)).to.be.true
 })
 
 it('Successful RedeemSplit With No Fees', async function () {
 
-  const bobAmount1 = issueTx.vout[0].value / 2
-  const bobAmount2 = issueTx.vout[0].value - bobAmount1
-  const splitDestinations = []
-  splitDestinations[0] = { address: bobAddr, amount: bobAmount1 }
-  splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
-  const issueOutFundingVout = issueTx.vout.length - 1
+  const rsBobAmount = issueTx.vout[0].value / 3
+  const rsAliceAmount1 = issueTx.vout[0].value / 3
+  const rSplitDestinations = []
+  rSplitDestinations[0] = { address: bobAddr, amount: rsBobAmount }
+  rSplitDestinations[1] = { address: aliceAddr, amount: rsAliceAmount1 }
 
-  const redeemHex = redeemSplit(
+  const redeemSplitHex = redeemSplit(
     alicePrivateKey,
     issuerPrivateKey.publicKey,
     utils.getUtxo(issueTxid, issueTx, 0),
-    splitDestinations,
+    rSplitDestinations,
     null,
     null
   )
-  console.log(redeemHex)
-  const redeemSplitTxid = await broadcast(redeemHex)
+  const redeemTxid = await broadcast(redeemSplitHex)
+  expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00002334)
+  expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.00002333)
+  expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.00002333)
+  expect(await utils.areFeesProcessed(redeemTxid, 3)).to.be.false
 })
 
 it("No Split Completes Successfully", async function () {
@@ -82,7 +85,7 @@ it("No Split Completes Successfully", async function () {
   splitDestinations[0] = { address: bobAddr, amount: bobAmount }
   const issueOutFundingVout = issueTx.vout.length - 1
 
-  const redeemHex = redeemSplit(
+  const redeemSplitHex = redeemSplit(
     alicePrivateKey,
     issuerPrivateKey.publicKey,
     utils.getUtxo(issueTxid, issueTx, 0),
@@ -90,10 +93,13 @@ it("No Split Completes Successfully", async function () {
     utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
     fundingPrivateKey
   )
-  const splitTxid = await broadcast(redeemHex)
-  let noOfTokens = await countNumOfTokens(splitTxid, true)
-  expect(splitDestinations).to.have.length(noOfTokens) //ensure that tx output contains 1 
-})
+
+  const redeemTxid = await broadcast(redeemSplitHex)
+
+//   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00002334)
+//   let noOfTokens = await countNumOfTokens(redeemTxid, true)
+//   expect(splitDestinations).to.have.length(noOfTokens) //ensure that tx output contains 1 
+ })
 
 //needs fixed - throwing 'Output satoshis is not a natural number' 
 it("Add Too Much To Split Throws Error", async function () {
@@ -191,7 +197,7 @@ it('Incorrect Owner Private Key Throws Error', async function () {
     utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
     fundingPrivateKey
   )
-  
+
   try {
     await broadcast(redeemHex)
     assert(false)
@@ -220,7 +226,7 @@ it('Incorrect Funding Private Key Throws Error', async function () {
     utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
     incorrectPrivateKey
   )
-  
+
   try {
     await broadcast(redeemHex)
     assert(false)
@@ -249,7 +255,7 @@ it('Incorrect Public Key Throws Error', async function () {
     utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
     fundingPrivateKey
   )
-  
+
   try {
     await broadcast(redeemHex)
     assert(false)
@@ -290,7 +296,7 @@ it("Splitting Into Too Many Tokens Throws Error", async function () {
 
 
 
-async function setup () {
+async function setup() {
   const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
   const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
   const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
@@ -320,6 +326,4 @@ async function setup () {
   )
   issueTxid = await broadcast(issueHex)
   issueTx = await getTransaction(issueTxid)
-
-  
 }

@@ -3,15 +3,15 @@ const { completeSTASUnlockingScript } = require('../../lib/stas')
 require('dotenv').config()
 
 
-function schema(pkHash, symbol, supply) {
+function schema(publicKeyHash, symbol, supply) {
   const schema = {
     name: 'Taal Token',
-    tokenId: `${pkHash}`,
+    tokenId: `${publicKeyHash}`,
     protocolId: 'To be decided',
-    symbol: symbol,
+    symbol: `${symbol}`,
     description: 'Example token on private Taalnet',
     image: 'https://www.taal.com/wp-content/themes/taal_v2/img/favicon/favicon-96x96.png',
-    totalSupply: supply,
+    totalSupply: `${supply}`,
     decimals: 0,
     satsPerToken: 1,
     properties: {
@@ -139,8 +139,7 @@ async function getTokenResponse(tokenId) {
       password: process.env.PASSWORD
     }
   })
-
-  return response
+  return response.data.token
 }
 
 async function areFeesProcessed(txid, vout) {

@@ -42,7 +42,7 @@ it('Successful Redeem', async function () {
   )
   const redeemTxid = await broadcast(redeemHex)
   expect(await getAmount(redeemTxid, 0)).to.equal(0.00007)
-  expect(await getAmount(redeemTxid, 1)).to.equal(0.01986673)
+  expect(await utils.areFeesProcessed(redeemTxid, 1)).to.be.true
 })
 
 it('Successful Redeem No Fee', async function () {
