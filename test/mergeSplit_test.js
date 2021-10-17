@@ -33,18 +33,20 @@ let splitTxObj
 it('Successful MergeSplit With Fees', async function () {
   await setup() // contract, issue, transfer then split
 
+  const issueOutFundingVout = splitTx.vout.length - 1
+
   const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
   const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
 
   const mergeSplitHex = mergeSplit(
-    alicePrivateKey,
+    bobPrivateKey,
     issuerPrivateKey.publicKey,
     utils.getMergeSplitUtxo(splitTxObj, splitTx),
     aliceAddr,
     aliceAmountSatoshis,
     bobAddr,
     bobAmountSatoshis,
-    utils.getUtxo(splitTxid, splitTx, 2),
+    utils.getUtxo(splitTxid, splitTx, issueOutFundingVout),
     fundingPrivateKey
   )
   const mergeSplitTxid = await broadcast(mergeSplitHex)
@@ -60,7 +62,7 @@ it('Successful MergeSplit No Fees', async function () {
   const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
 
   const mergeSplitHex = mergeSplit(
-    alicePrivateKey,
+    bobPrivateKey,
     issuerPrivateKey.publicKey,
     utils.getMergeSplitUtxo(splitTxObj, splitTx),
     aliceAddr,
@@ -68,7 +70,7 @@ it('Successful MergeSplit No Fees', async function () {
     bobAddr,
     bobAmountSatoshis,
     null,
-    fundingPrivateKey
+    null
   )
   const mergeSplitTxid = await broadcast(mergeSplitHex)
   expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075)
@@ -76,26 +78,6 @@ it('Successful MergeSplit No Fees', async function () {
   expect(await utils.areFeesProcessed(mergeSplitTxid, 2)).to.be.false
 })
 
-// needs fixed
-it('Successful MergeSplit No Fees Empty Array', async function () {
-  await setup() // contract, issue, transfer then split
-
-  const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
-  const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
-
-  const mergeSplitHex = mergeSplit(
-    alicePrivateKey,
-    issuerPrivateKey.publicKey,
-    utils.getMergeSplitUtxo(splitTxObj, splitTx),
-    aliceAddr,
-    aliceAmountSatoshis,
-    bobAddr,
-    bobAmountSatoshis,
-    [],
-    fundingPrivateKey
-  )
-  await broadcast(mergeSplitHex)
-})
 
 it('Incorrect Destination 1 Satoshi Amount', async function () {
   await setup() // contract, issue, transfer then split
@@ -117,9 +99,10 @@ it('Incorrect Destination 1 Satoshi Amount', async function () {
   try {
     await broadcast(mergeSplitHex)
     assert(false)
+    return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Request failed with status code 400')
+    expect(e.response.data).to.contain('mandatory-script-verify-flag-failed (Script failed an OP_EQUALVERIFY operation)')
   }
 })
 
@@ -145,7 +128,7 @@ it('Incorrect Destination 2 Satoshi Amount', async function () {
     assert(false)
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Request failed with status code 400')
+    expect(e.response.data).to.contain('mandatory-script-verify-flag-failed (Script failed an OP_EQUALVERIFY operation)')
   }
 })
 
@@ -170,9 +153,10 @@ it('Incorrect Owner Private Key Throws Error', async function () {
   try {
     await broadcast(mergeSplitHex)
     assert(false)
+    return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Request failed with status code 400')
+    expect(e.response.data).to.contain('mandatory-script-verify-flag-failed (Script failed an OP_EQUALVERIFY operation)')
   }
 })
 
@@ -197,9 +181,10 @@ it('Incorrect Payments Private Key Throws Error', async function () {
   try {
     await broadcast(mergeSplitHex)
     assert(false)
+    return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Request failed with status code 400')
+    expect(e.response.data).to.contain('mandatory-script-verify-flag-failed (Script failed an OP_EQUALVERIFY operation)')
   }
 })
 
@@ -224,9 +209,10 @@ it('Incorrect Contract Public Key Throws Error', async function () {
   try {
     await broadcast(mergeSplitHex)
     assert(false)
+    return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Request failed with status code 400')
+    expect(e.response.data).to.contain('mandatory-script-verify-flag-failed (Script failed an OP_EQUALVERIFY operation)')
   }
 })
 
@@ -268,6 +254,7 @@ it('Attempt to MergeSplit More Than Two Tokens Throws Error', async function () 
       fundingPrivateKey
     )
     assert(false)
+    return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
     expect(e.message).to.eql('This function can only merge exactly 2 STAS tokens')
@@ -298,6 +285,7 @@ it('Attempt to MergeSplit Less Than Two Tokens Throws Error', async function () 
       fundingPrivateKey
     )
     assert(false)
+    return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
     expect(e.message).to.eql('This function can only merge exactly 2 STAS tokens')
@@ -324,6 +312,7 @@ it('Invalid Address Destination Address 1 Throws Error', async function () {
       fundingPrivateKey
     )
     assert(false)
+    return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
     expect(e.message).to.eql('Invalid Address string provided')
@@ -350,6 +339,7 @@ it('Invalid Address Destination Address 2 Throws Error', async function () {
       fundingPrivateKey
     )
     assert(false)
+    return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
     expect(e.message).to.eql('Invalid Address string provided')
@@ -386,7 +376,6 @@ async function setup () {
   )
   const issueTxid = await broadcast(issueHex)
   const issueTx = await getTransaction(issueTxid)
-
   const issueOutFundingVout = issueTx.vout.length - 1
 
   const transferHex = transfer(
@@ -407,46 +396,14 @@ async function setup () {
   splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
 
   const splitHex = split(
-    alicePrivateKey,
-    issuerPrivateKey.publicKey,
-    utils.getUtxo(transferTxid, transferTx, 0),
-    splitDestinations,
-    utils.getUtxo(transferTxid, transferTx, 1),
-    fundingPrivateKey
+      alicePrivateKey,
+      issuerPrivateKey.publicKey,
+      utils.getUtxo(transferTxid, transferTx, 0),
+      splitDestinations,
+      utils.getUtxo(transferTxid, transferTx, 1),
+      fundingPrivateKey
   )
-  splitTxidMerge = await broadcast(splitHex)
-  splitTxMerge = await getTransaction(splitTxidMerge)
-  splitTxObjMerge = new bsv.Transaction(splitHex)
-
-  const mergeHex = merge(
-    bobPrivateKey,
-    issuerPrivateKey.publicKey,
-    utils.getMergeUtxo(splitTxObjMerge),
-    aliceAddr,
-    utils.getUtxo(splitTxidMerge, splitTxMerge, 2),
-    fundingPrivateKey
-  )
-
-  const mergeTxid = await broadcast(mergeHex)
-  const mergeTx = await getTransaction(mergeTxid)
-
-  const aliceAmount1 = mergeTx.vout[0].value / 2
-  const aliceAmount2 = mergeTx.vout[0].value - aliceAmount1
-
-  const split2Destinations = []
-  split2Destinations[0] = { address: aliceAddr, amount: aliceAmount1 }
-  split2Destinations[1] = { address: aliceAddr, amount: aliceAmount2 }
-
-  const splitHex2 = split(
-    alicePrivateKey,
-    issuerPrivateKey.publicKey,
-    utils.getUtxo(mergeTxid, mergeTx, 0),
-    split2Destinations,
-    utils.getUtxo(mergeTxid, mergeTx, 1),
-    fundingPrivateKey
-  )
-  splitTxid = await broadcast(splitHex2)
+  splitTxid = await broadcast(splitHex)
   splitTx = await getTransaction(splitTxid)
-
-  splitTxObj = new bsv.Transaction(splitHex2)
+  splitTxObj = new bsv.Transaction(splitHex)
 }
