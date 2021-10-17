@@ -45,18 +45,17 @@ it("Successful Transfer With Fee", async function () {
     fundingPrivateKey
   )
   const transferTxid = await broadcast(transferHex)
-  console.log(transferTxid)
   const tokenId = await utils.getToken(issueTxid)
-  let response = await utils.getTokenResponse(tokenId) //tokengeneration is failing intermittingly 
-  expect(response.data.token.symbol).to.equal(symbol)
+  let response = await utils.getTokenResponse(tokenId)
+  expect(response.symbol).to.equal(symbol)
   expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
   expect(await utils.areFeesProcessed(transferTxid, 1)).to.be.true
 })
 
 
 it("Successful No Fee Transfer", async function () {
-
-  const issueOutFundingVout = issueTx.vout.length - 1
 
   const transferHex = transfer(
     bobPrivateKey,
@@ -69,36 +68,15 @@ it("Successful No Fee Transfer", async function () {
   const transferTxid = await broadcast(transferHex)
   const tokenId = await utils.getToken(issueTxid)
   let response = await utils.getTokenResponse(tokenId)
-  expect(response.data.token.symbol).to.equal(symbol)
+  expect(response.symbol).to.equal(symbol)
   expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
-  expect(await utils.areFeesProcessed(transferTxid, 1)).to.be.false
-})
-
-//should empty array be accepted as no fees?
-it("Successful No Fee Transfer Payment UTXO Empty Array", async function () {
-
-  const issueOutFundingVout = issueTx.vout.length - 1
-
-  const transferHex = transfer(
-    bobPrivateKey,
-    issuerPrivateKey.publicKey,
-    utils.getUtxo(issueTxid, issueTx, 1),
-    aliceAddr,
-    [],
-    null
-  )
-  const transferTxid = await broadcast(transferHex)
-  console.log(transferTxid)
-
-  const tokenId = await utils.getToken(issueTxid)
-  let response = await utils.getTokenResponse(tokenId)
-  expect(response.data.token.symbol).to.equal(symbol)
-  expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
   expect(await utils.areFeesProcessed(transferTxid, 1)).to.be.false
 })
 
 
-it("Transfer With Invalid Issuer PK Throws Error", async function () {
+it("Transfer With Invalid Issuer Private Key Throws Error", async function () {
 
   const issueOutFundingVout = issueTx.vout.length - 1
   const incorrectPK = bsv.PrivateKey()
@@ -114,13 +92,14 @@ it("Transfer With Invalid Issuer PK Throws Error", async function () {
   try {
     await broadcast(transferHex)
     assert(false)
+    return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Request failed with status code 400')
+    expect(e.response.data).to.contain('mandatory-script-verify-flag-failed (Script failed an OP_EQUALVERIFY operation)')
   }
 })
 
-it("Transfer With Invalid Funding PK Throws Error", async function () {
+it("Transfer With Invalid Funding Private Key Throws Error", async function () {
 
   const issueOutFundingVout = issueTx.vout.length - 1
   const incorrectPK = bsv.PrivateKey()
@@ -136,9 +115,10 @@ it("Transfer With Invalid Funding PK Throws Error", async function () {
   try {
     await broadcast(transferHex)
     assert(false)
+    return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Request failed with status code 400')
+    expect(e.response.data).to.contain('mandatory-script-verify-flag-failed (Script failed an OP_EQUALVERIFY operation)')
   }
 })
 
@@ -158,9 +138,10 @@ it("Transfer With Invalid Contract Public Key Throws Error", async function () {
   try {
     await broadcast(transferHex)
     assert(false)
+    return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Request failed with status code 400')
+    expect(e.response.data).to.contain('mandatory-script-verify-flag-failed')
   }
 })
 
@@ -180,6 +161,7 @@ it("Address Validation - Too Few Chars", async function () {
       fundingPrivateKey
     )
     assert(false)
+    return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
     expect(e.message).to.eql('Invalid Address string provided')
@@ -203,6 +185,7 @@ it("Address Validation - Too May Chars", async function () {
       fundingPrivateKey
     )
     assert(false)
+    return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
     expect(e.message).to.eql('Invalid Address string provided')
@@ -230,16 +213,16 @@ it("Incorrect STAS UTXO Amount Throws Error", async function () {
   try {
     await broadcast(transferHex)
     assert(false)
+    return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Request failed with status code 400')
+    expect(e.response.data).to.contain('bad-txns-in-belowout')
   }
 })
 
 it("Incorrect Payment UTXO Amount Throws Error", async function () {
 
   const issueOutFundingVout = issueTx.vout.length - 1
-
 
   const transferHex = transfer(
     bobPrivateKey,
@@ -257,13 +240,12 @@ it("Incorrect Payment UTXO Amount Throws Error", async function () {
   try {
     await broadcast(transferHex)
     assert(false)
+    return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Request failed with status code 400')
+    expect(e.response.data).to.contain('mandatory-script-verify-flag-failed (Signature must be zero for failed CHECK(MULTI)SIG operation)')
   }
 })
-
-
 
 async function setup() {
 
