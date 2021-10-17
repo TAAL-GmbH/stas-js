@@ -25,7 +25,7 @@ const bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
 const aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
 let issueTxid
 let issueTx
-//broadcast failing for all tests- 16: mandatory-script-verify-flag-failed (Script failed an OP_VERIFY operation)
+
 
 beforeEach(async function () {
 
@@ -78,6 +78,7 @@ it('Successful RedeemSplit With No Fees', async function () {
   expect(await utils.areFeesProcessed(redeemTxid, 3)).to.be.false
 })
 
+//Needs fixed
 it("No Split Completes Successfully", async function () {
 
   const bobAmount = issueTx.vout[0].value
@@ -326,4 +327,5 @@ async function setup() {
   )
   issueTxid = await broadcast(issueHex)
   issueTx = await getTransaction(issueTxid)
+  console.log("Bob Balance "   + await utils.getTokenBalance(bobAddr))
 }
