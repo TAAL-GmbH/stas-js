@@ -31,7 +31,6 @@ it("Full Life Cycle Test With No Fees", async function () {
   const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
   const supply = 10000
   const symbol = 'TAALT'
-
   const schema = utils.schema(publicKeyHash, symbol, supply)
 
   const contractHex = contract(
@@ -43,37 +42,37 @@ it("Full Life Cycle Test With No Fees", async function () {
     supply
   )
   const contractTxid = await broadcast(contractHex)
+  console.log(`Contract TX:     ${contractTxid}`)
   const contractTx = await getTransaction(contractTxid)
-  let amount = await utils.getVoutAmount(contractTxid, 0)
-  expect(amount).to.equal(supply / 100000000)
-  expect(await utils.areFeesProcessed(contractTxid, 1)).to.be.false;
+  expect(await utils.areFeesProcessed(contractTxid, 2)).to.be.false
 
-
-  let issueHex
-  try {
-    issueHex = issue(
-      issuerPrivateKey,
-      utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
-      utils.getUtxo(contractTxid, contractTx, 0),
-      null,
-      null,
-      true,
-      2
-    )
-  } catch (e) {
-    console.log('error issuing token', e)
-    return
-  }
+  const issueHex = issue(
+    issuerPrivateKey,
+    utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+    utils.getUtxo(contractTxid, contractTx, 0),
+    null,
+    null,
+    true,
+    2
+  )
+  
   const issueTxid = await broadcast(issueHex)
   const issueTx = await getTransaction(issueTxid)
-  // const tokenId = await utils.getToken(issueTxid)
-  // let response = await utils.getTokenResponse(tokenId)
-  // expect(response.token.symbol).to.equal(symbol)  //token issue is intermittingly failing 
-  // expect(response.token.contract_txs).to.contain(contractTxid)
-  // expect(response.token.issuance_txs).to.contain(issueTxid)
+  console.log(issueTxid)
+  const tokenId = await utils.getToken(issueTxid)
+  console.log(`Token ID:        ${tokenId}`)
+  let response = await utils.getTokenResponse(tokenId)  //token issuance fails intermittingly
+  expect(await utils.areFeesProcessed(issueTxid, 3)).to.be.false
+  expect(response.symbol).to.equal(symbol) 
+  expect(response.contract_txs).to.contain(contractTxid)
+  expect(response.issuance_txs).to.contain(issueTxid)
   expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
   expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
-  expect(await utils.areFeesProcessed(issueTxid, 2)).to.be.false;
+  await new Promise(r => setTimeout(r, 5000));
+  console.log("Alice Balance "   + await utils.getTokenBalance(aliceAddr))
+  console.log("Bob Balance "   + await utils.getTokenBalance(bobAddr))
+  // expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000) 
+  // expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
 
   const transferHex = transfer(
     bobPrivateKey,
