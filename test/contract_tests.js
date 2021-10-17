@@ -89,7 +89,7 @@ it('Duplicate Private Keys Throws Error', async function () {
     assert(false)
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Request failed with status code 400')
+    expect(e.response.data).to.contain('mandatory-script-verify-flag-failed')
   }
 })
 
@@ -108,7 +108,7 @@ it('Duplicate UTXOS Throws Error', async function () {
     assert(false)
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Request failed with status code 400')
+    expect(e.response.data).to.contain('bad-txns-inputs-duplicate')
   }
 })
 
@@ -327,22 +327,7 @@ it('Empty Array Contract UTXO Throw Error', async function () {
     expect(e.message).to.eql('ContractUtxos is invalid')
   }
 })
-//needs fixed
-it('Empty Array Payment UTXO Successful', async function () {
-  const contractHex = contract(
-    issuerPrivateKey,
-    contractUtxos,
-    fundingUtxos,
-    [],
-    schema,
-    supply
-  )
-  const contractTxid = await broadcast(contractHex)
-  console.log(contractTxid)
-  let amount = await utils.getVoutAmount(contractTxid, 0)
-  expect(amount).to.equal(supply / 100000000)
-  expect(await utils.areFeesProcessed(contractTxid, 1)).to.be.false;
-})
+
 
 async function setup() {
 
