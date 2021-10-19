@@ -141,52 +141,6 @@ it('Incorrect Funding Private Key Throws Error', async function () {
   }
 })
 
-it('Incorrect Issuer Address Throws Error', async function () {
-  const incorrectPrivateKey = bsv.PrivateKey()
-  const incorrectAddr = incorrectPrivateKey.toAddress().toString()
-
-  const issueHex = issue(
-    issuerPrivateKey,
-    utils.getIssueInfo(incorrectAddr, 7000, bobAddr, 3000),
-    utils.getUtxo(contractTxid, contractTx, 0),
-    utils.getUtxo(contractTxid, contractTx, 1),
-    incorrectPrivateKey,
-    true,
-    2
-  )
-  try {
-    await broadcast(issueHex)
-    assert(false)
-    return
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.response.data).to.contain('mandatory-script-verify-flag-failed (Script failed an OP_EQUALVERIFY operation)')
-  }
-})
-
-it('Incorrect Redemption Address Throws Error', async function () {
-  
-  const incorrectPrivateKey = bsv.PrivateKey()
-  const incorrectAddr = incorrectPrivateKey.toAddress().toString()
-
-  const issueHex = issue(
-    issuerPrivateKey,
-    utils.getIssueInfo(aliceAddr, 7000, incorrectAddr, 3000),
-    utils.getUtxo(contractTxid, contractTx, 0),
-    utils.getUtxo(contractTxid, contractTx, 1),
-    incorrectPrivateKey,
-    true,
-    2
-  )
-  try {
-    await broadcast(issueHex)
-    assert(false)
-    return
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.response.data).to.contain('mandatory-script-verify-flag-failed (Script failed an OP_EQUALVERIFY operation)')
-  }
-})
 
 it('Issue with Incorrect Balance (Less Than) Throws Error', async function () {
   try {
