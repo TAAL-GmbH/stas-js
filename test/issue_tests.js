@@ -26,7 +26,7 @@ let symbol
 
 beforeEach(async function () {
 
- await setup() // set up contract
+  await setup() // set up contract
 })
 
 it('Successful Issue Token With Split And Fee', async function () {
@@ -43,7 +43,7 @@ it('Successful Issue Token With Split And Fee', async function () {
   const issueTxid = await broadcast(issueHex)
   const tokenId = await utils.getToken(issueTxid)
   let response = await utils.getTokenResponse(tokenId)
-  expect(response.symbol).to.equal(symbol) 
+  expect(response.symbol).to.equal(symbol)
   expect(response.contract_txs).to.contain(contractTxid)
   expect(response.issuance_txs).to.contain(issueTxid)
   expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
@@ -99,6 +99,61 @@ it('Successful Issue Token With Split No Fee', async function () {
   expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
   expect(await utils.areFeesProcessed(issueTxid, 2)).to.be.false
 })
+
+it('Successful Issue Token 10 Addresses', async function () {
+
+  const pk1 = bsv.PrivateKey()
+  const add1 = pk1.toAddress(process.env.NETWORK).toString()
+  const pk2 = bsv.PrivateKey()
+  const add2 = pk2.toAddress(process.env.NETWORK).toString()
+  const pk3 = bsv.PrivateKey()
+  const add3 = pk3.toAddress(process.env.NETWORK).toString()
+  const pk4 = bsv.PrivateKey()
+  const add4 = pk4.toAddress(process.env.NETWORK).toString()
+  const pk5 = bsv.PrivateKey()
+  const add5 = pk5.toAddress(process.env.NETWORK).toString()
+  const pk6 = bsv.PrivateKey()
+  const add6 = pk6.toAddress(process.env.NETWORK).toString()
+  const pk7 = bsv.PrivateKey()
+  const add7 = pk7.toAddress(process.env.NETWORK).toString()
+  const pk8 = bsv.PrivateKey()
+  const add8 = pk8.toAddress(process.env.NETWORK).toString()
+
+  const issueHex = issue(
+    issuerPrivateKey,
+    utils.getTenIssueInfo(add1, add2, add3, add4, add5, add6, add7, add8, aliceAddr, bobAddr),
+    utils.getUtxo(contractTxid, contractTx, 0),
+    utils.getUtxo(contractTxid, contractTx, 1),
+    fundingPrivateKey,
+    true,
+    2
+  )
+  const issueTxid = await broadcast(issueHex)
+  const tokenId = await utils.getToken(issueTxid)
+  console.log(issueTxid)
+  let response = await utils.getTokenResponse(tokenId)
+  expect(response.symbol).to.equal(symbol)
+  expect(response.contract_txs).to.contain(contractTxid)
+  expect(response.issuance_txs).to.contain(issueTxid)
+  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00001)
+  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00001)
+  expect(await utils.getVoutAmount(issueTxid, 2)).to.equal(0.00001)
+  expect(await utils.getVoutAmount(issueTxid, 3)).to.equal(0.00001)
+  expect(await utils.getVoutAmount(issueTxid, 4)).to.equal(0.00001)
+  expect(await utils.getVoutAmount(issueTxid, 5)).to.equal(0.00001)
+  expect(await utils.getVoutAmount(issueTxid, 6)).to.equal(0.00001)
+  expect(await utils.getVoutAmount(issueTxid, 7)).to.equal(0.00001)
+  expect(await utils.getVoutAmount(issueTxid, 8)).to.equal(0.00001)
+  expect(await utils.getVoutAmount(issueTxid, 9)).to.equal(0.00001)
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+  expect(await utils.areFeesProcessed(issueTxid, 2)).to.be.true
+})
+
+
+
+
+
 
 it('Incorrect Issue Private Key Throws Error', async function () {
 
@@ -329,33 +384,6 @@ it('Empty Payment UTXO Info Throws Error', async function () {
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
     expect(e.message).to.eql('Invalid Argument: Output satoshis is not a natural number')
-  }
-})
-
-
-it('Increase Contract UTXO Amount Throws Error (when matching info amounts)', async function () {
-
-  const issueHex = issue(
-    issuerPrivateKey,
-    utils.getIssueInfo(aliceAddr, 700000, bobAddr, 300000),
-    {
-      txid: contractTxid,
-      vout: 0,
-      scriptPubKey: contractTx.vout[0].scriptPubKey.hex,
-      amount: 0.01
-    },
-    utils.getUtxo(contractTxid, contractTx, 1),
-    fundingPrivateKey,
-    true,
-    2
-  )
-  try {
-    await broadcast(issueHex)
-    assert(false)
-    return
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Request failed with status code 400')
   }
 })
 

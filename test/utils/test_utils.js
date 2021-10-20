@@ -96,6 +96,63 @@ function getMergeSplitUtxo(splitTxObj, splitTx) {
 }
 
 
+function getTenIssueInfo(add1, add2, add3, add4, add5, add6, add7, add8, add9, add10){
+return  [
+          {
+            addr: add1,
+            satoshis: 1000,
+            data: 'one'
+          },
+          {
+            addr: add2,
+            satoshis: 1000,
+            data: 'two'
+          },
+          {
+            addr: add3,
+            satoshis: 1000,
+            data: 'two'
+          },
+          {
+            addr: add4,
+            satoshis: 1000,
+            data: 'two'
+          },
+          {
+            addr: add5,
+            satoshis: 1000,
+            data: 'two'
+          },
+          {
+            addr: add6,
+            satoshis: 1000,
+            data: 'two'
+          },
+          {
+            addr: add7,
+            satoshis: 1000,
+            data: 'two'
+          },
+          {
+            addr: add8,
+            satoshis: 1000,
+            data: 'two'
+          },
+          {
+            addr: add9,
+            satoshis: 1000,
+            data: 'two'
+          },
+          {
+            addr: add10,
+            satoshis: 1000,
+            data: 'two'
+          },
+        ]
+
+}
+
+
 
 async function getVoutAmount(txid, vout) {
 
@@ -186,5 +243,6 @@ module.exports = {
   getToken,
   getTokenResponse,
   areFeesProcessed,
-  getTokenBalance 
+  getTokenBalance,
+  getTenIssueInfo
 }
