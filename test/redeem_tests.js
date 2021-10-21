@@ -18,12 +18,15 @@ const {
   SATS_PER_BITCOIN
 } = require('../index').utils
 
-const issuerPrivateKey = bsv.PrivateKey()
-const fundingPrivateKey = bsv.PrivateKey()
-const bobPrivateKey = bsv.PrivateKey()
-const alicePrivateKey = bsv.PrivateKey()
-const bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
-const aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
+var issuerPrivateKey
+var fundingPrivateKey
+var bobPrivateKey
+var alicePrivateKey
+var contractUtxos
+var fundingUtxos
+var publicKeyHash
+var bobAddr
+var aliceAddr
 let issueTxid
 let issueTx
 
@@ -33,6 +36,7 @@ beforeEach(async function () {
 
 
 it('Successful Redeem', async function () {
+
   const redeemHex = redeem(
     alicePrivateKey,
     issuerPrivateKey.publicKey,
@@ -182,10 +186,17 @@ it('Attempt To Redeem with Incorrect Payment Private Key Throws Error', async fu
   }
 })
 
-async function setup () {
-  const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
-  const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
-  const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
+async function setup() {
+
+  issuerPrivateKey = bsv.PrivateKey()
+  fundingPrivateKey = bsv.PrivateKey()
+  bobPrivateKey = bsv.PrivateKey()
+  alicePrivateKey = bsv.PrivateKey()
+  contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
+  fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
+  publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
+  bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
+  aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
   const symbol = 'TAALT'
   const supply = 10000
   const schema = utils.schema(publicKeyHash, symbol, supply)
@@ -214,7 +225,7 @@ async function setup () {
   issueTx = await getTransaction(issueTxid)
 }
 
-async function getAmount (txid, vout) {
+async function getAmount(txid, vout) {
   const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/tx/hash/' + txid
   const response = await axios({
     method: 'get',
