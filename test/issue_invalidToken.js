@@ -67,8 +67,8 @@ it('Attempt to issue invalid token', async function () {
       method: 'get',
       url,
       auth: {
-        username: 'taal_private',
-        password: 'dotheT@@l007'
+      username: process.env.API_USERNAME,
+      password: process.env.API_PASSWORD
       }
     })
   } catch (e) {
@@ -83,8 +83,8 @@ async function getToken (txid) {
     method: 'get',
     url,
     auth: {
-      username: 'taal_private',
-      password: 'dotheT@@l007'
+      username: process.env.API_USERNAME,
+      password: process.env.API_PASSWORD
     }
   })
 

@@ -378,8 +378,8 @@ async function countNumOfTokens(txid, isThereAFee) {
         method: 'get',
         url,
         auth: {
-            username: process.env.USERNAME,
-            password: process.env.PASSWORD
+      username: process.env.API_USERNAME,
+      password: process.env.API_PASSWORD
         }
     })
 

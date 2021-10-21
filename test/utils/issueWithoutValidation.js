@@ -1,13 +1,11 @@
 const bsv = require('bsv')
+require('dotenv').config()
 const {
   P2PKH_UNLOCKING_SCRIPT_BYTES,
   getStasScript,
   sighash
 } = require('../../lib/stas')
 const { addressToPubkeyhash, SATS_PER_BITCOIN } = require('../../lib/utils')
-
-const config = require('../config')
-const { app: { sats, perByte } } = config
 
 // the minimum length of a bitcoin address
 const ADDRESS_MIN_LENGTH = 26
@@ -68,7 +66,7 @@ function issueWithoutValiation (privateKey, issueInfo, contractUtxo, paymentUtxo
     const changeScript = bsv.Script.fromASM(`OP_DUP OP_HASH160 ${paymentPubKeyHash} OP_EQUALVERIFY OP_CHECKSIG`)
     // Calculate the change amount
     const txSize = (tx.serialize(true).length / 2) + 1 + 8 + changeScript.toBuffer().length + (tx.inputs.length * P2PKH_UNLOCKING_SCRIPT_BYTES)
-    const fee = Math.ceil(txSize * sats / perByte)
+    const fee = Math.ceil(txSize * process.env.SATS / process.env.PERBYTE)
 
     tx.addOutput(new bsv.Transaction.Output({
       script: changeScript,

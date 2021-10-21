@@ -152,8 +152,6 @@ return  [
 
 }
 
-
-
 async function getVoutAmount(txid, vout) {
 
   const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/tx/hash/' + txid
@@ -161,8 +159,8 @@ async function getVoutAmount(txid, vout) {
     method: 'get',
     url,
     auth: {
-      username: process.env.USERNAME,
-      password: process.env.PASSWORD
+      username: process.env.API_USERNAME,
+      password: process.env.API_PASSWORD
     }
   })
   return response.data.vout[vout].value
@@ -174,8 +172,8 @@ async function getToken(txid) {
     method: 'get',
     url,
     auth: {
-      username: process.env.USERNAME,
-      password: process.env.PASSWORD
+      username: process.env.API_USERNAME,
+      password: process.env.API_PASSWORD
     }
   })
 
@@ -192,8 +190,8 @@ async function getTokenResponse(tokenId) {
     method: 'get',
     url,
     auth: {
-      username: process.env.USERNAME,
-      password: process.env.PASSWORD
+      username: process.env.API_USERNAME,
+      password: process.env.API_PASSWORD
     }
   })
   return response.data.token
@@ -206,8 +204,8 @@ async function areFeesProcessed(txid, vout) {
     method: 'get',
     url,
     auth: {
-      username: process.env.USERNAME,
-      password: process.env.PASSWORD
+      username: process.env.API_USERNAME,
+      password: process.env.API_PASSWORD
     }
   })
 
@@ -225,8 +223,8 @@ async function getTokenBalance(address) {
     method: 'get',
     url,
     auth: {
-      username: process.env.USERNAME,
-      password: process.env.PASSWORD
+      username: process.env.API_USERNAME,
+      password: process.env.API_PASSWORD
     }
   })
 
