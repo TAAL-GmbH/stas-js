@@ -19,12 +19,15 @@ const {
     broadcast
 } = require('../index').utils
 
-const issuerPrivateKey = bsv.PrivateKey()
-const fundingPrivateKey = bsv.PrivateKey()
-const bobPrivateKey = bsv.PrivateKey()
-const alicePrivateKey = bsv.PrivateKey()
-const bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
-const aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
+var issuerPrivateKey
+var fundingPrivateKey
+var bobPrivateKey
+var alicePrivateKey
+var bobAddr
+var aliceAddr
+var contractUtxos
+var fundingUtxos
+var publicKeyHash
 let splitTxid
 let splitTx
 let splitTxObj
@@ -32,7 +35,7 @@ let splitTxObj
 beforeEach(async function () {
 
     await setup()
-  })
+})
 
 //needs fixed - token balance is intermittingly incorrect 
 it("Successful Merge With Fee", async function () {
@@ -54,7 +57,7 @@ it("Successful Merge With Fee", async function () {
     expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007)
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000) //intermittingly incorrect
     expect(await utils.areFeesProcessed(mergeTxid, 1)).to.be.true
-    
+
 })
 
 it("Successful Merge With No Fee", async function () {
@@ -173,27 +176,27 @@ it("Attempt to Merge More Than 2 Tokens", async function () {
 
 it("Attempt to Merge More Than 2 Tokens Without SDK Validation", async function () {
 
-   
-        const mergeHex = mergeUtil.mergeWithoutValidation(
-            bobPrivateKey,
-            issuerPrivateKey.publicKey,
-            [{
-                tx: splitTxObj,
-                vout: 0
-            },
-            {
-                tx: splitTxObj,
-                vout: 1
-            },
-            {
-                tx: splitTxObj,
-                vout: 2
-            }],
-            aliceAddr,
-            utils.getUtxo(splitTxid, splitTx, 2),
-            fundingPrivateKey
-        )
-        try {
+
+    const mergeHex = mergeUtil.mergeWithoutValidation(
+        bobPrivateKey,
+        issuerPrivateKey.publicKey,
+        [{
+            tx: splitTxObj,
+            vout: 0
+        },
+        {
+            tx: splitTxObj,
+            vout: 1
+        },
+        {
+            tx: splitTxObj,
+            vout: 2
+        }],
+        aliceAddr,
+        utils.getUtxo(splitTxid, splitTx, 2),
+        fundingPrivateKey
+    )
+    try {
         await broadcast(mergeHex)
         assert(false)
         return
@@ -228,9 +231,15 @@ it("Attempt to Merge Less Than Two  Tokens", async function () {
 
 async function setup() {
 
-    const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
-    const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
-    const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
+    issuerPrivateKey = bsv.PrivateKey()
+    fundingPrivateKey = bsv.PrivateKey()
+    bobPrivateKey = bsv.PrivateKey()
+    alicePrivateKey = bsv.PrivateKey()
+    bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
+    aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
+    contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
+    fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
+    publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
     const symbol = 'TAALT'
     const supply = 10000
     const schema = utils.schema(publicKeyHash, symbol, supply)
