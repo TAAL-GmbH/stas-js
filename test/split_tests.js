@@ -18,12 +18,15 @@ const {
     broadcast
 } = require('../index').utils
 
-const issuerPrivateKey = bsv.PrivateKey()
-const fundingPrivateKey = bsv.PrivateKey()
-const bobPrivateKey = bsv.PrivateKey()
-const alicePrivateKey = bsv.PrivateKey()
-const bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
-const aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
+let issuerPrivateKey
+let fundingPrivateKey
+let contractUtxos
+let fundingUtxos
+let publicKeyHash
+let bobPrivateKey
+let alicePrivateKey
+let bobAddr
+let aliceAddr
 let issueTxid
 let issueTx
 
@@ -215,14 +218,14 @@ it("Address Too Long Throws Error", async function () {
     splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
     const incorrectPrivateKey = bsv.PrivateKey()
     try {
-    const splitHex = split(
-        incorrectPrivateKey,
-        issuerPrivateKey.publicKey,
-        utils.getUtxo(issueTxid, issueTx, 0),
-        splitDestinations,
-        utils.getUtxo(issueTxid, issueTx, 2),
-        fundingPrivateKey
-    )
+        const splitHex = split(
+            incorrectPrivateKey,
+            issuerPrivateKey.publicKey,
+            utils.getUtxo(issueTxid, issueTx, 0),
+            splitDestinations,
+            utils.getUtxo(issueTxid, issueTx, 2),
+            fundingPrivateKey
+        )
         assert(false)
         return
     } catch (e) {
@@ -241,14 +244,14 @@ it("Address Too Short Throws Error", async function () {
     splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
     const incorrectPrivateKey = bsv.PrivateKey()
     try {
-    const splitHex = split(
-        incorrectPrivateKey,
-        issuerPrivateKey.publicKey,
-        utils.getUtxo(issueTxid, issueTx, 0),
-        splitDestinations,
-        utils.getUtxo(issueTxid, issueTx, 2),
-        fundingPrivateKey
-    )
+        const splitHex = split(
+            incorrectPrivateKey,
+            issuerPrivateKey.publicKey,
+            utils.getUtxo(issueTxid, issueTx, 0),
+            splitDestinations,
+            utils.getUtxo(issueTxid, issueTx, 2),
+            fundingPrivateKey
+        )
         assert(false)
         return
     } catch (e) {
@@ -339,9 +342,16 @@ it("Incorrect Contract Public Key Throws Error", async function () {
 
 async function setup() {
 
-    const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
-    const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
-    const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
+    issuerPrivateKey = bsv.PrivateKey()
+    fundingPrivateKey = bsv.PrivateKey()
+    contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
+    fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
+    publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
+    bobPrivateKey = bsv.PrivateKey()
+    alicePrivateKey = bsv.PrivateKey()
+    bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
+    aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
+
     const symbol = 'TAALT'
     const supply = 10000
     const schema = utils.schema(publicKeyHash, symbol, supply)
@@ -366,8 +376,8 @@ async function setup() {
         true,
         2
     )
-     issueTxid = await broadcast(issueHex)
-     issueTx = await getTransaction(issueTxid)
+    issueTxid = await broadcast(issueHex)
+    issueTx = await getTransaction(issueTxid)
 }
 
 
@@ -378,8 +388,8 @@ async function countNumOfTokens(txid, isThereAFee) {
         method: 'get',
         url,
         auth: {
-      username: process.env.API_USERNAME,
-      password: process.env.API_PASSWORD
+            username: process.env.API_USERNAME,
+            password: process.env.API_PASSWORD
         }
     })
 

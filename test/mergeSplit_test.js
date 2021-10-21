@@ -20,12 +20,15 @@ const {
   SATS_PER_BITCOIN
 } = require('../index').utils
 
-const issuerPrivateKey = bsv.PrivateKey()
-const fundingPrivateKey = bsv.PrivateKey()
-const bobPrivateKey = bsv.PrivateKey()
-const alicePrivateKey = bsv.PrivateKey()
-const bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
-const aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
+let issuerPrivateKey
+let fundingPrivateKey
+let contractUtxos
+let fundingUtxos
+let publicKeyHash
+let bobPrivateKey
+let alicePrivateKey
+let bobAddr
+let aliceAddr
 let splitTxid
 let splitTx
 let splitTxObj
@@ -330,7 +333,7 @@ it('Invalid Address Destination Address 2 Throws Error', async function () {
     const mergeSplitHex = mergeSplit(
       issuerPrivateKey,
       issuerPrivateKey.publicKey,
-        utils.getMergeSplitUtxo(splitTxObj, splitTx),
+      utils.getMergeSplitUtxo(splitTxObj, splitTx),
       aliceAddr,
       aliceAmountSatoshis,
       invalidAddr,
@@ -346,10 +349,17 @@ it('Invalid Address Destination Address 2 Throws Error', async function () {
   }
 })
 
-async function setup () {
-  const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
-  const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
-  const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
+async function setup() {
+
+  issuerPrivateKey = bsv.PrivateKey()
+  fundingPrivateKey = bsv.PrivateKey()
+  bobPrivateKey = bsv.PrivateKey()
+  alicePrivateKey = bsv.PrivateKey()
+  bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
+  aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
+  contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
+  fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
+  publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
   const symbol = 'TAALT'
   const supply = 10000
   const schema = utils.schema(publicKeyHash, symbol, supply)
@@ -396,12 +406,12 @@ async function setup () {
   splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
 
   const splitHex = split(
-      alicePrivateKey,
-      issuerPrivateKey.publicKey,
-      utils.getUtxo(transferTxid, transferTx, 0),
-      splitDestinations,
-      utils.getUtxo(transferTxid, transferTx, 1),
-      fundingPrivateKey
+    alicePrivateKey,
+    issuerPrivateKey.publicKey,
+    utils.getUtxo(transferTxid, transferTx, 0),
+    splitDestinations,
+    utils.getUtxo(transferTxid, transferTx, 1),
+    fundingPrivateKey
   )
   splitTxid = await broadcast(splitHex)
   splitTx = await getTransaction(splitTxid)

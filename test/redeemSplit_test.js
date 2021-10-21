@@ -17,12 +17,15 @@ const {
   SATS_PER_BITCOIN
 } = require('../index').utils
 
-const issuerPrivateKey = bsv.PrivateKey()
-const fundingPrivateKey = bsv.PrivateKey()
-const bobPrivateKey = bsv.PrivateKey()
-const alicePrivateKey = bsv.PrivateKey()
-const bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
-const aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
+let issuerPrivateKey
+let fundingPrivateKey
+let bobPrivateKey
+let alicePrivateKey
+let bobAddr
+let aliceAddr
+let contractUtxos
+let fundingUtxos
+let publicKeyHash
 let issueTxid
 let issueTx
 
@@ -97,10 +100,10 @@ it("No Split Completes Successfully", async function () {
 
   const redeemTxid = await broadcast(redeemSplitHex)
 
-//   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00002334)
-//   let noOfTokens = await countNumOfTokens(redeemTxid, true)
-//   expect(splitDestinations).to.have.length(noOfTokens) //ensure that tx output contains 1 
- })
+  //   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00002334)
+  //   let noOfTokens = await countNumOfTokens(redeemTxid, true)
+  //   expect(splitDestinations).to.have.length(noOfTokens) //ensure that tx output contains 1 
+})
 
 //needs fixed - throwing 'Output satoshis is not a natural number' 
 it("Add Too Much To Split Throws Error", async function () {
@@ -110,19 +113,19 @@ it("Add Too Much To Split Throws Error", async function () {
   splitDestinations[0] = { address: bobAddr, amount: bobAmount }
   const issueOutFundingVout = issueTx.vout.length - 1
   try {
-  const redeemHex = redeemSplit(
-    alicePrivateKey,
-    issuerPrivateKey.publicKey,
-    utils.getUtxo(issueTxid, issueTx, 0),
-    splitDestinations,
-    utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-    fundingPrivateKey
-  )
-      assert(false)
-      return
+    const redeemHex = redeemSplit(
+      alicePrivateKey,
+      issuerPrivateKey.publicKey,
+      utils.getUtxo(issueTxid, issueTx, 0),
+      splitDestinations,
+      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
+      fundingPrivateKey
+    )
+    assert(false)
+    return
   } catch (e) {
-      expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('Some Error')
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Some Error')
   }
 })
 
@@ -143,11 +146,11 @@ it("Address Too Short Throws Error", async function () {
       utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
       fundingPrivateKey
     )
-      assert(false)
-      return
+    assert(false)
+    return
   } catch (e) {
-      expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('Invalid Address string provided')
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Invalid Address string provided')
   }
 })
 
@@ -171,11 +174,11 @@ it("Address Too Long Throws Error", async function () {
       utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
       fundingPrivateKey
     )
-      assert(false)
-      return
+    assert(false)
+    return
   } catch (e) {
-      expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('Invalid Address string provided')
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Invalid Address string provided')
   }
 })
 
@@ -260,7 +263,7 @@ it('Incorrect Public Key Throws Error', async function () {
   try {
     await broadcast(redeemHex)
     assert(false)
-    return  
+    return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
     expect(e.message).to.eql('Request failed with status code 400')
@@ -289,18 +292,25 @@ it("Splitting Into Too Many Tokens Throws Error", async function () {
     )
     assert(false)
     return
-} catch (e) {
+  } catch (e) {
     expect(e).to.be.instanceOf(Error)
     expect(e.message).to.eql('Must have less than 5 segments')
-}
+  }
 })
 
 
 
 async function setup() {
-  const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
-  const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
-  const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
+
+  issuerPrivateKey = bsv.PrivateKey()
+  fundingPrivateKey = bsv.PrivateKey()
+  bobPrivateKey = bsv.PrivateKey()
+  alicePrivateKey = bsv.PrivateKey()
+  bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
+  aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
+  contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
+  fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
+  publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
   const symbol = 'TAALT'
   const supply = 10000
   const schema = utils.schema(publicKeyHash, symbol, supply)
@@ -327,5 +337,4 @@ async function setup() {
   )
   issueTxid = await broadcast(issueHex)
   issueTx = await getTransaction(issueTxid)
-  console.log("Bob Balance "   + await utils.getTokenBalance(bobAddr))
 }
