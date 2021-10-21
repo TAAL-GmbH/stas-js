@@ -142,7 +142,7 @@ it('Null Contract UTXO Throws Error', async function () {
     assert(false)
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('ContractUtxos is invalid')
+    expect(e.message).to.eql('inputUtxos is invalid'')
   }
 })
 
@@ -164,7 +164,7 @@ it('Non Array Contract UTXO Throws Error', async function () {
     assert(false)
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('ContractUtxos is invalid')
+    expect(e.message).to.eql('inputUtxos is invalid')
   }
 })
 
@@ -230,7 +230,7 @@ it('Null Supply Throws Error', async function () {
     expect(e.message).to.eql('Token satoshis is Not a natural number')
   }
 })
-//needs fixed
+
 it('Negative Supply Throws Error', async function () {
   try {
     contract(
@@ -244,7 +244,7 @@ it('Negative Supply Throws Error', async function () {
     assert(false)
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Token satoshis is Not a natural number')
+    expect(e.message).to.eql('Invalid Argument: Output satoshis is not a natural number')
   }
 })
 
@@ -324,7 +324,7 @@ it('Empty Array Contract UTXO Throw Error', async function () {
     assert(false)
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('ContractUtxos is invalid')
+    expect(e.message).to.eql('inputUtxos is invalid')
   }
 })
 

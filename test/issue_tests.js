@@ -150,11 +150,6 @@ it('Successful Issue Token 10 Addresses', async function () {
   expect(await utils.areFeesProcessed(issueTxid, 2)).to.be.true
 })
 
-
-
-
-
-
 it('Incorrect Issue Private Key Throws Error', async function () {
 
   const incorrectPrivateKey = bsv.PrivateKey()
