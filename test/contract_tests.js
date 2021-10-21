@@ -142,7 +142,7 @@ it('Null Contract UTXO Throws Error', async function () {
     assert(false)
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('inputUtxos is invalid'')
+    expect(e.message).to.eql('inputUtxos is invalid')
   }
 })
 

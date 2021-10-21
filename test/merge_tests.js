@@ -19,15 +19,15 @@ const {
     broadcast
 } = require('../index').utils
 
-var issuerPrivateKey
-var fundingPrivateKey
-var bobPrivateKey
-var alicePrivateKey
-var bobAddr
-var aliceAddr
-var contractUtxos
-var fundingUtxos
-var publicKeyHash
+let issuerPrivateKey
+let fundingPrivateKey
+let bobPrivateKey
+let alicePrivateKey
+let bobAddr
+let aliceAddr
+let contractUtxos
+let fundingUtxos
+let publicKeyHash
 let splitTxid
 let splitTx
 let splitTxObj

@@ -15,8 +15,13 @@ const {
   broadcast
 } = require('../index').utils
 
-const issuerPrivateKey = bsv.PrivateKey()
-const fundingPrivateKey = bsv.PrivateKey()
+let issuerPrivateKey
+let fundingPrivateKey
+let bobPrivateKey
+let alicePrivateKey
+let contractUtxos
+let fundingUtxos
+let publicKeyHash
 let contractTx
 let contractTxid
 let issueInfo
@@ -130,24 +135,17 @@ it('Successful Issue Token 10 Addresses', async function () {
   )
   const issueTxid = await broadcast(issueHex)
   const tokenId = await utils.getToken(issueTxid)
-  console.log(issueTxid)
   let response = await utils.getTokenResponse(tokenId)
   expect(response.symbol).to.equal(symbol)
   expect(response.contract_txs).to.contain(contractTxid)
   expect(response.issuance_txs).to.contain(issueTxid)
-  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00001)
-  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00001)
-  expect(await utils.getVoutAmount(issueTxid, 2)).to.equal(0.00001)
-  expect(await utils.getVoutAmount(issueTxid, 3)).to.equal(0.00001)
-  expect(await utils.getVoutAmount(issueTxid, 4)).to.equal(0.00001)
-  expect(await utils.getVoutAmount(issueTxid, 5)).to.equal(0.00001)
-  expect(await utils.getVoutAmount(issueTxid, 6)).to.equal(0.00001)
-  expect(await utils.getVoutAmount(issueTxid, 7)).to.equal(0.00001)
-  expect(await utils.getVoutAmount(issueTxid, 8)).to.equal(0.00001)
-  expect(await utils.getVoutAmount(issueTxid, 9)).to.equal(0.00001)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
-  expect(await utils.areFeesProcessed(issueTxid, 2)).to.be.true
+
+  for (let i = 1; i < 10; i++){
+    expect(await utils.getVoutAmount(issueTxid, i)).to.equal(0.00001)
+  }
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(1000)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(1000)
+  expect(await utils.areFeesProcessed(issueTxid, 11)).to.be.true
 })
 
 it('Incorrect Issue Private Key Throws Error', async function () {
@@ -384,16 +382,18 @@ it('Empty Payment UTXO Info Throws Error', async function () {
 
 
 async function setup() {
-  const bobPrivateKey = bsv.PrivateKey()
-  const alicePrivateKey = bsv.PrivateKey()
-  const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
-  const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
-  const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
+  issuerPrivateKey = bsv.PrivateKey()
+  fundingPrivateKey = bsv.PrivateKey()
+  bobPrivateKey = bsv.PrivateKey()
+  alicePrivateKey = bsv.PrivateKey()
+  contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
+  fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
+  publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
+  aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
+  bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
   symbol = 'TAALT'
   supply = 10000
   schema = utils.schema(publicKeyHash, symbol, supply)
-  aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
-  bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
 
   const contractHex = contract(
     issuerPrivateKey,

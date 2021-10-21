@@ -18,15 +18,15 @@ const {
   SATS_PER_BITCOIN
 } = require('../index').utils
 
-var issuerPrivateKey
-var fundingPrivateKey
-var bobPrivateKey
-var alicePrivateKey
-var contractUtxos
-var fundingUtxos
-var publicKeyHash
-var bobAddr
-var aliceAddr
+let issuerPrivateKey
+let fundingPrivateKey
+let bobPrivateKey
+let alicePrivateKey
+let contractUtxos
+let fundingUtxos
+let publicKeyHash
+let bobAddr
+let aliceAddr
 let issueTxid
 let issueTx
 
