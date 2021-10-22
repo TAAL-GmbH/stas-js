@@ -34,7 +34,7 @@ beforeEach(async function () {
   await setup() // set up contract
 })
 
-it('Successful Issue Token With Split And Fee', async function () {
+it('Issue - Successful Issue Token With Split And Fee', async function () {
 
   const issueHex = issue(
     issuerPrivateKey,
@@ -58,7 +58,7 @@ it('Successful Issue Token With Split And Fee', async function () {
   expect(await utils.areFeesProcessed(issueTxid, 2)).to.be.true
 })
 
-it('Successful Issue Token Non Split', async function () {
+it('Issue - Successful Issue Token Non Split', async function () {
 
   const issueHex = issue(
     issuerPrivateKey,
@@ -81,7 +81,7 @@ it('Successful Issue Token Non Split', async function () {
   expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
 })
 
-it('Successful Issue Token With Split No Fee', async function () {
+it('Issue - Successful Issue Token With Split No Fee', async function () {
 
   const issueHex = issue(
     issuerPrivateKey,
@@ -105,7 +105,7 @@ it('Successful Issue Token With Split No Fee', async function () {
   expect(await utils.areFeesProcessed(issueTxid, 2)).to.be.false
 })
 
-it('Successful Issue Token 10 Addresses', async function () {
+it('Issue - Successful Issue Token 10 Addresses', async function () {
 
   const pk1 = bsv.PrivateKey()
   const add1 = pk1.toAddress(process.env.NETWORK).toString()
@@ -145,10 +145,10 @@ it('Successful Issue Token 10 Addresses', async function () {
   }
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(1000)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(1000)
-  expect(await utils.areFeesProcessed(issueTxid, 11)).to.be.true
+  expect(await utils.areFeesProcessed(issueTxid, 10)).to.be.true
 })
 
-it('Incorrect Issue Private Key Throws Error', async function () {
+it('Issue - Incorrect Issue Private Key Throws Error', async function () {
 
   const incorrectPrivateKey = bsv.PrivateKey()
   const issueHex = issue(
@@ -169,7 +169,7 @@ it('Incorrect Issue Private Key Throws Error', async function () {
   }
 })
 
-it('Incorrect Funding Private Key Throws Error', async function () {
+it('Issue - Incorrect Funding Private Key Throws Error', async function () {
   const incorrectPrivateKey = bsv.PrivateKey()
   const issueHex = issue(
     issuerPrivateKey,
@@ -190,7 +190,7 @@ it('Incorrect Funding Private Key Throws Error', async function () {
 })
 
 
-it('Issue with Incorrect Balance (Less Than) Throws Error', async function () {
+it('Issue - Issue with Incorrect Balance (Less Than) Throws Error', async function () {
   try {
     issue(
       issuerPrivateKey,
@@ -209,7 +209,7 @@ it('Issue with Incorrect Balance (Less Than) Throws Error', async function () {
   }
 })
 
-it('Issue with Incorrect Balance (More Than) Throws Error', async function () {
+it('Issue - Issue with Incorrect Balance (More Than) Throws Error', async function () {
   try {
     issue(
       issuerPrivateKey,
@@ -229,7 +229,7 @@ it('Issue with Incorrect Balance (More Than) Throws Error', async function () {
 })
 
 
-it('Empty Issue Info Throws Error', async function () {
+it('Issue - Empty Issue Info Throws Error', async function () {
   try {
     issue(
       issuerPrivateKey,
@@ -248,7 +248,7 @@ it('Empty Issue Info Throws Error', async function () {
   }
 })
 
-it('Invalid Issue Address (Too Short) throws error', async function () {
+it('Issue - Invalid Issue Address (Too Short) throws error', async function () {
   issueInfo = [
     {
       addr: '1bc1qxy2kgdygjrsqtzq2',
@@ -281,7 +281,7 @@ it('Invalid Issue Address (Too Short) throws error', async function () {
 
 //throwing a 'Checksum mismatch' error - if i am reading code correctly it should validate address first 
 //and trigger > ADDRESS_MAX_LENGTH  error
-it('Invalid Issue Address (Too Long) throws error', async function () {
+it('Issue - Invalid Issue Address (Too Long) throws error', async function () {
   issueInfo = [
     {
       addr: '1zP1eP5QGefi2DMPTfTL5SLmv7DivfNabc1qxymv7',
@@ -313,7 +313,7 @@ it('Invalid Issue Address (Too Long) throws error', async function () {
 })
 
 
-it('Non Array Issue Info Throws Error', async function () {
+it('Issue - Non Array Issue Info Throws Error', async function () {
   try {
     issue(
       issuerPrivateKey,
@@ -343,7 +343,7 @@ it('Non Array Issue Info Throws Error', async function () {
 
 
 
-it('Empty Contract UTXO Info Throws Error', async function () {
+it('Issue - Empty Contract UTXO Info Throws Error', async function () {
   try {
     issue(
       issuerPrivateKey,
@@ -362,7 +362,7 @@ it('Empty Contract UTXO Info Throws Error', async function () {
   }
 })
 
-it('Empty Payment UTXO Info Throws Error', async function () {
+it('Issue - Empty Payment UTXO Info Throws Error', async function () {
   try {
     issue(
       issuerPrivateKey,

@@ -313,7 +313,7 @@ it("Incorrect Payments Private Key Throws Error", async function () {
     }
 })
 
-it("Incorrect Contract Public Key Throws Error", async function () {
+it("Split - Incorrect Contract Public Key Throws Error", async function () {
 
     const bobAmount1 = issueTx.vout[0].value / 2
     const bobAmount2 = issueTx.vout[0].value - bobAmount1

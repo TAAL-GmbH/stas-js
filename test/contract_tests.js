@@ -26,7 +26,7 @@ beforeEach(async function () {
   await setup()
 })
 
-it('Successful Contract With Fees', async function () {
+it('Contract - Successful With Fees', async function () {
   const contractHex = contract(
     issuerPrivateKey,
     contractUtxos,
@@ -42,7 +42,7 @@ it('Successful Contract With Fees', async function () {
   expect(await utils.areFeesProcessed(contractTxid, 1)).to.be.true
 })
 
-it('Successful Contract No Fees', async function () {
+it('Contract - Successful No Fees', async function () {
   const contractHex = contract(
     issuerPrivateKey,
     contractUtxos,
@@ -59,7 +59,7 @@ it('Successful Contract No Fees', async function () {
 
 })
 
-it('Successful Contract No Fees Empty Arrays', async function () {
+it('Contract - Successful No Fees Empty Arrays', async function () {
   const contractHex = contract(
     issuerPrivateKey,
     contractUtxos,
@@ -74,7 +74,7 @@ it('Successful Contract No Fees Empty Arrays', async function () {
   expect(await utils.areFeesProcessed(contractTxid, 1)).to.be.false
 })
 
-it('Duplicate Private Keys Throws Error', async function () {
+it('Contract - Duplicate Private Keys Throws Error', async function () {
   const contractHex = contract(
     fundingPrivateKey,
     contractUtxos,
@@ -93,7 +93,7 @@ it('Duplicate Private Keys Throws Error', async function () {
   }
 })
 
-it('Duplicate UTXOS Throws Error', async function () {
+it('Contract - Duplicate UTXOS Throws Error', async function () {
   const contractHex = contract(
     issuerPrivateKey,
     fundingUtxos,
@@ -112,7 +112,7 @@ it('Duplicate UTXOS Throws Error', async function () {
   }
 })
 
-it('Null Issuer Public Key Throws Error', async function () {
+it('Contract - Null Issuer Public Key Throws Error', async function () {
   try {
     contract(
       null,
@@ -129,7 +129,7 @@ it('Null Issuer Public Key Throws Error', async function () {
   }
 })
 
-it('Null Contract UTXO Throws Error', async function () {
+it('Contract - Null Contract UTXO Throws Error', async function () {
   try {
     contract(
       issuerPrivateKey,
@@ -146,7 +146,7 @@ it('Null Contract UTXO Throws Error', async function () {
   }
 })
 
-it('Non Array Contract UTXO Throws Error', async function () {
+it('Contract - Non Array Contract UTXO Throws Error', async function () {
   try {
     contract(
       issuerPrivateKey,
@@ -168,7 +168,7 @@ it('Non Array Contract UTXO Throws Error', async function () {
   }
 })
 
-it('Null Payment UTXO Successful Broadcast(no fees)', async function () {
+it('Contract - Null Payment UTXO Successful Broadcast(no fees)', async function () {
   const contractHex = contract(
     issuerPrivateKey,
     contractUtxos,
@@ -180,7 +180,7 @@ it('Null Payment UTXO Successful Broadcast(no fees)', async function () {
   await broadcast(contractHex)
 })
 
-it('Null Funding Private Key Throws Error', async function () {
+it('Contract - Null Funding Private Key Throws Error', async function () {
   try {
     contract(
       issuerPrivateKey,
@@ -197,7 +197,7 @@ it('Null Funding Private Key Throws Error', async function () {
   }
 })
 
-it('Null Schema Throws Error', async function () {
+it('Contract - Null Schema Throws Error', async function () {
   try {
     contract(
       issuerPrivateKey,
@@ -214,7 +214,7 @@ it('Null Schema Throws Error', async function () {
   }
 })
 //needs fixed
-it('Null Supply Throws Error', async function () {
+it('Contract - Null Supply Throws Error', async function () {
   try {
     contract(
       issuerPrivateKey,
@@ -227,11 +227,11 @@ it('Null Supply Throws Error', async function () {
     assert(false)
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Token satoshis is Not a natural number')
+    expect(e.message).to.eql('Invalid Argument: Output satoshis is not a natural number')
   }
 })
 
-it('Negative Supply Throws Error', async function () {
+it('Contract - Negative Supply Throws Error', async function () {
   try {
     contract(
       issuerPrivateKey,
@@ -248,7 +248,7 @@ it('Negative Supply Throws Error', async function () {
   }
 })
 
-it('Zero Supply Throws Error', async function () {
+it('Contract - Zero Supply Throws Error', async function () {
   try {
     contract(
       issuerPrivateKey,
@@ -265,7 +265,7 @@ it('Zero Supply Throws Error', async function () {
   }
 })
 
-it('Invalid Contract UTXO Throw Error', async function () {
+it('Contract - Invalid Contract UTXO Throw Error', async function () {
   try {
     contract(
       issuerPrivateKey,
@@ -288,7 +288,7 @@ it('Invalid Contract UTXO Throw Error', async function () {
   }
 })
 
-it('Invalid Payment UTXO Throw Error', async function () {
+it('Contract - Invalid Payment UTXO Throw Error', async function () {
   try {
     contract(
       issuerPrivateKey,
@@ -311,7 +311,7 @@ it('Invalid Payment UTXO Throw Error', async function () {
   }
 })
 
-it('Empty Array Contract UTXO Throw Error', async function () {
+it('Contract - Empty Array Contract UTXO Throw Error', async function () {
   try {
     contract(
       issuerPrivateKey,

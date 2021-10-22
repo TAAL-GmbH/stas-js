@@ -38,7 +38,7 @@ beforeEach(async function () {
 })
 
 //needs fixed - token balance is intermittingly incorrect 
-it("Successful Merge With Fee", async function () {
+it("Merge - Successful Merge With Fee", async function () {
 
     const mergeHex = merge(
         bobPrivateKey,
@@ -60,7 +60,7 @@ it("Successful Merge With Fee", async function () {
 
 })
 
-it("Successful Merge With No Fee", async function () {
+it("Merge - Merge With No Fee", async function () {
 
     const mergeHex = merge(
         bobPrivateKey,
@@ -81,7 +81,7 @@ it("Successful Merge With No Fee", async function () {
     expect(await utils.areFeesProcessed(mergeTxid, 1)).to.be.false
 })
 
-it("Incorrect Owner Private Key Throws Error", async function () {
+it("Merge -Incorrect Owner Private Key Throws Error", async function () {
 
     const incorrectPrivateKey = bsv.PrivateKey()
     const mergeHex = merge(
@@ -102,7 +102,7 @@ it("Incorrect Owner Private Key Throws Error", async function () {
     }
 })
 
-it("Incorrect Funding Private Key Throws Error", async function () {
+it("Merge -Incorrect Funding Private Key Throws Error", async function () {
 
     const incorrectPrivateKey = bsv.PrivateKey()
     const mergeHex = merge(
@@ -123,7 +123,7 @@ it("Incorrect Funding Private Key Throws Error", async function () {
     }
 })
 
-it("Incorrect Contract Public Key Throws Error", async function () {
+it("Merge - Incorrect Contract Public Key Throws Error", async function () {
 
     const incorrectPrivateKey = bsv.PrivateKey()
     const mergeHex = merge(
@@ -144,7 +144,7 @@ it("Incorrect Contract Public Key Throws Error", async function () {
     }
 })
 
-it("Attempt to Merge More Than 2 Tokens", async function () {
+it("Merge -Attempt to Merge More Than 2 Tokens", async function () {
 
     try {
         const mergeHex = merge(
@@ -174,7 +174,7 @@ it("Attempt to Merge More Than 2 Tokens", async function () {
     }
 })
 
-it("Attempt to Merge More Than 2 Tokens Without SDK Validation", async function () {
+it("Merge -Attempt to Merge More Than 2 Tokens Without SDK Validation", async function () {
 
 
     const mergeHex = mergeUtil.mergeWithoutValidation(
@@ -206,7 +206,7 @@ it("Attempt to Merge More Than 2 Tokens Without SDK Validation", async function 
     }
 })
 
-it("Attempt to Merge Less Than Two  Tokens", async function () {
+it("Merge -Attempt to Merge Less Than Two  Tokens", async function () {
 
     try {
         const mergeHex = merge(

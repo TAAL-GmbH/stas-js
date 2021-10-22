@@ -35,7 +35,7 @@ beforeEach(async function () {
 })
 
 
-it('Successful Redeem', async function () {
+it('Redeem - Successful Redeem', async function () {
 
   const redeemHex = redeem(
     alicePrivateKey,
@@ -49,7 +49,7 @@ it('Successful Redeem', async function () {
   expect(await utils.areFeesProcessed(redeemTxid, 1)).to.be.true
 })
 
-it('Successful Redeem No Fee', async function () {
+it('Redeem - Successful Redeem No Fee', async function () {
   const redeemHex = redeem(
     alicePrivateKey,
     issuerPrivateKey.publicKey,
@@ -62,7 +62,8 @@ it('Successful Redeem No Fee', async function () {
   expect(await utils.areFeesProcessed(redeemTxid, 1)).to.be.false
 })
 
-it('Successful Redeem No Fee Empty Array', async function () {
+//Needs fixed
+it('Redeem - Successful Redeem No Fee Empty Array', async function () {
   const redeemHex = redeem(
     alicePrivateKey,
     issuerPrivateKey.publicKey,
@@ -75,7 +76,7 @@ it('Successful Redeem No Fee Empty Array', async function () {
   expect(await utils.areFeesProcessed(redeemTxid, 1)).to.be.false
 })
 
-it('Incorrect Stas UTXO Amount Throws Error', async function () {
+it('Redeem - Incorrect Stas UTXO Amount Throws Error', async function () {
   const redeemHex = redeem(
     alicePrivateKey,
     issuerPrivateKey.publicKey,
@@ -102,7 +103,7 @@ it('Incorrect Stas UTXO Amount Throws Error', async function () {
   }
 })
 
-it('Incorrect Stas UTXO Amount Throws Error', async function () {
+it('Redeem - Incorrect Stas UTXO Amount Throws Error', async function () {
   const redeemHex = redeem(
     alicePrivateKey,
     issuerPrivateKey.publicKey,
@@ -129,7 +130,7 @@ it('Incorrect Stas UTXO Amount Throws Error', async function () {
   }
 })
 
-it('Attempt To Unlock With Incorrect Public Key Throws Error', async function () {
+it('Redeem - Attempt To Unlock With Incorrect Public Key Throws Error', async function () {
   incorrectKey = bsv.PrivateKey()
 
   const redeemHex = redeem(
@@ -148,7 +149,7 @@ it('Attempt To Unlock With Incorrect Public Key Throws Error', async function ()
   }
 })
 
-it('Attempt To Redeem with Incorrect Owner Private Key Throws Error', async function () {
+it('Redeem - Attempt To Redeem with Incorrect Owner Private Key Throws Error', async function () {
   incorrectKey = bsv.PrivateKey()
 
   const redeemHex = redeem(
@@ -167,7 +168,7 @@ it('Attempt To Redeem with Incorrect Owner Private Key Throws Error', async func
   }
 })
 
-it('Attempt To Redeem with Incorrect Payment Private Key Throws Error', async function () {
+it('Redeem - Attempt To Redeem with Incorrect Payment Private Key Throws Error', async function () {
   incorrectKey = bsv.PrivateKey()
 
   const redeemHex = redeem(

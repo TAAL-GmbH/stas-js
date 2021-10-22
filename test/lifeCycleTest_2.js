@@ -74,10 +74,10 @@ it("Full Life Cycle Test With More Supply", async function () {
   console.log(`Issue TX:        ${issueTxid}`)
   const issueTx = await getTransaction(issueTxid)
   const tokenId = await utils.getToken(issueTxid)
-  // let response = await utils.getTokenResponse(tokenId)
-  // expect(response.token.symbol).to.equal(symbol)  //token issuance currently delayed
-  // expect(response.token.contract_txs).to.contain(contractTxid)
-  // expect(response.token.issuance_txs).to.contain(issueTxid)
+  let response = await utils.getTokenResponse(tokenId)
+  expect(response.symbol).to.equal(symbol)  //token issuance failing
+  expect(response.contract_txs).to.contain(contractTxid)
+  expect(response.issuance_txs).to.contain(issueTxid)
   expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.004)
   expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.001)
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(400000)

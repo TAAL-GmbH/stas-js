@@ -113,7 +113,7 @@ it("Full Life Cycle Test With 3 Issuance Addresses", async function () {
   const transferTxid = await broadcast(transferHex)
   console.log(`Transfer TX:     ${transferTxid}`)
   const transferTx = await getTransaction(transferTxid)
-  expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.001)
+  expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
 
 
   // Split tokens into 2 - both payable to Bob...
@@ -134,8 +134,8 @@ it("Full Life Cycle Test With 3 Issuance Addresses", async function () {
   const splitTxid = await broadcast(splitHex)
   console.log(`Split TX:        ${splitTxid}`)
   const splitTx = await getTransaction(splitTxid)
-  expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.0005)
-  expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.0005)
+  expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000015)
+  expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000015)
 
   // Now let's merge the last split back together
   const splitTxObj = new bsv.Transaction(splitHex)
@@ -152,13 +152,12 @@ it("Full Life Cycle Test With 3 Issuance Addresses", async function () {
   const mergeTxid = await broadcast(mergeHex)
   console.log(`Merge TX:        ${mergeTxid}`)
   const mergeTx = await getTransaction(mergeTxid)
-  expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.001)
+  expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00003)
   const tokenIdMerge = await utils.getToken(issueTxid)
   let responseMerge = await utils.getTokenResponse(tokenIdMerge)
-  console.log(responseMerge.token)
-  expect(responseMerge.token.symbol).to.equal(symbol)
-  expect(responseMerge.token.contract_txs).to.contain(contractTxid)
-  expect(responseMerge.token.issuance_txs).to.contain(issueTxid)
+  expect(responseMerge.symbol).to.equal(symbol)
+  expect(responseMerge.contract_txs).to.contain(contractTxid)
+  expect(responseMerge.issuance_txs).to.contain(issueTxid)
 
   // Split again - both payable to Alice...
   const aliceAmount1 = mergeTx.vout[0].value / 2
@@ -179,8 +178,8 @@ it("Full Life Cycle Test With 3 Issuance Addresses", async function () {
   const splitTxid2 = await broadcast(splitHex2)
   console.log(`Split TX2:       ${splitTxid2}`)
   const splitTx2 = await getTransaction(splitTxid2)
-  expect(await utils.getVoutAmount(splitTxid2, 0)).to.equal(0.0005)
-  expect(await utils.getVoutAmount(splitTxid2, 1)).to.equal(0.0005)
+  expect(await utils.getVoutAmount(splitTxid2, 0)).to.equal(0.000015)
+  expect(await utils.getVoutAmount(splitTxid2, 1)).to.equal(0.000015)
 
   // Now mergeSplit
   const splitTxObj2 = new bsv.Transaction(splitHex2)
@@ -203,8 +202,8 @@ it("Full Life Cycle Test With 3 Issuance Addresses", async function () {
   const mergeSplitTxid = await broadcast(mergeSplitHex)
   console.log(`MergeSplit TX:   ${mergeSplitTxid}`)
   const mergeSplitTx = await getTransaction(mergeSplitTxid)
-  expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.00025)
-  expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.00075)
+  expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075)
+  expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
 
 
   // Alice wants to redeem the money from bob...
@@ -217,7 +216,7 @@ it("Full Life Cycle Test With 3 Issuance Addresses", async function () {
   )
   const redeemTxid = await broadcast(redeemHex)
   console.log(`Redeem TX:       ${redeemTxid}`)
-  expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00025)
+  expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.0000075)
 
 })
 

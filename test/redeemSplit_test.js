@@ -82,7 +82,7 @@ it('Successful RedeemSplit With No Fees', async function () {
 })
 
 //Needs fixed
-it("No Split Completes Successfully", async function () {
+it("RedeemSplit - No Split Completes Successfully", async function () {
 
   const bobAmount = issueTx.vout[0].value
   const splitDestinations = []
@@ -106,7 +106,7 @@ it("No Split Completes Successfully", async function () {
 })
 
 //needs fixed - throwing 'Output satoshis is not a natural number' 
-it("Add Too Much To Split Throws Error", async function () {
+it("RedeemSplit - Add Too Much To Split Throws Error", async function () {
 
   const bobAmount = issueTx.vout[0].value * 2
   const splitDestinations = []
@@ -129,7 +129,7 @@ it("Add Too Much To Split Throws Error", async function () {
   }
 })
 
-it("Address Too Short Throws Error", async function () {
+it("RedeemSplit - Address Too Short Throws Error", async function () {
 
   const bobAmount1 = issueTx.vout[0].value / 2
   const bobAmount2 = issueTx.vout[0].value - bobAmount1
@@ -156,7 +156,7 @@ it("Address Too Short Throws Error", async function () {
 
 //throwing a 'Checksum mismatch' error - if i am reading code correctly it should validate address first 
 //and trigger > ADDRESS_MAX_LENGTH  error
-it("Address Too Long Throws Error", async function () {
+it("RedeemSplit - Address Too Long Throws Error", async function () {
 
   const bobAmount1 = issueTx.vout[0].value / 2
   const bobAmount2 = issueTx.vout[0].value - bobAmount1
@@ -183,7 +183,7 @@ it("Address Too Long Throws Error", async function () {
 })
 
 
-it('Incorrect Owner Private Key Throws Error', async function () {
+it('RedeemSplit - Incorrect Owner Private Key Throws Error', async function () {
 
   const bobAmount1 = issueTx.vout[0].value / 2
   const bobAmount2 = issueTx.vout[0].value - bobAmount1
@@ -212,7 +212,7 @@ it('Incorrect Owner Private Key Throws Error', async function () {
   }
 })
 
-it('Incorrect Funding Private Key Throws Error', async function () {
+it('RedeemSplit - Incorrect Funding Private Key Throws Error', async function () {
 
   const bobAmount1 = issueTx.vout[0].value / 2
   const bobAmount2 = issueTx.vout[0].value - bobAmount1
@@ -241,7 +241,7 @@ it('Incorrect Funding Private Key Throws Error', async function () {
   }
 })
 
-it('Incorrect Public Key Throws Error', async function () {
+it('RedeemSplit - Incorrect Public Key Throws Error', async function () {
 
   const bobAmount1 = issueTx.vout[0].value / 2
   const bobAmount2 = issueTx.vout[0].value - bobAmount1
@@ -271,7 +271,7 @@ it('Incorrect Public Key Throws Error', async function () {
 })
 
 
-it("Splitting Into Too Many Tokens Throws Error", async function () {
+it("RedeemSplit - Splitting Into Too Many Tokens Throws Error", async function () {
 
   const bobAmount = issueTx.vout[0].value / 5
   const splitDestinations = []

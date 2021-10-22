@@ -33,7 +33,7 @@ let splitTxid
 let splitTx
 let splitTxObj
 
-it('Successful MergeSplit With Fees', async function () {
+it('MergeSplit - Successful MergeSplit With Fees', async function () {
   await setup() // contract, issue, transfer then split
 
   const issueOutFundingVout = splitTx.vout.length - 1
@@ -58,7 +58,7 @@ it('Successful MergeSplit With Fees', async function () {
   expect(await utils.areFeesProcessed(mergeSplitTxid, 2)).to.be.true
 })
 
-it('Successful MergeSplit No Fees', async function () {
+it('MergeSplit - Successful MergeSplit No Fees', async function () {
   await setup() // contract, issue, transfer then split
 
   const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
@@ -82,7 +82,7 @@ it('Successful MergeSplit No Fees', async function () {
 })
 
 
-it('Incorrect Destination 1 Satoshi Amount', async function () {
+it('MergeSplit - Incorrect Destination 1 Satoshi Amount', async function () {
   await setup() // contract, issue, transfer then split
 
   const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
@@ -109,7 +109,7 @@ it('Incorrect Destination 1 Satoshi Amount', async function () {
   }
 })
 
-it('Incorrect Destination 2 Satoshi Amount', async function () {
+it('MergeSplit - Incorrect Destination 2 Satoshi Amount', async function () {
   await setup() // contract, issue, transfer then split
 
   const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
@@ -135,7 +135,7 @@ it('Incorrect Destination 2 Satoshi Amount', async function () {
   }
 })
 
-it('Incorrect Owner Private Key Throws Error', async function () {
+it('MergeSplit - Incorrect Owner Private Key Throws Error', async function () {
   await setup() // contract, issue, transfer then split
 
   const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
@@ -163,7 +163,7 @@ it('Incorrect Owner Private Key Throws Error', async function () {
   }
 })
 
-it('Incorrect Payments Private Key Throws Error', async function () {
+it('MergeSplit - Incorrect Payments Private Key Throws Error', async function () {
   await setup() // contract, issue, transfer then split
 
   const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
@@ -191,7 +191,7 @@ it('Incorrect Payments Private Key Throws Error', async function () {
   }
 })
 
-it('Incorrect Contract Public Key Throws Error', async function () {
+it('MergeSplit - Incorrect Contract Public Key Throws Error', async function () {
   await setup() // contract, issue, transfer then split
 
   const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
@@ -219,7 +219,7 @@ it('Incorrect Contract Public Key Throws Error', async function () {
   }
 })
 
-it('Attempt to MergeSplit More Than Two Tokens Throws Error', async function () {
+it('MergeSplit - Attempt to MergeSplit More Than Two Tokens Throws Error', async function () {
   await setup() // contract, issue, transfer then split
 
   const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
@@ -264,7 +264,7 @@ it('Attempt to MergeSplit More Than Two Tokens Throws Error', async function () 
   }
 })
 
-it('Attempt to MergeSplit Less Than Two Tokens Throws Error', async function () {
+it('MergeSplit - Attempt to MergeSplit Less Than Two Tokens Throws Error', async function () {
   await setup() // contract, issue, transfer then split
 
   const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
@@ -295,7 +295,7 @@ it('Attempt to MergeSplit Less Than Two Tokens Throws Error', async function () 
   }
 })
 
-it('Invalid Address Destination Address 1 Throws Error', async function () {
+it('MergeSplit - Invalid Address Destination Address 1 Throws Error', async function () {
   await setup() // contract, issue, transfer then split
 
   const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
@@ -322,7 +322,7 @@ it('Invalid Address Destination Address 1 Throws Error', async function () {
   }
 })
 
-it('Invalid Address Destination Address 2 Throws Error', async function () {
+it('MergeSplit - Invalid Address Destination Address 2 Throws Error', async function () {
   await setup() // contract, issue, transfer then split
 
   const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2

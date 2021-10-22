@@ -44,7 +44,8 @@ There are various mocha tests located in test folder.
 Files ending _tests contain multiple general tests per function (eg contract_tests.js contains contract tests)
 Files with specific names contain tests targeting a specific test case (eg mergeInvalidStasToken.js)
 ```sh
-npm test contract_tests.js //run specific test file
+npm test  --  --grep 'Successful Merge With Fee'  // run specific test 
+npm test .\test\merge_tests.js //run specific test file
 npm test //run all tests
 ```
 
