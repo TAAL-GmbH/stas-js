@@ -22,9 +22,9 @@ The mining fee is set in the config.js file. The default is currently 500 sats p
 ## Env Vars
 
 The following environment variables must be set inside the .env file
-USERNAME=  The API username
-PASSWORD=  The API password
-NETWORK=   The newtork that the tests will run on (set to testnet as default)
+API_USERNAME=  The API username
+API_PASSWORD=  The API password
+NETWORK=   The netork that the tests will run on (set to testnet as default)
 
 
 ## Testing
