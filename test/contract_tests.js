@@ -47,7 +47,7 @@ it('Contract - Successful No Fees', async function () {
     issuerPrivateKey,
     contractUtxos,
     null,
-    fundingPrivateKey,
+    null,
     schema,
     supply
   )
@@ -168,19 +168,7 @@ it('Contract - Non Array Contract UTXO Throws Error', async function () {
   }
 })
 
-it('Contract - Null Payment UTXO Successful Broadcast(no fees)', async function () {
-  const contractHex = contract(
-    issuerPrivateKey,
-    contractUtxos,
-    null,
-    fundingPrivateKey,
-    schema,
-    supply
-  )
-  await broadcast(contractHex)
-})
-
-it('Contract - Null Funding Private Key Throws Error', async function () {
+it('Contract - Null Funding Private Key With Funding UTXO Throws Error', async function () {
   try {
     contract(
       issuerPrivateKey,

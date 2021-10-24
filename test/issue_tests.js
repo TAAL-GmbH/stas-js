@@ -189,6 +189,44 @@ it('Issue - Incorrect Funding Private Key Throws Error', async function () {
   }
 })
 
+it('Issue - Issue to Address with a negative token amount(?)', async function () {
+  try {
+    issue(
+      issuerPrivateKey,
+      utils.getIssueInfo(aliceAddr, 13000, bobAddr, -3000),
+      utils.getUtxo(contractTxid, contractTx, 0),
+      utils.getUtxo(contractTxid, contractTx, 1),
+      fundingPrivateKey,
+      true,
+      2
+    )
+    assert(false)
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Invalid Argument: Output satoshis is not a natural number')
+  }
+})
+
+//should we validate that balance in issue info is a postive integer?
+it('Issue - Issue to Address with Zero Tokens Throws Errror(?)', async function () {
+  try {
+    issue(
+      issuerPrivateKey,
+      utils.getIssueInfo(aliceAddr, 10000, bobAddr, 0),
+      utils.getUtxo(contractTxid, contractTx, 0),
+      utils.getUtxo(contractTxid, contractTx, 1),
+      fundingPrivateKey,
+      true,
+      2
+    )
+    assert(false)
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Some Error')
+  }
+})
 
 it('Issue - Issue with Incorrect Balance (Less Than) Throws Error', async function () {
   try {
