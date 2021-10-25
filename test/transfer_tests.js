@@ -48,7 +48,7 @@ it("Transfer - Successful With Fee 1", async function () {
     fundingPrivateKey
   )
   const transferTxid = await broadcast(transferHex)
-  const tokenId = await utils.getToken(issueTxid)
+  const tokenId = await utils.getToken(transferTxid)
   let response = await utils.getTokenResponse(tokenId)
   expect(response.symbol).to.equal(symbol)
   expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
@@ -70,15 +70,62 @@ it("Transfer - Successful With Fee 2", async function () {
     fundingPrivateKey
   )
   const transferTxid = await broadcast(transferHex)
-  const tokenId = await utils.getToken(issueTxid)
+  const tokenId = await utils.getToken(transferTxid)
   let response = await utils.getTokenResponse(tokenId)
   expect(response.symbol).to.equal(symbol)
   expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00007)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(4000)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(6000)
   expect(await utils.areFeesProcessed(transferTxid, 1)).to.be.true
 })
 
+it("Transfer - Successful With Fee 3", async function () {
+
+  const davePrivateKey = bsv.PrivateKey()
+  const daveAddr = davePrivateKey.toAddress(process.env.NETWORK).toString()
+  const issueOutFundingVout = issueTx.vout.length - 1
+
+  const transferHex = transfer(
+    bobPrivateKey,
+    issuerPrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 1),
+    daveAddr,
+    utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
+    fundingPrivateKey
+  )
+  const transferTxid = await broadcast(transferHex)
+  const tokenId = await utils.getToken(transferTxid)
+  let response = await utils.getTokenResponse(tokenId)
+  expect(response.symbol).to.equal(symbol)
+  expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
+  expect(await utils.getTokenBalance(daveAddr)).to.equal(3000)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+  expect(await utils.areFeesProcessed(transferTxid, 1)).to.be.true
+})
+
+
+it("Transfer - Successful With Fee 4", async function () {
+
+  const issueOutFundingVout = issueTx.vout.length - 1
+
+  const transferHex = transfer(
+    bobPrivateKey,
+    issuerPrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 1),
+    bobAddr,
+    utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
+    fundingPrivateKey
+  )
+  const transferTxid = await broadcast(transferHex)
+  const tokenId = await utils.getToken(transferTxid)
+  let response = await utils.getTokenResponse(tokenId)
+  expect(response.symbol).to.equal(symbol)
+  expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(6000)
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(4000)
+  expect(await utils.areFeesProcessed(transferTxid, 1)).to.be.true
+})
 
 
 it("Transfer - Successful No Fee", async function () {
@@ -92,7 +139,7 @@ it("Transfer - Successful No Fee", async function () {
     null
   )
   const transferTxid = await broadcast(transferHex)
-  const tokenId = await utils.getToken(issueTxid)
+  const tokenId = await utils.getToken(transferTxid)
   let response = await utils.getTokenResponse(tokenId)
   expect(response.symbol).to.equal(symbol)
   expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
@@ -306,6 +353,7 @@ async function setup() {
     utils.getUtxo(contractTxid, contractTx, 1),
     fundingPrivateKey,
     true,
+    symbol,
     2
   )
   issueTxid = await broadcast(issueHex)
