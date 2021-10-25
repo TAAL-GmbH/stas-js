@@ -20,8 +20,8 @@ const {
   SATS_PER_BITCOIN
 } = require('../../index').utils
 
-// token issue is intermittingly failing - Tx broadcast is successful but token is not issuing - see line 79
-it('Full Life Cycle Test', async function () {
+//Symbol changed in issuance - does not seem to have any effect on tokens/balances etc
+it('Changed Symbol in issue functions', async function () {
   const issuerPrivateKey = bsv.PrivateKey()
   const fundingPrivateKey = bsv.PrivateKey()
 
@@ -61,7 +61,7 @@ it('Full Life Cycle Test', async function () {
     utils.getUtxo(contractTxid, contractTx, 1),
     fundingPrivateKey,
     true,
-    symbol,
+    'wrong_symbol',  // symbol changed
     2
   )
   const issueTxid = await broadcast(issueHex)
@@ -78,6 +78,9 @@ it('Full Life Cycle Test', async function () {
   console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+
+  console.log('Alice  ' + aliceAddr)
+  console.log('Bob  ' + bobAddr)
 
   const issueOutFundingVout = issueTx.vout.length - 1
 
