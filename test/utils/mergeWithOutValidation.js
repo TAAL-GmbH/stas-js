@@ -8,6 +8,7 @@ const {
   getStasScript,
   getVersion,
   getScriptData,
+  getSymbol,
   sighash,
   P2PKH_UNLOCKING_SCRIPT_BYTES,
   isSplittable
@@ -18,7 +19,6 @@ const {
   addressToPubkeyhash,
   reverseEndian
 } = require('../../lib/utils')
-
 
 // merge will take 2 existing STAS UTXOs and combine them and assign the single UTXO to another address.
 // The tokenOwnerPrivateKey must own the existing STAS UTXOs, the payment UTXOs and will be the owner of the change, if any.
@@ -41,7 +41,7 @@ function mergeWithoutValidation (tokenOwnerPrivateKey, contractPublicKey, mergeU
   })
   const version = getVersion(lockingScript)
   const destinationPubkeyHash = addressToPubkeyhash(destinationAddr)
-  const stasScript = getStasScript(destinationPubkeyHash, contractPublicKey, version, getScriptData(lockingScript, version), isSplittable(lockingScript))
+  const stasScript = getStasScript(destinationPubkeyHash, contractPublicKey, version, getScriptData(lockingScript, version), isSplittable(lockingScript), getSymbol(lockingScript))
 
   const tx = new bsv.Transaction()
 

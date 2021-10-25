@@ -52,7 +52,7 @@ function issueWithoutValiation (privateKey, issueInfo, contractUtxo, paymentUtxo
       data = Buffer.from(is.data).toString('hex')
     }
     // Add the issuing output
-    const stasScript = getStasScript(pubKeyHash, privateKey.publicKey, version, data, isSplittable)
+    const stasScript = getStasScript(pubKeyHash, privateKey.publicKey, version, data, isSplittable, 'symbol')
 
     tx.addOutput(new bsv.Transaction.Output({
       script: stasScript,

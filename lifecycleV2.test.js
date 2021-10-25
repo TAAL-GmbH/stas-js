@@ -116,6 +116,7 @@ const {
       },
       fundingPrivateKey,
       true, // isSplittable
+      symbol,
       2 // STAS version
     )
   } catch (e) {

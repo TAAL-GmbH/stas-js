@@ -1,4 +1,4 @@
-const expect = require("chai").expect
+const expect = require('chai').expect
 const assert = require('chai').assert
 const utils = require('./utils/test_utils')
 const chai = require('chai')
@@ -25,10 +25,8 @@ const {
   broadcast
 } = require('../index').utils
 
-
-//Work In Progress
-it("Merge Invalid Token", async function () {
-
+// Work In Progress
+it('Merge Invalid Token', async function () {
   const issuerPrivateKey = bsv.PrivateKey()
   const fundingPrivateKey = bsv.PrivateKey()
 
@@ -140,19 +138,15 @@ it("Merge Invalid Token", async function () {
 
   const splitTxObj1 = new bsv.Transaction(issueHex)
 
-
-
-
   invalidTxUtxo = invalidTxUtxo[0]
   const tx = new bsv.Transaction()
   tx.from(invalidTxUtxo)
-  const stasScript = util.getStasScript(alicePrivateKey.publicKey, issuerPrivateKey.publicKey, 2, null, true)
+  const stasScript = util.getStasScript(alicePrivateKey.publicKey, issuerPrivateKey.publicKey, 2, null, true, symbol)
   tx.addOutput(new bsv.Transaction.Output({
     script: stasScript,
     satoshis: (Math.round(invalidTxUtxo.amount * 1e8))
   }))
   tx.sign(invalidTxUtxoPK)
-
 
   const txId = await broadcast(tx.serialize(true))
   const txOut = await getTransaction(txId)
@@ -180,10 +174,5 @@ it("Merge Invalid Token", async function () {
     fundingPrivateKey
   )
 
-
-    await broadcast(mergeHex)
-
-
-
-
+  await broadcast(mergeHex)
 })

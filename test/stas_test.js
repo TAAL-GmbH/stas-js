@@ -1,8 +1,8 @@
 const {
-  // getStasScript,
   getVersion,
   getScriptFlags,
   getScriptData,
+  getSymbol,
   isSplittable
 } = require('../lib/stas')
 
@@ -76,9 +76,22 @@ function testGetScriptData () {
     console.error(`Failed. Expected ${expected}, got ${got}`)
   }
 }
+function testGetSymbol () {
+  const got = getSymbol(scriptV2)
+  const expected = 'TAALT'
+
+  try {
+    assert.equal(got, expected)
+
+    console.log('Passed.')
+  } catch (error) {
+    console.error(`Failed. Expected ${expected}, got ${got}`)
+  }
+}
 
 testGetVersion()
 testGetScriptFlags()
 testIsSplittable()
 testGetScriptData()
 testGetVersionUnsplittable()
+testGetSymbol()
