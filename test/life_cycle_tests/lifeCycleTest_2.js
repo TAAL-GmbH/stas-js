@@ -64,6 +64,7 @@ it("Full Life Cycle Test With More Supply", async function () {
       utils.getUtxo(contractTxid, contractTx, 1),
       fundingPrivateKey,
       true,
+      symbol,
       2
     )
   } catch (e) {

@@ -60,6 +60,7 @@ it("Full Life Cycle Test", async function () {
       utils.getUtxo(contractTxid, contractTx, 1),
       fundingPrivateKey,
       false,
+      symbol,
       2
     )
   } catch (e) {

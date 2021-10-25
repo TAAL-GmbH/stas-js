@@ -1,5 +1,5 @@
 const expect = require("chai").expect
-const utils = require('./utils/test_utils')
+const utils = require('../utils/test_utils')
 const bsv = require('bsv')
 require('dotenv').config()
 
@@ -11,14 +11,14 @@ const {
   merge,
   mergeSplit,
   redeem
-} = require('../index')
+} = require('../../index')
 
 const {
   getTransaction,
   getFundsFromFaucet,
   broadcast,
   SATS_PER_BITCOIN
-} = require('../index').utils
+} = require('../../index').utils
 
 
 it("Full Life Cycle Test With 1000 Issuance Addresses", async function () {
@@ -64,6 +64,7 @@ it("Full Life Cycle Test With 1000 Issuance Addresses", async function () {
     utils.getUtxo(contractTxid, contractTx, 1),
     fundingPrivateKey,
     true,
+    symbol,
     2
   )
   const issueTxid = await broadcast(issueHex)

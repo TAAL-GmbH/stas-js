@@ -142,6 +142,7 @@ it('Contract - Null Contract UTXO Throws Error', async function () {
       supply
     )
     assert(false)
+    return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
     expect(e.message).to.eql('inputUtxos is invalid')
@@ -164,6 +165,7 @@ it('Contract - Non Array Contract UTXO Throws Error', async function () {
       supply
     )
     assert(false)
+    return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
     expect(e.message).to.eql('inputUtxos is invalid')
@@ -181,6 +183,7 @@ it('Contract - Null Funding Private Key With Funding UTXO Throws Error', async f
       supply
     )
     assert(false)
+    return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
     expect(e.message).to.eql('Cannot read property \'publicKey\' of null')
@@ -198,6 +201,7 @@ it('Contract - Null Schema Throws Error', async function () {
       supply
     )
     assert(false)
+    return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
     expect(e.message).to.eql('Schema is null')
@@ -215,6 +219,7 @@ it('Contract - Null Supply Throws Error', async function () {
       null
     )
     assert(false)
+    return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
     expect(e.message).to.eql('Invalid Argument: Output satoshis is not a natural number')
@@ -232,6 +237,7 @@ it('Contract - Negative Supply Throws Error', async function () {
       -100
     )
     assert(false)
+    return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
     expect(e.message).to.eql('Invalid Argument: Output satoshis is not a natural number')
@@ -249,6 +255,7 @@ it('Contract - Zero Supply Throws Error', async function () {
       0
     )
     assert(false)
+    return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
     expect(e.message).to.eql('Token satoshis is zero')
@@ -272,6 +279,7 @@ it('Contract - Invalid Contract UTXO Throw Error', async function () {
       supply
     )
     assert(false)
+    return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
     expect(e.message).to.eql('Invalid Argument: Must provide the scriptPubKey for that output!')
@@ -295,6 +303,7 @@ it('Contract - Invalid Payment UTXO Throw Error', async function () {
       supply
     )
     assert(false)
+    return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
     expect(e.message).to.eql('Invalid TXID in object')
@@ -312,6 +321,7 @@ it('Contract - Empty Array Contract UTXO Throw Error', async function () {
       supply
     )
     assert(false)
+    return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
     expect(e.message).to.eql('inputUtxos is invalid')
@@ -358,6 +368,24 @@ it('Contract - Invalid Char Symbol Throws Error', async function () {
   }
 })
 
+it('Contract - Null Symbol In Schema Throws Error', async function () {
+  try {
+    contract(
+      issuerPrivateKey,
+      contractUtxos,
+      fundingUtxos,
+      fundingPrivateKey,
+      schemaNullSymbol,
+      supply
+    )
+    assert(false)
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Invalid Symbol')
+  }
+})
+
 
 async function setup() {
 
@@ -367,4 +395,45 @@ async function setup() {
   fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
   publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
   schema = utils.schema(publicKeyHash, symbol, supply)
+}
+
+
+function schemaNullSymbol() {
+
+  return schema = {
+    name: 'Taal Token',
+    tokenId: `${publicKeyHash}`,
+    protocolId: 'To be decided',
+    symbol: null,
+    description: 'Example token on private Taalnet',
+    image: 'https://www.taal.com/wp-content/themes/taal_v2/img/favicon/favicon-96x96.png',
+    totalSupply: supply,
+    decimals: 0,
+    satsPerToken: 1,
+    properties: {
+      legal: {
+        terms: '© 2020 TAAL TECHNOLOGIES SEZC\nALL RIGHTS RESERVED. ANY USE OF THIS SOFTWARE IS SUBJECT TO TERMS AND CONDITIONS OF LICENSE. USE OF THIS SOFTWARE WITHOUT LICENSE CONSTITUTES INFRINGEMENT OF INTELLECTUAL PROPERTY. FOR LICENSE DETAILS OF THE SOFTWARE, PLEASE REFER TO: www.taal.com/stas-token-license-agreement',
+        licenceId: '1234'
+      },
+      issuer: {
+        organisation: 'Taal Technologies SEZC',
+        legalForm: 'Limited Liability Public Company',
+        governingLaw: 'CA',
+        mailingAddress: '1 Volcano Stret, Canada',
+        issuerCountry: 'CYM',
+        jurisdiction: '',
+        email: 'info@taal.com'
+      },
+      meta: {
+        schemaId: 'token1',
+        website: 'https://taal.com',
+        legal: {
+          terms: 'blah blah'
+        },
+        media: {
+          type: 'mp4'
+        }
+      }
+    }
+  }
 }

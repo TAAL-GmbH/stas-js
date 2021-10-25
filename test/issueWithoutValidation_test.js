@@ -51,6 +51,7 @@ it("Attempt to Issue More Tokens Than Supply", async function () {
             utils.getUtxo(contractTxid, contractTx, 1),
             fundingPrivateKey,
             false,
+            symbol,
             2
         )
     } catch (e) {
@@ -80,6 +81,7 @@ it("Attempt to Issue Less Tokens Than Supply", async function () {
             utils.getUtxo(contractTxid, contractTx, 1),
             fundingPrivateKey,
             false,
+            symbol,
             2
         )
     } catch (e) {

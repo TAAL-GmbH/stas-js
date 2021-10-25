@@ -4,7 +4,7 @@
   "description": "This library will create various types of STAS token transactions that add token functionality to the BSV blockchain.",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --reporter spec --timeout 10000",
+    "test": "mocha --reporter spec --timeout 120000",
     "lint": "standard"
   },
   "repository": {

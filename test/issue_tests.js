@@ -43,6 +43,7 @@ it('Issue - Successful Issue Token With Split And Fee', async function () {
     utils.getUtxo(contractTxid, contractTx, 1),
     fundingPrivateKey,
     true,
+    symbol,
     2
   )
   const issueTxid = await broadcast(issueHex)
@@ -67,6 +68,7 @@ it('Issue - Successful Issue Token Non Split', async function () {
     utils.getUtxo(contractTxid, contractTx, 1),
     fundingPrivateKey,
     false,
+    symbol,
     2
   )
   const issueTxid = await broadcast(issueHex)
@@ -90,6 +92,7 @@ it('Issue - Successful Issue Token With Split No Fee', async function () {
     null,
     null,
     true,
+    symbol,
     2
   )
   const issueTxid = await broadcast(issueHex)
@@ -131,6 +134,7 @@ it('Issue - Successful Issue Token 10 Addresses', async function () {
     utils.getUtxo(contractTxid, contractTx, 1),
     fundingPrivateKey,
     true,
+    symbol,
     2
   )
   const issueTxid = await broadcast(issueHex)
@@ -158,6 +162,7 @@ it('Issue - Incorrect Issue Private Key Throws Error', async function () {
     utils.getUtxo(contractTxid, contractTx, 1),
     fundingPrivateKey,
     true,
+    symbol,
     2
   )
   try {
@@ -178,6 +183,7 @@ it('Issue - Incorrect Funding Private Key Throws Error', async function () {
     utils.getUtxo(contractTxid, contractTx, 1),
     incorrectPrivateKey,
     true,
+    symbol,
     2
   )
   try {
@@ -198,6 +204,7 @@ it('Issue - Issue to Address with a negative token amount(?)', async function ()
       utils.getUtxo(contractTxid, contractTx, 1),
       fundingPrivateKey,
       true,
+      symbol,
       2
     )
     assert(false)
@@ -218,6 +225,7 @@ it('Issue - Issue to Address with Zero Tokens Throws Errror(?)', async function 
       utils.getUtxo(contractTxid, contractTx, 1),
       fundingPrivateKey,
       true,
+      symbol,
       2
     )
     assert(false)
@@ -237,6 +245,7 @@ it('Issue - Issue with Incorrect Balance (Less Than) Throws Error', async functi
       utils.getUtxo(contractTxid, contractTx, 1),
       fundingPrivateKey,
       true,
+      symbol,
       2
     )
     assert(false)
@@ -256,6 +265,7 @@ it('Issue - Issue with Incorrect Balance (More Than) Throws Error', async functi
       utils.getUtxo(contractTxid, contractTx, 1),
       fundingPrivateKey,
       true,
+      symbol,
       2
     )
     assert(false)
@@ -307,6 +317,7 @@ it('Issue - Invalid Issue Address (Too Short) throws error', async function () {
       utils.getUtxo(contractTxid, contractTx, 1),
       fundingPrivateKey,
       true,
+      symbol,
       2
     )
     assert(false)
@@ -340,6 +351,7 @@ it('Issue - Invalid Issue Address (Too Long) throws error', async function () {
       utils.getUtxo(contractTxid, contractTx, 1),
       fundingPrivateKey,
       true,
+      symbol,
       2
     )
     assert(false)
@@ -369,6 +381,7 @@ it('Issue - Non Array Issue Info Throws Error', async function () {
       utils.getUtxo(contractTxid, contractTx, 1),
       fundingPrivateKey,
       true,
+      symbol,
       2
     )
     assert(false)
@@ -390,6 +403,7 @@ it('Issue - Empty Contract UTXO Info Throws Error', async function () {
       utils.getUtxo(contractTxid, contractTx, 1),
       fundingPrivateKey,
       true,
+      symbol,
       2
     )
     assert(false)
@@ -409,6 +423,7 @@ it('Issue - Empty Payment UTXO Info Throws Error', async function () {
       [],
       fundingPrivateKey,
       true,
+      symbol,
       2
     )
     assert(false)

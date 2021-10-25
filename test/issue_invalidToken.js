@@ -57,6 +57,7 @@ it('Attempt to issue invalid token', async function () {
     paymentUtxo(),
     fundingPrivateKey,
     true, 
+    symbol,
     2 
   )
   const issueTxid = await broadcast(issueHex)

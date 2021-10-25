@@ -4,20 +4,23 @@ const {
   P2PKH_UNLOCKING_SCRIPT_BYTES,
   getStasScript,
   sighash
-} = require('../../lib/stas')
-const { addressToPubkeyhash, SATS_PER_BITCOIN } = require('../../lib/utils')
+} = require('./stas')
+const { addressToPubkeyhash, SATS_PER_BITCOIN } = require('./utils')
 
 // the minimum length of a bitcoin address
 const ADDRESS_MIN_LENGTH = 26
 // the maximum length of a bitcoin address
 const ADDRESS_MAX_LENGTH = 35
 
-// issue issues one or more token outputs from the contract
-// privateKey that can spend the contract, issueInfo contains the addresses, satoshis and extra data to issue to
-// contractUtxo is the contract output, paymentUtxo pay sthe fees for the issue transaction
-// version can be 2 only
-// Validation checks removed to test STAS directly
-function issueWithoutValiation (privateKey, issueInfo, contractUtxo, paymentUtxo, paymentPrivateKey, isSplittable, version) {
+/* The issue function issues one or more token outputs by spending the outputs from the contract
+   privateKey is the key that can spend the contract
+   issueInfo contains the addresses to issue to, the amount in satoshis and optional arbitrary extra data that will accompany the token throughout its life.
+   contractUtxo is the contract output,
+   paymentUtxo pays the fees for the issue transaction
+   isSplittable is a flag which sets whether the token can be split into further parts.
+   version is the version of the STAS script, currently only version 2 is available.
+*/
+function issue (privateKey, issueInfo, contractUtxo, paymentUtxo, paymentPrivateKey, isSplittable, symbol, version) {
   if (!isIssueInfoValid(issueInfo)) {
     throw new Error('issueInfo is invalid')
   }
@@ -27,8 +30,6 @@ function issueWithoutValiation (privateKey, issueInfo, contractUtxo, paymentUtxo
 
   // if the payment UTXO is null then we treat this as a zero fee transaction
   const isZeroFee = (paymentUtxo === null)
-
-  const totalOutSats = issueInfo.reduce((a, b) => a + b.satoshis, 0)
 
   // create a new transaction
   const tx = new bsv.Transaction()
@@ -51,8 +52,12 @@ function issueWithoutValiation (privateKey, issueInfo, contractUtxo, paymentUtxo
     if (is.data) {
       data = Buffer.from(is.data).toString('hex')
     }
+    let hexSymbol
+    if (symbol) {
+      hexSymbol = Buffer.from(symbol).toString('hex')
+    }
     // Add the issuing output
-    const stasScript = getStasScript(pubKeyHash, privateKey.publicKey, version, data, isSplittable, 'symbol')
+    const stasScript = getStasScript(pubKeyHash, privateKey.publicKey, version, data, isSplittable, hexSymbol)
 
     tx.addOutput(new bsv.Transaction.Output({
       script: stasScript,
@@ -123,7 +128,4 @@ function isUtxoValid (utxo) {
   }
   return true
 }
-
-module.exports = {
-  issueWithoutValiation
-}
+module.exports = issue

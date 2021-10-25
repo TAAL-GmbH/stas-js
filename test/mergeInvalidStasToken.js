@@ -126,6 +126,7 @@ it('Merge Invalid Token', async function () {
       },
       fundingPrivateKey,
       true, // isSplittable
+      symbol,
       2 // STAS version
     )
   } catch (e) {

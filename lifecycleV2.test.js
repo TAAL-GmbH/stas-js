@@ -116,7 +116,7 @@ const {
       },
       fundingPrivateKey,
       true, // isSplittable
-      symbol,
+      "TEST-TOKEN",
       2 // STAS version
     )
   } catch (e) {

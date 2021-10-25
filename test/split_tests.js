@@ -41,13 +41,13 @@ it("Successful Split Into Two Tokens With Fee", async function () {
     const bobAmount1 = issueTx.vout[0].value / 2
     const bobAmount2 = issueTx.vout[0].value - bobAmount1
     const splitDestinations = []
-    splitDestinations[0] = { address: bobAddr, amount: bobAmount1 }
-    splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
+    splitDestinations[0] = { address: bobAddr, amount: bobAmount1 } //3500 tokens
+    splitDestinations[1] = { address: bobAddr, amount: bobAmount2 } //3500 tokens
 
     const splitHex = split(
         alicePrivateKey,
         issuerPrivateKey.publicKey,
-        utils.getUtxo(issueTxid, issueTx, 0),
+        utils.getUtxo(issueTxid, issueTx, 0), 
         splitDestinations,
         utils.getUtxo(issueTxid, issueTx, 2),
         fundingPrivateKey
@@ -57,7 +57,41 @@ it("Successful Split Into Two Tokens With Fee", async function () {
     expect(splitDestinations).to.have.length(noOfTokens) //ensure that tx output contains 2 values
     expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035)
     expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000035)
+    console.log("Alice Balance "   + await utils.getTokenBalance(aliceAddr))
+    console.log("Bob Balance "   + await utils.getTokenBalance(bobAddr))
+    expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
+    expect(await utils.getTokenBalance(bobAddr)).to.equal(10000)
     expect(await utils.areFeesProcessed(splitTxid, 2)).to.be.true
+})
+
+it("Successful Split Into Three Tokens", async function () {
+
+    const bobAmount = issueTx.vout[0].value / 3
+    const splitDestinations = []
+    splitDestinations[0] = { address: bobAddr, amount: bobAmount }
+    splitDestinations[1] = { address: bobAddr, amount: bobAmount }
+    splitDestinations[2] = { address: bobAddr, amount: bobAmount }
+
+
+    const splitHex = split(
+        alicePrivateKey,
+        issuerPrivateKey.publicKey,
+        utils.getUtxo(issueTxid, issueTx, 0),
+        splitDestinations,
+        utils.getUtxo(issueTxid, issueTx, 2),
+        fundingPrivateKey
+    )
+    console.log(splitHex)
+    const splitTxid = await broadcast(splitHex)
+    // let noOfTokens = await countNumOfTokens(splitTxid, true)
+    // expect(splitDestinations).to.have.length(noOfTokens) //ensure that tx output contains 4 values
+    // expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.0000175)
+    // expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.0000175)
+    // expect(await utils.getVoutAmount(splitTxid, 2)).to.equal(0.0000175)
+    // expect(await utils.getVoutAmount(splitTxid, 3)).to.equal(0.0000175)
+    // console.log("Alice Balance "   + await utils.getTokenBalance(aliceAddr))
+    // console.log("Bob Balance "   + await utils.getTokenBalance(bobAddr))
+
 })
 
 
@@ -68,7 +102,6 @@ it("Successful Split Into Four Tokens", async function () {
     splitDestinations[0] = { address: bobAddr, amount: bobAmount }
     splitDestinations[1] = { address: bobAddr, amount: bobAmount }
     splitDestinations[2] = { address: bobAddr, amount: bobAmount }
-    splitDestinations[3] = { address: bobAddr, amount: bobAmount }
 
     const splitHex = split(
         alicePrivateKey,
@@ -374,6 +407,7 @@ async function setup() {
         utils.getUtxo(contractTxid, contractTx, 1),
         fundingPrivateKey,
         true,
+        symbol,
         2
     )
     issueTxid = await broadcast(issueHex)

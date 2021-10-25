@@ -382,6 +382,7 @@ async function setup() {
     utils.getUtxo(contractTxid, contractTx, 1),
     fundingPrivateKey,
     true,
+    symbol,
     2
   )
   const issueTxid = await broadcast(issueHex)

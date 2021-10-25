@@ -53,6 +53,7 @@ it("Full Life Cycle Test With No Fees", async function () {
     null,
     null,
     true,
+    symbol,
     2
   )
   

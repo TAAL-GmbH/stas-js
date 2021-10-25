@@ -59,6 +59,7 @@ it("Full Life Cycle Test With Decimals And Extra SatsPerToken", async function (
     utils.getUtxo(contractTxid, contractTx, 1),
     fundingPrivateKey,
     true,
+    symbol,
     2
   )
   const issueTxid = await broadcast(issueHex)

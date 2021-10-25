@@ -100,9 +100,6 @@ it("Attempt To Merge Token with Different Owners Without SDK Validation Throws E
 })
 
 
-
-
-
 async function validToken() {
 
   const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
@@ -155,6 +152,7 @@ async function validToken() {
       },
       fundingPrivateKey,
       true, // isSplittable
+      symbol,
       2 // STAS version
     )
   } catch (e) {
@@ -282,6 +280,7 @@ async function invalidToken() {
       },
       fundingPrivateKey,
       true, // isSplittable
+      symbol,
       2 // STAS version
     )
   } catch (e) {

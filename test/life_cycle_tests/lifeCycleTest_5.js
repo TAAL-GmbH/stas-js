@@ -61,6 +61,7 @@ it("Full Life Cycle Test Below Dust Limit", async function () {
     utils.getUtxo(contractTxid, contractTx, 1),
     fundingPrivateKey,
     true,
+    symbol,
     2
   )
   const issueTxid = await broadcast(issueHex)

@@ -47,6 +47,7 @@ it("Transfer - Successful With Fee 1", async function () {
     utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
     fundingPrivateKey
   )
+  console.log()
   const transferTxid = await broadcast(transferHex)
   const tokenId = await utils.getToken(transferTxid)
   let response = await utils.getTokenResponse(tokenId)
@@ -329,7 +330,7 @@ async function setup() {
   contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
   fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
   publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
-  symbol = 'TAALT'
+  symbol = 'CHANGED_TOKEN'
   supply = 10000
   schema = utils.schema(publicKeyHash, symbol, supply)
   aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
