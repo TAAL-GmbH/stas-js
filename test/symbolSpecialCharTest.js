@@ -1,4 +1,4 @@
-const expect = require("chai").expect
+const expect = require('chai').expect
 const utils = require('./utils/test_utils')
 const bsv = require('bsv')
 require('dotenv').config()
@@ -11,11 +11,10 @@ const {
 const {
   getTransaction,
   getFundsFromFaucet,
-  broadcast,
+  broadcast
 } = require('../index').utils
 
-
-it("Symbol Special Char Test", async function () {
+it('Symbol Special Char Test', async function () {
   const issuerPrivateKey = bsv.PrivateKey()
   const fundingPrivateKey = bsv.PrivateKey()
 
@@ -52,20 +51,21 @@ it("Symbol Special Char Test", async function () {
     utils.getUtxo(contractTxid, contractTx, 1),
     fundingPrivateKey,
     true,
+    symbol,
     2
   )
   const issueTxid = await broadcast(issueHex)
   const issueTx = await getTransaction(issueTxid)
   const tokenId = await utils.getToken(issueTxid)
   console.log(`Token ID:        ${tokenId}`)
-  let response = await utils.getTokenResponse(tokenId)  //token issuance fails intermittingly
-  expect(response.symbol).to.equal(symbol) 
+  const response = await utils.getTokenResponse(tokenId) // token issuance fails intermittingly
+  expect(response.symbol).to.equal(symbol)
   expect(response.contract_txs).to.contain(contractTxid)
   expect(response.issuance_txs).to.contain(issueTxid)
   expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
   expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
-  console.log("Alice Balance "   + await utils.getTokenBalance(aliceAddr))
-  console.log("Bob Balance "   + await utils.getTokenBalance(bobAddr))
+  console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
+  console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
 })
