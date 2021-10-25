@@ -61,7 +61,7 @@ it('Full Life Cycle Test', async function () {
     utils.getUtxo(contractTxid, contractTx, 1),
     fundingPrivateKey,
     true,
-    symbol,
+    'wrong_symbol',
     2
   )
   const issueTxid = await broadcast(issueHex)
@@ -78,6 +78,9 @@ it('Full Life Cycle Test', async function () {
   console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+
+  console.log('Alice  ' + aliceAddr)
+  console.log('Bob  ' + bobAddr)
 
   const issueOutFundingVout = issueTx.vout.length - 1
 
