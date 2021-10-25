@@ -106,6 +106,7 @@ it('Contract - Duplicate UTXOS Throws Error', async function () {
   try {
     await broadcast(contractHex)
     assert(false)
+    return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
     expect(e.response.data).to.contain('bad-txns-inputs-duplicate')
@@ -123,6 +124,7 @@ it('Contract - Null Issuer Public Key Throws Error', async function () {
       supply
     )
     assert(false)
+    return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
     expect(e.message).to.eql('Cannot read property \'publicKey\' of null')
@@ -313,6 +315,46 @@ it('Contract - Empty Array Contract UTXO Throw Error', async function () {
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
     expect(e.message).to.eql('inputUtxos is invalid')
+  }
+})
+
+it('Contract - Invalid Char Symbol Throws Error', async function () {
+  invalidCharsSymbol = '!invalid..;'
+  invalidSchema = utils.schema(publicKeyHash, invalidCharsSymbol, supply)
+  try {
+    contract(
+      issuerPrivateKey,
+      contractUtxos,
+      fundingUtxos,
+      fundingPrivateKey,
+      invalidSchema,
+      supply
+    )
+    assert(false)
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Invalid Symbol')
+  }
+})
+
+it('Contract - Invalid Char Symbol Throws Error', async function () {
+  invalidCharsSymbol = '&@invalid\"\'+='
+  invalidSchema = utils.schema(publicKeyHash, invalidCharsSymbol, supply)
+  try {
+    contract(
+      issuerPrivateKey,
+      contractUtxos,
+      fundingUtxos,
+      fundingPrivateKey,
+      invalidSchema,
+      supply
+    )
+    assert(false)
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Invalid Symbol')
   }
 })
 
