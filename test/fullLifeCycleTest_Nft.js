@@ -19,7 +19,7 @@ const {
 
 
 
-it("Full Life Cycle Test", async function () {
+it("Full Life Cycle Test NFT", async function () {
 
   const issuerPrivateKey = bsv.PrivateKey()
   const fundingPrivateKey = bsv.PrivateKey()

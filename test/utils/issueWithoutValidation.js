@@ -4,8 +4,8 @@ const {
   P2PKH_UNLOCKING_SCRIPT_BYTES,
   getStasScript,
   sighash
-} = require('./stas')
-const { addressToPubkeyhash, SATS_PER_BITCOIN } = require('./utils')
+} = require('../../lib/stas')
+const { addressToPubkeyhash, SATS_PER_BITCOIN } = require('../../lib/utils')
 
 // the minimum length of a bitcoin address
 const ADDRESS_MIN_LENGTH = 26

@@ -35,7 +35,7 @@ beforeEach(async function () {
 })
 
 
-it('Redeem - Successful Redeem', async function () {
+it('Redeem - Successful Redeem 1', async function () {
 
   const redeemHex = redeem(
     alicePrivateKey,
@@ -47,6 +47,22 @@ it('Redeem - Successful Redeem', async function () {
   const redeemTxid = await broadcast(redeemHex)
   expect(await getAmount(redeemTxid, 0)).to.equal(0.00007)
   expect(await utils.areFeesProcessed(redeemTxid, 1)).to.be.true
+  //add token checks
+})
+
+it('Redeem - Successful Redeem 2', async function () {
+
+  const redeemHex = redeem(
+    bobPrivateKey,
+    issuerPrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 1),
+    utils.getUtxo(issueTxid, issueTx, 2),
+    fundingPrivateKey
+  )
+  const redeemTxid = await broadcast(redeemHex)
+  expect(await getAmount(redeemTxid, 0)).to.equal(0.00003)
+  expect(await utils.areFeesProcessed(redeemTxid, 1)).to.be.true
+  //add token checks
 })
 
 it('Redeem - Successful Redeem No Fee', async function () {
@@ -60,6 +76,7 @@ it('Redeem - Successful Redeem No Fee', async function () {
   const redeemTxid = await broadcast(redeemHex)
   expect(await getAmount(redeemTxid, 0)).to.equal(0.00007) // grab programmatically
   expect(await utils.areFeesProcessed(redeemTxid, 1)).to.be.false
+  //add token checks
 })
 
 //Needs fixed
@@ -103,7 +120,7 @@ it('Redeem - Incorrect Stas UTXO Amount Throws Error', async function () {
   }
 })
 
-it('Redeem - Incorrect Stas UTXO Amount Throws Error', async function () {
+it('Redeem - Incorrect Funding UTXO Amount Throws Error', async function () {
   const redeemHex = redeem(
     alicePrivateKey,
     issuerPrivateKey.publicKey,
@@ -184,6 +201,79 @@ it('Redeem - Attempt To Redeem with Incorrect Payment Private Key Throws Error',
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
     expect(e.message).to.eql('Request failed with status code 400')
+  }
+})
+
+//needs fixed
+it('Redeem - Null Token Owner Private Key Throws Error', async function () {
+
+  try {
+   redeemHex = redeem(
+    null,
+    issuerPrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 0),
+    utils.getUtxo(issueTxid, issueTx, 2),
+    fundingPrivateKey
+  )
+    assert(false)
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Some Error')
+  }
+})
+//needs fixed
+it('Redeem - Null Contract Public Key Throws Error', async function () {
+
+  try {
+   redeemHex = redeem(
+    alicePrivateKey,
+    null,
+    utils.getUtxo(issueTxid, issueTx, 0),
+    utils.getUtxo(issueTxid, issueTx, 2),
+    fundingPrivateKey
+  )
+    assert(false)
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Some Error')
+  }
+})
+
+it('Redeem - Null STAS UTXO Throws Error', async function () {
+
+  try {
+   redeemHex = redeem(
+    alicePrivateKey,
+    issuerPrivateKey.publicKey,
+    null,
+    utils.getUtxo(issueTxid, issueTx, 2),
+    fundingPrivateKey
+  )
+    assert(false)
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Invalid Argument: Must provide an object from where to extract data')
+  }
+})
+
+it('Redeem - Funding Private Key Throws Error', async function () {
+
+  try {
+   redeemHex = redeem(
+    alicePrivateKey,
+    issuerPrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 0),
+    utils.getUtxo(issueTxid, issueTx, 2),
+    null
+  )
+    assert(false)
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Cannot read property \'publicKey\' of null')
   }
 })
 
