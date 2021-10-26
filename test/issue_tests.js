@@ -362,6 +362,26 @@ it('Issue - Invalid Issue Address (Too Long) throws error', async function () {
   }
 })
 
+it('Issue - Issue Amount Decimal Throws Error', async function () {
+  try {
+    issue(
+      issuerPrivateKey,
+      utils.getIssueInfo(aliceAddr, 7000.5, bobAddr, 2999.5),
+      utils.getUtxo(contractTxid, contractTx, 0),
+      utils.getUtxo(contractTxid, contractTx, 1),
+      fundingPrivateKey,
+      true,
+      symbol,
+      2
+    )
+    assert(false)
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Invalid Argument: Output satoshis is not a natural number')
+  }
+})
+
 
 it('Issue - Non Array Issue Info Throws Error', async function () {
   try {
