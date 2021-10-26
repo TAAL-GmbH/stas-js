@@ -222,12 +222,10 @@ it("Transfer -  Invalid Contract Public Key Throws Error", async function () {
 it("Transfer - Address Validation - Too Few Chars", async function () {
 
   const issueOutFundingVout = issueTx.vout.length - 1
-  const incorrectPK = bsv.PrivateKey()
-  const invalidAddr = '1MSCReQT9E4GpxuK1K7'
-
+  const invalidAddr = '1MSCReQT9E4GpxuK1K7uyD5q'
   try {
-    const transferHex = transfer(
-      incorrectPK,
+     transferHex = transfer(
+      bobPrivateKey,
       issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 1),
       invalidAddr,
@@ -243,15 +241,14 @@ it("Transfer - Address Validation - Too Few Chars", async function () {
 })
 
 //needs fixed - throwing 'Checksum mismatch'  - can we validate address similar to issue?
-it("Transfer -  Validation - Too May Chars", async function () {
+it("Transfer -  Address Validation - Too Many Chars", async function () {
 
   const issueOutFundingVout = issueTx.vout.length - 1
-  const incorrectPK = bsv.PrivateKey()
   const invalidAddr = '1MSCReQT9E4GpxuK1K7uyD5qF1EmznXjkrmoFCgGtkmhyaL2frwff84p2bwTf3FDpkZcCgGtkmhyaL2frwff84p2bwTf3FDpkZcCgGtkmhy'
 
   try {
-    const transferHex = transfer(
-      incorrectPK,
+     transferHex = transfer(
+      bobPrivateKey,
       issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 1),
       invalidAddr,
@@ -320,6 +317,107 @@ it("Transfer - Incorrect Payment UTXO Amount Throws Error", async function () {
     expect(e.response.data).to.contain('mandatory-script-verify-flag-failed (Signature must be zero for failed CHECK(MULTI)SIG operation)')
   }
 })
+//needs fixed
+it("Transfer - Null Token Owner Private Key Throws Error", async function () {
+
+  const issueOutFundingVout = issueTx.vout.length - 1
+  try {
+     transferHex = transfer(
+      null,
+      issuerPrivateKey.publicKey,
+      utils.getUtxo(issueTxid, issueTx, 1),
+      aliceAddr,
+      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
+      fundingPrivateKey
+    )
+    assert(false)
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Some Error')
+  }
+})
+//needs fixed
+it("Transfer - Null Contract Public Key Throws Error", async function () {
+
+  const issueOutFundingVout = issueTx.vout.length - 1
+  try {
+     transferHex = transfer(
+      bobPrivateKey,
+      null,
+      utils.getUtxo(issueTxid, issueTx, 1),
+      aliceAddr,
+      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
+      fundingPrivateKey
+    )
+    assert(false)
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Needs Fixed')
+  }
+})
+
+it("Transfer - Null STAS UTXO Throws Error", async function () {
+
+  const issueOutFundingVout = issueTx.vout.length - 1
+  try {
+     transferHex = transfer(
+      bobPrivateKey,
+      issuerPrivateKey.publicKey,
+      null,
+      aliceAddr,
+      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
+      fundingPrivateKey
+    )
+    assert(false)
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Invalid Argument: Must provide an object from where to extract data')
+  }
+})
+
+it("Transfer - Null Destination Address Throws Error", async function () {
+
+  const issueOutFundingVout = issueTx.vout.length - 1
+  try {
+     transferHex = transfer(
+      bobPrivateKey,
+      issuerPrivateKey.publicKey,
+      utils.getUtxo(issueTxid, issueTx, 1),
+      null,
+      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
+      fundingPrivateKey
+    )
+    assert(false)
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.contains('data parameter supplied is not a string')
+  }
+})
+
+it("Transfer - Null Funding Private Key Throws Error", async function () {
+
+  const issueOutFundingVout = issueTx.vout.length - 1
+  try {
+     transferHex = transfer(
+      bobPrivateKey,
+      issuerPrivateKey.publicKey,
+      utils.getUtxo(issueTxid, issueTx, 1),
+      aliceAddr,
+      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
+      null
+    )
+    assert(false)
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Cannot read property \'publicKey\' of null')
+  }
+})
+
 
 async function setup() {
 
