@@ -1,5 +1,5 @@
 const expect = require('chai').expect
-const utils = require('../utils/test_utils')
+const utils = require('./utils/test_utils')
 const bsv = require('bsv')
 require('dotenv').config()
 
@@ -11,14 +11,14 @@ const {
   merge,
   mergeSplit,
   redeem
-} = require('../../index')
+} = require('./../index')
 
 const {
   getTransaction,
   getFundsFromFaucet,
   broadcast,
   SATS_PER_BITCOIN
-} = require('../../index').utils
+} = require('./../index').utils
 
 // token issue is intermittingly failing - Tx broadcast is successful but token is not issuing - see line 79
 it('Full Life Cycle Test 1', async function () {
@@ -39,7 +39,11 @@ it('Full Life Cycle Test 1', async function () {
   const symbol = 'TAALT'
   const schema = utils.schema(publicKeyHash, symbol, supply)
 
-  const wait = 10000 //set wait before token balance check
+
+  console.log('Alice  ' + aliceAddr)
+  console.log('Bob  ' + bobAddr)
+
+  const wait = 1000 //set wait before token balance check
 
   // change goes back to the fundingPrivateKey
   const contractHex = contract(
