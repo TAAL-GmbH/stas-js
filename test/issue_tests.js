@@ -216,7 +216,7 @@ it('Issue - Issue to Address with a negative token amount(?)', async function ()
 })
 
 //should we validate that balance in issue info is a postive integer?
-it('Issue - Issue to Address with Zero Tokens Throws Errror(?)', async function () {
+it('Issue - Issue to Address with Zero Tokens Throws Errror', async function () {
   try {
     issue(
       issuerPrivateKey,

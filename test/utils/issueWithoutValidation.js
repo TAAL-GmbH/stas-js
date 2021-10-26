@@ -20,7 +20,7 @@ const ADDRESS_MAX_LENGTH = 35
    isSplittable is a flag which sets whether the token can be split into further parts.
    version is the version of the STAS script, currently only version 2 is available.
 */
-function issue (privateKey, issueInfo, contractUtxo, paymentUtxo, paymentPrivateKey, isSplittable, symbol, version) {
+function issueWithoutValiation (privateKey, issueInfo, contractUtxo, paymentUtxo, paymentPrivateKey, isSplittable, symbol, version) {
   if (!isIssueInfoValid(issueInfo)) {
     throw new Error('issueInfo is invalid')
   }
@@ -128,4 +128,6 @@ function isUtxoValid (utxo) {
   }
   return true
 }
-module.exports = issue
+module.exports = {
+  issueWithoutValiation
+}

@@ -14,7 +14,6 @@ const {
   getTransaction,
   getFundsFromFaucet,
   broadcast,
-  SATS_PER_BITCOIN
 } = require('../index').utils
 
 let issuerPrivateKey
@@ -84,25 +83,20 @@ it('Successful RedeemSplit With No Fees', async function () {
 //Needs fixed
 it("RedeemSplit - No Split Completes Successfully", async function () {
 
-  const bobAmount = issueTx.vout[0].value
-  const splitDestinations = []
-  splitDestinations[0] = { address: bobAddr, amount: bobAmount }
-  const issueOutFundingVout = issueTx.vout.length - 1
+  const rsBobAmount = issueTx.vout[0].value / 2
+  const rSplitDestinations = []
+  rSplitDestinations[0] = { address: bobAddr, amount: rsBobAmount }
 
   const redeemSplitHex = redeemSplit(
     alicePrivateKey,
     issuerPrivateKey.publicKey,
     utils.getUtxo(issueTxid, issueTx, 0),
-    splitDestinations,
-    utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
+    rSplitDestinations,
+    utils.getUtxo(issueTxid, issueTx, 2),
     fundingPrivateKey
   )
-
   const redeemTxid = await broadcast(redeemSplitHex)
-
-  //   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00002334)
-  //   let noOfTokens = await countNumOfTokens(redeemTxid, true)
-  //   expect(splitDestinations).to.have.length(noOfTokens) //ensure that tx output contains 1 
+  expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000035)
 })
 
 //needs fixed - throwing 'Output satoshis is not a natural number' 

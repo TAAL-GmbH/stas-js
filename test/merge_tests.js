@@ -338,25 +338,6 @@ it("Merge - Null Funding Private Key Throws Error", async function () {
     }
 })
 
-it("Merge - Null Token Owner Private Key Throws Error", async function () {
-    try {
-        mergeHex = merge(
-            bobPrivateKey,
-            issuerPrivateKey.publicKey,
-            utils.getMergeUtxo(splitTxObj),
-            aliceAddr,
-            utils.getUtxo(splitTxid, splitTx, 2),
-            fundingPrivateKey
-        )
-        assert(false)
-        return
-    } catch (e) {
-        expect(e).to.be.instanceOf(Error)
-        expect(e.message).to.eql('Some Error')
-    }
-})
-
-
 
 async function setup() {
 

@@ -8,7 +8,6 @@ require('dotenv').config()
 
 const {
     contract,
-    issue
 } = require('../index')
 
 const {
@@ -39,9 +38,8 @@ beforeEach(async function () {
     await setup() // set up contract
 })
 
-it("Attempt to Issue More Tokens Than Supply", async function () {
+it("Attempt to Issue More Tokens Than Supply Without SDK Validation", async function () {
 
-    issueUtil.issueWithoutValiation
     let issueHex
     try {
         issueHex = issueUtil.issueWithoutValiation(
@@ -69,9 +67,8 @@ it("Attempt to Issue More Tokens Than Supply", async function () {
 })
 
 //needs fixed - Token is issued when issued with less token than supply
-it("Attempt to Issue Less Tokens Than Supply", async function () {
+it("Attempt to Issue Less Tokens Than Supply Without SDK Validation", async function () {
 
-    issueUtil.issueWithoutValiation
     let issueHex
     try {
         issueHex = issueUtil.issueWithoutValiation(
@@ -98,18 +95,14 @@ it("Attempt to Issue Less Tokens Than Supply", async function () {
       expect(response.issuance_txs).to.contain(issueTxid)
       expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00001) //reduced amounts
       expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003) //reduced amounts
-      console.log("Alice Balance "   + await utils.getTokenBalance(aliceAddr))
-      console.log("Bob Balance "   + await utils.getTokenBalance(bobAddr))
-      console.log(issueAddr)
-      console.log(fundingAddr)
-//    try {
-//        await broadcast(issueHex)
-//        assert(false)
-//        return
-//    } catch (e) {
-//        expect(e).to.be.instanceOf(Error)
-//        expect(e.message).to.eql('Request failed with status code 400')
-//    }
+   try {
+       await broadcast(issueHex)
+       assert(false)
+       return
+   } catch (e) {
+       expect(e).to.be.instanceOf(Error)
+       expect(e.message).to.eql('Request failed with status code 400')
+   }
 })
 
 

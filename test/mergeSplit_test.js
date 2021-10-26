@@ -449,7 +449,7 @@ it('MergeSplit - Null Destination Address 1 Throws Error', async function () {
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('data parameter supplied is not a string')
+    expect(e.message).to.eql('data parameter supplied is not a string.')
   }
 })
 
@@ -501,7 +501,7 @@ it('MergeSplit - Null Destination Address 2 Throws Error', async function () {
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('data parameter supplied is not a string')
+    expect(e.message).to.eql('data parameter supplied is not a string.')
   }
 })
 
@@ -553,7 +553,7 @@ it('MergeSplit - Null Funding Private Key Throws Error', async function () {
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Invalid Address string provided')
+    expect(e.message).to.eql('Cannot read property \'publicKey\' of null')
   }
 })
 

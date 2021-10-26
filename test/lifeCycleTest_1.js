@@ -21,7 +21,7 @@ const {
 } = require('../../index').utils
 
 // token issue is intermittingly failing - Tx broadcast is successful but token is not issuing - see line 79
-it('Full Life Cycle Test', async function () {
+it('Full Life Cycle Test 1', async function () {
   const issuerPrivateKey = bsv.PrivateKey()
   const fundingPrivateKey = bsv.PrivateKey()
 

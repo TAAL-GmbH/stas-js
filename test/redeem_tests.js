@@ -86,10 +86,10 @@ it('Redeem - Successful Redeem No Fee Empty Array', async function () {
     issuerPrivateKey.publicKey,
     utils.getUtxo(issueTxid, issueTx, 0),
     [],
-    fundingPrivateKey
+    null
   )
   const redeemTxid = await broadcast(redeemHex)
-  expect(await getAmount(redeemTxid, 0)).to.equal(0.0000075) // grab programmatically
+  expect(await getAmount(redeemTxid, 0)).to.equal(0.0000075) 
   expect(await utils.areFeesProcessed(redeemTxid, 1)).to.be.false
 })
 

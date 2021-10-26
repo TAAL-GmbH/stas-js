@@ -21,20 +21,21 @@ let contractTx
 let contractTxid
 let aliceAddr
 let bobAddr
+const incorrectPrivateKey = bsv.PrivateKey()
+const bobPrivateKey = bsv.PrivateKey()
+const alicePrivateKey = bsv.PrivateKey()
+const symbol = 'TAALT'
+const supply = 10000
+
+aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
+bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
 
 // We create contract with incorrect public key hash
 beforeEach(async function () {
-  const incorrectPrivateKey = bsv.PrivateKey()
-  const bobPrivateKey = bsv.PrivateKey()
-  const alicePrivateKey = bsv.PrivateKey()
   const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
   const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
   const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(incorrectPrivateKey.publicKey.toBuffer()).toString('hex')
-  const symbol = 'TAALT'
-  const supply = 10000
   const schema = utils.schema(publicKeyHash, symbol, supply)
-  aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
-  bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
 
   const contractHex = contract(
     issuerPrivateKey,
