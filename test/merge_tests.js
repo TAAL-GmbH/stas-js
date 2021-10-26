@@ -57,7 +57,27 @@ it("Merge - Successful Merge With Fee", async function () {
     expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007)
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000) //intermittingly incorrect
     expect(await utils.areFeesProcessed(mergeTxid, 1)).to.be.true
+})
 
+it("Merge - Successful Merge With Fee 2", async function () {
+
+    const mergeHex = merge(
+        bobPrivateKey,
+        issuerPrivateKey.publicKey,
+        utils.getMergeUtxo(splitTxObj),
+        bobAddr,
+        utils.getUtxo(splitTxid, splitTx, 2),
+        fundingPrivateKey
+    )
+    const mergeTxid = await broadcast(mergeHex)
+    const tokenIdMerge = await utils.getToken(mergeTxid)
+    let response = await utils.getTokenResponse(tokenIdMerge)
+    expect(response.symbol).to.equal('TAALT')
+    expect(response.contract_txs).to.contain(contractTxid)
+    expect(response.issuance_txs).to.contain(issueTxid)
+    expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007)
+    expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000) //intermittingly incorrect
+    expect(await utils.areFeesProcessed(mergeTxid, 1)).to.be.true
 })
 
 it("Merge - Merge With No Fee", async function () {
@@ -81,7 +101,7 @@ it("Merge - Merge With No Fee", async function () {
     expect(await utils.areFeesProcessed(mergeTxid, 1)).to.be.false
 })
 
-it("Merge -Incorrect Owner Private Key Throws Error", async function () {
+it("Merge - Incorrect Owner Private Key Throws Error", async function () {
 
     const incorrectPrivateKey = bsv.PrivateKey()
     const mergeHex = merge(
@@ -102,7 +122,7 @@ it("Merge -Incorrect Owner Private Key Throws Error", async function () {
     }
 })
 
-it("Merge -Incorrect Funding Private Key Throws Error", async function () {
+it("Merge - Incorrect Funding Private Key Throws Error", async function () {
 
     const incorrectPrivateKey = bsv.PrivateKey()
     const mergeHex = merge(
@@ -144,10 +164,10 @@ it("Merge - Incorrect Contract Public Key Throws Error", async function () {
     }
 })
 
-it("Merge -Attempt to Merge More Than 2 Tokens", async function () {
+it("Merge - Attempt to Merge More Than 2 Tokens", async function () {
 
     try {
-        const mergeHex = merge(
+         mergeHex = merge(
             bobPrivateKey,
             issuerPrivateKey.publicKey,
             [{
@@ -174,7 +194,7 @@ it("Merge -Attempt to Merge More Than 2 Tokens", async function () {
     }
 })
 
-it("Merge -Attempt to Merge More Than 2 Tokens Without SDK Validation", async function () {
+it("Merge - Attempt to Merge More Than 2 Tokens Without SDK Validation", async function () {
 
 
     const mergeHex = mergeUtil.mergeWithoutValidation(
@@ -206,7 +226,7 @@ it("Merge -Attempt to Merge More Than 2 Tokens Without SDK Validation", async fu
     }
 })
 
-it("Merge -Attempt to Merge Less Than Two  Tokens", async function () {
+it("Merge - Attempt to Merge Less Than Two Tokens", async function () {
 
     try {
         const mergeHex = merge(
@@ -227,6 +247,115 @@ it("Merge -Attempt to Merge Less Than Two  Tokens", async function () {
         expect(e.message).to.eql('This function can only merge exactly 2 STAS tokens')
     }
 })
+//needs fixed
+it("Merge - Null Token Owner Private Key Throws Error", async function () {
+    try {
+        mergeHex = merge(
+            null,
+            issuerPrivateKey.publicKey,
+            utils.getMergeUtxo(splitTxObj),
+            aliceAddr,
+            utils.getUtxo(splitTxid, splitTx, 2),
+            fundingPrivateKey
+        )
+        assert(false)
+        return
+    } catch (e) {
+        expect(e).to.be.instanceOf(Error)
+        expect(e.message).to.eql('Some Error')
+    }
+})
+//needs fixed
+it("Merge - Issuer Public Key Throws Error", async function () {
+    try {
+        mergeHex = merge(
+            bobPrivateKey,
+            null,
+            utils.getMergeUtxo(splitTxObj),
+            aliceAddr,
+            utils.getUtxo(splitTxid, splitTx, 2),
+            fundingPrivateKey
+        )
+        assert(false)
+        return
+    } catch (e) {
+        expect(e).to.be.instanceOf(Error)
+        expect(e.message).to.eql('Some Error')
+    }
+})
+//needs fixed
+it("Merge - Null Merge STAS UTXO Throws Error", async function () {
+    try {
+        mergeHex = merge(
+            bobPrivateKey,
+            issuerPrivateKey.publicKey,
+            null,
+            aliceAddr,
+            utils.getUtxo(splitTxid, splitTx, 2),
+            fundingPrivateKey
+        )
+        assert(false)
+        return
+    } catch (e) {
+        expect(e).to.be.instanceOf(Error)
+        expect(e.message).to.eql('Some Error')
+    }
+})
+//needs fixed
+it("Merge - Null Destination Address Throws Error", async function () {
+    try {
+        mergeHex = merge(
+            bobPrivateKey,
+            issuerPrivateKey.publicKey,
+            utils.getMergeUtxo(splitTxObj),
+            null,
+            utils.getUtxo(splitTxid, splitTx, 2),
+            fundingPrivateKey
+        )
+        assert(false)
+        return
+    } catch (e) {
+        expect(e).to.be.instanceOf(Error)
+        expect(e.message).to.contains('data parameter supplied is not a string')
+    }
+})
+
+it("Merge - Null Funding Private Key Throws Error", async function () {
+    try {
+        mergeHex = merge(
+            bobPrivateKey,
+            issuerPrivateKey.publicKey,
+            utils.getMergeUtxo(splitTxObj),
+            aliceAddr,
+            utils.getUtxo(splitTxid, splitTx, 2),
+            null
+        )
+        assert(false)
+        return
+    } catch (e) {
+        expect(e).to.be.instanceOf(Error)
+        expect(e.message).to.eql('Cannot read property \'publicKey\' of null')
+    }
+})
+
+it("Merge - Null Token Owner Private Key Throws Error", async function () {
+    try {
+        mergeHex = merge(
+            bobPrivateKey,
+            issuerPrivateKey.publicKey,
+            utils.getMergeUtxo(splitTxObj),
+            aliceAddr,
+            utils.getUtxo(splitTxid, splitTx, 2),
+            fundingPrivateKey
+        )
+        assert(false)
+        return
+    } catch (e) {
+        expect(e).to.be.instanceOf(Error)
+        expect(e.message).to.eql('Some Error')
+    }
+})
+
 
 
 async function setup() {

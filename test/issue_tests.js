@@ -433,6 +433,147 @@ it('Issue - Empty Payment UTXO Info Throws Error', async function () {
   }
 })
 
+it('Issue - Null Issuer Private Key Throws Error', async function () {
+  try {
+    issue(
+      null,
+      utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+      utils.getUtxo(contractTxid, contractTx, 0),
+      utils.getUtxo(contractTxid, contractTx, 1),
+      fundingPrivateKey,
+      true,
+      symbol,
+      2
+    )
+    assert(false)
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Cannot read property \'publicKey\' of null')
+  }
+})
+
+it('Issue - Null Issue Info Throws Error', async function () {
+  try {
+    issue(
+      issuerPrivateKey,
+      null,
+      utils.getUtxo(contractTxid, contractTx, 0),
+      utils.getUtxo(contractTxid, contractTx, 1),
+      fundingPrivateKey,
+      true,
+      symbol,
+      2
+    )
+    assert(false)
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('issueInfo is invalid')
+  }
+})
+
+it('Issue - Null Contract UTXO Throws Error', async function () {
+  try {
+    issue(
+      issuerPrivateKey,
+      utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+      null,
+      utils.getUtxo(contractTxid, contractTx, 1),
+      fundingPrivateKey,
+      true,
+      symbol,
+      2
+    )
+    assert(false)
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('contractUtxo is invalid')
+  }
+})
+
+it('Issue - Null Payment Private Key Throws Error', async function () {
+  try {
+    issue(
+      issuerPrivateKey,
+      utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+      utils.getUtxo(contractTxid, contractTx, 0),
+      utils.getUtxo(contractTxid, contractTx, 1),
+      null,
+      true,
+      symbol,
+      2
+    )
+    assert(false)
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Cannot read property \'publicKey\' of null')
+  }
+})
+//needs fixed
+it('Issue - Null isSplittable Throws Error', async function () {
+  try {
+    issue(
+      issuerPrivateKey,
+      utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+      utils.getUtxo(contractTxid, contractTx, 0),
+      utils.getUtxo(contractTxid, contractTx, 1),
+      fundingPrivateKey,
+      null,
+      symbol,
+      2
+    )
+    assert(false)
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Some Error')
+  }
+})
+//needs fixed
+it('Issue - Null Symbol Throws Error', async function () {
+  try {
+    issue(
+      issuerPrivateKey,
+      utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+      utils.getUtxo(contractTxid, contractTx, 0),
+      utils.getUtxo(contractTxid, contractTx, 1),
+      fundingPrivateKey,
+      true,
+      null,
+      2
+    )
+    assert(false)
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Some Error')
+  }
+})
+
+it('Issue - Null Version Throws Error', async function () {
+  try {
+    issue(
+      issuerPrivateKey,
+      utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+      utils.getUtxo(contractTxid, contractTx, 0),
+      utils.getUtxo(contractTxid, contractTx, 1),
+      fundingPrivateKey,
+      true,
+      symbol,
+      null
+    )
+    assert(false)
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.contain('invalid protocol version')
+  }
+})
+
+
 
 async function setup() {
   issuerPrivateKey = bsv.PrivateKey()

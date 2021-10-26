@@ -226,7 +226,7 @@ it('MergeSplit - Attempt to MergeSplit More Than Two Tokens Throws Error', async
   const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
   const incorrectPrivateKey = bsv.PrivateKey()
   try {
-    const mergeSplitHex = mergeSplit(
+     mergeSplitHex = mergeSplit(
       incorrectPrivateKey,
       issuerPrivateKey.publicKey,
       [{
@@ -271,7 +271,7 @@ it('MergeSplit - Attempt to MergeSplit Less Than Two Tokens Throws Error', async
   const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
   const incorrectPrivateKey = bsv.PrivateKey()
   try {
-    const mergeSplitHex = mergeSplit(
+     mergeSplitHex = mergeSplit(
       incorrectPrivateKey,
       issuerPrivateKey.publicKey,
       [{
@@ -303,7 +303,7 @@ it('MergeSplit - Invalid Address Destination Address 1 Throws Error', async func
   const invalidAddr = '1MSCReQT9E4GpxuK1K'
 
   try {
-    const mergeSplitHex = mergeSplit(
+     mergeSplitHex = mergeSplit(
       issuerPrivateKey,
       issuerPrivateKey.publicKey,
       utils.getMergeSplitUtxo(splitTxObj, splitTx),
@@ -330,7 +330,7 @@ it('MergeSplit - Invalid Address Destination Address 2 Throws Error', async func
   const invalidAddr = '1MSCReQT9E4GpxuK1K'
 
   try {
-    const mergeSplitHex = mergeSplit(
+     mergeSplitHex = mergeSplit(
       issuerPrivateKey,
       issuerPrivateKey.publicKey,
       utils.getMergeSplitUtxo(splitTxObj, splitTx),
@@ -348,6 +348,216 @@ it('MergeSplit - Invalid Address Destination Address 2 Throws Error', async func
     expect(e.message).to.eql('Invalid Address string provided')
   }
 })
+//needs fixed
+it('MergeSplit - Null Issuer Private Key Throws Error', async function () {
+  await setup() // contract, issue, transfer then split
+
+  const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
+  const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
+
+  try {
+     mergeSplitHex = mergeSplit(
+      null,
+      issuerPrivateKey.publicKey,
+      utils.getMergeSplitUtxo(splitTxObj, splitTx),
+      aliceAddr,
+      aliceAmountSatoshis,
+      bobAddr,
+      bobAmountSatoshis,
+      utils.getUtxo(splitTxid, splitTx, 2),
+      fundingPrivateKey
+    )
+    assert(false)
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Invalid Address string provided')
+  }
+})
+//needs fixed
+it('MergeSplit - Null Contract Public Key Error', async function () {
+  await setup() // contract, issue, transfer then split
+
+  const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
+  const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
+
+  try {
+     mergeSplitHex = mergeSplit(
+      issuerPrivateKey,
+      null,
+      utils.getMergeSplitUtxo(splitTxObj, splitTx),
+      aliceAddr,
+      aliceAmountSatoshis,
+      bobAddr,
+      bobAmountSatoshis,
+      utils.getUtxo(splitTxid, splitTx, 2),
+      fundingPrivateKey
+    )
+    assert(false)
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Invalid Address string provided')
+  }
+})
+//needs fixed
+it('MergeSplit - Null STAS Merge UTXO Throws Error', async function () {
+  await setup() // contract, issue, transfer then split
+
+  const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
+  const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
+
+  try {
+     mergeSplitHex = mergeSplit(
+      issuerPrivateKey,
+      issuerPrivateKey.publicKey,
+      null,
+      aliceAddr,
+      aliceAmountSatoshis,
+      bobAddr,
+      bobAmountSatoshis,
+      utils.getUtxo(splitTxid, splitTx, 2),
+      fundingPrivateKey
+    )
+    assert(false)
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Invalid Address string provided')
+  }
+})
+
+it('MergeSplit - Null Destination Address 1 Throws Error', async function () {
+  await setup() // contract, issue, transfer then split
+
+  const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
+  const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
+
+  try {
+     mergeSplitHex = mergeSplit(
+      issuerPrivateKey,
+      issuerPrivateKey.publicKey,
+      utils.getMergeSplitUtxo(splitTxObj, splitTx),
+      null,
+      aliceAmountSatoshis,
+      bobAddr,
+      bobAmountSatoshis,
+      utils.getUtxo(splitTxid, splitTx, 2),
+      fundingPrivateKey
+    )
+    assert(false)
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('data parameter supplied is not a string')
+  }
+})
+
+it('MergeSplit - Null Satoshi Amount 1 Throws Error', async function () {
+  await setup() // contract, issue, transfer then split
+
+  const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
+  const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
+
+  try {
+     mergeSplitHex = mergeSplit(
+      issuerPrivateKey,
+      issuerPrivateKey.publicKey,
+      utils.getMergeSplitUtxo(splitTxObj, splitTx),
+      aliceAddr,
+      null,
+      bobAddr,
+      bobAmountSatoshis,
+      utils.getUtxo(splitTxid, splitTx, 2),
+      fundingPrivateKey
+    )
+    assert(false)
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Invalid Argument: Output satoshis is not a natural number')
+  }
+})
+
+it('MergeSplit - Null Destination Address 2 Throws Error', async function () {
+  await setup() // contract, issue, transfer then split
+
+  const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
+  const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
+
+  try {
+     mergeSplitHex = mergeSplit(
+      issuerPrivateKey,
+      issuerPrivateKey.publicKey,
+      utils.getMergeSplitUtxo(splitTxObj, splitTx),
+      aliceAddr,
+      aliceAmountSatoshis,
+      null,
+      bobAmountSatoshis,
+      utils.getUtxo(splitTxid, splitTx, 2),
+      fundingPrivateKey
+    )
+    assert(false)
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('data parameter supplied is not a string')
+  }
+})
+
+
+it('MergeSplit - Null Satoshi Amount 2 Throws Error', async function () {
+  await setup() // contract, issue, transfer then split
+
+  const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
+  try {
+     mergeSplitHex = mergeSplit(
+      issuerPrivateKey,
+      issuerPrivateKey.publicKey,
+      utils.getMergeSplitUtxo(splitTxObj, splitTx),
+      aliceAddr,
+      aliceAmountSatoshis,
+      bobAddr,
+      null,
+      utils.getUtxo(splitTxid, splitTx, 2),
+      fundingPrivateKey
+    )
+    assert(false)
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Invalid Argument: Output satoshis is not a natural number')
+  }
+})
+
+
+it('MergeSplit - Null Funding Private Key Throws Error', async function () {
+  await setup() // contract, issue, transfer then split
+
+  const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
+  const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
+
+  try {
+     mergeSplitHex = mergeSplit(
+      issuerPrivateKey,
+      issuerPrivateKey.publicKey,
+      utils.getMergeSplitUtxo(splitTxObj, splitTx),
+      aliceAddr,
+      aliceAmountSatoshis,
+      bobAddr,
+      bobAmountSatoshis,
+      utils.getUtxo(splitTxid, splitTx, 2),
+      null
+    )
+    assert(false)
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Invalid Address string provided')
+  }
+})
+
+
 
 async function setup() {
 
