@@ -91,6 +91,7 @@ it('Successful RedeemSplit With 3 Split', async function () {
   console.log('Dave Balance ' + await utils.getTokenBalance(daveAddr))
 })
 
+//throws error as redeem address is counted  - probably not a defect, check with Liam
 it('Successful RedeemSplit With 4 Split', async function () {
 
   const davePrivateKey = bsv.PrivateKey()

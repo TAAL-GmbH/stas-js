@@ -17,12 +17,10 @@ const {
   getTransaction,
   getFundsFromFaucet,
   broadcast,
-  SATS_PER_BITCOIN
 } = require('./../index').utils
 
 const issuerPrivateKey = bsv.PrivateKey()
 const fundingPrivateKey = bsv.PrivateKey()
-
 const pk1 = bsv.PrivateKey()
 const addr1 = pk1.toAddress(process.env.NETWORK).toString()
 const pk2 = bsv.PrivateKey()
@@ -44,7 +42,8 @@ const addr9 = pk9.toAddress(process.env.NETWORK).toString()
 const pk10 = bsv.PrivateKey()
 const addr10 = pk10.toAddress(process.env.NETWORK).toString()  
 
-
+console.log('addr3  ' + addr2)
+console.log('addr4  ' + addr3)
 
 // token issue is intermittingly failing - Tx broadcast is successful but token is not issuing - see line 79
 it('Full Life Cycle Test With 10 Issuance Addresses', async function () {
@@ -88,20 +87,11 @@ it('Full Life Cycle Test With 10 Issuance Addresses', async function () {
   expect(response.contract_txs).to.contain(contractTxid)
   expect(response.issuance_txs).to.contain(issueTxid)
 
+  let addrArray = [addr1, addr2, addr3, addr4, addr5, addr6, addr7, addr8, addr9, addr10]
   for (let i = 1; i < 10; i++){
     expect(await utils.getVoutAmount(issueTxid, i)).to.equal(0.00001)
+    expect(await utils.getTokenBalance(addrArray[i])).to.equal(1000)
   }
-
-  expect(await utils.getTokenBalance(addr1)).to.equal(1000)
-  expect(await utils.getTokenBalance(addr2)).to.equal(1000)
-  expect(await utils.getTokenBalance(addr3)).to.equal(1000)
-  expect(await utils.getTokenBalance(addr4)).to.equal(1000)
-  expect(await utils.getTokenBalance(addr5)).to.equal(1000)
-  expect(await utils.getTokenBalance(addr6)).to.equal(1000)
-  expect(await utils.getTokenBalance(addr7)).to.equal(1000)
-  expect(await utils.getTokenBalance(addr8)).to.equal(1000)
-  expect(await utils.getTokenBalance(addr9)).to.equal(1000)
-  expect(await utils.getTokenBalance(addr10)).to.equal(1000)
 
   const issueOutFundingVout = issueTx.vout.length - 1
 
@@ -116,159 +106,117 @@ it('Full Life Cycle Test With 10 Issuance Addresses', async function () {
   const transferTxid = await broadcast(transferHex)
   console.log(`Transfer TX:     ${transferTxid}`)
   const transferTx = await getTransaction(transferTxid)
-  console.log('addr3 ' + await utils.getTokenBalance(addr3))
 
+  expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00001)
+  // expect(await utils.getTokenBalance(addr2)).to.equal(0)
+  // expect(await utils.getTokenBalance(addr3)).to.equal(2000)
 
-  const fundingPrivateKey2 = bsv.PrivateKey()
-  const fundingUtxos2 = await getFundsFromFaucet(fundingPrivateKey2.toAddress(process.env.NETWORK).toString())
+  const amount = transferTx.vout[0].value / 2
+  const splitDestinations = []
+  splitDestinations[0] = { address: addr4, amount: amount }
+  splitDestinations[1] = { address: addr4, amount: amount }
 
-  const transferHex2 = transfer(
-    pk5,
+  const splitHex = split(
+    pk3,
     issuerPrivateKey.publicKey,
-    utils.getUtxo(issueTxid, issueTx, 4),
-    addr3,
-    fundingUtxos2,
-    fundingPrivateKey2
+    utils.getUtxo(transferTxid, transferTx, 0),
+    splitDestinations,
+    utils.getUtxo(transferTxid, transferTx, 1),
+    fundingPrivateKey
   )
-  const transferTxid2 = await broadcast(transferHex2)
-  console.log(`Transfer TX2:     ${transferTxid2}`)
-  const transferTx2 = await getTransaction(transferTxid2)
-  console.log('addr3 ' + await utils.getTokenBalance(addr3))
+  const splitTxid = await broadcast(splitHex)
+  console.log(`Split TX:        ${splitTxid}`)
+  const splitTx = await getTransaction(splitTxid)
+  expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000005)
+  expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000005)
+  // expect(await utils.getTokenBalance(addr3)).to.equal(0)
+  // expect(await utils.getTokenBalance(addr4)).to.equal(2000)
 
-  const fundingPrivateKey3 = bsv.PrivateKey()
-  const fundingUtxos3 = await getFundsFromFaucet(fundingPrivateKey3.toAddress(process.env.NETWORK).toString())
+  // Now let's merge the last split back together
+  const splitTxObj = new bsv.Transaction(splitHex)
 
-  const transferHex3 = transfer(
-    pk6,
+  const mergeHex = merge(
+    pk4,
     issuerPrivateKey.publicKey,
-    utils.getUtxo(issueTxid, issueTx, 5),
+    utils.getMergeUtxo(splitTxObj),
     addr3,
-    fundingUtxos3,
-    fundingPrivateKey3
+    utils.getUtxo(splitTxid, splitTx, 2),
+    fundingPrivateKey
   )
-  const transferTxid3 = await broadcast(transferHex3)
-  console.log(`Transfer TX2:     ${transferTxid3}`)
-  const transferTx3 = await getTransaction(transferTxid3)
-  console.log('addr3 ' + await utils.getTokenBalance(addr3))
+  const mergeTxid = await broadcast(mergeHex)
+  console.log(`Merge TX:        ${mergeTxid}`)
+  const mergeTx = await getTransaction(mergeTxid)
+  expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00001)
+  const tokenIdMerge = await utils.getToken(issueTxid)
+  let responseMerge = await utils.getTokenResponse(tokenIdMerge)
+  expect(responseMerge.symbol).to.equal(symbol)
+  expect(responseMerge.contract_txs).to.contain(contractTxid)
+  expect(responseMerge.issuance_txs).to.contain(issueTxid)
+  // expect(await utils.getTokenBalance(addr3)).to.equal(0)
+  // expect(await utils.getTokenBalance(addr3)).to.equal(2000)
 
+  // const aliceAmount1 = mergeTx.vout[0].value / 2
+  // const aliceAmount2 = mergeTx.vout[0].value - aliceAmount1
 
+  // const split2Destinations = []
+  // split2Destinations[0] = { address: aliceAddr, amount: aliceAmount1 }
+  // split2Destinations[1] = { address: aliceAddr, amount: aliceAmount2 }
 
-//   expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
-//   // expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
-//   // expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
-//   console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
-//   console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
+  // const splitHex2 = split(
+  //   pk3,
+  //   issuerPrivateKey.publicKey,
+  //   utils.getUtxo(mergeTxid, mergeTx, 0),
+  //   split2Destinations,
+  //   utils.getUtxo(mergeTxid, mergeTx, 1),
+  //   fundingPrivateKey
+  // )
+  // const splitTxid2 = await broadcast(splitHex2)
+  // console.log(`Split TX2:       ${splitTxid2}`)
+  // const splitTx2 = await getTransaction(splitTxid2)
+  // expect(await utils.getVoutAmount(splitTxid2, 0)).to.equal(0.000015)
+  // expect(await utils.getVoutAmount(splitTxid2, 1)).to.equal(0.000015)
+  // // console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
+  // // console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
 
-//   // Split tokens into 2 - both payable to Bob...
-//   const bobAmount1 = transferTx.vout[0].value / 2
-//   const bobAmount2 = transferTx.vout[0].value - bobAmount1
-//   const splitDestinations = []
-//   splitDestinations[0] = { address: bobAddr, amount: bobAmount1 }
-//   splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
+  // // Now mergeSplit
+  // const splitTxObj2 = new bsv.Transaction(splitHex2)
 
-//   const splitHex = split(
-//     alicePrivateKey,
-//     issuerPrivateKey.publicKey,
-//     utils.getUtxo(transferTxid, transferTx, 0),
-//     splitDestinations,
-//     utils.getUtxo(transferTxid, transferTx, 1),
-//     fundingPrivateKey
-//   )
-//   const splitTxid = await broadcast(splitHex)
-//   console.log(`Split TX:        ${splitTxid}`)
-//   const splitTx = await getTransaction(splitTxid)
-//   expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000015)
-//   expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000015)
-//   console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
-//   console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
+  // const aliceAmountSatoshis = Math.floor(splitTx2.vout[0].value * SATS_PER_BITCOIN) / 2
+  // const bobAmountSatoshis = Math.floor(splitTx2.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx2.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
 
-//   // Now let's merge the last split back together
-//   const splitTxObj = new bsv.Transaction(splitHex)
+  // const mergeSplitHex = mergeSplit(
+  //   alicePrivateKey,
+  //   issuerPrivateKey.publicKey,
+  //   utils.getMergeSplitUtxo(splitTxObj2, splitTx2),
+  //   aliceAddr,
+  //   aliceAmountSatoshis,
+  //   bobAddr,
+  //   bobAmountSatoshis,
+  //   utils.getUtxo(splitTxid2, splitTx2, 2),
+  //   fundingPrivateKey
+  // )
 
-//   const mergeHex = merge(
-//     bobPrivateKey,
-//     issuerPrivateKey.publicKey,
-//     utils.getMergeUtxo(splitTxObj),
-//     aliceAddr,
-//     utils.getUtxo(splitTxid, splitTx, 2),
-//     fundingPrivateKey
-//   )
+  // const mergeSplitTxid = await broadcast(mergeSplitHex)
+  // console.log(`MergeSplit TX:   ${mergeSplitTxid}`)
+  // const mergeSplitTx = await getTransaction(mergeSplitTxid)
+  // expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075)
+  // expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
+  // console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
+  // console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
 
-//   const mergeTxid = await broadcast(mergeHex)
-//   console.log(`Merge TX:        ${mergeTxid}`)
-//   const mergeTx = await getTransaction(mergeTxid)
-//   expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00003)
-//   // const tokenIdMerge = await utils.getToken(issueTxid)
-//   // let responseMerge = await utils.getTokenResponse(tokenIdMerge)
-//   // expect(responseMerge.token.symbol).to.equal(symbol)
-//   // expect(responseMerge.token.contract_txs).to.contain(contractTxid)
-//   // expect(responseMerge.token.issuance_txs).to.contain(issueTxid)
-//   console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
-//   console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
-
-//   // Split again - both payable to Alice...
-//   const aliceAmount1 = mergeTx.vout[0].value / 2
-//   const aliceAmount2 = mergeTx.vout[0].value - aliceAmount1
-
-//   const split2Destinations = []
-//   split2Destinations[0] = { address: aliceAddr, amount: aliceAmount1 }
-//   split2Destinations[1] = { address: aliceAddr, amount: aliceAmount2 }
-
-//   const splitHex2 = split(
-//     alicePrivateKey,
-//     issuerPrivateKey.publicKey,
-//     utils.getUtxo(mergeTxid, mergeTx, 0),
-//     split2Destinations,
-//     utils.getUtxo(mergeTxid, mergeTx, 1),
-//     fundingPrivateKey
-//   )
-//   const splitTxid2 = await broadcast(splitHex2)
-//   console.log(`Split TX2:       ${splitTxid2}`)
-//   const splitTx2 = await getTransaction(splitTxid2)
-//   expect(await utils.getVoutAmount(splitTxid2, 0)).to.equal(0.000015)
-//   expect(await utils.getVoutAmount(splitTxid2, 1)).to.equal(0.000015)
-//   console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
-//   console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
-
-//   // Now mergeSplit
-//   const splitTxObj2 = new bsv.Transaction(splitHex2)
-
-//   const aliceAmountSatoshis = Math.floor(splitTx2.vout[0].value * SATS_PER_BITCOIN) / 2
-//   const bobAmountSatoshis = Math.floor(splitTx2.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx2.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
-
-//   const mergeSplitHex = mergeSplit(
-//     alicePrivateKey,
-//     issuerPrivateKey.publicKey,
-//     utils.getMergeSplitUtxo(splitTxObj2, splitTx2),
-//     aliceAddr,
-//     aliceAmountSatoshis,
-//     bobAddr,
-//     bobAmountSatoshis,
-//     utils.getUtxo(splitTxid2, splitTx2, 2),
-//     fundingPrivateKey
-//   )
-
-//   const mergeSplitTxid = await broadcast(mergeSplitHex)
-//   console.log(`MergeSplit TX:   ${mergeSplitTxid}`)
-//   const mergeSplitTx = await getTransaction(mergeSplitTxid)
-//   expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075)
-//   expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
-//   console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
-//   console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
-
-//   // Alice wants to redeem the money from bob...
-//   const redeemHex = redeem(
-//     alicePrivateKey,
-//     issuerPrivateKey.publicKey,
-//     utils.getUtxo(mergeSplitTxid, mergeSplitTx, 0),
-//     utils.getUtxo(mergeSplitTxid, mergeSplitTx, 2),
-//     fundingPrivateKey
-//   )
-//   const redeemTxid = await broadcast(redeemHex)
-//   console.log(`Redeem TX:       ${redeemTxid}`)
-//   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.0000075)
-//   console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
-//   console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
+  // // Alice wants to redeem the money from bob...
+  // const redeemHex = redeem(
+  //   alicePrivateKey,
+  //   issuerPrivateKey.publicKey,
+  //   utils.getUtxo(mergeSplitTxid, mergeSplitTx, 0),
+  //   utils.getUtxo(mergeSplitTxid, mergeSplitTx, 2),
+  //   fundingPrivateKey
+  // )
+  // const redeemTxid = await broadcast(redeemHex)
+  // console.log(`Redeem TX:       ${redeemTxid}`)
+  // expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.0000075)
+  // console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
+  // console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
  })
 
 
