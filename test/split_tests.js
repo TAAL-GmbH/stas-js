@@ -175,6 +175,8 @@ it("Split - No Split Completes Successfully", async function () {
     expect(splitDestinations).to.have.length(noOfTokens) //ensure that tx output contains 1 
 })
 
+
+
 it("Split - Successful Split Into Two Tokens With No Fee", async function () {
 
     const bobAmount1 = issueTx.vout[0].value / 2
@@ -270,6 +272,55 @@ it("Split - Empty Array Split Throws Error", async function () {
         expect(e.message).to.eql('Invalid Split Destinations')
     }
 })
+
+//should we validate in SDK?
+it("Split - Add Zero Sats to Split Throws Error", async function () {
+
+    const splitDestinations = []
+    splitDestinations[0] = { address: bobAddr, amount: 0 }
+    splitDestinations[1] = { address: bobAddr, amount: 0 }
+
+    try {
+        splitHex = split(
+           alicePrivateKey,
+           issuerPrivateKey.publicKey,
+           utils.getUtxo(issueTxid, issueTx, 0),
+           splitDestinations,
+           utils.getUtxo(issueTxid, issueTx, 2),
+           fundingPrivateKey
+       )
+       assert(false)
+       return
+   } catch (e) {
+       expect(e).to.be.instanceOf(Error)
+       expect(e.message).to.eql('Some Error')
+   }
+})
+
+//should we validate in SDK?
+it("Split - Negative Integer Sats to Split Throws Error", async function () {
+
+    const splitDestinations = []
+    splitDestinations[0] = { address: bobAddr, amount: -0.00015}
+    splitDestinations[1] = { address: bobAddr, amount: 0.00015 }
+
+    try {
+        splitHex = split(
+           alicePrivateKey,
+           issuerPrivateKey.publicKey,
+           utils.getUtxo(issueTxid, issueTx, 0),
+           splitDestinations,
+           utils.getUtxo(issueTxid, issueTx, 2),
+           fundingPrivateKey
+       )
+       assert(false)
+       return
+   } catch (e) {
+       expect(e).to.be.instanceOf(Error)
+       expect(e.message).to.eql('Some Error')
+   }
+})
+
 
 it("Split - Add Too Much To Split Throws Error", async function () {
 
