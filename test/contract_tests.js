@@ -36,7 +36,6 @@ it('Contract - Successful With Fees', async function () {
     supply
   )
   const contractTxid = await broadcast(contractHex)
-  console.log(contractTxid)
   let amount = await utils.getVoutAmount(contractTxid, 0)
   expect(amount).to.equal(supply / 100000000)
   expect(await utils.areFeesProcessed(contractTxid, 1)).to.be.true
@@ -52,7 +51,6 @@ it('Contract - Successful No Fees', async function () {
     supply
   )
   const contractTxid = await broadcast(contractHex)
-  console.log(contractTxid)
   let amount = await utils.getVoutAmount(contractTxid, 0)
   expect(amount).to.equal(supply / 100000000)
   expect(await utils.areFeesProcessed(contractTxid, 1)).to.be.false
@@ -328,7 +326,7 @@ it('Contract - Empty Array Contract UTXO Throw Error', async function () {
   }
 })
 
-it('Contract - Invalid Char Symbol Throws Error', async function () {
+it('Contract - Invalid Char Symbol Throws Error 1 ', async function () {
   invalidCharsSymbol = '!invalid..;'
   invalidSchema = utils.schema(publicKeyHash, invalidCharsSymbol, supply)
   try {
@@ -348,7 +346,7 @@ it('Contract - Invalid Char Symbol Throws Error', async function () {
   }
 })
 
-it('Contract - Invalid Char Symbol Throws Error', async function () {
+it('Contract - Invalid Char Symbol Throws Error 2', async function () {
   invalidCharsSymbol = '&@invalid\"\'+='
   invalidSchema = utils.schema(publicKeyHash, invalidCharsSymbol, supply)
   try {
@@ -376,6 +374,25 @@ it('Contract - Null Symbol In Schema Throws Error', async function () {
       fundingUtxos,
       fundingPrivateKey,
       schemaNullSymbol,
+      supply
+    )
+    assert(false)
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Invalid Symbol')
+  }
+})
+
+//needs fixed
+it('Contract - Empty Symbol In Schema Throws Error', async function () {
+  try {
+    contract(
+      issuerPrivateKey,
+      contractUtxos,
+      fundingUtxos,
+      fundingPrivateKey,
+      '',
       supply
     )
     assert(false)

@@ -335,58 +335,6 @@ it('Issue - Successful Issue Different Symbol 1', async function () {
   expect(await utils.areFeesProcessed(issueTxid, 2)).to.be.true
 })
 
-it('Issue - Successful Issue Symbol Special Char 1', async function () {
-
-  const newSymbol = 'TEST-123'
-  const issueHex = issue(
-    issuerPrivateKey,
-    utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
-    utils.getUtxo(contractTxid, contractTx, 0),
-    utils.getUtxo(contractTxid, contractTx, 1),
-    fundingPrivateKey,
-    true,
-    newSymbol,
-    2
-  )
-  const issueTxid = await broadcast(issueHex)
-  const tokenId = await utils.getToken(issueTxid)
-  let response = await utils.getTokenResponse(tokenId)
-  expect(response.symbol).to.equal(newSymbol)
-  expect(response.contract_txs).to.contain(contractTxid)
-  expect(response.issuance_txs).to.contain(issueTxid)
-  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
-  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
-  expect(await utils.areFeesProcessed(issueTxid, 2)).to.be.true
-})
-
-
-it('Issue - Successful Issue Symbol Special Char 2', async function () {
-
-  const newSymbol = 'TEST_123'
-  const issueHex = issue(
-    issuerPrivateKey,
-    utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
-    utils.getUtxo(contractTxid, contractTx, 0),
-    utils.getUtxo(contractTxid, contractTx, 1),
-    fundingPrivateKey,
-    true,
-    newSymbol,
-    2
-  )
-  const issueTxid = await broadcast(issueHex)
-  const tokenId = await utils.getToken(issueTxid)
-  let response = await utils.getTokenResponse(tokenId)
-  expect(response.symbol).to.equal(newSymbol)
-  expect(response.contract_txs).to.contain(contractTxid)
-  expect(response.issuance_txs).to.contain(issueTxid)
-  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
-  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
-  expect(await utils.areFeesProcessed(issueTxid, 2)).to.be.true
-})
 
 it('Issue - Incorrect Issue Private Key Throws Error', async function () {
 
