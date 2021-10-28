@@ -68,7 +68,6 @@ it('Issue - Successful Issue Token With Split And Fee 2', async function () {
       data: 'one'
     }
   ]
-
   const issueHex = issue(
     issuerPrivateKey,
     issueInfo,
@@ -192,6 +191,31 @@ it('Issue - Successful Issue Token With Split And Fee 4', async function () {
   expect(await utils.areFeesProcessed(issueTxid, 4)).to.be.true
 })
 
+it('Issue - Successful Issue Token To Same Address', async function () {
+
+  const issueHex = issue(
+    issuerPrivateKey,
+    utils.getIssueInfo(aliceAddr, 7000, aliceAddr, 3000),
+    utils.getUtxo(contractTxid, contractTx, 0),
+    utils.getUtxo(contractTxid, contractTx, 1),
+    fundingPrivateKey,
+    true,
+    symbol,
+    2
+  )
+  const issueTxid = await broadcast(issueHex)
+  const tokenId = await utils.getToken(issueTxid)
+  let response = await utils.getTokenResponse(tokenId)
+  expect(response.symbol).to.equal(symbol)
+  expect(response.contract_txs).to.contain(contractTxid)
+  expect(response.issuance_txs).to.contain(issueTxid)
+  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00006)
+  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00004)
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
+  expect(await utils.areFeesProcessed(issueTxid, 2)).to.be.true
+})
+
+
 it('Issue - Successful Issue Token Non Split', async function () {
 
   const issueHex = issue(
@@ -285,6 +309,85 @@ it('Issue - Successful Issue Token 10 Addresses', async function () {
   expect(await utils.areFeesProcessed(issueTxid, 10)).to.be.true
 })
 
+it('Issue - Successful Issue Different Symbol 1', async function () {
+
+  const newSymbol = 'TEST'
+  const issueHex = issue(
+    issuerPrivateKey,
+    utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+    utils.getUtxo(contractTxid, contractTx, 0),
+    utils.getUtxo(contractTxid, contractTx, 1),
+    fundingPrivateKey,
+    true,
+    newSymbol,
+    2
+  )
+  const issueTxid = await broadcast(issueHex)
+  const tokenId = await utils.getToken(issueTxid)
+  let response = await utils.getTokenResponse(tokenId)
+  expect(response.symbol).to.equal(symbol)
+  expect(response.contract_txs).to.contain(contractTxid)
+  expect(response.issuance_txs).to.contain(issueTxid)
+  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
+  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+  expect(await utils.areFeesProcessed(issueTxid, 2)).to.be.true
+})
+
+it('Issue - Successful Issue Symbol Special Char 1', async function () {
+
+  const newSymbol = 'TEST-123'
+  const issueHex = issue(
+    issuerPrivateKey,
+    utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+    utils.getUtxo(contractTxid, contractTx, 0),
+    utils.getUtxo(contractTxid, contractTx, 1),
+    fundingPrivateKey,
+    true,
+    newSymbol,
+    2
+  )
+  const issueTxid = await broadcast(issueHex)
+  const tokenId = await utils.getToken(issueTxid)
+  let response = await utils.getTokenResponse(tokenId)
+  expect(response.symbol).to.equal(newSymbol)
+  expect(response.contract_txs).to.contain(contractTxid)
+  expect(response.issuance_txs).to.contain(issueTxid)
+  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
+  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+  expect(await utils.areFeesProcessed(issueTxid, 2)).to.be.true
+})
+
+
+it('Issue - Successful Issue Symbol Special Char 2', async function () {
+
+  const newSymbol = 'TEST_123'
+  const issueHex = issue(
+    issuerPrivateKey,
+    utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+    utils.getUtxo(contractTxid, contractTx, 0),
+    utils.getUtxo(contractTxid, contractTx, 1),
+    fundingPrivateKey,
+    true,
+    newSymbol,
+    2
+  )
+  const issueTxid = await broadcast(issueHex)
+  const tokenId = await utils.getToken(issueTxid)
+  let response = await utils.getTokenResponse(tokenId)
+  expect(response.symbol).to.equal(newSymbol)
+  expect(response.contract_txs).to.contain(contractTxid)
+  expect(response.issuance_txs).to.contain(issueTxid)
+  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
+  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+  expect(await utils.areFeesProcessed(issueTxid, 2)).to.be.true
+})
+
 it('Issue - Incorrect Issue Private Key Throws Error', async function () {
 
   const incorrectPrivateKey = bsv.PrivateKey()
@@ -373,7 +476,7 @@ it('Issue - Issue with Incorrect Balance (Less Than) Throws Error', async functi
   try {
     issue(
       issuerPrivateKey,
-      utils.getIssueInfo(aliceAddr, 0, bobAddr, 0),
+      utils.getIssueInfo(aliceAddr, 5000, bobAddr, 4000),
       utils.getUtxo(contractTxid, contractTx, 0),
       utils.getUtxo(contractTxid, contractTx, 1),
       fundingPrivateKey,
@@ -385,7 +488,7 @@ it('Issue - Issue with Incorrect Balance (Less Than) Throws Error', async functi
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('total out amount 0 must equal total in amount 10000')
+    expect(e.message).to.eql('total out amount 9000 must equal total in amount 10000')
   }
 })
 
@@ -705,7 +808,7 @@ it('Issue - Null Symbol Throws Error', async function () {
     expect(e.message).to.eql('Some Error')
   }
 })
-
+//needs fixed
 it('Issue - Null Version Throws Error', async function () {
   try {
     issue(
