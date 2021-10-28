@@ -34,7 +34,7 @@ beforeEach(async function () {
   await setup() // set up contract
 })
 
-it('Issue - Successful Issue Token With Split And Fee', async function () {
+it('Issue - Successful Issue Token With Split And Fee 1', async function () {
 
   const issueHex = issue(
     issuerPrivateKey,
@@ -57,6 +57,139 @@ it('Issue - Successful Issue Token With Split And Fee', async function () {
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
   expect(await utils.areFeesProcessed(issueTxid, 2)).to.be.true
+})
+
+it('Issue - Successful Issue Token With Split And Fee 2', async function () {
+
+  const issueInfo = [
+    {
+      addr: aliceAddr,
+      satoshis: 10000,
+      data: 'one'
+    }
+  ]
+
+  const issueHex = issue(
+    issuerPrivateKey,
+    issueInfo,
+    utils.getUtxo(contractTxid, contractTx, 0),
+    utils.getUtxo(contractTxid, contractTx, 1),
+    fundingPrivateKey,
+    true,
+    symbol,
+    2
+  )
+  const issueTxid = await broadcast(issueHex)
+  const tokenId = await utils.getToken(issueTxid)
+  let response = await utils.getTokenResponse(tokenId)
+  expect(response.symbol).to.equal(symbol)
+  expect(response.contract_txs).to.contain(contractTxid)
+  expect(response.issuance_txs).to.contain(issueTxid)
+  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00001)
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
+  expect(await utils.areFeesProcessed(issueTxid, 1)).to.be.true
+})
+
+it('Issue - Successful Issue Token With Split And Fee 3', async function () {
+
+  const davePrivateKey = bsv.PrivateKey()
+  const daveAddr = davePrivateKey.toAddress(process.env.NETWORK).toString()
+
+  const issueInfo = [
+    {
+      addr: aliceAddr,
+      satoshis: 6000,
+      data: 'one'
+    },
+    {
+      addr: bobAddr,
+      satoshis: 2000,
+      data: 'two'
+    },
+    {
+      addr: daveAddr,
+      satoshis: 2000,
+      data: 'three'
+    }
+  ]
+  const issueHex = issue(
+    issuerPrivateKey,
+    issueInfo,
+    utils.getUtxo(contractTxid, contractTx, 0),
+    utils.getUtxo(contractTxid, contractTx, 1),
+    fundingPrivateKey,
+    true,
+    symbol,
+    2
+  )
+  const issueTxid = await broadcast(issueHex)
+  const tokenId = await utils.getToken(issueTxid)
+  let response = await utils.getTokenResponse(tokenId)
+  expect(response.symbol).to.equal(symbol)
+  expect(response.contract_txs).to.contain(contractTxid)
+  expect(response.issuance_txs).to.contain(issueTxid)
+  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00006)
+  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00002)
+  expect(await utils.getVoutAmount(issueTxid, 2)).to.equal(0.00002)
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(6000)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(2000)
+  expect(await utils.getTokenBalance(daveAddr)).to.equal(2000)
+  expect(await utils.areFeesProcessed(issueTxid, 3)).to.be.true
+})
+
+it('Issue - Successful Issue Token With Split And Fee 4', async function () {
+
+  const davePrivateKey = bsv.PrivateKey()
+  const daveAddr = davePrivateKey.toAddress(process.env.NETWORK).toString()
+  const emmaPrivateKey = bsv.PrivateKey()
+  const emmaAddr = emmaPrivateKey.toAddress(process.env.NETWORK).toString()
+  const issueInfo = [
+    {
+      addr: aliceAddr,
+      satoshis: 4000,
+      data: 'one'
+    },
+    {
+      addr: bobAddr,
+      satoshis: 3000,
+      data: 'two'
+    },
+    {
+      addr: daveAddr,
+      satoshis: 2000,
+      data: 'three'
+    },
+    {
+      addr: emmaAddr,
+      satoshis: 1000,
+      data: 'three'
+    }
+  ]
+  const issueHex = issue(
+    issuerPrivateKey,
+    issueInfo,
+    utils.getUtxo(contractTxid, contractTx, 0),
+    utils.getUtxo(contractTxid, contractTx, 1),
+    fundingPrivateKey,
+    true,
+    symbol,
+    2
+  )
+  const issueTxid = await broadcast(issueHex)
+  const tokenId = await utils.getToken(issueTxid)
+  let response = await utils.getTokenResponse(tokenId)
+  expect(response.symbol).to.equal(symbol)
+  expect(response.contract_txs).to.contain(contractTxid)
+  expect(response.issuance_txs).to.contain(issueTxid)
+  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00004)
+  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
+  expect(await utils.getVoutAmount(issueTxid, 2)).to.equal(0.00002)
+  expect(await utils.getVoutAmount(issueTxid, 3)).to.equal(0.00001)
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(4000)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+  expect(await utils.getTokenBalance(daveAddr)).to.equal(2000)
+  expect(await utils.getTokenBalance(emmaAddr)).to.equal(1000)
+  expect(await utils.areFeesProcessed(issueTxid, 4)).to.be.true
 })
 
 it('Issue - Successful Issue Token Non Split', async function () {
@@ -584,6 +717,46 @@ it('Issue - Null Version Throws Error', async function () {
       true,
       symbol,
       null
+    )
+    assert(false)
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.contain('invalid protocol version')
+  }
+})
+
+it('Issue - Invalid Version Throws Error 1', async function () {
+  try {
+    issue(
+      issuerPrivateKey,
+      utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+      utils.getUtxo(contractTxid, contractTx, 0),
+      utils.getUtxo(contractTxid, contractTx, 1),
+      fundingPrivateKey,
+      true,
+      symbol,
+      1
+    )
+    assert(false)
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.contain('invalid protocol version')
+  }
+})
+
+it('Issue - Invalid Version Throws Error 2', async function () {
+  try {
+    issue(
+      issuerPrivateKey,
+      utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+      utils.getUtxo(contractTxid, contractTx, 0),
+      utils.getUtxo(contractTxid, contractTx, 1),
+      fundingPrivateKey,
+      true,
+      symbol,
+      3
     )
     assert(false)
     return
