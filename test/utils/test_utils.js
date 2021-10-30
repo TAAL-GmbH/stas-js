@@ -197,6 +197,23 @@ async function getTokenResponse(tokenId) {
   return response.data.token
 }
 
+
+
+async function getTokenWithSymbol(tokenId, symbol) {
+
+  const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/token/' + tokenId + '/' + symbol
+  console.log(url)
+  const response = await axios({
+    method: 'get',
+    url,
+    auth: {
+      username: process.env.API_USERNAME,
+      password: process.env.API_PASSWORD
+    }
+  })
+  return response.data.token
+}
+
 async function areFeesProcessed(txid, vout) {
 
   const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/tx/hash/' + txid
@@ -242,5 +259,6 @@ module.exports = {
   getTokenResponse,
   areFeesProcessed,
   getTokenBalance,
-  getTenIssueInfo
+  getTenIssueInfo,
+  getTokenWithSymbol
 }
