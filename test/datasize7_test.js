@@ -15,9 +15,9 @@ const {
 
 } = require('../index').utils
 
-// Symbol size of more than 128 bytes
-const symbol = 'CallmeIshmaelSomeyearsagosdnevermindhowlongpreciselyhavinglittleornomoneyinmypurseandnothingparticulartointerestmeotoadasdfasfggsdxx'
-const wait = 1000
+// Large symbol size
+const symbol = utils.addData(100)
+const wait = 1000 //wait may be required due to delay in issuance of token
 let issuerPrivateKey
 let fundingPrivateKey
 let bobPrivateKey
@@ -31,8 +31,8 @@ beforeEach(async function () {
 
     await setup()
 })
-
-it('Symbol > 128 Data Size Zero Bytes', async function () {
+// Script is too big failure on broadcast
+it('Large Symbol Data Size Zero Bytes', async function () {
 
     let data = ''
     console.log("Data Size " + utils.byteCount(data))
@@ -53,6 +53,7 @@ it('Symbol > 128 Data Size Zero Bytes', async function () {
         symbol,
         2
     )
+    console.log(issueHex)
     const issueTxid = await broadcast(issueHex)
     const tokenId = await utils.getToken(issueTxid)
     console.log(`issueTxid:        ${issueTxid}`)
@@ -62,7 +63,7 @@ it('Symbol > 128 Data Size Zero Bytes', async function () {
     expect(response.symbol).to.equal(symbol)
 })
 
-it('Symbol > 128 Data Size 1 Byte', async function () {
+it('Large Symbol Data Size 1 Byte', async function () {
 
     let data = 'A'
     console.log("Data Size " + utils.byteCount(data))
@@ -83,6 +84,7 @@ it('Symbol > 128 Data Size 1 Byte', async function () {
         symbol,
         2
     )
+    console.log(issueHex)
     const issueTxid = await broadcast(issueHex)
     const tokenId = await utils.getToken(issueTxid)
     console.log(`issueTxid:        ${issueTxid}`)
@@ -92,7 +94,7 @@ it('Symbol > 128 Data Size 1 Byte', async function () {
     expect(response.symbol).to.equal(symbol)
 })
 
-it('Symbol > 128 Data Size < 75 Bytes', async function () {
+it('Large Symbol Data Size < 75 Bytes', async function () {
 
     let data = 'It was the best of times, it was the worst of times, it was the age of'
     console.log("Data Size " + utils.byteCount(data))
@@ -123,9 +125,7 @@ it('Symbol > 128 Data Size < 75 Bytes', async function () {
 })
 
 
-
-
-it('Symbol > 128 Data Size < 128 Bytes', async function () {
+it('Large Symbol Data Size < 128 Bytes', async function () {
 
     let data = 'It was the best of times, it was the worst of times, it was the age of wisdom. It was the best of times, it was the'
     console.log("Data Size " + utils.byteCount(data))
@@ -156,7 +156,7 @@ it('Symbol > 128 Data Size < 128 Bytes', async function () {
 })
 
 
-it('Symbol > 128 Data Size > 128 Bytes', async function () {
+it('Large Symbol Data Size > 128 Bytes', async function () {
 
     let data = 'It was the best of times, it was the worst of times, it was the age of wisdom. It was the best of times, it was the worst of'
     console.log("Data Size " + utils.byteCount(data))
@@ -187,7 +187,7 @@ it('Symbol > 128 Data Size > 128 Bytes', async function () {
 })
 
 
-it('Symbol >  128 Data Size > 32768 Bytes', async function () {
+it('Large Symbol Data Size > 32768 Bytes', async function () {
 
     console.log("Data Size " + utils.byteCount(utils.addData(33)))
     const issueInfo = [
@@ -216,7 +216,7 @@ it('Symbol >  128 Data Size > 32768 Bytes', async function () {
     expect(response.symbol).to.equal(symbol)
 })
 
-it('Symbol >  128 Data Size < 32768 Bytes', async function () {
+it('Large Symbol Data Size < 32768 Bytes', async function () {
 
     console.log("Data Size " + utils.byteCount(utils.addData(32)))
 
@@ -247,7 +247,7 @@ it('Symbol >  128 Data Size < 32768 Bytes', async function () {
 })
 
 
-it('Symbol >  128 Data Size Large', async function () {
+it('Large Symbol Data Size Large', async function () {
 
     console.log("Data Size " + utils.byteCount(utils.addData(1000)))
 
@@ -277,6 +277,7 @@ it('Symbol >  128 Data Size Large', async function () {
     expect(response.symbol).to.equal(symbol)
 })
 
+
 async function setup() {
 
     issuerPrivateKey = bsv.PrivateKey()
@@ -302,3 +303,4 @@ async function setup() {
     contractTxid = await broadcast(contractHex)
     contractTx = await getTransaction(contractTxid)
   }
+  

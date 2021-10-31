@@ -62,6 +62,36 @@ it('Symbol < 128 Data Size Zero Bytes', async function () {
     expect(response.symbol).to.equal(symbol)
 })
 
+it('Symbol < 128 Data Size 1 Byte', async function () {
+
+    let data = 'A'
+    console.log("Data Size " + utils.byteCount(data))
+    const issueInfo = [
+        {
+            addr: aliceAddr,
+            satoshis: 10000,
+            data: data
+        }
+    ]
+    const issueHex = issue(
+        issuerPrivateKey,
+        issueInfo,
+        utils.getUtxo(contractTxid, contractTx, 0),
+        utils.getUtxo(contractTxid, contractTx, 1),
+        fundingPrivateKey,
+        true,
+        symbol,
+        2
+    )
+    console.log(issueHex)
+    const issueTxid = await broadcast(issueHex)
+    const tokenId = await utils.getToken(issueTxid)
+    console.log(`issueTxid:        ${issueTxid}`)
+    console.log(`Token ID:        ${tokenId}`)
+    await new Promise(r => setTimeout(r, wait));
+    const response = await utils.getTokenWithSymbol(tokenId, symbol)
+    expect(response.symbol).to.equal(symbol)
+})
 
 it('Symbol < 128 Data Size < 75 Bytes', async function () {
 
@@ -125,7 +155,7 @@ it('Symbol < 128 Data Size < 128 Bytes', async function () {
 })
 
 
-it('Symbol < 128Data Size > 128 Bytes', async function () {
+it('Symbol < 128 Data Size > 128 Bytes', async function () {
 
     let data = 'It was the best of times, it was the worst of times, it was the age of wisdom. It was the best of times, it was the worst of'
     console.log("Data Size " + utils.byteCount(data))
