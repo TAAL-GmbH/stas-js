@@ -248,6 +248,22 @@ async function getTokenBalance(address) {
   return response.data.tokens[0].balance
 }
 
+
+
+function addData(sizeIn1000bytes) {
+
+  let data
+  for (let i = 0; i < sizeIn1000bytes; i++) {
+
+      data += 'CallmeIshmaelSomeyearsagonevermindhowlongpreciselyhavinglittleornomoneyinmypurseandnothingparticulartointerestmeonshoreIthoughtIwouldsailaboutalittleandseethewaterypartoftheworldItisawayIhaveofdrivingoffthespleenandregulatingthecirculationWheneverIfindmyselfgrowinggrimaboutthemouthwheneveritisadampdrizzlyNovemberinmysoulwheneverIfindmyselfinvoluntarilypausingbeforecoffinwarehousesandbringinguptherearofeveryfuneralImeetandespeciallywhenevermyhyposgetsuchanupperhandofmethatitrequiresastrongmoralprincipletopreventmefromdeliberatelysteppingintothestreetandmethodicallyknockingpeopleshatsoffthenIaccountithightimetozzgettoseaassoonasIcan.Thisismysubstituteforpistolandball.WithaphilosophicalflourishCatothrowshimselfuponhisswordIquietlytaketotheshipThereisnothingsurprisinginthisIftheybutknewit,almostallmenintheirdegreesometimeorothercherishverynearlythesamefeelingstowardstheoceanwithmeCallmeIshmaelSomeyearsagonevermindhowlongpreciselyhavinglittleornomoneyinmypurseCallmeIshmaelSomeyears'
+  }
+  return data
+}
+
+function byteCount(s) {
+  return encodeURI(s).split(/%..|./).length - 1;
+}
+
 module.exports = {
   schema,
   getIssueInfo,
@@ -260,5 +276,7 @@ module.exports = {
   areFeesProcessed,
   getTokenBalance,
   getTenIssueInfo,
-  getTokenWithSymbol
+  getTokenWithSymbol,
+  addData,
+  byteCount
 }
