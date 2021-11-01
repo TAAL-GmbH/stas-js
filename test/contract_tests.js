@@ -342,7 +342,7 @@ it('Contract - Invalid Char Symbol Throws Error 1 ', async function () {
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Invalid Symbol')
+    expect(e.message).to.eql('Invalid Symbol. Must be between 1 and 128 long and contain alpahnumeric, \'-\', \'_\' chars.')
   }
 })
 
@@ -362,7 +362,27 @@ it('Contract - Invalid Char Symbol Throws Error 2', async function () {
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Invalid Symbol')
+    expect(e.message).to.eql('Invalid Symbol. Must be between 1 and 128 long and contain alpahnumeric, \'-\', \'_\' chars.')
+  }
+})
+
+it('Contract - Symbol Greater than 128 Bytes Throws Error', async function () {
+  invalidSymbol = 'CallmeIshmaelSomeyearsagosdnevermindhowlongpreciselyhavinglittleornomoneyinmypurseandnothingparticulartointerestmeotoadasdfasfgg1'
+  invalidSchema = utils.schema(publicKeyHash, invalidSymbol, supply)
+  try {
+    contract(
+      issuerPrivateKey,
+      contractUtxos,
+      fundingUtxos,
+      fundingPrivateKey,
+      invalidSchema,
+      supply
+    )
+    assert(false)
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Invalid Symbol. Must be between 1 and 128 long and contain alpahnumeric, \'-\', \'_\' chars.')
   }
 })
 
@@ -380,7 +400,7 @@ it('Contract - Null Symbol In Schema Throws Error', async function () {
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Invalid Symbol')
+    expect(e.message).to.eql('Invalid Symbol. Must be between 1 and 128 long and contain alpahnumeric, \'-\', \'_\' chars.')
   }
 })
 
@@ -399,7 +419,7 @@ it('Contract - Empty Symbol In Schema Throws Error', async function () {
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Invalid Symbol')
+    expect(e.message).to.eql('Invalid Symbol. Must be between 1 and 128 long and contain alpahnumeric, \'-\', \'_\' chars.')
   }
 })
 

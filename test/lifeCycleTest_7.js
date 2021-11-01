@@ -22,7 +22,6 @@ const {
 
 const issuerPrivateKey = bsv.PrivateKey()
 const fundingPrivateKey = bsv.PrivateKey()
-
 const bobPrivateKey = bsv.PrivateKey()
 const bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
 const alicePrivateKey = bsv.PrivateKey()
@@ -32,9 +31,7 @@ const daveAddr = davePrivateKey.toAddress(process.env.NETWORK).toString()
 const emmaPrivateKey = bsv.PrivateKey()
 const emmaAddr = emmaPrivateKey.toAddress(process.env.NETWORK).toString()
 
-
-// token issue is intermittingly failing - Tx broadcast is successful but token is not issuing - see line 79
-it('Full Life Cycle Test With 10 Issuance Addresses', async function () {
+it('Full Life Cycle Test With Multiple Transfers & Splits', async function () {
 
   const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
   const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
@@ -79,8 +76,6 @@ it('Full Life Cycle Test With 10 Issuance Addresses', async function () {
       data: '4_data'
     }]
 
-
-
   const issueHex = issue(
     issuerPrivateKey,
     issueInfo,
@@ -103,11 +98,10 @@ it('Full Life Cycle Test With 10 Issuance Addresses', async function () {
   for (let i = 1; i < 4; i++) {
     expect(await utils.getVoutAmount(issueTxid, i)).to.equal(0.00001)
   }
-
   expect(await utils.getTokenBalance(bobAddr)).to.equal(1000)
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(1000)
   expect(await utils.getTokenBalance(daveAddr)).to.equal(1000)
-  expect(await utils.getTokenBalance(emmaAddr)).to.equal(1000)
+  expect(await utils.getTokenBalance(emmaAddr)).to.equal(1000) 
 
   const issueOutFundingVout = issueTx.vout.length - 1
 
