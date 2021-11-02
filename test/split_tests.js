@@ -53,7 +53,7 @@ it("Split - Successful Split Into Two Tokens With Fee", async function () {
         fundingPrivateKey
     )
     const splitTxid = await broadcast(splitHex)
-    let noOfTokens = await countNumOfTokens(splitTxid, true)
+    let noOfTokens = await utils.countNumOfTokens(splitTxid, true)
     expect(splitDestinations).to.have.length(noOfTokens) //ensure that tx output contains 2 values
     expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035)
     expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000035)
@@ -82,7 +82,7 @@ it("Split - Successful Split Into Three Tokens", async function () {
         fundingPrivateKey
     )
     const splitTxid = await broadcast(splitHex)
-    let noOfTokens = await countNumOfTokens(splitTxid, true)
+    let noOfTokens = await utils.countNumOfTokens(splitTxid, true)
     expect(splitDestinations).to.have.length(noOfTokens) //ensure that tx output contains 4 values
     expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035)
     expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.0000175)
@@ -112,7 +112,7 @@ it("Split - Successful Split Into Four Tokens 1", async function () {
         fundingPrivateKey
     )
     const splitTxid = await broadcast(splitHex)
-    let noOfTokens = await countNumOfTokens(splitTxid, true)
+    let noOfTokens = await utils.countNumOfTokens(splitTxid, true)
     expect(splitDestinations).to.have.length(noOfTokens) //ensure that tx output contains 4 values
     expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.0000175)
     expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.0000175)
@@ -144,7 +144,7 @@ it("Split - Successful Split Into Four Tokens 2", async function () {
         fundingPrivateKey
     )
     const splitTxid = await broadcast(splitHex)
-    let noOfTokens = await countNumOfTokens(splitTxid, true)
+    let noOfTokens = await utils.countNumOfTokens(splitTxid, true)
     expect(splitDestinations).to.have.length(noOfTokens) //ensure that tx output contains 4 values
     expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.0000175)
     expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.0000175)
@@ -171,7 +171,7 @@ it("Split - No Split Completes Successfully", async function () {
         fundingPrivateKey
     )
     const splitTxid = await broadcast(splitHex)
-    let noOfTokens = await countNumOfTokens(splitTxid, true)
+    let noOfTokens = await utils.countNumOfTokens(splitTxid, true)
     expect(splitDestinations).to.have.length(noOfTokens) //ensure that tx output contains 1 
 })
 
@@ -194,7 +194,7 @@ it("Split - Successful Split Into Two Tokens With No Fee", async function () {
         null
     )
     const splitTxid = await broadcast(splitHex)
-    let noOfTokens = await countNumOfTokens(splitTxid, false)
+    let noOfTokens = await utils.countNumOfTokens(splitTxid, false)
     expect(splitDestinations).to.have.length(noOfTokens) //ensure that tx output contains 2 values
     expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035)
     expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000035)
@@ -219,7 +219,7 @@ it("Split - Successful Split Into Two Tokens With No Fee Empty Array", async fun
         null
     )
     const splitTxid = await broadcast(splitHex)
-    let noOfTokens = await countNumOfTokens(splitTxid, false)
+    let noOfTokens = await utils.countNumOfTokens(splitTxid, false)
     expect(splitDestinations).to.have.length(noOfTokens) //ensure that tx output contains 2 values
     expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035)
     expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000035)
@@ -633,26 +633,3 @@ async function setup() {
 }
 
 
-async function countNumOfTokens(txid, isThereAFee) {
-
-    const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/tx/hash/' + txid
-    const response = await axios({
-        method: 'get',
-        url,
-        auth: {
-            username: process.env.API_USERNAME,
-            password: process.env.API_PASSWORD
-        }
-    })
-
-    let count = 0
-    for (var i = 0; i < response.data.vout.length; i++) {
-        if (response.data.vout[i].value != null) {
-            count++
-        }
-    }
-    if (isThereAFee == true) //output decreased by 1 if fees charged
-        return count - 1
-    else
-        return count
-}

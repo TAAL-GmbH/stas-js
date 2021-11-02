@@ -45,7 +45,7 @@ it('Redeem - Successful Redeem 1', async function () {
     fundingPrivateKey
   )
   const redeemTxid = await broadcast(redeemHex)
-  expect(await getAmount(redeemTxid, 0)).to.equal(0.00007)
+  expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007)
   expect(await utils.areFeesProcessed(redeemTxid, 1)).to.be.true
   //add token checks
 })
@@ -60,7 +60,7 @@ it('Redeem - Successful Redeem 2', async function () {
     fundingPrivateKey
   )
   const redeemTxid = await broadcast(redeemHex)
-  expect(await getAmount(redeemTxid, 0)).to.equal(0.00003)
+  expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00003)
   expect(await utils.areFeesProcessed(redeemTxid, 1)).to.be.true
   //add token checks
 })
@@ -74,7 +74,7 @@ it('Redeem - Successful Redeem No Fee', async function () {
     fundingPrivateKey
   )
   const redeemTxid = await broadcast(redeemHex)
-  expect(await getAmount(redeemTxid, 0)).to.equal(0.00007) // grab programmatically
+  expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007) // grab programmatically
   expect(await utils.areFeesProcessed(redeemTxid, 1)).to.be.false
   //add token checks
 })
@@ -89,7 +89,7 @@ it('Redeem - Successful Redeem No Fee Empty Array', async function () {
     null
   )
   const redeemTxid = await broadcast(redeemHex)
-  expect(await getAmount(redeemTxid, 0)).to.equal(0.0000075) 
+  expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.0000075) 
   expect(await utils.areFeesProcessed(redeemTxid, 1)).to.be.false
 })
 
@@ -315,19 +315,4 @@ async function setup() {
   )
   issueTxid = await broadcast(issueHex)
   issueTx = await getTransaction(issueTxid)
-}
-
-async function getAmount(txid, vout) {
-  const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/tx/hash/' + txid
-  const response = await axios({
-    method: 'get',
-    url,
-    auth: {
-      username: process.env.API_USERNAME,
-      password: process.env.API_PASSWORD
-    }
-  })
-  console.log(response.data.vout[vout].value)
-  const amount = response.data.vout[vout].value
-  return amount
 }

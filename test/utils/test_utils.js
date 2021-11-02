@@ -154,7 +154,7 @@ function getTenIssueInfo(add1, add2, add3, add4, add5, add6, add7, add8, add9, a
 
 async function getVoutAmount(txid, vout) {
 
-  const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/tx/hash/' + txid
+  const url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/tx/hash/${txid}`
   const response = await axios({
     method: 'get',
     url,
@@ -167,7 +167,7 @@ async function getVoutAmount(txid, vout) {
 }
 
 async function getToken(txid) {
-  const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/tx/hash/' + txid
+  const url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/tx/hash/${txid}`
   const response = await axios({
     method: 'get',
     url,
@@ -187,7 +187,7 @@ async function getTokenResponse(tokenId) {
 
   let response
   try {
-    const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/token/' + tokenId + '/TAALT'
+    const url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/token/${tokenId}/TAALT`
     response = await axios({
       method: 'get',
       url,
@@ -207,11 +207,11 @@ async function getTokenResponse(tokenId) {
 
 async function getTokenWithSymbol(tokenId, symbol) {
 
-  const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/token/' + tokenId + '/' + symbol
+  const url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/token/${tokenId}/${symbol}`
   console.log(url)
   let response
   try {
-    const response = await axios({
+    response = await axios({
       method: 'get',
       url,
       auth: {
@@ -228,7 +228,7 @@ async function getTokenWithSymbol(tokenId, symbol) {
 
 async function areFeesProcessed(txid, vout) {
 
-  const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/tx/hash/' + txid
+  const url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/tx/hash/${txid}`
   const response = await axios({
     method: 'get',
     url,
@@ -247,7 +247,7 @@ async function areFeesProcessed(txid, vout) {
 
 async function getTokenBalance(address) {
 
-  const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/address/' + address + '/tokens'
+  const url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/address/${address}/tokens`
   const response = await axios({
     method: 'get',
     url,
@@ -258,6 +258,45 @@ async function getTokenBalance(address) {
   })
 
   return response.data.tokens[0].balance
+}
+
+async function countNumOfTokens(txid, isThereAFee) {
+
+  const url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/tx/hash/${txid}`
+  const response = await axios({
+      method: 'get',
+      url,
+      auth: {
+          username: process.env.API_USERNAME,
+          password: process.env.API_PASSWORD
+      }
+  })
+
+  let count = 0
+  for (var i = 0; i < response.data.vout.length; i++) {
+      if (response.data.vout[i].value != null) {
+          count++
+      }
+  }
+  if (isThereAFee == true) //output decreased by 1 if fees charged
+      return count - 1
+  else
+      return count
+}
+
+async function getAmount(txid, vout) {
+  const url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/tx/hash/${txid}`
+  const response = await axios({
+    method: 'get',
+    url,
+    auth: {
+      username: process.env.API_USERNAME,
+      password: process.env.API_PASSWORD
+    }
+  })
+  console.log(response.data.vout[vout].value)
+  const amount = response.data.vout[vout].value
+  return amount
 }
 
 
@@ -276,6 +315,9 @@ function byteCount(s) {
   return encodeURI(s).split(/%..|./).length - 1;
 }
 
+
+
+
 module.exports = {
   schema,
   getIssueInfo,
@@ -290,5 +332,7 @@ module.exports = {
   getTenIssueInfo,
   getTokenWithSymbol,
   addData,
-  byteCount
+  byteCount,
+  countNumOfTokens,
+  getAmount
 }
