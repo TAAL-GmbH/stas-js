@@ -36,13 +36,10 @@ beforeEach(async function () {
 
 it('Successful RedeemSplit With 2 Split', async function () {
 
-  const rsBobAmount = issueTx.vout[0].value / 5
-  const rsAliceAmount1 = issueTx.vout[0].value / 5
+  const amount = issueTx.vout[0].value / 5
   const rSplitDestinations = []
-  rSplitDestinations[0] = { address: bobAddr, amount: rsBobAmount }
-  rSplitDestinations[1] = { address: aliceAddr, amount: rsAliceAmount1 }
-  rSplitDestinations[2] = { address: bobAddr, amount: rsBobAmount }
-  rSplitDestinations[3] = { address: aliceAddr, amount: rsAliceAmount1 }
+  rSplitDestinations[0] = { address: bobAddr, amount: amount }
+  rSplitDestinations[1] = { address: aliceAddr, amount: amount }
 
   const redeemSplitHex = redeemSplit(
     alicePrivateKey,
@@ -53,9 +50,10 @@ it('Successful RedeemSplit With 2 Split', async function () {
     fundingPrivateKey
   )
   const redeemTxid = await broadcast(redeemSplitHex)
-  expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00002334)
-  expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.00002333)
-  expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.00002333)
+  console.log(redeemTxid)
+  expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000042) // first utxo goes to redemption address
+  expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000014)
+  expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.000014)
   expect(await utils.areFeesProcessed(redeemTxid, 3)).to.be.true
   console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
   console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
@@ -81,10 +79,10 @@ it('Successful RedeemSplit With 3 Split', async function () {
     fundingPrivateKey
   )
   const redeemTxid = await broadcast(redeemSplitHex)
-  expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.0000175)
-  expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.0000175)
-  expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.0000175)
-  expect(await utils.getVoutAmount(redeemTxid, 3)).to.equal(0.0000175)
+  expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000049) 
+  expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000007)
+  expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.000007)
+  expect(await utils.getVoutAmount(redeemTxid, 3)).to.equal(0.000007)
   expect(await utils.areFeesProcessed(redeemTxid, 4)).to.be.true
   console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
   console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
