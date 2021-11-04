@@ -56,7 +56,6 @@ it('Issue - Successful Issue Token With Split And Fee 1', async function () {
   expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
-  expect(await utils.areFeesProcessed(issueTxid, 2)).to.be.true
 })
 
 it('Issue - Successful Issue Token With Split And Fee 2', async function () {
@@ -86,7 +85,6 @@ it('Issue - Successful Issue Token With Split And Fee 2', async function () {
   expect(response.issuance_txs).to.contain(issueTxid)
   expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00001)
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
-  expect(await utils.areFeesProcessed(issueTxid, 1)).to.be.true
 })
 
 it('Issue - Successful Issue Token With Split And Fee 3', async function () {
@@ -133,7 +131,6 @@ it('Issue - Successful Issue Token With Split And Fee 3', async function () {
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(6000)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(2000)
   expect(await utils.getTokenBalance(daveAddr)).to.equal(2000)
-  expect(await utils.areFeesProcessed(issueTxid, 3)).to.be.true
 })
 
 it('Issue - Successful Issue Token With Split And Fee 4', async function () {
@@ -188,7 +185,6 @@ it('Issue - Successful Issue Token With Split And Fee 4', async function () {
   expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
   expect(await utils.getTokenBalance(daveAddr)).to.equal(2000)
   expect(await utils.getTokenBalance(emmaAddr)).to.equal(1000)
-  expect(await utils.areFeesProcessed(issueTxid, 4)).to.be.true
 })
 
 it('Issue - Successful Issue Token To Same Address', async function () {
@@ -212,7 +208,6 @@ it('Issue - Successful Issue Token To Same Address', async function () {
   expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00006)
   expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00004)
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
-  expect(await utils.areFeesProcessed(issueTxid, 2)).to.be.true
 })
 
 
@@ -262,7 +257,6 @@ it('Issue - Successful Issue Token With Split No Fee', async function () {
   expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
-  expect(await utils.areFeesProcessed(issueTxid, 2)).to.be.false
 })
 
 it('Issue - Successful Issue Token 10 Addresses', async function () {
@@ -306,7 +300,6 @@ it('Issue - Successful Issue Token 10 Addresses', async function () {
   }
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(1000)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(1000)
-  expect(await utils.areFeesProcessed(issueTxid, 10)).to.be.true
 })
 
 it('Issue - Successful Issue Different Symbol 1', async function () {
@@ -332,7 +325,6 @@ it('Issue - Successful Issue Different Symbol 1', async function () {
   expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
-  expect(await utils.areFeesProcessed(issueTxid, 2)).to.be.true
 })
 
 

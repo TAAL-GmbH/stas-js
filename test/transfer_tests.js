@@ -55,7 +55,6 @@ it("Transfer - Successful With Fee 1", async function () {
   expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
-  expect(await utils.areFeesProcessed(transferTxid, 1)).to.be.true
 })
 
 it("Transfer - Successful With Fee 2", async function () {
@@ -77,7 +76,6 @@ it("Transfer - Successful With Fee 2", async function () {
   expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00007)
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(4000)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(6000)
-  expect(await utils.areFeesProcessed(transferTxid, 1)).to.be.true
 })
 
 it("Transfer - Successful With Fee 3", async function () {
@@ -102,7 +100,6 @@ it("Transfer - Successful With Fee 3", async function () {
   expect(await utils.getTokenBalance(daveAddr)).to.equal(3000)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
-  expect(await utils.areFeesProcessed(transferTxid, 1)).to.be.true
 })
 
 
@@ -125,7 +122,6 @@ it("Transfer - Successful With Fee 4", async function () {
   expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(6000)
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(4000)
-  expect(await utils.areFeesProcessed(transferTxid, 1)).to.be.true
 })
 
 
@@ -146,7 +142,6 @@ it("Transfer - Successful No Fee", async function () {
   expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
-  expect(await utils.areFeesProcessed(transferTxid, 1)).to.be.false
 })
 
 

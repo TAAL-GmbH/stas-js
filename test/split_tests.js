@@ -61,7 +61,6 @@ it("Split - Successful Split Into Two Tokens With Fee", async function () {
     console.log("Bob Balance "   + await utils.getTokenBalance(bobAddr))
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
     expect(await utils.getTokenBalance(bobAddr)).to.equal(10000)
-    expect(await utils.areFeesProcessed(splitTxid, 2)).to.be.true
 })
 
 it("Split - Successful Split Into Three Tokens", async function () {
@@ -198,7 +197,6 @@ it("Split - Successful Split Into Two Tokens With No Fee", async function () {
     expect(splitDestinations).to.have.length(noOfTokens) //ensure that tx output contains 2 values
     expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035)
     expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000035)
-    expect(await utils.areFeesProcessed(splitTxid, 2)).to.be.false
 })
 
 //needs fixed
@@ -223,7 +221,6 @@ it("Split - Successful Split Into Two Tokens With No Fee Empty Array", async fun
     expect(splitDestinations).to.have.length(noOfTokens) //ensure that tx output contains 2 values
     expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035)
     expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000035)
-    expect(await utils.areFeesProcessed(splitTxid, 2)).to.be.false
 })
 
 it("Split - Splitting Into Too Many Tokens Throws Error", async function () {

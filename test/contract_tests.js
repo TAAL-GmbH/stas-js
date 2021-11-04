@@ -38,7 +38,6 @@ it('Contract - Successful With Fees', async function () {
   const contractTxid = await broadcast(contractHex)
   let amount = await utils.getVoutAmount(contractTxid, 0)
   expect(amount).to.equal(supply / 100000000)
-  expect(await utils.areFeesProcessed(contractTxid, 1)).to.be.true
 })
 
 it('Contract - Successful No Fees', async function () {
@@ -53,7 +52,6 @@ it('Contract - Successful No Fees', async function () {
   const contractTxid = await broadcast(contractHex)
   let amount = await utils.getVoutAmount(contractTxid, 0)
   expect(amount).to.equal(supply / 100000000)
-  expect(await utils.areFeesProcessed(contractTxid, 1)).to.be.false
 
 })
 
@@ -69,7 +67,6 @@ it('Contract - Successful No Fees Empty Arrays', async function () {
   const contractTxid = await broadcast(contractHex)
   let amount = await utils.getVoutAmount(contractTxid, 0)
   expect(amount).to.equal(supply / 100000000)
-  expect(await utils.areFeesProcessed(contractTxid, 1)).to.be.false
 })
 
 it('Contract - Duplicate Private Keys Throws Error', async function () {

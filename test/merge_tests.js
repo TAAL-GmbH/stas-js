@@ -56,7 +56,6 @@ it("Merge - Successful Merge With Fee", async function () {
     expect(response.issuance_txs).to.contain(issueTxid)
     expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007)
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000) //intermittingly incorrect
-    expect(await utils.areFeesProcessed(mergeTxid, 1)).to.be.true
 })
 
 it("Merge - Successful Merge With Fee 2", async function () {
@@ -77,7 +76,6 @@ it("Merge - Successful Merge With Fee 2", async function () {
     expect(response.issuance_txs).to.contain(issueTxid)
     expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007)
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000) //intermittingly incorrect
-    expect(await utils.areFeesProcessed(mergeTxid, 1)).to.be.true
 })
 
 it("Merge - Merge With No Fee", async function () {
@@ -98,7 +96,6 @@ it("Merge - Merge With No Fee", async function () {
     expect(response.issuance_txs).to.contain(issueTxid)
     expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007)
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000) //intermittingly incorrect
-    expect(await utils.areFeesProcessed(mergeTxid, 1)).to.be.false
 })
 
 it("Merge - Incorrect Owner Private Key Throws Error", async function () {

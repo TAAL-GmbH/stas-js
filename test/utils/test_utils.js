@@ -226,25 +226,6 @@ async function getTokenWithSymbol(tokenId, symbol) {
   return response.data.token
 }
 
-async function areFeesProcessed(txid, vout) {
-
-  const url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/tx/hash/${txid}`
-  const response = await axios({
-    method: 'get',
-    url,
-    auth: {
-      username: process.env.API_USERNAME,
-      password: process.env.API_PASSWORD
-    }
-  })
-
-  if (response.data.vout[vout] != null)
-    return true
-  else
-    return false
-}
-
-
 async function getTokenBalance(address) {
 
   const url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/address/${address}/tokens`
@@ -327,7 +308,6 @@ module.exports = {
   getVoutAmount,
   getToken,
   getTokenResponse,
-  areFeesProcessed,
   getTokenBalance,
   getTenIssueInfo,
   getTokenWithSymbol,

@@ -55,7 +55,6 @@ it('MergeSplit - Successful MergeSplit With Fees', async function () {
   const mergeSplitTxid = await broadcast(mergeSplitHex)
   expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075)
   expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
-  expect(await utils.areFeesProcessed(mergeSplitTxid, 2)).to.be.true
 })
 
 it('MergeSplit - Successful MergeSplit No Fees', async function () {
@@ -78,7 +77,6 @@ it('MergeSplit - Successful MergeSplit No Fees', async function () {
   const mergeSplitTxid = await broadcast(mergeSplitHex)
   expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075)
   expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
-  expect(await utils.areFeesProcessed(mergeSplitTxid, 2)).to.be.false
 })
 
 

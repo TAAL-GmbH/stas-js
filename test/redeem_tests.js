@@ -46,7 +46,6 @@ it('Redeem - Successful Redeem 1', async function () {
   )
   const redeemTxid = await broadcast(redeemHex)
   expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007)
-  expect(await utils.areFeesProcessed(redeemTxid, 1)).to.be.true
   //add token checks
 })
 
@@ -61,7 +60,6 @@ it('Redeem - Successful Redeem 2', async function () {
   )
   const redeemTxid = await broadcast(redeemHex)
   expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00003)
-  expect(await utils.areFeesProcessed(redeemTxid, 1)).to.be.true
   //add token checks
 })
 
@@ -75,7 +73,6 @@ it('Redeem - Successful Redeem No Fee', async function () {
   )
   const redeemTxid = await broadcast(redeemHex)
   expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007) // grab programmatically
-  expect(await utils.areFeesProcessed(redeemTxid, 1)).to.be.false
   //add token checks
 })
 
@@ -90,7 +87,6 @@ it('Redeem - Successful Redeem No Fee Empty Array', async function () {
   )
   const redeemTxid = await broadcast(redeemHex)
   expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.0000075) 
-  expect(await utils.areFeesProcessed(redeemTxid, 1)).to.be.false
 })
 
 it('Redeem - Incorrect Stas UTXO Amount Throws Error', async function () {

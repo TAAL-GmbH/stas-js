@@ -54,7 +54,6 @@ it('Successful RedeemSplit With 2 Split', async function () {
   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000042) // first utxo goes to redemption address
   expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000014)
   expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.000014)
-  expect(await utils.areFeesProcessed(redeemTxid, 3)).to.be.true
   console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
   console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
 })
@@ -83,7 +82,6 @@ it('Successful RedeemSplit With 3 Split', async function () {
   expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000007)
   expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.000007)
   expect(await utils.getVoutAmount(redeemTxid, 3)).to.equal(0.000007)
-  expect(await utils.areFeesProcessed(redeemTxid, 4)).to.be.true
   console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
   console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
   console.log('Dave Balance ' + await utils.getTokenBalance(daveAddr))
@@ -117,7 +115,6 @@ it('Successful RedeemSplit With 4 Split', async function () {
   expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.000028)
   expect(await utils.getVoutAmount(redeemTxid, 3)).to.equal(0.000028)
   expect(await utils.getVoutAmount(redeemTxid, 4)).to.equal(0.000028)
-  expect(await utils.areFeesProcessed(redeemTxid, 5)).to.be.true
   console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
   console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
   console.log('Dave Balance ' + await utils.getTokenBalance(daveAddr))
@@ -144,7 +141,6 @@ it('Successful RedeemSplit With No Fees', async function () {
   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00002334)
   expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.00002333)
   expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.00002333)
-  expect(await utils.areFeesProcessed(redeemTxid, 3)).to.be.false
 })
 
 it("RedeemSplit - No Split Completes Successfully", async function () {
