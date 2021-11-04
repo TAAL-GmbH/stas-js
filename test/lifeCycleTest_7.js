@@ -101,7 +101,7 @@ it('Full Life Cycle Test With Multiple Transfers & Splits', async function () {
   expect(await utils.getTokenBalance(bobAddr)).to.equal(1000)
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(1000)
   expect(await utils.getTokenBalance(daveAddr)).to.equal(1000)
-  expect(await utils.getTokenBalance(emmaAddr)).to.equal(1000) 
+  expect(await utils.getTokenBalance(emmaAddr)).to.equal(1000)
 
   const issueOutFundingVout = issueTx.vout.length - 1
 

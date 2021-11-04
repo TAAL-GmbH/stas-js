@@ -53,7 +53,6 @@ it("Full Life Cycle Test With More Supply", async function () {
   const contractTx = await getTransaction(contractTxid)
   let amount = await utils.getVoutAmount(contractTxid, 0)
   expect(amount).to.equal(supply / 100000000)
-  expect(await utils.areFeesProcessed(contractTxid, 1)).to.be.true
 
   let issueHex
   try {
