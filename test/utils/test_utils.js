@@ -344,7 +344,16 @@ async function getTransactionMainNet (txid) {
   return response.data
 }
 
+async function getTokenBalanceMainNet(address) {
 
+  const url = `https://api.whatsonchain.com/v1/bsv/main/address/${address}/tokens`
+  const response = await axios({
+    method: 'get',
+    url
+  })
+
+  return response.data.tokens[0].balance
+}
 
 module.exports = {
   schema,
@@ -363,5 +372,6 @@ module.exports = {
   countNumOfTokens,
   getAmount,
   broadcastToMainNet,
-  getTransactionMainNet
+  getTransactionMainNet,
+  getTokenBalanceMainNet
 }
