@@ -296,6 +296,53 @@ function byteCount(s) {
   return encodeURI(s).split(/%..|./).length - 1;
 }
 
+async function broadcastToMainNet (tx) {
+  if (Buffer.isBuffer(tx)) {
+    tx = tx.toString('hex')
+  }
+  const url = `https://api.whatsonchain.com/v1/bsv/main/tx/raw?dontcheckfee=true`
+
+  const response = await axios({
+    method: 'post',
+    url,
+    data: {
+      txhex: tx
+    }
+  })
+
+  let txid = response.data
+
+  if (txid[0] === '"') {
+    txid = txid.slice(1)
+  }
+
+  if (txid.slice(-1) === '\n') {
+    txid = txid.slice(0, -1)
+  }
+
+  if (txid.slice(-1) === '"') {
+    txid = txid.slice(0, -1)
+  }
+
+  // Check this is a valid hex string
+  if (!txid.match(/^[0-9a-fA-F]{64}$/)) {
+    throw new Error(`Failed to broadcast: ${txid}`)
+  }
+
+  return txid
+}
+
+
+async function getTransactionMainNet (txid) {
+  const url = `https://api.whatsonchain.com/v1/bsv/main/tx/hash/${txid}`
+
+  const response = await axios({
+    method: 'get',
+    url,
+  })
+
+  return response.data
+}
 
 
 
@@ -314,5 +361,7 @@ module.exports = {
   addData,
   byteCount,
   countNumOfTokens,
-  getAmount
+  getAmount,
+  broadcastToMainNet,
+  getTransactionMainNet
 }
