@@ -245,24 +245,24 @@ async function countNumOfTokens(txid, isThereAFee) {
 
   const url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/tx/hash/${txid}`
   const response = await axios({
-      method: 'get',
-      url,
-      auth: {
-          username: process.env.API_USERNAME,
-          password: process.env.API_PASSWORD
-      }
+    method: 'get',
+    url,
+    auth: {
+      username: process.env.API_USERNAME,
+      password: process.env.API_PASSWORD
+    }
   })
 
   let count = 0
   for (var i = 0; i < response.data.vout.length; i++) {
-      if (response.data.vout[i].value != null) {
-          count++
-      }
+    if (response.data.vout[i].value != null) {
+      count++
+    }
   }
   if (isThereAFee == true) //output decreased by 1 if fees charged
-      return count - 1
+    return count - 1
   else
-      return count
+    return count
 }
 
 async function getAmount(txid, vout) {
@@ -296,7 +296,7 @@ function byteCount(s) {
   return encodeURI(s).split(/%..|./).length - 1;
 }
 
-async function broadcastToMainNet (tx) {
+async function broadcastToMainNet(tx) {
   if (Buffer.isBuffer(tx)) {
     tx = tx.toString('hex')
   }
@@ -333,7 +333,31 @@ async function broadcastToMainNet (tx) {
 }
 
 
-async function getTransactionMainNet (txid) {
+async function broadcastMapi(tx) {
+
+  const url = 'https://mapi.taal.com/mapi/tx';
+  var response;
+  try {
+    response = await
+      axios({
+        headers: {
+          'Authorization': process.env.MAPI_KEY,
+          'Content-Type': 'application/json',
+        },
+        method: 'post',
+        url,
+        data: {
+          rawTx: tx
+        }
+      });
+  } catch (error) {
+    console.log(error);
+  }
+  console.log(response)
+  return response
+}
+
+async function getTransactionMainNet(txid) {
   const url = `https://api.whatsonchain.com/v1/bsv/main/tx/hash/${txid}`
 
   const response = await axios({
@@ -344,16 +368,52 @@ async function getTransactionMainNet (txid) {
   return response.data
 }
 
-async function getTokenBalanceMainNet(address) {
+async function getTokenBalanceMainNet(address, symbolIn) {
 
   const url = `https://api.whatsonchain.com/v1/bsv/main/address/${address}/tokens`
   const response = await axios({
     method: 'get',
     url
   })
+  const result = response.data.tokens.find( ({ symbol }) => symbol === `${symbolIn}` )
+  return result.balance
 
-  return response.data.tokens[0].balance
 }
+
+
+
+async function getTokenMainNet(txid) {
+
+  const url = `https://api.whatsonchain.com/v1/bsv/main/tx/hash/${txid}`
+  const response = await axios({
+    method: 'get',
+    url
+  })
+
+  const temp = response.data.vout[0].scriptPubKey.asm
+  const split = temp.split('OP_RETURN')[1]
+  const tokenId = split.split(' ')[1]
+  return tokenId
+}
+
+async function getTokenResponseMainNet(tokenId, symbol) {
+
+  let response
+  try {
+    const url = `https://api.whatsonchain.com/v1/bsv/main/token/${tokenId}/${symbol}`
+    response = await axios({
+      method: 'get',
+      url
+    })
+  } catch (e) {
+    console.log("Token Not Found: " + e)
+    return
+  }
+  return response.data.token
+}
+
+
+
 
 module.exports = {
   schema,
@@ -373,5 +433,8 @@ module.exports = {
   getAmount,
   broadcastToMainNet,
   getTransactionMainNet,
-  getTokenBalanceMainNet
+  getTokenBalanceMainNet,
+  broadcastMapi,
+  getTokenMainNet,
+  getTokenResponseMainNet
 }

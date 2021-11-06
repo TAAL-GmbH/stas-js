@@ -20,7 +20,7 @@ const {
 
 it('Mainnet LifeCycle Test 1', async function () {
 
-  const wait = 10000 //set wait before token balance check
+  const wait = 0 //set wait before token balance check
 
   const aliceWif = process.env.ALICEWIF //the issuer of the contract and pays fees
   const bobWif = process.env.BOBWIF
@@ -105,6 +105,7 @@ it('Mainnet LifeCycle Test 1', async function () {
   const contractTxid = await utils.broadcastToMainNet(contractHex)
   console.log(`Contract TX:     ${contractTxid}`)
   const contractTx = await utils.getTransactionMainNet(contractTxid)
+  
 
   await new Promise(r => setTimeout(r, wait));
 
@@ -149,7 +150,10 @@ it('Mainnet LifeCycle Test 1', async function () {
   const issueTxid = await utils.broadcastToMainNet(issueHex)
   console.log(`Issue TX:        ${issueTxid}`)
   const issueTx = await utils.getTransactionMainNet(issueTxid)
-
+  const tokenId = await utils.getTokenMainNet(issueTxid)
+  console.log(`Token ID:        ${tokenId}`)
+  const response = await utils.getTokenResponseMainNet(tokenId, symbol) 
+  expect(response.symbol).to.equal(symbol)
 
   await new Promise(r => setTimeout(r, wait));
 
