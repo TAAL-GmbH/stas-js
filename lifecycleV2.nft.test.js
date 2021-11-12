@@ -14,7 +14,6 @@ const {
   broadcast
 } = require('./index').utils
 
-
 ;(async () => {
   const issuerPrivateKey = bsv.PrivateKey()
   const fundingPrivateKey = bsv.PrivateKey()
