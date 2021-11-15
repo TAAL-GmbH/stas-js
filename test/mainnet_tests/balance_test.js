@@ -10,7 +10,7 @@ it('Balance Test', async function () {
     const privateKey1 = bsv.PrivateKey()
     const addr1 = privateKey1.toAddress('mainnet').toString()
 
-    const privateKey2 = bsv.PrivateKey()
+    const privateKey2   = bsv.PrivateKey()
     const addr2 = privateKey2.toAddress('mainnet').toString()
 
     const privateKey3 = bsv.PrivateKey()

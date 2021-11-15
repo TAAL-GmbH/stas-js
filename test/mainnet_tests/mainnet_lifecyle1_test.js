@@ -20,32 +20,34 @@ const {
 
 it('Mainnet LifeCycle Test 1', async function () {
 
-  const wait = 0 //set wait before token balance check
+  // per-run modifiable values
+  const inputUtxoid = '9a739198b2f3a890932024a77c6f3f67c409ba2aa74c3f36778dc613954bfa2d' // the input utxo
+  const inputUtxoidFee = 'b4cfcfacbaa4801e0f067d72e4ccd4e4cdce5c4097475652be9719093e5b3d82' // the fee utxo
+  const symbol = 'PIERO-1' // Use a unique symbol every test run to ensure that token balances can be checked correctly
 
-  const aliceWif = process.env.ALICEWIF //the issuer of the contract and pays fees
+
+  const supply = 10000
+
+  const wait = 1000 // set wait before token balance check
+
+  const aliceWif = process.env.ALICEWIF // the issuer of the contract and pays fees
   const bobWif = process.env.BOBWIF
   const emmaWif = process.env.EMMAWIF
+
 
   const alicePrivateKey = bsv.PrivateKey.fromWIF(aliceWif)
   const bobprivateKey = bsv.PrivateKey.fromWIF(bobWif)
   const emmaPrivateKey = bsv.PrivateKey.fromWIF(emmaWif)
 
-  const aliceAddr = alicePrivateKey.toAddress('mainnet').toString()
   const bobAddr = bobprivateKey.toAddress('mainnet').toString()
-  const emmaAddr = emmaPrivateKey.toAddress('mainnet').toString()
-
   console.log("Bob Address " + bobAddr)
+  const emmaAddr = emmaPrivateKey.toAddress('mainnet').toString()
   console.log("Emma Address " + emmaAddr)
 
-  const inputUtxoid = '' // the input utxo 
   const inputUtxo = await utils.getTransactionMainNet(inputUtxoid)
-
-  const inputUtxoidFee = '' // the fee utxo 
   const inputUtxoFee = await utils.getTransactionMainNet(inputUtxoidFee)
 
   const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(alicePrivateKey.publicKey.toBuffer()).toString('hex')
-  const supply = 10000
-  const symbol = ''  // Use a unique symbol every test run to ensure that token balances can be checked correctly
 
   const schema = {
     name: 'Taal Token',
@@ -93,9 +95,9 @@ it('Mainnet LifeCycle Test 1', async function () {
     }],
     [{
       txid: inputUtxoidFee,
-      vout: 1,
-      scriptPubKey: inputUtxoFee.vout[1].scriptPubKey.hex,
-      amount: inputUtxoFee.vout[1].value
+      vout: 0,
+      scriptPubKey: inputUtxoFee.vout[0].scriptPubKey.hex,
+      amount: inputUtxoFee.vout[0].value
     }],
     alicePrivateKey,
     schema,
@@ -105,9 +107,9 @@ it('Mainnet LifeCycle Test 1', async function () {
   const contractTxid = await utils.broadcastToMainNet(contractHex)
   console.log(`Contract TX:     ${contractTxid}`)
   const contractTx = await utils.getTransactionMainNet(contractTxid)
-  
 
-  await new Promise(r => setTimeout(r, wait));
+  // eslint-disable-next-line promise/param-names
+  await new Promise(r => setTimeout(r, wait))
 
   const issueInfo = [
     {
@@ -152,10 +154,11 @@ it('Mainnet LifeCycle Test 1', async function () {
   const issueTx = await utils.getTransactionMainNet(issueTxid)
   const tokenId = await utils.getTokenMainNet(issueTxid)
   console.log(`Token ID:        ${tokenId}`)
-  const response = await utils.getTokenResponseMainNet(tokenId, symbol) 
+  const response = await utils.getTokenResponseMainNet(tokenId, symbol)
   expect(response.symbol).to.equal(symbol)
 
-  await new Promise(r => setTimeout(r, wait));
+  // eslint-disable-next-line promise/param-names
+  await new Promise(r => setTimeout(r, wait))
 
   // expect(await utils.getTokenBalanceMainNet(bobAddr)).to.contain(6000)
   // expect(await utils.getTokenBalanceMainNet(emmaAddr)).to.contain(4000)
