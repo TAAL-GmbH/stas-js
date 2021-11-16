@@ -21,21 +21,25 @@ const {
 it('Mainnet LifeCycle Test 1', async function () {
 
   // per-run modifiable values
-  const inputUtxoid = '9a739198b2f3a890932024a77c6f3f67c409ba2aa74c3f36778dc613954bfa2d' // the input utxo
-  const inputUtxoidFee = 'b4cfcfacbaa4801e0f067d72e4ccd4e4cdce5c4097475652be9719093e5b3d82' // the fee utxo
-  const symbol = 'PIERO-1' // Use a unique symbol every test run to ensure that token balances can be checked correctly
+  const inputUtxoid = 'd44ecca3945ed34602ce7e4032c034609de082f52b141d9de7a3fa7c2ea44acc' // the input utxo
+  const inputUtxoIdVoutIndex = 0
+  const inputUtxoidFee = 'f245666caf5a15c43c14c57a0d26fff2082445534cdd50ef769610b9f22534b4' // the fee utxo
+  const inputUtxoIdFeeVoutIndex = 2
+  const symbol = 'PIERO-2' // Use a unique symbol every test run to ensure that token balances can be checked correctly
 
 
   const supply = 10000
+  const bobsInitialSathoshis = 6000
+  const emmasInitialSatoshis = supply - bobsInitialSathoshis
 
   const wait = 1000 // set wait before token balance check
 
-  const aliceWif = process.env.ALICEWIF // the issuer of the contract and pays fees
+  const issuerWif = process.env.ALICEWIF // the issuer of the contract and pays fees
   const bobWif = process.env.BOBWIF
   const emmaWif = process.env.EMMAWIF
 
 
-  const alicePrivateKey = bsv.PrivateKey.fromWIF(aliceWif)
+  const issuerPrivateKey = bsv.PrivateKey.fromWIF(issuerWif)
   const bobprivateKey = bsv.PrivateKey.fromWIF(bobWif)
   const emmaPrivateKey = bsv.PrivateKey.fromWIF(emmaWif)
 
@@ -47,7 +51,7 @@ it('Mainnet LifeCycle Test 1', async function () {
   const inputUtxo = await utils.getTransactionMainNet(inputUtxoid)
   const inputUtxoFee = await utils.getTransactionMainNet(inputUtxoidFee)
 
-  const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(alicePrivateKey.publicKey.toBuffer()).toString('hex')
+  const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
 
   const schema = {
     name: 'Taal Token',
@@ -86,20 +90,20 @@ it('Mainnet LifeCycle Test 1', async function () {
     }
   }
   const contractHex = contract(
-    alicePrivateKey,
+    issuerPrivateKey,
     [{
       txid: inputUtxoid,
       vout: 0,
-      scriptPubKey: inputUtxo.vout[0].scriptPubKey.hex,
-      amount: inputUtxo.vout[0].value
+      scriptPubKey: inputUtxo.vout[inputUtxoIdVoutIndex].scriptPubKey.hex,
+      amount: inputUtxo.vout[inputUtxoIdVoutIndex].value
     }],
     [{
       txid: inputUtxoidFee,
       vout: 0,
-      scriptPubKey: inputUtxoFee.vout[0].scriptPubKey.hex,
-      amount: inputUtxoFee.vout[0].value
+      scriptPubKey: inputUtxoFee.vout[inputUtxoIdFeeVoutIndex].scriptPubKey.hex,
+      amount: inputUtxoFee.vout[inputUtxoIdFeeVoutIndex].value
     }],
-    alicePrivateKey,
+    issuerPrivateKey,
     schema,
     supply
   )
@@ -114,19 +118,19 @@ it('Mainnet LifeCycle Test 1', async function () {
   const issueInfo = [
     {
       addr: bobAddr,
-      satoshis: 6000,
+      satoshis: bobsInitialSathoshis,
       data: 'sent to bob'
     },
     {
       addr: emmaAddr,
-      satoshis: 4000,
+      satoshis: emmasInitialSatoshis,
       data: 'sent to emma'
     }
   ]
   let issueHex
   try {
     issueHex = issue(
-      alicePrivateKey,
+      issuerPrivateKey,
       issueInfo,
       {
         txid: contractTxid,
@@ -140,7 +144,7 @@ it('Mainnet LifeCycle Test 1', async function () {
         scriptPubKey: contractTx.vout[1].scriptPubKey.hex,
         amount: contractTx.vout[1].value
       },
-      alicePrivateKey,
+      issuerPrivateKey,
       true, // isSplittable
       symbol,
       2 // STAS version
@@ -170,7 +174,7 @@ it('Mainnet LifeCycle Test 1', async function () {
 
   const transferHex = transfer(
     bobprivateKey,
-    alicePrivateKey.publicKey,
+    issuerPrivateKey.publicKey,
     {
       txid: issueTxid,
       vout: 0,
@@ -184,7 +188,7 @@ it('Mainnet LifeCycle Test 1', async function () {
       scriptPubKey: issueTx.vout[issueOutFundingVout].scriptPubKey.hex,
       amount: issueTx.vout[issueOutFundingVout].value
     },
-    alicePrivateKey
+    issuerPrivateKey
   )
   const transferTxid = await utils.broadcastToMainNet(transferHex)
   console.log(`Transfer TX:     ${transferTxid}`)
@@ -204,7 +208,7 @@ it('Mainnet LifeCycle Test 1', async function () {
 
   const splitHex = split(
     emmaPrivateKey,
-    alicePrivateKey.publicKey,
+    issuerPrivateKey.publicKey,
     {
       txid: transferTxid,
       vout: 0,
@@ -218,7 +222,7 @@ it('Mainnet LifeCycle Test 1', async function () {
       scriptPubKey: transferTx.vout[1].scriptPubKey.hex,
       amount: transferTx.vout[1].value
     },
-    alicePrivateKey
+    issuerPrivateKey
   )
   const splitTxid = await utils.broadcastToMainNet(splitHex)
   console.log(`Split TX:        ${splitTxid}`)
@@ -235,7 +239,7 @@ it('Mainnet LifeCycle Test 1', async function () {
 
   const mergeHex = merge(
     bobprivateKey,
-    alicePrivateKey.publicKey,
+    issuerPrivateKey.publicKey,
     [{
       tx: splitTxObj,
       vout: 0
@@ -251,7 +255,7 @@ it('Mainnet LifeCycle Test 1', async function () {
       scriptPubKey: splitTx.vout[2].scriptPubKey.hex,
       amount: splitTx.vout[2].value
     },
-    alicePrivateKey
+    issuerPrivateKey
   )
 
   const mergeTxid = await utils.broadcastToMainNet(mergeHex)
@@ -271,7 +275,7 @@ it('Mainnet LifeCycle Test 1', async function () {
 
   const splitHex2 = split(
     emmaPrivateKey,
-    alicePrivateKey.publicKey,
+    issuerPrivateKey.publicKey,
     {
       txid: mergeTxid,
       vout: 0,
@@ -285,7 +289,7 @@ it('Mainnet LifeCycle Test 1', async function () {
       scriptPubKey: mergeTx.vout[1].scriptPubKey.hex,
       amount: mergeTx.vout[1].value
     },
-    alicePrivateKey
+    issuerPrivateKey
   )
   const splitTxid2 = await utils.broadcastToMainNet(splitHex2)
   console.log(`Split TX2:       ${splitTxid2}`)
@@ -304,7 +308,7 @@ it('Mainnet LifeCycle Test 1', async function () {
 
   const mergeSplitHex = mergeSplit(
     bobprivateKey,
-    alicePrivateKey.publicKey,
+    issuerPrivateKey.publicKey,
     [{
       tx: splitTxObj2,
       scriptPubKey: splitTx2.vout[0].scriptPubKey.hex,
@@ -328,7 +332,7 @@ it('Mainnet LifeCycle Test 1', async function () {
       scriptPubKey: splitTx2.vout[2].scriptPubKey.hex,
       amount: splitTx2.vout[2].value
     },
-    alicePrivateKey
+    issuerPrivateKey
   )
   const mergeSplitTxid = await utils.broadcastToMainNet(mergeSplitHex)
   console.log(`MergeSplit TX:   ${mergeSplitTxid}`)
@@ -342,7 +346,7 @@ it('Mainnet LifeCycle Test 1', async function () {
 
   const redeemHex = redeem(
     bobprivateKey,
-    alicePrivateKey.publicKey,
+    issuerPrivateKey.publicKey,
     {
       txid: mergeSplitTxid,
       vout: 0,
@@ -355,7 +359,7 @@ it('Mainnet LifeCycle Test 1', async function () {
       scriptPubKey: mergeSplitTx.vout[2].scriptPubKey.hex,
       amount: mergeSplitTx.vout[2].value
     },
-    alicePrivateKey
+    issuerPrivateKey
   )
   const redeemTxid = await utils.broadcastToMainNet(redeemHex)
   console.log(`Redeem TX:       ${redeemTxid}`)
