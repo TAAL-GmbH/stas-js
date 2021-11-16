@@ -17,17 +17,14 @@ const {
   SATS_PER_BITCOIN
 } = require('../../index').utils
 
-var crypto = require('crypto')
-
 // eslint-disable-next-line no-undef
 it('Mainnet LifeCycle Test 1', async function () {
-
   // per-run modifiable values
-  const inputUtxoid = 'b80cbe72c920540e392b7c356de3494b204c95d9d4ff02375122934a433de24d' // the input utxo
+  const inputUtxoid = '25f7dd7474fbbce1a853a9319754cd7a688cbbc52b80cf8b971fe5f5f678418a' // the input utxo
   const inputUtxoIdVoutIndex = 2
-  const inputUtxoidFee = '211f5416b98219219aaeb6b93dec89310c3f01ebabbc06f7720f339ee889cf80' // the fee utxo
-  const inputUtxoIdFeeVoutIndex = 2
-  var symbol = crypto.randomBytes(5).toString('hex') // Use a unique symbol every test run to ensure that token balances can be checked correctly
+  const inputUtxoidFee = '3a9b52ee25f8d7bc771b5eeb80ce4bcc60b54204a476a2aae5c9b0308af57ab2' // the fee utxo
+  const inputUtxoIdFeeVoutIndex = 1
+  const symbol = 'piero-12' // Use a unique symbol every test run to ensure that token balances can be checked correctly
 
   console.log('token symbol:', symbol)
 
@@ -162,6 +159,7 @@ it('Mainnet LifeCycle Test 1', async function () {
   const issueTx = await utils.getTransactionMainNet(issueTxid)
   const tokenId = await utils.getTokenMainNet(issueTxid)
   console.log(`Token ID:        ${tokenId}`)
+
   const response = await utils.getTokenResponseMainNet(tokenId, symbol)
   expect(response.symbol).to.equal(symbol)
 
