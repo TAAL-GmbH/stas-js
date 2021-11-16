@@ -17,15 +17,19 @@ const {
   SATS_PER_BITCOIN
 } = require('../../index').utils
 
+var crypto = require('crypto')
+
 // eslint-disable-next-line no-undef
 it('Mainnet LifeCycle Test 1', async function () {
 
   // per-run modifiable values
-  const inputUtxoid = 'c1f9933c11f4fb46dcf7e8bba4842a07d12863ce1107bdd85cca18ab195f178d' // the input utxo
-  const inputUtxoIdVoutIndex = 1
-  const inputUtxoidFee = '16b66bfff8630b4bfc2edb865f409768a4b4ba3cc2089f03174c77f1f656d16b' // the fee utxo
-  const inputUtxoIdFeeVoutIndex = 0
-  const symbol = 'PIERO-3' // Use a unique symbol every test run to ensure that token balances can be checked correctly
+  const inputUtxoid = 'b80cbe72c920540e392b7c356de3494b204c95d9d4ff02375122934a433de24d' // the input utxo
+  const inputUtxoIdVoutIndex = 2
+  const inputUtxoidFee = '211f5416b98219219aaeb6b93dec89310c3f01ebabbc06f7720f339ee889cf80' // the fee utxo
+  const inputUtxoIdFeeVoutIndex = 2
+  var symbol = crypto.randomBytes(5).toString('hex') // Use a unique symbol every test run to ensure that token balances can be checked correctly
+
+  console.log('token symbol:', symbol)
 
   const supply = 10000
   const bobsInitialSathoshis = 6000
