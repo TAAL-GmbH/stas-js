@@ -38,10 +38,11 @@ beforeEach(async function () {
 it("Transfer - Successful With Fee 1", async function () {
 
   const issueOutFundingVout = issueTx.vout.length - 1
+  const incorrectPK = bsv.PrivateKey()
 
   const transferHex = transfer(
     bobPrivateKey,
-    issuerPrivateKey.publicKey,
+    incorrectPK.publicKey,
     utils.getUtxo(issueTxid, issueTx, 1),
     aliceAddr,
     utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
@@ -65,7 +66,7 @@ it("Transfer - Successful With Fee 2", async function () {
     alicePrivateKey,
     issuerPrivateKey.publicKey,
     utils.getUtxo(issueTxid, issueTx, 0),
-    aliceAddr,
+    bobAddr,
     utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
     fundingPrivateKey
   )
@@ -74,8 +75,10 @@ it("Transfer - Successful With Fee 2", async function () {
   let response = await utils.getTokenResponse(tokenId)
   expect(response.symbol).to.equal(symbol)
   expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00007)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
+  console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
+  console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(10000)
 })
 
 it("Transfer - Successful With Fee 3", async function () {
@@ -120,8 +123,8 @@ it("Transfer - Successful With Fee 4", async function () {
   let response = await utils.getTokenResponse(tokenId)
   expect(response.symbol).to.equal(symbol)
   expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(6000)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(4000)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
 })
 
 
@@ -206,11 +209,12 @@ it("Transfer -  Invalid Contract Public Key Throws Error", async function () {
   )
   try {
     await broadcast(transferHex)
+    console.log(transferHex)
     assert(false)
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.response.data).to.contain('mandatory-script-verify-flag-failed')
+    expect(e.message).to.contain('mandatory-script-verify-flag-failed')
   }
 })
 

@@ -83,7 +83,7 @@ it('Issue - Successful Issue Token With Split And Fee 2', async function () {
   expect(response.symbol).to.equal(symbol)
   expect(response.contract_txs).to.contain(contractTxid)
   expect(response.issuance_txs).to.contain(issueTxid)
-  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00001)
+  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.0001)
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
 })
 
@@ -205,8 +205,8 @@ it('Issue - Successful Issue Token To Same Address', async function () {
   expect(response.symbol).to.equal(symbol)
   expect(response.contract_txs).to.contain(contractTxid)
   expect(response.issuance_txs).to.contain(issueTxid)
-  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00006)
-  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00004)
+  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
+  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
 })
 
