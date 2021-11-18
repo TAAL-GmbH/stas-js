@@ -40,6 +40,8 @@ it("Split - Successful Split Into Two Tokens With Fee", async function () {
 
     const bobAmount1 = issueTx.vout[0].value / 2
     const bobAmount2 = issueTx.vout[0].value - bobAmount1
+    console.log(bobAmount1)
+    console.log(bobAmount2)
     const splitDestinations = []
     splitDestinations[0] = { address: bobAddr, amount: bobAmount1 } //3500 tokens
     splitDestinations[1] = { address: bobAddr, amount: bobAmount2 } //3500 tokens
@@ -60,9 +62,8 @@ it("Split - Successful Split Into Two Tokens With Fee", async function () {
     console.log("Alice Balance "   + await utils.getTokenBalance(aliceAddr))
     console.log("Bob Balance "   + await utils.getTokenBalance(bobAddr))
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
-    expect(await utils.getTokenBalance(bobAddr)).to.equal(10000)
+    expect(await utils.getTokenBalance(bobAddr)).to.equal(7500)
 })
-
 it("Split - Successful Split Into Three Tokens", async function () {
 
     const bobAmount = issueTx.vout[0].value / 2
@@ -627,6 +628,8 @@ async function setup() {
     )
     issueTxid = await broadcast(issueHex)
     issueTx = await getTransaction(issueTxid)
+    console.log("Alice Balance "   + await utils.getTokenBalance(aliceAddr))
+    console.log("Bob Balance "   + await utils.getTokenBalance(bobAddr))
 }
 
 
