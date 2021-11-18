@@ -47,8 +47,8 @@ it("Transfer - Successful With Fee 1", async function () {
     utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
     fundingPrivateKey
   )
+  console.log()
   const transferTxid = await broadcast(transferHex)
-  console.log(transferTxid)
   const tokenId = await utils.getToken(transferTxid)
   let response = await utils.getTokenResponse(tokenId)
   expect(response.symbol).to.equal(symbol)
@@ -74,8 +74,8 @@ it("Transfer - Successful With Fee 2", async function () {
   let response = await utils.getTokenResponse(tokenId)
   expect(response.symbol).to.equal(symbol)
   expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00007)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(4000)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(6000)
 })
 
 it("Transfer - Successful With Fee 3", async function () {
@@ -423,7 +423,7 @@ async function setup() {
   contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
   fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
   publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
-  symbol = 'TAALT'
+  symbol = 'CHANGED_TOKEN'
   supply = 10000
   schema = utils.schema(publicKeyHash, symbol, supply)
   aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()

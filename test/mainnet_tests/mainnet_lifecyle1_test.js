@@ -17,35 +17,42 @@ const {
   SATS_PER_BITCOIN
 } = require('../../index').utils
 
-
+// eslint-disable-next-line no-undef
 it('Mainnet LifeCycle Test 1', async function () {
 
-  const wait = 0 //set wait before token balance check
 
-  const aliceWif = process.env.ALICEWIF //the issuer of the contract and pays fees
+  // per-run modifiable values
+  const inputUtxoid = '327afa6665a2c314508e5b9a86efa873b019bc87607c89bbf8e216aa74dd1da2' // the input utxo
+  const inputUtxoIdVoutIndex = 0
+  const inputUtxoidFee = '327afa6665a2c314508e5b9a86efa873b019bc87607c89bbf8e216aa74dd1da2' // the fee utxo
+  const inputUtxoIdFeeVoutIndex = 1
+  const symbol = 'PIERO-15' // Use a unique symbol every test run to ensure that token balances can be checked correctly
+
+  console.log('token symbol:', symbol)
+
+  const supply = 10000
+  const bobsInitialSathoshis = 6000
+  const emmasInitialSatoshis = supply - bobsInitialSathoshis
+
+  const wait = 1000 // set wait before token balance check
+
+  const issuerWif = process.env.ALICEWIF // the issuer of the contract and pays fees
   const bobWif = process.env.BOBWIF
   const emmaWif = process.env.EMMAWIF
 
-  const alicePrivateKey = bsv.PrivateKey.fromWIF(aliceWif)
-  const bobprivateKey = bsv.PrivateKey.fromWIF(bobWif)
-  const emmaPrivateKey = bsv.PrivateKey.fromWIF(emmaWif)
+  const issuerPrivateKey = bsv.PrivateKey.fromWIF(issuerWif)
+  const bobsPrivateKey = bsv.PrivateKey.fromWIF(bobWif)
+  const emmasPrivateKey = bsv.PrivateKey.fromWIF(emmaWif)
 
-  const aliceAddr = alicePrivateKey.toAddress('mainnet').toString()
-  const bobAddr = bobprivateKey.toAddress('mainnet').toString()
-  const emmaAddr = emmaPrivateKey.toAddress('mainnet').toString()
+  const bobAddr = bobsPrivateKey.toAddress('mainnet').toString()
+  const emmaAddr = emmasPrivateKey.toAddress('mainnet').toString()
+  console.log('Bob Address ' + bobAddr)
+  console.log('Emma Address ' + emmaAddr)
 
-  console.log("Bob Address " + bobAddr)
-  console.log("Emma Address " + emmaAddr)
-
-  const inputUtxoid = '' // the input utxo 
   const inputUtxo = await utils.getTransactionMainNet(inputUtxoid)
-
-  const inputUtxoidFee = '' // the fee utxo 
   const inputUtxoFee = await utils.getTransactionMainNet(inputUtxoidFee)
 
-  const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(alicePrivateKey.publicKey.toBuffer()).toString('hex')
-  const supply = 10000
-  const symbol = ''  // Use a unique symbol every test run to ensure that token balances can be checked correctly
+  const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
 
   const schema = {
     name: 'Taal Token',
@@ -84,20 +91,20 @@ it('Mainnet LifeCycle Test 1', async function () {
     }
   }
   const contractHex = contract(
-    alicePrivateKey,
+    issuerPrivateKey,
     [{
       txid: inputUtxoid,
-      vout: 0,
-      scriptPubKey: inputUtxo.vout[0].scriptPubKey.hex,
-      amount: inputUtxo.vout[0].value
+      vout: inputUtxoIdVoutIndex,
+      scriptPubKey: inputUtxo.vout[inputUtxoIdVoutIndex].scriptPubKey.hex,
+      amount: inputUtxo.vout[inputUtxoIdVoutIndex].value
     }],
     [{
       txid: inputUtxoidFee,
-      vout: 1,
-      scriptPubKey: inputUtxoFee.vout[1].scriptPubKey.hex,
-      amount: inputUtxoFee.vout[1].value
+      vout: inputUtxoIdFeeVoutIndex,
+      scriptPubKey: inputUtxoFee.vout[inputUtxoIdFeeVoutIndex].scriptPubKey.hex,
+      amount: inputUtxoFee.vout[inputUtxoIdFeeVoutIndex].value
     }],
-    alicePrivateKey,
+    issuerPrivateKey,
     schema,
     supply
   )
@@ -105,26 +112,27 @@ it('Mainnet LifeCycle Test 1', async function () {
   const contractTxid = await utils.broadcastToMainNet(contractHex)
   console.log(`Contract TX:     ${contractTxid}`)
   const contractTx = await utils.getTransactionMainNet(contractTxid)
-  
 
-  await new Promise(r => setTimeout(r, wait));
+  // eslint-disable-next-line promise/param-names
+  await new Promise(r => setTimeout(r, wait))
 
   const issueInfo = [
     {
       addr: bobAddr,
-      satoshis: 6000,
+      satoshis: bobsInitialSathoshis,
       data: 'sent to bob'
     },
     {
       addr: emmaAddr,
-      satoshis: 4000,
+      satoshis: emmasInitialSatoshis,
       data: 'sent to emma'
     }
   ]
+
   let issueHex
   try {
     issueHex = issue(
-      alicePrivateKey,
+      issuerPrivateKey,
       issueInfo,
       {
         txid: contractTxid,
@@ -138,7 +146,7 @@ it('Mainnet LifeCycle Test 1', async function () {
         scriptPubKey: contractTx.vout[1].scriptPubKey.hex,
         amount: contractTx.vout[1].value
       },
-      alicePrivateKey,
+      issuerPrivateKey,
       true, // isSplittable
       symbol,
       2 // STAS version
@@ -147,27 +155,29 @@ it('Mainnet LifeCycle Test 1', async function () {
     console.log('error issuing token', e)
     return
   }
+
   const issueTxid = await utils.broadcastToMainNet(issueHex)
   console.log(`Issue TX:        ${issueTxid}`)
   const issueTx = await utils.getTransactionMainNet(issueTxid)
   const tokenId = await utils.getTokenMainNet(issueTxid)
   console.log(`Token ID:        ${tokenId}`)
-  const response = await utils.getTokenResponseMainNet(tokenId, symbol) 
+
+  const response = await utils.getTokenResponseMainNet(tokenId, symbol)
   expect(response.symbol).to.equal(symbol)
 
-  await new Promise(r => setTimeout(r, wait));
+  // eslint-disable-next-line promise/param-names
+  await new Promise(r => setTimeout(r, wait))
 
   // expect(await utils.getTokenBalanceMainNet(bobAddr)).to.contain(6000)
   // expect(await utils.getTokenBalanceMainNet(emmaAddr)).to.contain(4000)
-  console.log("Bob Balance  " + await utils.getTokenBalanceMainNet(bobAddr, symbol))
-  console.log("Emma Balance  " + await utils.getTokenBalanceMainNet(emmaAddr, symbol))
-
+  console.log('Bob Balance  ' + await utils.getTokenBalanceMainNet(bobAddr, symbol))
+  console.log('Emma Balance  ' + await utils.getTokenBalanceMainNet(emmaAddr, symbol))
 
   const issueOutFundingVout = issueTx.vout.length - 1
 
   const transferHex = transfer(
-    bobprivateKey,
-    alicePrivateKey.publicKey,
+    bobsPrivateKey,
+    issuerPrivateKey.publicKey,
     {
       txid: issueTxid,
       vout: 0,
@@ -181,16 +191,16 @@ it('Mainnet LifeCycle Test 1', async function () {
       scriptPubKey: issueTx.vout[issueOutFundingVout].scriptPubKey.hex,
       amount: issueTx.vout[issueOutFundingVout].value
     },
-    alicePrivateKey
+    issuerPrivateKey
   )
   const transferTxid = await utils.broadcastToMainNet(transferHex)
   console.log(`Transfer TX:     ${transferTxid}`)
   const transferTx = await utils.getTransactionMainNet(transferTxid)
 
-  await new Promise(r => setTimeout(r, wait));
+  await new Promise(r => setTimeout(r, wait))
   // expect(await utils.getTokenBalanceMainNet(emmaAddr)).to.contain(10000)
-  console.log("Bob Balance  " + await utils.getTokenBalanceMainNet(bobAddr, symbol))
-  console.log("Emma Balance  " + await utils.getTokenBalanceMainNet(emmaAddr, symbol))
+  console.log('Bob Balance  ' + await utils.getTokenBalanceMainNet(bobAddr, symbol))
+  console.log('Emma Balance  ' + await utils.getTokenBalanceMainNet(emmaAddr, symbol))
 
   // Split tokens into 2 - both payable to Bob...
   const bobAmount1 = transferTx.vout[0].value / 2
@@ -200,8 +210,8 @@ it('Mainnet LifeCycle Test 1', async function () {
   splitDestinations[1] = { address: bobAddr, amount: bobAmount1 }
 
   const splitHex = split(
-    emmaPrivateKey,
-    alicePrivateKey.publicKey,
+    emmasPrivateKey,
+    issuerPrivateKey.publicKey,
     {
       txid: transferTxid,
       vout: 0,
@@ -215,32 +225,32 @@ it('Mainnet LifeCycle Test 1', async function () {
       scriptPubKey: transferTx.vout[1].scriptPubKey.hex,
       amount: transferTx.vout[1].value
     },
-    alicePrivateKey
+    issuerPrivateKey
   )
   const splitTxid = await utils.broadcastToMainNet(splitHex)
   console.log(`Split TX:        ${splitTxid}`)
   const splitTx = await utils.getTransactionMainNet(splitTxid)
-  await new Promise(r => setTimeout(r, wait));
+  await new Promise(r => setTimeout(r, wait))
 
   // expect(await utils.getTokenBalanceMainNet(bobAddr)).to.contain(0)
   // expect(await utils.getTokenBalanceMainNet(emmaAddr)).to.contain(10000)
-  console.log("Bob Balance  " + await utils.getTokenBalanceMainNet(bobAddr, symbol))
-  console.log("Emma Balance  " + await utils.getTokenBalanceMainNet(emmaAddr, symbol))
+  console.log('Bob Balance  ' + await utils.getTokenBalanceMainNet(bobAddr, symbol))
+  console.log('Emma Balance  ' + await utils.getTokenBalanceMainNet(emmaAddr, symbol))
 
   // Now let's merge the last split back together
   const splitTxObj = new bsv.Transaction(splitHex)
 
   const mergeHex = merge(
-    bobprivateKey,
-    alicePrivateKey.publicKey,
+    bobsPrivateKey,
+    issuerPrivateKey.publicKey,
     [{
       tx: splitTxObj,
       vout: 0
     },
-    {
-      tx: splitTxObj,
-      vout: 1
-    }],
+      {
+        tx: splitTxObj,
+        vout: 1
+      }],
     emmaAddr,
     {
       txid: splitTxid,
@@ -248,16 +258,16 @@ it('Mainnet LifeCycle Test 1', async function () {
       scriptPubKey: splitTx.vout[2].scriptPubKey.hex,
       amount: splitTx.vout[2].value
     },
-    alicePrivateKey
+    issuerPrivateKey
   )
 
   const mergeTxid = await utils.broadcastToMainNet(mergeHex)
   console.log(`Merge TX:        ${mergeTxid}`)
   const mergeTx = await utils.getTransactionMainNet(mergeTxid)
 
-   await new Promise(r => setTimeout(r, wait));
-  console.log("Bob Balance  " + await utils.getTokenBalanceMainNet(bobAddr, symbol))
-  console.log("Emma Balance  " + await utils.getTokenBalanceMainNet(emmaAddr, symbol))
+  await new Promise(r => setTimeout(r, wait))
+  console.log('Bob Balance  ' + await utils.getTokenBalanceMainNet(bobAddr, symbol))
+  console.log('Emma Balance  ' + await utils.getTokenBalanceMainNet(emmaAddr, symbol))
 
   // Split again - both payable to Bob...
   const amount = mergeTx.vout[0].value / 2
@@ -267,8 +277,8 @@ it('Mainnet LifeCycle Test 1', async function () {
   split2Destinations[1] = { address: bobAddr, amount: amount }
 
   const splitHex2 = split(
-    emmaPrivateKey,
-    alicePrivateKey.publicKey,
+    emmasPrivateKey,
+    issuerPrivateKey.publicKey,
     {
       txid: mergeTxid,
       vout: 0,
@@ -282,16 +292,16 @@ it('Mainnet LifeCycle Test 1', async function () {
       scriptPubKey: mergeTx.vout[1].scriptPubKey.hex,
       amount: mergeTx.vout[1].value
     },
-    alicePrivateKey
+    issuerPrivateKey
   )
   const splitTxid2 = await utils.broadcastToMainNet(splitHex2)
   console.log(`Split TX2:       ${splitTxid2}`)
   const splitTx2 = await utils.getTransactionMainNet(splitTxid2)
-  
-  await new Promise(r => setTimeout(r, wait));
 
-  console.log("Bob Balance  " + await utils.getTokenBalanceMainNet(bobAddr, symbol))
-  console.log("Emma Balance  " + await utils.getTokenBalanceMainNet(emmaAddr, symbol))
+  await new Promise(r => setTimeout(r, wait))
+
+  console.log('Bob Balance  ' + await utils.getTokenBalanceMainNet(bobAddr, symbol))
+  console.log('Emma Balance  ' + await utils.getTokenBalanceMainNet(emmaAddr, symbol))
 
   // Now mergeSplit
   const splitTxObj2 = new bsv.Transaction(splitHex2)
@@ -300,21 +310,21 @@ it('Mainnet LifeCycle Test 1', async function () {
   const bobAmountSatoshis = Math.floor(splitTx2.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx2.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
 
   const mergeSplitHex = mergeSplit(
-    bobprivateKey,
-    alicePrivateKey.publicKey,
+    bobsPrivateKey,
+    issuerPrivateKey.publicKey,
     [{
       tx: splitTxObj2,
       scriptPubKey: splitTx2.vout[0].scriptPubKey.hex,
       vout: 0,
       amount: splitTx2.vout[0].value
     },
-    {
-      tx: splitTxObj2,
-      scriptPubKey: splitTx2.vout[1].scriptPubKey.hex,
-      vout: 1,
-      amount: splitTx2.vout[1].value
+      {
+        tx: splitTxObj2,
+        scriptPubKey: splitTx2.vout[1].scriptPubKey.hex,
+        vout: 1,
+        amount: splitTx2.vout[1].value
 
-    }],
+      }],
     bobAddr,
     aliceAmountSatoshis,
     emmaAddr,
@@ -325,21 +335,20 @@ it('Mainnet LifeCycle Test 1', async function () {
       scriptPubKey: splitTx2.vout[2].scriptPubKey.hex,
       amount: splitTx2.vout[2].value
     },
-    alicePrivateKey
+    issuerPrivateKey
   )
   const mergeSplitTxid = await utils.broadcastToMainNet(mergeSplitHex)
   console.log(`MergeSplit TX:   ${mergeSplitTxid}`)
   const mergeSplitTx = await utils.getTransactionMainNet(mergeSplitTxid)
 
+  await new Promise(r => setTimeout(r, wait))
 
-  await new Promise(r => setTimeout(r, wait));
-
-  console.log("Bob Balance  " + await utils.getTokenBalanceMainNet(bobAddr, symbol))
-  console.log("Emma Balance  " + await utils.getTokenBalanceMainNet(emmaAddr, symbol))
+  console.log('Bob Balance  ' + await utils.getTokenBalanceMainNet(bobAddr, symbol))
+  console.log('Emma Balance  ' + await utils.getTokenBalanceMainNet(emmaAddr, symbol))
 
   const redeemHex = redeem(
-    bobprivateKey,
-    alicePrivateKey.publicKey,
+    bobsPrivateKey,
+    issuerPrivateKey.publicKey,
     {
       txid: mergeSplitTxid,
       vout: 0,
@@ -352,12 +361,12 @@ it('Mainnet LifeCycle Test 1', async function () {
       scriptPubKey: mergeSplitTx.vout[2].scriptPubKey.hex,
       amount: mergeSplitTx.vout[2].value
     },
-    alicePrivateKey
+    issuerPrivateKey
   )
   const redeemTxid = await utils.broadcastToMainNet(redeemHex)
   console.log(`Redeem TX:       ${redeemTxid}`)
 
-    //add check that token has been redeemed
+  //add check that token has been redeemed
 
 })
 

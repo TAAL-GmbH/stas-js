@@ -182,6 +182,7 @@ const {
     },
     fundingPrivateKey
   )
+  console.log(`Split hex:        ${splitHex}`)
   const splitTxid = await broadcast(splitHex)
   console.log(`Split TX:        ${splitTxid}`)
   const splitTx = await getTransaction(splitTxid)
