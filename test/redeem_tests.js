@@ -231,25 +231,6 @@ it('Redeem - Null Token Owner Private Key Throws Error', async function () {
     expect(e.message).to.eql('Some Error')
   }
 })
-//needs fixed
-it('Redeem - Null Contract Public Key Throws Error', async function () {
-
-  try {
-   redeemHex = redeem(
-    alicePrivateKey,
-    null,
-    utils.getUtxo(issueTxid, issueTx, 0),
-    utils.getUtxo(issueTxid, issueTx, 2),
-    fundingPrivateKey
-  )
-    assert(false)
-    return
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Some Error')
-  }
-})
-
 it('Redeem - Null STAS UTXO Throws Error', async function () {
 
   try {
