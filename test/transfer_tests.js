@@ -194,30 +194,6 @@ it("Transfer - Invalid Funding Private Key Throws Error", async function () {
   }
 })
 
-it("Transfer -  Invalid Contract Public Key Throws Error", async function () {
-
-  const issueOutFundingVout = issueTx.vout.length - 1
-  const incorrectPrivateKey = bsv.PrivateKey()
-
-  const transferHex = transfer(
-    bobPrivateKey,
-    incorrectPrivateKey.publicKey,
-    utils.getUtxo(issueTxid, issueTx, 1),
-    aliceAddr,
-    utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-    fundingPrivateKey
-  )
-  try {
-    await broadcast(transferHex)
-    console.log(transferHex)
-    assert(false)
-    return
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.contain('mandatory-script-verify-flag-failed')
-  }
-})
-
 it("Transfer - Address Validation - Too Few Chars", async function () {
 
   const issueOutFundingVout = issueTx.vout.length - 1
