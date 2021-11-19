@@ -588,8 +588,6 @@ it('Issue - Non Array Issue Info Throws Error', async function () {
   }
 })
 
-
-
 it('Issue - Empty Contract UTXO Info Throws Error', async function () {
   try {
     issue(
