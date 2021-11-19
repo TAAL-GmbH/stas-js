@@ -56,6 +56,8 @@ it('Successful RedeemSplit With 2 Split', async function () {
   expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.000014)
   console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
   console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(1400)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(4400)
 })
 
 
@@ -85,6 +87,9 @@ it('Successful RedeemSplit With 3 Split', async function () {
   console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
   console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
   console.log('Dave Balance ' + await utils.getTokenBalance(daveAddr))
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(700)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(3700)
+  expect(await utils.getTokenBalance(daveAddr)).to.equal(700)
 })
 
 //throws error as redeem address is counted  - probably not a defect, check with Liam
@@ -119,6 +124,10 @@ it('Successful RedeemSplit With 4 Split', async function () {
   console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
   console.log('Dave Balance ' + await utils.getTokenBalance(daveAddr))
   console.log('Dave Balance ' + await utils.getTokenBalance(emmaAddr))
+  // expect(await utils.getTokenBalance(aliceAddr)).to.equal(700)
+  // expect(await utils.getTokenBalance(bobAddr)).to.equal(3700)
+  // expect(await utils.getTokenBalance(daveAddr)).to.equal(700)
+  // expect(await utils.getTokenBalance(emmaAddr)).to.equal(700)
 })
 
 it('Successful RedeemSplit With No Fees', async function () {
@@ -141,6 +150,11 @@ it('Successful RedeemSplit With No Fees', async function () {
   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00002334)
   expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.00002333)
   expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.00002333)
+  console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
+  console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(2334)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(5333)
+  return false // tokens left + redemption = 10001
 })
 
 it("RedeemSplit - No Split Completes Successfully", async function () {
@@ -159,6 +173,10 @@ it("RedeemSplit - No Split Completes Successfully", async function () {
   )
   const redeemTxid = await broadcast(redeemSplitHex)
   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000035)
+  console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
+  console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(6500)
 })
 
 //needs fixed - throwing 'Output satoshis is not a natural number' 
@@ -379,33 +397,6 @@ it("RedeemSplit - Null Token Owner Private Key Throws Error", async function () 
   }
 })
 
-
-it("RedeemSplit - Null Contract Public Key Throws Error", async function () {
-
-  const bobAmount = issueTx.vout[0].value / 2
-  const splitDestinations = []
-  splitDestinations[0] = { address: bobAddr, amount: bobAmount }
-  splitDestinations[1] = { address: bobAddr, amount: bobAmount }
-
-  const issueOutFundingVout = issueTx.vout.length - 1
-  try {
-     redeemHex = redeemSplit(
-      alicePrivateKey,
-      null,
-      utils.getUtxo(issueTxid, issueTx, 0),
-      splitDestinations,
-      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-      fundingPrivateKey
-    )
-    assert(false)
-    return
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Some Error')
-  }
-})
-
-
 it("RedeemSplit - Null STAS UTXO Throws Error", async function () {
 
   const bobAmount = issueTx.vout[0].value / 2
@@ -430,7 +421,6 @@ it("RedeemSplit - Null STAS UTXO Throws Error", async function () {
     expect(e.message).to.eql('Invalid Argument: Must provide an object from where to extract data')
   }
 })
-
 
 it("RedeemSplit - Null Split Destinations Throws Error", async function () {
 
