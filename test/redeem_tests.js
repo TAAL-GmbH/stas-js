@@ -46,7 +46,10 @@ it('Redeem - Successful Redeem 1', async function () {
   )
   const redeemTxid = await broadcast(redeemHex)
   expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007)
-  //add token checks
+  console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
+  console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
 })
 
 it('Redeem - Successful Redeem 2', async function () {
@@ -60,7 +63,10 @@ it('Redeem - Successful Redeem 2', async function () {
   )
   const redeemTxid = await broadcast(redeemHex)
   expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00003)
-  //add token checks
+  console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
+  console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
 })
 
 it('Redeem - Successful Redeem No Fee', async function () {
@@ -73,7 +79,10 @@ it('Redeem - Successful Redeem No Fee', async function () {
   )
   const redeemTxid = await broadcast(redeemHex)
   expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007) // grab programmatically
-  //add token checks
+  console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
+  console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
 })
 
 //Needs fixed
@@ -87,6 +96,10 @@ it('Redeem - Successful Redeem No Fee Empty Array', async function () {
   )
   const redeemTxid = await broadcast(redeemHex)
   expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.0000075) 
+  console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
+  console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
 })
 
 it('Redeem - Incorrect Stas UTXO Amount Throws Error', async function () {
