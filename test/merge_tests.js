@@ -8,7 +8,6 @@ require('dotenv').config()
 const {
     contract,
     issue,
-    transfer,
     split,
     merge
 } = require('../index')
@@ -37,7 +36,6 @@ beforeEach(async function () {
     await setup()
 })
 
-//needs fixed - token balance is intermittingly incorrect 
 it("Merge - Successful Merge With Fee", async function () {
 
     const mergeHex = merge(
@@ -55,7 +53,10 @@ it("Merge - Successful Merge With Fee", async function () {
     expect(response.contract_txs).to.contain(contractTxid)
     expect(response.issuance_txs).to.contain(issueTxid)
     expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007)
-    expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000) //intermittingly incorrect
+    expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+    expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+    console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
+    console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
 })
 
 it("Merge - Successful Merge With Fee 2", async function () {
@@ -75,7 +76,10 @@ it("Merge - Successful Merge With Fee 2", async function () {
     expect(response.contract_txs).to.contain(contractTxid)
     expect(response.issuance_txs).to.contain(issueTxid)
     expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007)
-    expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000) //intermittingly incorrect
+    expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
+    expect(await utils.getTokenBalance(bobAddr)).to.equal(10000)
+    console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
+    console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
 })
 
 it("Merge - Merge With No Fee", async function () {
@@ -95,7 +99,10 @@ it("Merge - Merge With No Fee", async function () {
     expect(response.contract_txs).to.contain(contractTxid)
     expect(response.issuance_txs).to.contain(issueTxid)
     expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007)
-    expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000) //intermittingly incorrect
+    expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+    expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+    console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
+    console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
 })
 
 it("Merge - Incorrect Owner Private Key Throws Error", async function () {
@@ -140,31 +147,10 @@ it("Merge - Incorrect Funding Private Key Throws Error", async function () {
     }
 })
 
-it("Merge - Incorrect Contract Public Key Throws Error", async function () {
-
-    const incorrectPrivateKey = bsv.PrivateKey()
-    const mergeHex = merge(
-        bobPrivateKey,
-        incorrectPrivateKey.publicKey,
-        utils.getMergeUtxo(splitTxObj),
-        aliceAddr,
-        utils.getUtxo(splitTxid, splitTx, 2),
-        fundingPrivateKey
-    )
-    try {
-        await broadcast(mergeHex)
-        assert(false)
-        return
-    } catch (e) {
-        expect(e).to.be.instanceOf(Error)
-        expect(e.response.data).to.contain('mandatory-script-verify-flag-failed')
-    }
-})
-
 it("Merge - Attempt to Merge More Than 2 Tokens", async function () {
 
     try {
-         mergeHex = merge(
+        mergeHex = merge(
             bobPrivateKey,
             issuerPrivateKey.publicKey,
             [{
