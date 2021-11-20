@@ -1,6 +1,7 @@
 const expect = require('chai').expect
 const utils = require('../utils/test_utils')
 const bsv = require('bsv')
+const axios = require('axios')
 require('dotenv').config()
 
 const {
@@ -22,10 +23,14 @@ it('Mainnet LifeCycle Test 1', async function () {
 
 
   // per-run modifiable values
-  const inputUtxoid = '' // the input utxo
-  const inputUtxoIdVoutIndex = 2
-  const inputUtxoidFee = '' // the fee utxo
-  const inputUtxoIdFeeVoutIndex = 23
+
+  const contractUtxo = await getUtxoMainNet('17WYiaND4U88fKkt1tSa142gFSquRsXkpP', true)
+  const feeUtxo = await getUtxoMainNet('17WYiaND4U88fKkt1tSa142gFSquRsXkpP', false)
+
+  const inputUtxoid = contractUtxo[0] // the input utxo
+  const inputUtxoIdVoutIndex = contractUtxo[1]
+  const inputUtxoidFee = feeUtxo[0] // the fee utxo
+  const inputUtxoIdFeeVoutIndex = feeUtxo[1]
   const symbol = 'test-' + randomSymbol(10) // Use a unique symbol every test run to ensure that token balances can be checked correctly
 
   console.log('token symbol:', symbol)
@@ -203,7 +208,8 @@ it('Mainnet LifeCycle Test 1', async function () {
 
   // Now let's merge the last split back together
   const splitTxObj = new bsv.Transaction(splitHex)
-
+  
+  console.log("here")
   const mergeHex = merge(
     bobsPrivateKey,
     issuerPrivateKey.publicKey,
@@ -224,7 +230,7 @@ it('Mainnet LifeCycle Test 1', async function () {
     },
     issuerPrivateKey
   )
-
+  console.log(mergeHex)
   const mergeTxid = await utils.broadcastToMainNet(mergeHex)
   console.log(`Merge TX:        ${mergeTxid}`)
   const mergeTx = await utils.getTransactionMainNet(mergeTxid)
@@ -329,8 +335,8 @@ it('Mainnet LifeCycle Test 1', async function () {
   )
   const redeemTxid = await utils.broadcastToMainNet(redeemHex)
   console.log(`Redeem TX:       ${redeemTxid}`)
-
-  //add check that token has been redeemed
+  console.log('Bob Balance  ' + await utils.getTokenBalanceMainNet(bobAddr, symbol))
+  console.log('Emma Balance  ' + await utils.getTokenBalanceMainNet(emmaAddr, symbol))
 
 })
 
@@ -344,5 +350,40 @@ function randomSymbol(length) {
   }
   return result;
 }
+
+
+async function getUtxoMainNet(address, forContract) {
+  const url = `https://api.whatsonchain.com/v1/bsv/main/address/${address}/unspent`
+
+  const response = await axios({
+    method: 'get',
+    url
+  })
+  let array = []
+  if (forContract){
+    for (var key in response.data) {
+      if (response.data[key].value > 10000) {
+        array.push(response.data[key].tx_hash)
+        array.push(response.data[key].tx_pos) 
+        break
+      }
+    }
+  }else{
+    for (var key in response.data) {
+      if (response.data[key].value = 10000) {
+        array.push(response.data[key].tx_hash)
+        array.push(response.data[key].tx_pos) 
+        break
+      }
+    }
+
+  }
+  
+
+  console.log(array[0])
+  console.log(array[1])
+  return array
+}
+
 
 
