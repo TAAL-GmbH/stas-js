@@ -21,9 +21,7 @@ const {
 // eslint-disable-next-line no-undef
 it('Mainnet LifeCycle Test 1', async function () {
 
-
   // per-run modifiable values
-
   const contractUtxo = await getUtxoMainNet('', true)
   const feeUtxo = await getUtxoMainNet('', false)
 
@@ -78,7 +76,6 @@ it('Mainnet LifeCycle Test 1', async function () {
     schema,
     supply
   )
-
   const contractTxid = await utils.broadcastToMainNet(contractHex)
   console.log(`Contract TX:     ${contractTxid}`)
   const contractTx = await utils.getTransactionMainNet(contractTxid)
@@ -86,18 +83,6 @@ it('Mainnet LifeCycle Test 1', async function () {
   // eslint-disable-next-line promise/param-names
   await new Promise(r => setTimeout(r, wait))
 
-  // const issueInfo = [
-  //   {
-  //     addr: bobAddr,
-  //     satoshis: bobsInitialSathoshis,
-  //     data: 'sent to bob'
-  //   },
-  //   {
-  //     addr: emmaAddr,
-  //     satoshis: emmasInitialSatoshis,
-  //     data: 'sent to emma'
-  //   }
-  // ]
 
   const issueHex = issue(
     issuerPrivateKey,
@@ -109,7 +94,6 @@ it('Mainnet LifeCycle Test 1', async function () {
     symbol,
     2
   )
-
   const issueTxid = await utils.broadcastToMainNet(issueHex)
   console.log(`Issue TX:        ${issueTxid}`)
   const issueTx = await utils.getTransactionMainNet(issueTxid)
@@ -121,8 +105,8 @@ it('Mainnet LifeCycle Test 1', async function () {
   // eslint-disable-next-line promise/param-names
   await new Promise(r => setTimeout(r, wait))
 
-  // expect(await utils.getTokenBalanceMainNet(bobAddr)).to.contain(6000)
-  // expect(await utils.getTokenBalanceMainNet(emmaAddr)).to.contain(4000)
+  expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(6000)
+  expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(4000)
   console.log('Bob Balance  ' + await utils.getTokenBalanceMainNet(bobAddr, symbol))
   console.log('Alice Balance  ' + await utils.getTokenBalanceMainNet(aliceAddr, symbol))
 
@@ -131,19 +115,9 @@ it('Mainnet LifeCycle Test 1', async function () {
   const transferHex = transfer(
     bobsPrivateKey,
     issuerPrivateKey.publicKey,
-    {
-      txid: issueTxid,
-      vout: 0,
-      scriptPubKey: issueTx.vout[0].scriptPubKey.hex,
-      amount: issueTx.vout[0].value
-    },
+    utils.getUtxo(issueTxid, issueTx, 0),
     aliceAddr,
-    {
-      txid: issueTxid,
-      vout: issueOutFundingVout,
-      scriptPubKey: issueTx.vout[issueOutFundingVout].scriptPubKey.hex,
-      amount: issueTx.vout[issueOutFundingVout].value
-    },
+    utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
     issuerPrivateKey
   )
   const transferTxid = await utils.broadcastToMainNet(transferHex)
@@ -151,7 +125,8 @@ it('Mainnet LifeCycle Test 1', async function () {
   const transferTx = await utils.getTransactionMainNet(transferTxid)
 
   await new Promise(r => setTimeout(r, wait))
-  // expect(await utils.getTokenBalanceMainNet(emmaAddr)).to.contain(10000)
+  expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(0)
+  expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(10000)
   console.log('Bob Balance  ' + await utils.getTokenBalanceMainNet(bobAddr, symbol))
   console.log('Alice Balance  ' + await utils.getTokenBalanceMainNet(aliceAddr, symbol))
 
@@ -165,19 +140,9 @@ it('Mainnet LifeCycle Test 1', async function () {
   const splitHex = split(
     alicePrivateKey,
     issuerPrivateKey.publicKey,
-    {
-      txid: transferTxid,
-      vout: 0,
-      scriptPubKey: transferTx.vout[0].scriptPubKey.hex,
-      amount: transferTx.vout[0].value
-    },
+    utils.getUtxo(transferTxid, transferTx, 0),
     splitDestinations,
-    {
-      txid: transferTxid,
-      vout: 1,
-      scriptPubKey: transferTx.vout[1].scriptPubKey.hex,
-      amount: transferTx.vout[1].value
-    },
+    utils.getUtxo(transferTxid, transferTx, 1),
     issuerPrivateKey
   )
   const splitTxid = await utils.broadcastToMainNet(splitHex)
@@ -185,33 +150,20 @@ it('Mainnet LifeCycle Test 1', async function () {
   const splitTx = await utils.getTransactionMainNet(splitTxid)
   await new Promise(r => setTimeout(r, wait))
 
-  // expect(await utils.getTokenBalanceMainNet(bobAddr)).to.contain(0)
-  // expect(await utils.getTokenBalanceMainNet(emmaAddr)).to.contain(10000)
+  expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(6000)
+  expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(4000)
   console.log('Bob Balance  ' + await utils.getTokenBalanceMainNet(bobAddr, symbol))
   console.log('Alice Balance  ' + await utils.getTokenBalanceMainNet(aliceAddr, symbol))
 
   // Now let's merge the last split back together
   const splitTxObj = new bsv.Transaction(splitHex)
-  
-  console.log("here")
+
   const mergeHex = merge(
     bobsPrivateKey,
     issuerPrivateKey.publicKey,
-    [{
-      tx: splitTxObj,
-      vout: 0
-    },
-    {
-      tx: splitTxObj,
-      vout: 1
-    }],
+    utils.getMergeUtxo(splitTxObj),
     aliceAddr,
-    {
-      txid: splitTxid,
-      vout: 2,
-      scriptPubKey: splitTx.vout[2].scriptPubKey.hex,
-      amount: splitTx.vout[2].value
-    },
+    utils.getUtxo(splitTxid, splitTx, 2),
     issuerPrivateKey
   )
   const mergeTxid = await utils.broadcastToMainNet(mergeHex)
@@ -219,6 +171,8 @@ it('Mainnet LifeCycle Test 1', async function () {
   const mergeTx = await utils.getTransactionMainNet(mergeTxid)
 
   await new Promise(r => setTimeout(r, wait))
+  expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(0)
+  expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(10000)
   console.log('Bob Balance  ' + await utils.getTokenBalanceMainNet(bobAddr, symbol))
   console.log('Alice Balance  ' + await utils.getTokenBalanceMainNet(aliceAddr, symbol))
 
@@ -232,19 +186,9 @@ it('Mainnet LifeCycle Test 1', async function () {
   const splitHex2 = split(
     alicePrivateKey,
     issuerPrivateKey.publicKey,
-    {
-      txid: mergeTxid,
-      vout: 0,
-      scriptPubKey: mergeTx.vout[0].scriptPubKey.hex,
-      amount: mergeTx.vout[0].value
-    },
+    utils.getUtxo(mergeTxid, mergeTx, 0),
     split2Destinations,
-    {
-      txid: mergeTxid,
-      vout: 1,
-      scriptPubKey: mergeTx.vout[1].scriptPubKey.hex,
-      amount: mergeTx.vout[1].value
-    },
+    utils.getUtxo(mergeTxid, mergeTx, 1),
     issuerPrivateKey
   )
   const splitTxid2 = await utils.broadcastToMainNet(splitHex2)
@@ -252,7 +196,8 @@ it('Mainnet LifeCycle Test 1', async function () {
   const splitTx2 = await utils.getTransactionMainNet(splitTxid2)
 
   await new Promise(r => setTimeout(r, wait))
-
+  expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(6000)
+  expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(4000)
   console.log('Bob Balance  ' + await utils.getTokenBalanceMainNet(bobAddr, symbol))
   console.log('Alice Balance  ' + await utils.getTokenBalanceMainNet(aliceAddr, symbol))
 
@@ -265,62 +210,38 @@ it('Mainnet LifeCycle Test 1', async function () {
   const mergeSplitHex = mergeSplit(
     bobsPrivateKey,
     issuerPrivateKey.publicKey,
-    [{
-      tx: splitTxObj2,
-      scriptPubKey: splitTx2.vout[0].scriptPubKey.hex,
-      vout: 0,
-      amount: splitTx2.vout[0].value
-    },
-    {
-      tx: splitTxObj2,
-      scriptPubKey: splitTx2.vout[1].scriptPubKey.hex,
-      vout: 1,
-      amount: splitTx2.vout[1].value
-
-    }],
+    utils.getMergeSplitUtxo(splitTxObj2, splitTx2),
     bobAddr,
     bobAmountSatoshis,
     aliceAddr,
     aliceAmountSatoshis,
-    {
-      txid: splitTxid2,
-      vout: 2,
-      scriptPubKey: splitTx2.vout[2].scriptPubKey.hex,
-      amount: splitTx2.vout[2].value
-    },
+    utils.getUtxo(splitTxid2, splitTx2, 2),
     issuerPrivateKey
   )
+
   const mergeSplitTxid = await utils.broadcastToMainNet(mergeSplitHex)
   console.log(`MergeSplit TX:   ${mergeSplitTxid}`)
   const mergeSplitTx = await utils.getTransactionMainNet(mergeSplitTxid)
 
   await new Promise(r => setTimeout(r, wait))
-
+  expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(4500)
+  expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(5500)
   console.log('Bob Balance  ' + await utils.getTokenBalanceMainNet(bobAddr, symbol))
   console.log('Alice Balance  ' + await utils.getTokenBalanceMainNet(aliceAddr, symbol))
 
   const redeemHex = redeem(
     bobsPrivateKey,
     issuerPrivateKey.publicKey,
-    {
-      txid: mergeSplitTxid,
-      vout: 0,
-      scriptPubKey: mergeSplitTx.vout[0].scriptPubKey.hex,
-      amount: mergeSplitTx.vout[0].value
-    },
-    {
-      txid: mergeSplitTxid,
-      vout: 2,
-      scriptPubKey: mergeSplitTx.vout[2].scriptPubKey.hex,
-      amount: mergeSplitTx.vout[2].value
-    },
+    utils.getUtxo(mergeSplitTxid, mergeSplitTx, 0),
+    utils.getUtxo(mergeSplitTxid, mergeSplitTx, 2),
     issuerPrivateKey
   )
   const redeemTxid = await utils.broadcastToMainNet(redeemHex)
   console.log(`Redeem TX:       ${redeemTxid}`)
+  expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(0)
+  expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(5500)
   console.log('Bob Balance  ' + await utils.getTokenBalanceMainNet(bobAddr, symbol))
   console.log('Alice Balance  ' + await utils.getTokenBalanceMainNet(aliceAddr, symbol))
-
 })
 
 function randomSymbol(length) {
@@ -343,28 +264,25 @@ async function getUtxoMainNet(address, forContract) {
     url
   })
   let array = []
-  if (forContract){
+  if (forContract) {
     for (var key in response.data) {
       if (response.data[key].value > 10000) {
         array.push(response.data[key].tx_hash)
-        array.push(response.data[key].tx_pos) 
+        array.push(response.data[key].tx_pos)
         break
       }
     }
-  }else{
+  } else {
     for (var key in response.data) {
-      if (response.data[key].value = 10000) {
+      if (response.data[key].value == 10000) {
         array.push(response.data[key].tx_hash)
-        array.push(response.data[key].tx_pos) 
+        array.push(response.data[key].tx_pos)
         break
       }
     }
 
   }
-  
-
-  console.log(array[0])
-  console.log(array[1])
+  console.log(array)
   return array
 }
 
