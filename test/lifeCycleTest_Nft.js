@@ -69,13 +69,13 @@ it("Full Life Cycle Test NFT", async function () {
   const issueTxid = await broadcast(issueHex)
   console.log(`Issue TX:        ${issueTxid}`)
   const issueTx = await getTransaction(issueTxid)
-//   const tokenId = await utils.getToken(issueTxid)
-//   let response = await utils.getTokenResponse(tokenId)
-//   expect(response.token.symbol).to.equal(symbol)  //token issue is intermittingly failing 
-//   expect(response.token.contract_txs).to.contain(contractTxid)
-//   expect(response.token.issuance_txs).to.contain(issueTxid)
-//   expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
-//   expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
+  const tokenId = await utils.getToken(issueTxid)
+  let response = await utils.getTokenResponse(tokenId)
+  expect(response.symbol).to.equal(symbol)  
+  expect(response.contract_txs).to.contain(contractTxid)
+  expect(response.issuance_txs).to.contain(issueTxid)
+  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
+  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
 
 
   const issueOutFundingVout = issueTx.vout.length - 1
