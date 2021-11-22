@@ -295,7 +295,7 @@ it('Issue - Successful Issue Token 10 Addresses', async function () {
   expect(response.contract_txs).to.contain(contractTxid)
   expect(response.issuance_txs).to.contain(issueTxid)
 
-  for (let i = 1; i < 10; i++){
+  for (let i = 1; i < 10; i++) {
     expect(await utils.getVoutAmount(issueTxid, i)).to.equal(0.00001)
   }
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(1000)
@@ -806,8 +806,6 @@ it('Issue - Invalid Version Throws Error 2', async function () {
     expect(e.message).to.contain('invalid protocol version')
   }
 })
-
-
 
 async function setup() {
   issuerPrivateKey = bsv.PrivateKey()

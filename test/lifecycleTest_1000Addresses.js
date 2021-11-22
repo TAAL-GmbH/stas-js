@@ -55,7 +55,7 @@ it("Full Life Cycle Test With 1000 Issuance Addresses", async function () {
   console.log(`Contract TX:     ${contractTxid}`)
   const contractTx = await getTransaction(contractTxid)
 
-  
+
   const issueInfo = add1000Addresses()
   const issueHex = issue(
     issuerPrivateKey,
@@ -74,7 +74,7 @@ it("Full Life Cycle Test With 1000 Issuance Addresses", async function () {
   console.log(`Token ID:        ${tokenId}`)
   let response = await utils.getTokenResponse(tokenId)  //token issuance fails
   console.log(response.symbol)
-  
+
 
 })
 

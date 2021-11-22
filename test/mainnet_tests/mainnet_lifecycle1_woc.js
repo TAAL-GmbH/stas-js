@@ -22,8 +22,8 @@ const {
 it('Mainnet LifeCycle Test 1 broadcast via WOC', async function () {
 
   // per-run modifiable values
-  const contractUtxo = await getUtxoMainNet('17WYiaND4U88fKkt1tSa142gFSquRsXkpP', true)
-  const feeUtxo = await getUtxoMainNet('17WYiaND4U88fKkt1tSa142gFSquRsXkpP', false)
+  const contractUtxo = await getUtxoMainNet('', true)
+  const feeUtxo = await getUtxoMainNet('', false)
 
   const inputUtxoid = contractUtxo[0] // the input utxo
   const inputUtxoIdVoutIndex = contractUtxo[1]
@@ -82,7 +82,7 @@ it('Mainnet LifeCycle Test 1 broadcast via WOC', async function () {
 
   // eslint-disable-next-line promise/param-names
   await new Promise(r => setTimeout(r, wait))
-  
+
   const issueHex = issue(
     issuerPrivateKey,
     utils.getIssueInfo(bobAddr, bobsInitialSathoshis, aliceAddr, aliceInitialSatoshis),

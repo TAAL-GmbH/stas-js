@@ -288,16 +288,15 @@ async function setup() {
     bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
     supply = 10000
     schema = utils.schema(publicKeyHash, symbol, supply)
-  
+
     const contractHex = contract(
-      issuerPrivateKey,
-      contractUtxos,
-      fundingUtxos,
-      fundingPrivateKey,
-      schema,
-      supply
+        issuerPrivateKey,
+        contractUtxos,
+        fundingUtxos,
+        fundingPrivateKey,
+        schema,
+        supply
     )
     contractTxid = await broadcast(contractHex)
     contractTx = await getTransaction(contractTxid)
-  }
-  
+}

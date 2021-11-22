@@ -55,21 +55,21 @@ it("Full Life Cycle Test With No Fees", async function () {
     symbol,
     2
   )
-  
+
   const issueTxid = await broadcast(issueHex)
   const issueTx = await getTransaction(issueTxid)
   console.log(issueTxid)
   const tokenId = await utils.getToken(issueTxid)
   console.log(`Token ID:        ${tokenId}`)
   let response = await utils.getTokenResponse(tokenId)  //token issuance fails intermittingly
-  expect(response.symbol).to.equal(symbol) 
+  expect(response.symbol).to.equal(symbol)
   expect(response.contract_txs).to.contain(contractTxid)
   expect(response.issuance_txs).to.contain(issueTxid)
   expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
   expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
   await new Promise(r => setTimeout(r, 5000));
-  console.log("Alice Balance "   + await utils.getTokenBalance(aliceAddr))
-  console.log("Bob Balance "   + await utils.getTokenBalance(bobAddr))
+  console.log("Alice Balance " + await utils.getTokenBalance(aliceAddr))
+  console.log("Bob Balance " + await utils.getTokenBalance(bobAddr))
   // expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000) 
   // expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
 

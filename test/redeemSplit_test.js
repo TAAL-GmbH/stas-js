@@ -68,7 +68,7 @@ it('Successful RedeemSplit With 3 Split', async function () {
   const amount = issueTx.vout[0].value / 10
   const rSplitDestinations = []
   rSplitDestinations[0] = { address: bobAddr, amount: amount }
-  rSplitDestinations[1] = { address: aliceAddr, amount: amount}
+  rSplitDestinations[1] = { address: aliceAddr, amount: amount }
   rSplitDestinations[2] = { address: daveAddr, amount: amount }
 
   const redeemSplitHex = redeemSplit(
@@ -80,7 +80,7 @@ it('Successful RedeemSplit With 3 Split', async function () {
     fundingPrivateKey
   )
   const redeemTxid = await broadcast(redeemSplitHex)
-  expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000049) 
+  expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000049)
   expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000007)
   expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.000007)
   expect(await utils.getVoutAmount(redeemTxid, 3)).to.equal(0.000007)
@@ -102,7 +102,7 @@ it('Successful RedeemSplit With 4 Split', async function () {
   const amount = issueTx.vout[0].value / 5
   const rSplitDestinations = []
   rSplitDestinations[0] = { address: bobAddr, amount: amount }
-  rSplitDestinations[1] = { address: aliceAddr, amount: amount}
+  rSplitDestinations[1] = { address: aliceAddr, amount: amount }
   rSplitDestinations[2] = { address: daveAddr, amount: amount }
   rSplitDestinations[3] = { address: emmaAddr, amount: amount }
 
@@ -356,7 +356,7 @@ it("RedeemSplit - Splitting Into Too Many Tokens Throws Error", async function (
   splitDestinations[4] = { address: bobAddr, amount: bobAmount }
   const issueOutFundingVout = issueTx.vout.length - 1
   try {
-     redeemHex = redeemSplit(
+    redeemHex = redeemSplit(
       alicePrivateKey,
       issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
@@ -381,7 +381,7 @@ it("RedeemSplit - Null Token Owner Private Key Throws Error", async function () 
 
   const issueOutFundingVout = issueTx.vout.length - 1
   try {
-     redeemHex = redeemSplit(
+    redeemHex = redeemSplit(
       null,
       issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
@@ -406,7 +406,7 @@ it("RedeemSplit - Null STAS UTXO Throws Error", async function () {
 
   const issueOutFundingVout = issueTx.vout.length - 1
   try {
-     redeemHex = redeemSplit(
+    redeemHex = redeemSplit(
       alicePrivateKey,
       issuerPrivateKey.publicKey,
       null,
@@ -431,7 +431,7 @@ it("RedeemSplit - Null Split Destinations Throws Error", async function () {
 
   const issueOutFundingVout = issueTx.vout.length - 1
   try {
-     redeemHex = redeemSplit(
+    redeemHex = redeemSplit(
       alicePrivateKey,
       issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
@@ -457,7 +457,7 @@ it("RedeemSplit - Null Funding Private Key Throws Error", async function () {
 
   const issueOutFundingVout = issueTx.vout.length - 1
   try {
-     redeemHex = redeemSplit(
+    redeemHex = redeemSplit(
       alicePrivateKey,
       issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),

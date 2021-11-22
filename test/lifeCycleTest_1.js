@@ -70,7 +70,7 @@ it('Full Life Cycle Test 1', async function () {
   const issueTx = await getTransaction(issueTxid)
   const tokenId = await utils.getToken(issueTxid)
   console.log(`Token ID:        ${tokenId}`)
-  const response = await utils.getTokenResponse(tokenId) 
+  const response = await utils.getTokenResponse(tokenId)
   expect(response.symbol).to.equal(symbol)
   expect(response.contract_txs).to.contain(contractTxid)
   expect(response.issuance_txs).to.contain(issueTxid)
@@ -182,7 +182,7 @@ it('Full Life Cycle Test 1', async function () {
   console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
-  
+
 
   // Now mergeSplit
   const splitTxObj2 = new bsv.Transaction(splitHex2)

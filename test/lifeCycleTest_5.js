@@ -21,9 +21,7 @@ const {
 } = require('../index').utils
 
 
-//token issue is intermittingly failing
-//Do we need validation in contract to ensure tx's are above dust limit?
-it("Full Life Cycle Test Below Dust Limit", async function () {
+it("Full Life Cycle Test Below Dust Limit??", async function () {
   const issuerPrivateKey = bsv.PrivateKey()
   const fundingPrivateKey = bsv.PrivateKey()
 
@@ -69,7 +67,7 @@ it("Full Life Cycle Test Below Dust Limit", async function () {
   const tokenId = await utils.getToken(issueTxid)
   console.log(`issueTxid:        ${issueTxid}`)
   console.log(`Token ID:        ${tokenId}`)
-  let response = await utils.getTokenResponse(tokenId)  //token issuance fails intermittingly
+  let response = await utils.getTokenResponse(tokenId) 
   expect(response.symbol).to.equal(symbol) 
   expect(response.contract_txs).to.contain(contractTxid)
   expect(response.issuance_txs).to.contain(issueTxid)

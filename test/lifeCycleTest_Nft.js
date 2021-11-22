@@ -71,7 +71,7 @@ it("Full Life Cycle Test NFT", async function () {
   const issueTx = await getTransaction(issueTxid)
   const tokenId = await utils.getToken(issueTxid)
   let response = await utils.getTokenResponse(tokenId)
-  expect(response.symbol).to.equal(symbol)  
+  expect(response.symbol).to.equal(symbol)
   expect(response.contract_txs).to.contain(contractTxid)
   expect(response.issuance_txs).to.contain(issueTxid)
   expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)

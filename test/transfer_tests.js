@@ -199,7 +199,7 @@ it("Transfer - Address Validation - Too Few Chars", async function () {
   const issueOutFundingVout = issueTx.vout.length - 1
   const invalidAddr = '1MSCReQT9E4GpxuK1K7uyD5q'
   try {
-     transferHex = transfer(
+    transferHex = transfer(
       bobPrivateKey,
       issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 1),
@@ -222,7 +222,7 @@ it("Transfer -  Address Validation - Too Many Chars", async function () {
   const invalidAddr = '1MSCReQT9E4GpxuK1K7uyD5qF1EmznXjkrmoFCgGtkmhyaL2frwff84p2bwTf3FDpkZcCgGtkmhyaL2frwff84p2bwTf3FDpkZcCgGtkmhy'
 
   try {
-     transferHex = transfer(
+    transferHex = transfer(
       bobPrivateKey,
       issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 1),
@@ -297,7 +297,7 @@ it("Transfer - Null Token Owner Private Key Throws Error", async function () {
 
   const issueOutFundingVout = issueTx.vout.length - 1
   try {
-     transferHex = transfer(
+    transferHex = transfer(
       null,
       issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 1),
@@ -317,7 +317,7 @@ it("Transfer - Null Contract Public Key Throws Error", async function () {
 
   const issueOutFundingVout = issueTx.vout.length - 1
   try {
-     transferHex = transfer(
+    transferHex = transfer(
       bobPrivateKey,
       null,
       utils.getUtxo(issueTxid, issueTx, 1),
@@ -337,7 +337,7 @@ it("Transfer - Null STAS UTXO Throws Error", async function () {
 
   const issueOutFundingVout = issueTx.vout.length - 1
   try {
-     transferHex = transfer(
+    transferHex = transfer(
       bobPrivateKey,
       issuerPrivateKey.publicKey,
       null,
@@ -357,7 +357,7 @@ it("Transfer - Null Destination Address Throws Error", async function () {
 
   const issueOutFundingVout = issueTx.vout.length - 1
   try {
-     transferHex = transfer(
+    transferHex = transfer(
       bobPrivateKey,
       issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 1),
@@ -377,7 +377,7 @@ it("Transfer - Null Funding Private Key Throws Error", async function () {
 
   const issueOutFundingVout = issueTx.vout.length - 1
   try {
-     transferHex = transfer(
+    transferHex = transfer(
       bobPrivateKey,
       issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 1),

@@ -85,48 +85,48 @@ it("Attempt to Issue Less Tokens Than Supply Without SDK Validation", async func
         console.log('error issuing token', e)
         return
     }
-      const issueTxid = await broadcast(issueHex)
-      const issueTx = await getTransaction(issueTxid)
-      const tokenId = await utils.getToken(issueTxid)
-      console.log(`Token ID:        ${tokenId}`)
-      let response = await utils.getTokenResponse(tokenId)  //token issuance fails intermittingly
-      expect(response.symbol).to.equal(symbol)
-      expect(response.contract_txs).to.contain(contractTxid)
-      expect(response.issuance_txs).to.contain(issueTxid)
-      expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00001) //reduced amounts
-      expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003) //reduced amounts
-   try {
-       await broadcast(issueHex)
-       assert(false)
-       return
-   } catch (e) {
-       expect(e).to.be.instanceOf(Error)
-       expect(e.message).to.eql('Request failed with status code 400')
-   }
+    const issueTxid = await broadcast(issueHex)
+    const issueTx = await getTransaction(issueTxid)
+    const tokenId = await utils.getToken(issueTxid)
+    console.log(`Token ID:        ${tokenId}`)
+    let response = await utils.getTokenResponse(tokenId)  //token issuance fails intermittingly
+    expect(response.symbol).to.equal(symbol)
+    expect(response.contract_txs).to.contain(contractTxid)
+    expect(response.issuance_txs).to.contain(issueTxid)
+    expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00001) //reduced amounts
+    expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003) //reduced amounts
+    try {
+        await broadcast(issueHex)
+        assert(false)
+        return
+    } catch (e) {
+        expect(e).to.be.instanceOf(Error)
+        expect(e.message).to.eql('Request failed with status code 400')
+    }
 })
 
 
 async function setup() {
-  const bobPrivateKey = bsv.PrivateKey()
-  const alicePrivateKey = bsv.PrivateKey()
-  const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
-  const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
-  const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
-  symbol = 'TAALT'
-  supply = 10000
-  schema = utils.schema(publicKeyHash, symbol, supply)
-  aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
-  bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
+    const bobPrivateKey = bsv.PrivateKey()
+    const alicePrivateKey = bsv.PrivateKey()
+    const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
+    const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
+    const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
+    symbol = 'TAALT'
+    supply = 10000
+    schema = utils.schema(publicKeyHash, symbol, supply)
+    aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
+    bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
 
 
-  const contractHex = contract(
-    issuerPrivateKey,
-    contractUtxos,
-    fundingUtxos,
-    fundingPrivateKey,
-    schema,
-    supply
-  )
-  contractTxid = await broadcast(contractHex)
-  contractTx = await getTransaction(contractTxid)
+    const contractHex = contract(
+        issuerPrivateKey,
+        contractUtxos,
+        fundingUtxos,
+        fundingPrivateKey,
+        schema,
+        supply
+    )
+    contractTxid = await broadcast(contractHex)
+    contractTx = await getTransaction(contractTxid)
 }

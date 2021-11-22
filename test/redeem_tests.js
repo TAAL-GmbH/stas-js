@@ -78,7 +78,7 @@ it('Redeem - Successful Redeem No Fee', async function () {
     fundingPrivateKey
   )
   const redeemTxid = await broadcast(redeemHex)
-  expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007) // grab programmatically
+  expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007)
   console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
   console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
@@ -95,7 +95,7 @@ it('Redeem - Successful Redeem No Fee Empty Array', async function () {
     null
   )
   const redeemTxid = await broadcast(redeemHex)
-  expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.0000075) 
+  expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.0000075)
   console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
   console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
@@ -217,13 +217,13 @@ it('Redeem - Attempt To Redeem with Incorrect Payment Private Key Throws Error',
 it('Redeem - Null Token Owner Private Key Throws Error', async function () {
 
   try {
-   redeemHex = redeem(
-    null,
-    issuerPrivateKey.publicKey,
-    utils.getUtxo(issueTxid, issueTx, 0),
-    utils.getUtxo(issueTxid, issueTx, 2),
-    fundingPrivateKey
-  )
+    redeemHex = redeem(
+      null,
+      issuerPrivateKey.publicKey,
+      utils.getUtxo(issueTxid, issueTx, 0),
+      utils.getUtxo(issueTxid, issueTx, 2),
+      fundingPrivateKey
+    )
     assert(false)
     return
   } catch (e) {
@@ -234,13 +234,13 @@ it('Redeem - Null Token Owner Private Key Throws Error', async function () {
 it('Redeem - Null STAS UTXO Throws Error', async function () {
 
   try {
-   redeemHex = redeem(
-    alicePrivateKey,
-    issuerPrivateKey.publicKey,
-    null,
-    utils.getUtxo(issueTxid, issueTx, 2),
-    fundingPrivateKey
-  )
+    redeemHex = redeem(
+      alicePrivateKey,
+      issuerPrivateKey.publicKey,
+      null,
+      utils.getUtxo(issueTxid, issueTx, 2),
+      fundingPrivateKey
+    )
     assert(false)
     return
   } catch (e) {
@@ -252,13 +252,13 @@ it('Redeem - Null STAS UTXO Throws Error', async function () {
 it('Redeem - Funding Private Key Throws Error', async function () {
 
   try {
-   redeemHex = redeem(
-    alicePrivateKey,
-    issuerPrivateKey.publicKey,
-    utils.getUtxo(issueTxid, issueTx, 0),
-    utils.getUtxo(issueTxid, issueTx, 2),
-    null
-  )
+    redeemHex = redeem(
+      alicePrivateKey,
+      issuerPrivateKey.publicKey,
+      utils.getUtxo(issueTxid, issueTx, 0),
+      utils.getUtxo(issueTxid, issueTx, 2),
+      null
+    )
     assert(false)
     return
   } catch (e) {

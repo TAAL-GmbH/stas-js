@@ -57,9 +57,9 @@ it('Attempt to issue invalid token', async function () {
     contractUtxo(),
     paymentUtxo(),
     fundingPrivateKey,
-    true, 
+    true,
     symbol,
-    2 
+    2
   )
   const issueTxid = await broadcast(issueHex)
   const tokenId = await getToken(issueTxid)
@@ -69,8 +69,8 @@ it('Attempt to issue invalid token', async function () {
       method: 'get',
       url,
       auth: {
-      username: process.env.API_USERNAME,
-      password: process.env.API_PASSWORD
+        username: process.env.API_USERNAME,
+        password: process.env.API_PASSWORD
       }
     })
   } catch (e) {
@@ -79,7 +79,7 @@ it('Attempt to issue invalid token', async function () {
   }
 })
 
-async function getToken (txid) {
+async function getToken(txid) {
   const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/tx/hash/' + txid
   const response = await axios({
     method: 'get',
@@ -97,7 +97,7 @@ async function getToken (txid) {
   return tokenId
 }
 
-function contractUtxo () {
+function contractUtxo() {
   return {
     txid: contractTxid,
     vout: 0,
@@ -106,7 +106,7 @@ function contractUtxo () {
   }
 }
 
-function paymentUtxo () {
+function paymentUtxo() {
   return {
     txid: contractTxid,
     vout: 1,
@@ -115,7 +115,7 @@ function paymentUtxo () {
   }
 }
 
-function issueInfo () {
+function issueInfo() {
   return [
     {
       addr: aliceAddr,

@@ -49,7 +49,7 @@ it("Split - Successful Split Into Two Tokens With Fee", async function () {
     const splitHex = split(
         alicePrivateKey,
         issuerPrivateKey.publicKey,
-        utils.getUtxo(issueTxid, issueTx, 0), 
+        utils.getUtxo(issueTxid, issueTx, 0),
         splitDestinations,
         utils.getUtxo(issueTxid, issueTx, 2),
         fundingPrivateKey
@@ -59,8 +59,8 @@ it("Split - Successful Split Into Two Tokens With Fee", async function () {
     expect(splitDestinations).to.have.length(noOfTokens) //ensure that tx output contains 2 values
     expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035)
     expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000035)
-    console.log("Alice Balance "   + await utils.getTokenBalance(aliceAddr))
-    console.log("Bob Balance "   + await utils.getTokenBalance(bobAddr))
+    console.log("Alice Balance " + await utils.getTokenBalance(aliceAddr))
+    console.log("Bob Balance " + await utils.getTokenBalance(bobAddr))
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
     expect(await utils.getTokenBalance(bobAddr)).to.equal(10000)
 })
@@ -87,8 +87,8 @@ it("Split - Successful Split Into Three Tokens", async function () {
     expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035)
     expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.0000175)
     expect(await utils.getVoutAmount(splitTxid, 2)).to.equal(0.0000175)
-    console.log("Alice Balance "   + await utils.getTokenBalance(aliceAddr))
-    console.log("Bob Balance "   + await utils.getTokenBalance(bobAddr))
+    console.log("Alice Balance " + await utils.getTokenBalance(aliceAddr))
+    console.log("Bob Balance " + await utils.getTokenBalance(bobAddr))
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(1750)
     expect(await utils.getTokenBalance(bobAddr)).to.equal(8250)
 
@@ -118,8 +118,8 @@ it("Split - Successful Split Into Four Tokens 1", async function () {
     expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.0000175)
     expect(await utils.getVoutAmount(splitTxid, 2)).to.equal(0.0000175)
     expect(await utils.getVoutAmount(splitTxid, 3)).to.equal(0.0000175)
-    console.log("Alice Balance "   + await utils.getTokenBalance(aliceAddr))
-    console.log("Bob Balance "   + await utils.getTokenBalance(bobAddr))
+    console.log("Alice Balance " + await utils.getTokenBalance(aliceAddr))
+    console.log("Bob Balance " + await utils.getTokenBalance(bobAddr))
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(1750)
     expect(await utils.getTokenBalance(bobAddr)).to.equal(8250)
 })
@@ -154,10 +154,10 @@ it("Split - Successful Split Into Four Tokens 2", async function () {
     expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.0000175)
     expect(await utils.getVoutAmount(splitTxid, 2)).to.equal(0.0000175)
     expect(await utils.getVoutAmount(splitTxid, 3)).to.equal(0.0000175)
-    console.log("Alice Balance "   + await utils.getTokenBalance(aliceAddr))
-    console.log("Bob Balance "   + await utils.getTokenBalance(bobAddr))
-    console.log("Dave Balance "   + await utils.getTokenBalance(daveAddr))
-    console.log("Emma Balance "   + await utils.getTokenBalance(emmaAddr))
+    console.log("Alice Balance " + await utils.getTokenBalance(aliceAddr))
+    console.log("Bob Balance " + await utils.getTokenBalance(bobAddr))
+    console.log("Dave Balance " + await utils.getTokenBalance(daveAddr))
+    console.log("Emma Balance " + await utils.getTokenBalance(emmaAddr))
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(1750)
     expect(await utils.getTokenBalance(bobAddr)).to.equal(4750)
     expect(await utils.getTokenBalance(daveAddr)).to.equal(1750)
@@ -244,7 +244,7 @@ it("Split - Splitting Into Too Many Tokens Throws Error", async function () {
     splitDestinations[3] = { address: bobAddr, amount: bobAmount }
     splitDestinations[4] = { address: bobAddr, amount: bobAmount }
     try {
-         splitHex = split(
+        splitHex = split(
             alicePrivateKey,
             issuerPrivateKey.publicKey,
             utils.getUtxo(issueTxid, issueTx, 0),
@@ -265,7 +265,7 @@ it("Split - Empty Array Split Throws Error", async function () {
 
     const splitDestinations = []
     try {
-         splitHex = split(
+        splitHex = split(
             alicePrivateKey,
             issuerPrivateKey.publicKey,
             utils.getUtxo(issueTxid, issueTx, 0),
@@ -290,43 +290,43 @@ it("Split - Add Zero Sats to Split Throws Error", async function () {
 
     try {
         splitHex = split(
-           alicePrivateKey,
-           issuerPrivateKey.publicKey,
-           utils.getUtxo(issueTxid, issueTx, 0),
-           splitDestinations,
-           utils.getUtxo(issueTxid, issueTx, 2),
-           fundingPrivateKey
-       )
-       assert(false)
-       return
-   } catch (e) {
-       expect(e).to.be.instanceOf(Error)
-       expect(e.message).to.eql('Some Error')
-   }
+            alicePrivateKey,
+            issuerPrivateKey.publicKey,
+            utils.getUtxo(issueTxid, issueTx, 0),
+            splitDestinations,
+            utils.getUtxo(issueTxid, issueTx, 2),
+            fundingPrivateKey
+        )
+        assert(false)
+        return
+    } catch (e) {
+        expect(e).to.be.instanceOf(Error)
+        expect(e.message).to.eql('Some Error')
+    }
 })
 
 //should we validate in SDK?
 it("Split - Negative Integer Sats to Split Throws Error", async function () {
 
     const splitDestinations = []
-    splitDestinations[0] = { address: bobAddr, amount: -0.00015}
+    splitDestinations[0] = { address: bobAddr, amount: -0.00015 }
     splitDestinations[1] = { address: bobAddr, amount: 0.00015 }
 
     try {
         splitHex = split(
-           alicePrivateKey,
-           issuerPrivateKey.publicKey,
-           utils.getUtxo(issueTxid, issueTx, 0),
-           splitDestinations,
-           utils.getUtxo(issueTxid, issueTx, 2),
-           fundingPrivateKey
-       )
-       assert(false)
-       return
-   } catch (e) {
-       expect(e).to.be.instanceOf(Error)
-       expect(e.message).to.eql('Invalid Argument: Output satoshis is not a natural number')
-   }
+            alicePrivateKey,
+            issuerPrivateKey.publicKey,
+            utils.getUtxo(issueTxid, issueTx, 0),
+            splitDestinations,
+            utils.getUtxo(issueTxid, issueTx, 2),
+            fundingPrivateKey
+        )
+        assert(false)
+        return
+    } catch (e) {
+        expect(e).to.be.instanceOf(Error)
+        expect(e.message).to.eql('Invalid Argument: Output satoshis is not a natural number')
+    }
 })
 
 
@@ -336,7 +336,7 @@ it("Split - Add Too Much To Split Throws Error", async function () {
     const splitDestinations = []
     splitDestinations[0] = { address: bobAddr, amount: bobAmount }
 
-     splitHex = split(
+    splitHex = split(
         alicePrivateKey,
         issuerPrivateKey.publicKey,
         utils.getUtxo(issueTxid, issueTx, 0),
@@ -366,7 +366,7 @@ it("Split - Address Too Long Throws Error", async function () {
     splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
     const incorrectPrivateKey = bsv.PrivateKey()
     try {
-         splitHex = split(
+        splitHex = split(
             alicePrivateKey,
             issuerPrivateKey.publicKey,
             utils.getUtxo(issueTxid, issueTx, 0),
@@ -392,7 +392,7 @@ it("Split - Address Too Short Throws Error", async function () {
     splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
     const incorrectPrivateKey = bsv.PrivateKey()
     try {
-         splitHex = split(
+        splitHex = split(
             alicePrivateKey,
             issuerPrivateKey.publicKey,
             utils.getUtxo(issueTxid, issueTx, 0),
@@ -468,7 +468,7 @@ it("Split - Null Token Owner Private Key Throws Error", async function () {
     splitDestinations[0] = { address: bobAddr, amount: bobAmount1 }
     splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
     try {
-         splitHex = split(
+        splitHex = split(
             null,
             issuerPrivateKey.publicKey,
             utils.getUtxo(issueTxid, issueTx, 0),
@@ -492,7 +492,7 @@ it("Split - Null  STAS UTXO Throws Error", async function () {
     splitDestinations[0] = { address: bobAddr, amount: bobAmount1 }
     splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
     try {
-         splitHex = split(
+        splitHex = split(
             alicePrivateKey,
             issuerPrivateKey.publicKey,
             null,
@@ -511,7 +511,7 @@ it("Split - Null  STAS UTXO Throws Error", async function () {
 
 it("Split - Null Split Addresses Throws Error", async function () {
     try {
-         splitHex = split(
+        splitHex = split(
             alicePrivateKey,
             issuerPrivateKey.publicKey,
             utils.getUtxo(issueTxid, issueTx, 0),
@@ -534,7 +534,7 @@ it("Split - Null Funding Private Key Throws Error", async function () {
     splitDestinations[0] = { address: bobAddr, amount: bobAmount1 }
     splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
     try {
-         splitHex = split(
+        splitHex = split(
             alicePrivateKey,
             issuerPrivateKey.publicKey,
             utils.getUtxo(issueTxid, issueTx, 0),

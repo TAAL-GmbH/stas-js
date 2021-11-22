@@ -231,7 +231,7 @@ it('MergeSplit - Attempt to MergeSplit More Than Two Tokens Throws Error', async
   const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
   const incorrectPrivateKey = bsv.PrivateKey()
   try {
-     mergeSplitHex = mergeSplit(
+    mergeSplitHex = mergeSplit(
       incorrectPrivateKey,
       issuerPrivateKey.publicKey,
       [{
@@ -276,7 +276,7 @@ it('MergeSplit - Attempt to MergeSplit Less Than Two Tokens Throws Error', async
   const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
   const incorrectPrivateKey = bsv.PrivateKey()
   try {
-     mergeSplitHex = mergeSplit(
+    mergeSplitHex = mergeSplit(
       incorrectPrivateKey,
       issuerPrivateKey.publicKey,
       [{
@@ -308,7 +308,7 @@ it('MergeSplit - Invalid Address Destination Address 1 Throws Error', async func
   const invalidAddr = '1MSCReQT9E4GpxuK1K'
 
   try {
-     mergeSplitHex = mergeSplit(
+    mergeSplitHex = mergeSplit(
       issuerPrivateKey,
       issuerPrivateKey.publicKey,
       utils.getMergeSplitUtxo(splitTxObj, splitTx),
@@ -335,7 +335,7 @@ it('MergeSplit - Invalid Address Destination Address 2 Throws Error', async func
   const invalidAddr = '1MSCReQT9E4GpxuK1K'
 
   try {
-     mergeSplitHex = mergeSplit(
+    mergeSplitHex = mergeSplit(
       issuerPrivateKey,
       issuerPrivateKey.publicKey,
       utils.getMergeSplitUtxo(splitTxObj, splitTx),
@@ -361,7 +361,7 @@ it('MergeSplit - Null Issuer Private Key Throws Error', async function () {
   const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
 
   try {
-     mergeSplitHex = mergeSplit(
+    mergeSplitHex = mergeSplit(
       null,
       issuerPrivateKey.publicKey,
       utils.getMergeSplitUtxo(splitTxObj, splitTx),
@@ -388,7 +388,7 @@ it('MergeSplit - Null STAS Merge UTXO Throws Error', async function () {
   const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
 
   try {
-     mergeSplitHex = mergeSplit(
+    mergeSplitHex = mergeSplit(
       issuerPrivateKey,
       issuerPrivateKey.publicKey,
       null,
@@ -414,7 +414,7 @@ it('MergeSplit - Null Destination Address 1 Throws Error', async function () {
   const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
 
   try {
-     mergeSplitHex = mergeSplit(
+    mergeSplitHex = mergeSplit(
       issuerPrivateKey,
       issuerPrivateKey.publicKey,
       utils.getMergeSplitUtxo(splitTxObj, splitTx),
@@ -440,7 +440,7 @@ it('MergeSplit - Null Satoshi Amount 1 Throws Error', async function () {
   const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
 
   try {
-     mergeSplitHex = mergeSplit(
+    mergeSplitHex = mergeSplit(
       issuerPrivateKey,
       issuerPrivateKey.publicKey,
       utils.getMergeSplitUtxo(splitTxObj, splitTx),
@@ -466,7 +466,7 @@ it('MergeSplit - Null Destination Address 2 Throws Error', async function () {
   const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
 
   try {
-     mergeSplitHex = mergeSplit(
+    mergeSplitHex = mergeSplit(
       issuerPrivateKey,
       issuerPrivateKey.publicKey,
       utils.getMergeSplitUtxo(splitTxObj, splitTx),
@@ -491,7 +491,7 @@ it('MergeSplit - Null Satoshi Amount 2 Throws Error', async function () {
 
   const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
   try {
-     mergeSplitHex = mergeSplit(
+    mergeSplitHex = mergeSplit(
       issuerPrivateKey,
       issuerPrivateKey.publicKey,
       utils.getMergeSplitUtxo(splitTxObj, splitTx),
@@ -518,7 +518,7 @@ it('MergeSplit - Null Funding Private Key Throws Error', async function () {
   const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
 
   try {
-     mergeSplitHex = mergeSplit(
+    mergeSplitHex = mergeSplit(
       issuerPrivateKey,
       issuerPrivateKey.publicKey,
       utils.getMergeSplitUtxo(splitTxObj, splitTx),

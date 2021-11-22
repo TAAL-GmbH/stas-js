@@ -419,7 +419,7 @@ it('Contract - Empty Symbol In Schema Throws Error', async function () {
   }
 })
 
-async function setup () {
+async function setup() {
   issuerPrivateKey = bsv.PrivateKey()
   fundingPrivateKey = bsv.PrivateKey()
   contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
@@ -428,7 +428,7 @@ async function setup () {
   schema = utils.schema(publicKeyHash, symbol, supply)
 }
 
-function schemaNullSymbol () {
+function schemaNullSymbol() {
   return {
     name: 'Taal Token',
     tokenId: `${publicKeyHash}`,

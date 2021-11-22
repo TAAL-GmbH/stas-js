@@ -67,14 +67,14 @@ it("Full Life Cycle Test With Decimals And Extra SatsPerToken", async function (
   const tokenId = await utils.getToken(issueTxid)
   console.log(`issueTx :        ${issueTxid}`)
   console.log(`Token ID:        ${tokenId}`)
-  let response = await utils.getTokenResponse(tokenId)  //token issuance fails intermittingly
-  expect(response.symbol).to.equal(symbol) 
+  let response = await utils.getTokenResponse(tokenId)
+  expect(response.symbol).to.equal(symbol)
   expect(response.contract_txs).to.contain(contractTxid)
   expect(response.issuance_txs).to.contain(issueTxid)
   expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
   expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
-  console.log("Alice Balance "   + await utils.getTokenBalance(aliceAddr))
-  console.log("Bob Balance "   + await utils.getTokenBalance(bobAddr))
+  console.log("Alice Balance " + await utils.getTokenBalance(aliceAddr))
+  console.log("Bob Balance " + await utils.getTokenBalance(bobAddr))
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
 
@@ -95,8 +95,8 @@ it("Full Life Cycle Test With Decimals And Extra SatsPerToken", async function (
   expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
-  console.log("Alice Balance "   + await utils.getTokenBalance(aliceAddr))
-  console.log("Bob Balance "   + await utils.getTokenBalance(bobAddr))
+  console.log("Alice Balance " + await utils.getTokenBalance(aliceAddr))
+  console.log("Bob Balance " + await utils.getTokenBalance(bobAddr))
 
 
   // Split tokens into 2 - both payable to Bob...
@@ -119,8 +119,11 @@ it("Full Life Cycle Test With Decimals And Extra SatsPerToken", async function (
   const splitTx = await getTransaction(splitTxid)
   expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000015)
   expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000015)
-  console.log("Alice Balance "   + await utils.getTokenBalance(aliceAddr))
-  console.log("Bob Balance "   + await utils.getTokenBalance(bobAddr))
+  console.log("Alice Balance " + await utils.getTokenBalance(aliceAddr))
+  console.log("Bob Balance " + await utils.getTokenBalance(bobAddr))
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+
 
   // Now let's merge the last split back together
   const splitTxObj = new bsv.Transaction(splitHex)
@@ -138,21 +141,21 @@ it("Full Life Cycle Test With Decimals And Extra SatsPerToken", async function (
   console.log(`Merge TX:        ${mergeTxid}`)
   const mergeTx = await getTransaction(mergeTxid)
   expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00003)
-  // const tokenIdMerge = await utils.getToken(issueTxid)
-  // let responseMerge = await utils.getTokenResponse(tokenIdMerge)
-  // expect(responseMerge.token.symbol).to.equal(symbol)
-  // expect(responseMerge.token.contract_txs).to.contain(contractTxid)
-  // expect(responseMerge.token.issuance_txs).to.contain(issueTxid)
-  console.log("Alice Balance "   + await utils.getTokenBalance(aliceAddr))
-  console.log("Bob Balance "   + await utils.getTokenBalance(bobAddr))
+  const tokenIdMerge = await utils.getToken(issueTxid)
+  let responseMerge = await utils.getTokenResponse(tokenIdMerge)
+  expect(responseMerge.symbol).to.equal(symbol)
+  expect(responseMerge.contract_txs).to.contain(contractTxid)
+  expect(responseMerge.issuance_txs).to.contain(issueTxid)
+  console.log("Alice Balance " + await utils.getTokenBalance(aliceAddr))
+  console.log("Bob Balance " + await utils.getTokenBalance(bobAddr))
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
 
-  // Split again - both payable to Alice...
-  const aliceAmount1 = mergeTx.vout[0].value / 2
-  const aliceAmount2 = mergeTx.vout[0].value - aliceAmount1
+  const amount = mergeTx.vout[0].value / 2
 
   const split2Destinations = []
-  split2Destinations[0] = { address: aliceAddr, amount: aliceAmount1 }
-  split2Destinations[1] = { address: aliceAddr, amount: aliceAmount2 }
+  split2Destinations[0] = { address: bobAddr, amount: amount }
+  split2Destinations[1] = { address: bobAddr, amount: amount }
 
   const splitHex2 = split(
     alicePrivateKey,
@@ -167,8 +170,10 @@ it("Full Life Cycle Test With Decimals And Extra SatsPerToken", async function (
   const splitTx2 = await getTransaction(splitTxid2)
   expect(await utils.getVoutAmount(splitTxid2, 0)).to.equal(0.000015)
   expect(await utils.getVoutAmount(splitTxid2, 1)).to.equal(0.000015)
-  console.log("Alice Balance "   + await utils.getTokenBalance(aliceAddr))
-  console.log("Bob Balance "   + await utils.getTokenBalance(bobAddr))
+  console.log("Alice Balance " + await utils.getTokenBalance(aliceAddr))
+  console.log("Bob Balance " + await utils.getTokenBalance(bobAddr))
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
 
   // Now mergeSplit
   const splitTxObj2 = new bsv.Transaction(splitHex2)
@@ -177,7 +182,7 @@ it("Full Life Cycle Test With Decimals And Extra SatsPerToken", async function (
   const bobAmountSatoshis = Math.floor(splitTx2.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx2.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
 
   const mergeSplitHex = mergeSplit(
-    alicePrivateKey,
+    bobPrivateKey,
     issuerPrivateKey.publicKey,
     utils.getMergeSplitUtxo(splitTxObj2, splitTx2),
     aliceAddr,
@@ -193,8 +198,10 @@ it("Full Life Cycle Test With Decimals And Extra SatsPerToken", async function (
   const mergeSplitTx = await getTransaction(mergeSplitTxid)
   expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075)
   expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
-  console.log("Alice Balance "   + await utils.getTokenBalance(aliceAddr))
-  console.log("Bob Balance "   + await utils.getTokenBalance(bobAddr))
+  console.log("Alice Balance " + await utils.getTokenBalance(aliceAddr))
+  console.log("Bob Balance " + await utils.getTokenBalance(bobAddr))
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
 
 
   // Alice wants to redeem the money from bob...
@@ -208,47 +215,49 @@ it("Full Life Cycle Test With Decimals And Extra SatsPerToken", async function (
   const redeemTxid = await broadcast(redeemHex)
   console.log(`Redeem TX:       ${redeemTxid}`)
   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.0000075)
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
 })
 
 
 
 
-function schemaWithDecimals(publicKeyHash, symbol, supply, decimals, satsPerToken){
+function schemaWithDecimals(publicKeyHash, symbol, supply, decimals, satsPerToken) {
 
-    return  schema = {
-        name: 'Taal Token',
-        tokenId: `${publicKeyHash}`,
-        protocolId: 'To be decided',
-        symbol: symbol,
-        description: 'Example token on private Taalnet',
-        image: 'https://www.taal.com/wp-content/themes/taal_v2/img/favicon/favicon-96x96.png',
-        totalSupply: supply,
-        decimals: decimals,
-        satsPerToken: satsPerToken,
-        properties: {
-          legal: {
-            terms: '© 2020 TAAL TECHNOLOGIES SEZC\nALL RIGHTS RESERVED. ANY USE OF THIS SOFTWARE IS SUBJECT TO TERMS AND CONDITIONS OF LICENSE. USE OF THIS SOFTWARE WITHOUT LICENSE CONSTITUTES INFRINGEMENT OF INTELLECTUAL PROPERTY. FOR LICENSE DETAILS OF THE SOFTWARE, PLEASE REFER TO: www.taal.com/stas-token-license-agreement',
-            licenceId: '1234'
-          },
-          issuer: {
-            organisation: 'Taal Technologies SEZC',
-            legalForm: 'Limited Liability Public Company',
-            governingLaw: 'CA',
-            mailingAddress: '1 Volcano Stret, Canada',
-            issuerCountry: 'CYM',
-            jurisdiction: '',
-            email: 'info@taal.com'
-          },
-          meta: {
-            schemaId: 'token1',
-            website: 'https://taal.com',
-            legal: {
-              terms: 'blah blah'
-            },
-            media: {
-              type: 'mp4'
-            }
-          }
+  return schema = {
+    name: 'Taal Token',
+    tokenId: `${publicKeyHash}`,
+    protocolId: 'To be decided',
+    symbol: symbol,
+    description: 'Example token on private Taalnet',
+    image: 'https://www.taal.com/wp-content/themes/taal_v2/img/favicon/favicon-96x96.png',
+    totalSupply: supply,
+    decimals: decimals,
+    satsPerToken: satsPerToken,
+    properties: {
+      legal: {
+        terms: '© 2020 TAAL TECHNOLOGIES SEZC\nALL RIGHTS RESERVED. ANY USE OF THIS SOFTWARE IS SUBJECT TO TERMS AND CONDITIONS OF LICENSE. USE OF THIS SOFTWARE WITHOUT LICENSE CONSTITUTES INFRINGEMENT OF INTELLECTUAL PROPERTY. FOR LICENSE DETAILS OF THE SOFTWARE, PLEASE REFER TO: www.taal.com/stas-token-license-agreement',
+        licenceId: '1234'
+      },
+      issuer: {
+        organisation: 'Taal Technologies SEZC',
+        legalForm: 'Limited Liability Public Company',
+        governingLaw: 'CA',
+        mailingAddress: '1 Volcano Stret, Canada',
+        issuerCountry: 'CYM',
+        jurisdiction: '',
+        email: 'info@taal.com'
+      },
+      meta: {
+        schemaId: 'token1',
+        website: 'https://taal.com',
+        legal: {
+          terms: 'blah blah'
+        },
+        media: {
+          type: 'mp4'
         }
       }
+    }
+  }
 }
