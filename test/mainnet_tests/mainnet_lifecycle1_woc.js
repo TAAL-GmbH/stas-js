@@ -19,11 +19,11 @@ const {
 } = require('../../index').utils
 
 // eslint-disable-next-line no-undef
-it('Mainnet LifeCycle Test 1 broadcast via MAPI', async function () {
+it('Mainnet LifeCycle Test 1 broadcast via WOC', async function () {
 
   // per-run modifiable values
-  const contractUtxo = await getUtxoMainNet('', true)
-  const feeUtxo = await getUtxoMainNet('', false)
+  const contractUtxo = await getUtxoMainNet('17WYiaND4U88fKkt1tSa142gFSquRsXkpP', true)
+  const feeUtxo = await getUtxoMainNet('17WYiaND4U88fKkt1tSa142gFSquRsXkpP', false)
 
   const inputUtxoid = contractUtxo[0] // the input utxo
   const inputUtxoIdVoutIndex = contractUtxo[1]
@@ -76,15 +76,13 @@ it('Mainnet LifeCycle Test 1 broadcast via MAPI', async function () {
     schema,
     supply
   )
-  console.log(contractHex)
-  const contractTxid = await utils.broadcastMapi(contractHex)
+  const contractTxid = await utils.broadcastToMainNet(contractHex)
   console.log(`Contract TX:     ${contractTxid}`)
   const contractTx = await utils.getTransactionMainNet(contractTxid)
 
   // eslint-disable-next-line promise/param-names
   await new Promise(r => setTimeout(r, wait))
-
-
+  
   const issueHex = issue(
     issuerPrivateKey,
     utils.getIssueInfo(bobAddr, bobsInitialSathoshis, aliceAddr, aliceInitialSatoshis),
@@ -95,7 +93,7 @@ it('Mainnet LifeCycle Test 1 broadcast via MAPI', async function () {
     symbol,
     2
   )
-  //const issueTxid = await utils.broadcastToMainNet(issueHex)
+  const issueTxid = await utils.broadcastToMainNet(issueHex)
   console.log(`Issue TX:        ${issueTxid}`)
   const issueTx = await utils.getTransactionMainNet(issueTxid)
   const tokenId = await utils.getTokenMainNet(issueTxid)
@@ -105,6 +103,7 @@ it('Mainnet LifeCycle Test 1 broadcast via MAPI', async function () {
   console.log("token issued")
   // eslint-disable-next-line promise/param-names
   await new Promise(r => setTimeout(r, wait))
+
   expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(6000)
   expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(4000)
   console.log('Bob Balance  ' + await utils.getTokenBalanceMainNet(bobAddr, symbol))
@@ -120,7 +119,7 @@ it('Mainnet LifeCycle Test 1 broadcast via MAPI', async function () {
     utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
     issuerPrivateKey
   )
-  //const transferTxid = await utils.broadcastToMainNet(transferHex)
+  const transferTxid = await utils.broadcastToMainNet(transferHex)
   console.log(`Transfer TX:     ${transferTxid}`)
   const transferTx = await utils.getTransactionMainNet(transferTxid)
 
@@ -145,10 +144,11 @@ it('Mainnet LifeCycle Test 1 broadcast via MAPI', async function () {
     utils.getUtxo(transferTxid, transferTx, 1),
     issuerPrivateKey
   )
- // const splitTxid = await utils.broadcastToMainNet(splitHex)
+  const splitTxid = await utils.broadcastToMainNet(splitHex)
   console.log(`Split TX:        ${splitTxid}`)
   const splitTx = await utils.getTransactionMainNet(splitTxid)
   await new Promise(r => setTimeout(r, wait))
+
   expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(6000)
   expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(4000)
   console.log('Bob Balance  ' + await utils.getTokenBalanceMainNet(bobAddr, symbol))
@@ -165,7 +165,7 @@ it('Mainnet LifeCycle Test 1 broadcast via MAPI', async function () {
     utils.getUtxo(splitTxid, splitTx, 2),
     issuerPrivateKey
   )
-  //const mergeTxid = await utils.broadcastToMainNet(mergeHex)
+  const mergeTxid = await utils.broadcastToMainNet(mergeHex)
   console.log(`Merge TX:        ${mergeTxid}`)
   const mergeTx = await utils.getTransactionMainNet(mergeTxid)
 
@@ -190,7 +190,7 @@ it('Mainnet LifeCycle Test 1 broadcast via MAPI', async function () {
     utils.getUtxo(mergeTxid, mergeTx, 1),
     issuerPrivateKey
   )
- // const splitTxid2 = await utils.broadcastToMainNet(splitHex2)
+  const splitTxid2 = await utils.broadcastToMainNet(splitHex2)
   console.log(`Split TX2:       ${splitTxid2}`)
   const splitTx2 = await utils.getTransactionMainNet(splitTxid2)
 
@@ -218,7 +218,7 @@ it('Mainnet LifeCycle Test 1 broadcast via MAPI', async function () {
     issuerPrivateKey
   )
 
- // const mergeSplitTxid = await utils.broadcastToMainNet(mergeSplitHex)
+  const mergeSplitTxid = await utils.broadcastToMainNet(mergeSplitHex)
   console.log(`MergeSplit TX:   ${mergeSplitTxid}`)
   const mergeSplitTx = await utils.getTransactionMainNet(mergeSplitTxid)
 
@@ -235,7 +235,7 @@ it('Mainnet LifeCycle Test 1 broadcast via MAPI', async function () {
     utils.getUtxo(mergeSplitTxid, mergeSplitTx, 2),
     issuerPrivateKey
   )
- // const redeemTxid = await utils.broadcastToMainNet(redeemHex)
+  const redeemTxid = await utils.broadcastToMainNet(redeemHex)
   console.log(`Redeem TX:       ${redeemTxid}`)
   expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(0)
   expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(5500)
