@@ -26,19 +26,19 @@ beforeEach(async function () {
   await setup()
 })
 
-it('Contract - Successful With Fees', async function () {
-  const contractHex = contract(
-    issuerPrivateKey,
-    contractUtxos,
-    fundingUtxos,
-    fundingPrivateKey,
-    schema,
-    supply
-  )
-  const contractTxid = await broadcast(contractHex)
-  let amount = await utils.getVoutAmount(contractTxid, 0)
-  expect(amount).to.equal(supply / 100000000)
-})
+// it('Contract - Successful With Fees', async function () {
+//   const contractHex = contract(
+//     issuerPrivateKey,
+//     contractUtxos,
+//     fundingUtxos,
+//     fundingPrivateKey,
+//     schema,
+//     supply
+//   )
+//   const contractTxid = await broadcast(contractHex)
+//   const amount = await utils.getVoutAmount(contractTxid, 0)
+//   expect(amount).to.equal(supply / 100000000)
+// })
 
 it('Contract - Successful No Fees', async function () {
   const contractHex = contract(
@@ -50,9 +50,8 @@ it('Contract - Successful No Fees', async function () {
     supply
   )
   const contractTxid = await broadcast(contractHex)
-  let amount = await utils.getVoutAmount(contractTxid, 0)
+  const amount = await utils.getVoutAmount(contractTxid, 0)
   expect(amount).to.equal(supply / 100000000)
-
 })
 
 it('Contract - Successful No Fees Empty Arrays', async function () {
@@ -65,7 +64,7 @@ it('Contract - Successful No Fees Empty Arrays', async function () {
     supply
   )
   const contractTxid = await broadcast(contractHex)
-  let amount = await utils.getVoutAmount(contractTxid, 0)
+  const amount = await utils.getVoutAmount(contractTxid, 0)
   expect(amount).to.equal(supply / 100000000)
 })
 
@@ -108,7 +107,7 @@ it('Contract - Duplicate UTXOS Throws Error', async function () {
   }
 })
 
-it('Contract - Null Issuer Public Key Throws Error', async function () {
+it('Contract - Null Issuer Private Key Throws Error', async function () {
   try {
     contract(
       null,
@@ -122,7 +121,7 @@ it('Contract - Null Issuer Public Key Throws Error', async function () {
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Cannot read property \'publicKey\' of null')
+    expect(e.message).to.eql('Issuer private key is null')
   }
 })
 
@@ -181,7 +180,7 @@ it('Contract - Null Funding Private Key With Funding UTXO Throws Error', async f
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Cannot read property \'publicKey\' of null')
+    expect(e.message).to.eql('Payment UTXIs provided but payment private key is null')
   }
 })
 
@@ -202,7 +201,7 @@ it('Contract - Null Schema Throws Error', async function () {
     expect(e.message).to.eql('Schema is null')
   }
 })
-//needs fixed
+// needs fixed
 it('Contract - Null Supply Throws Error', async function () {
   try {
     contract(
@@ -401,7 +400,7 @@ it('Contract - Null Symbol In Schema Throws Error', async function () {
   }
 })
 
-//needs fixed
+// needs fixed
 it('Contract - Empty Symbol In Schema Throws Error', async function () {
   try {
     contract(
@@ -420,9 +419,7 @@ it('Contract - Empty Symbol In Schema Throws Error', async function () {
   }
 })
 
-
-async function setup() {
-
+async function setup () {
   issuerPrivateKey = bsv.PrivateKey()
   fundingPrivateKey = bsv.PrivateKey()
   contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
@@ -431,10 +428,8 @@ async function setup() {
   schema = utils.schema(publicKeyHash, symbol, supply)
 }
 
-
-function schemaNullSymbol() {
-
-  return schema = {
+function schemaNullSymbol () {
+  return {
     name: 'Taal Token',
     tokenId: `${publicKeyHash}`,
     protocolId: 'To be decided',
