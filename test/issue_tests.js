@@ -30,12 +30,10 @@ let bobAddr
 let symbol
 
 beforeEach(async function () {
-
   await setup() // set up contract
 })
 
 it('Issue - Successful Issue Token With Split And Fee 1', async function () {
-
   const issueHex = issue(
     issuerPrivateKey,
     utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
@@ -48,7 +46,7 @@ it('Issue - Successful Issue Token With Split And Fee 1', async function () {
   )
   const issueTxid = await broadcast(issueHex)
   const tokenId = await utils.getToken(issueTxid)
-  let response = await utils.getTokenResponse(tokenId)
+  const response = await utils.getTokenResponse(tokenId)
   expect(response.symbol).to.equal(symbol)
   expect(response.contract_txs).to.contain(contractTxid)
   expect(response.issuance_txs).to.contain(issueTxid)
@@ -59,7 +57,6 @@ it('Issue - Successful Issue Token With Split And Fee 1', async function () {
 })
 
 it('Issue - Successful Issue Token With Split And Fee 2', async function () {
-
   const issueInfo = [
     {
       addr: aliceAddr,
@@ -79,7 +76,7 @@ it('Issue - Successful Issue Token With Split And Fee 2', async function () {
   )
   const issueTxid = await broadcast(issueHex)
   const tokenId = await utils.getToken(issueTxid)
-  let response = await utils.getTokenResponse(tokenId)
+  const response = await utils.getTokenResponse(tokenId)
   expect(response.symbol).to.equal(symbol)
   expect(response.contract_txs).to.contain(contractTxid)
   expect(response.issuance_txs).to.contain(issueTxid)
@@ -88,7 +85,6 @@ it('Issue - Successful Issue Token With Split And Fee 2', async function () {
 })
 
 it('Issue - Successful Issue Token With Split And Fee 3', async function () {
-
   const davePrivateKey = bsv.PrivateKey()
   const daveAddr = davePrivateKey.toAddress(process.env.NETWORK).toString()
 
@@ -121,7 +117,7 @@ it('Issue - Successful Issue Token With Split And Fee 3', async function () {
   )
   const issueTxid = await broadcast(issueHex)
   const tokenId = await utils.getToken(issueTxid)
-  let response = await utils.getTokenResponse(tokenId)
+  const response = await utils.getTokenResponse(tokenId)
   expect(response.symbol).to.equal(symbol)
   expect(response.contract_txs).to.contain(contractTxid)
   expect(response.issuance_txs).to.contain(issueTxid)
@@ -134,7 +130,6 @@ it('Issue - Successful Issue Token With Split And Fee 3', async function () {
 })
 
 it('Issue - Successful Issue Token With Split And Fee 4', async function () {
-
   const davePrivateKey = bsv.PrivateKey()
   const daveAddr = davePrivateKey.toAddress(process.env.NETWORK).toString()
   const emmaPrivateKey = bsv.PrivateKey()
@@ -173,7 +168,7 @@ it('Issue - Successful Issue Token With Split And Fee 4', async function () {
   )
   const issueTxid = await broadcast(issueHex)
   const tokenId = await utils.getToken(issueTxid)
-  let response = await utils.getTokenResponse(tokenId)
+  const response = await utils.getTokenResponse(tokenId)
   expect(response.symbol).to.equal(symbol)
   expect(response.contract_txs).to.contain(contractTxid)
   expect(response.issuance_txs).to.contain(issueTxid)
@@ -188,7 +183,6 @@ it('Issue - Successful Issue Token With Split And Fee 4', async function () {
 })
 
 it('Issue - Successful Issue Token To Same Address', async function () {
-
   const issueHex = issue(
     issuerPrivateKey,
     utils.getIssueInfo(aliceAddr, 7000, aliceAddr, 3000),
@@ -201,7 +195,7 @@ it('Issue - Successful Issue Token To Same Address', async function () {
   )
   const issueTxid = await broadcast(issueHex)
   const tokenId = await utils.getToken(issueTxid)
-  let response = await utils.getTokenResponse(tokenId)
+  const response = await utils.getTokenResponse(tokenId)
   expect(response.symbol).to.equal(symbol)
   expect(response.contract_txs).to.contain(contractTxid)
   expect(response.issuance_txs).to.contain(issueTxid)
@@ -210,9 +204,7 @@ it('Issue - Successful Issue Token To Same Address', async function () {
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
 })
 
-
 it('Issue - Successful Issue Token Non Split', async function () {
-
   const issueHex = issue(
     issuerPrivateKey,
     utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
@@ -225,7 +217,7 @@ it('Issue - Successful Issue Token Non Split', async function () {
   )
   const issueTxid = await broadcast(issueHex)
   const tokenId = await utils.getToken(issueTxid)
-  let response = await utils.getTokenResponse(tokenId)
+  const response = await utils.getTokenResponse(tokenId)
   expect(response.symbol).to.equal(symbol)
   expect(response.contract_txs).to.contain(contractTxid)
   expect(response.issuance_txs).to.contain(issueTxid)
@@ -236,7 +228,6 @@ it('Issue - Successful Issue Token Non Split', async function () {
 })
 
 it('Issue - Successful Issue Token With Split No Fee', async function () {
-
   const issueHex = issue(
     issuerPrivateKey,
     utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
@@ -248,8 +239,8 @@ it('Issue - Successful Issue Token With Split No Fee', async function () {
     2
   )
   const issueTxid = await broadcast(issueHex)
-  const tokenId = await utils.getToken(issueTxid) //token issuance currently delayed
-  let response = await utils.getTokenResponse(tokenId)
+  const tokenId = await utils.getToken(issueTxid) // token issuance currently delayed
+  const response = await utils.getTokenResponse(tokenId)
   expect(response.symbol).to.equal(symbol)
   expect(response.contract_txs).to.contain(contractTxid)
   expect(response.issuance_txs).to.contain(issueTxid)
@@ -260,7 +251,6 @@ it('Issue - Successful Issue Token With Split No Fee', async function () {
 })
 
 it('Issue - Successful Issue Token 10 Addresses', async function () {
-
   const pk1 = bsv.PrivateKey()
   const add1 = pk1.toAddress(process.env.NETWORK).toString()
   const pk2 = bsv.PrivateKey()
@@ -285,12 +275,12 @@ it('Issue - Successful Issue Token 10 Addresses', async function () {
     utils.getUtxo(contractTxid, contractTx, 1),
     fundingPrivateKey,
     true,
-    symbol,
+    'TAALT',
     2
   )
   const issueTxid = await broadcast(issueHex)
   const tokenId = await utils.getToken(issueTxid)
-  let response = await utils.getTokenResponse(tokenId)
+  const response = await utils.getTokenResponse(tokenId)
   expect(response.symbol).to.equal(symbol)
   expect(response.contract_txs).to.contain(contractTxid)
   expect(response.issuance_txs).to.contain(issueTxid)
@@ -302,34 +292,36 @@ it('Issue - Successful Issue Token 10 Addresses', async function () {
   expect(await utils.getTokenBalance(bobAddr)).to.equal(1000)
 })
 
-it('Issue - Successful Issue Different Symbol 1', async function () {
-
+it('Issue - Incorrect Issue Different Symbol 1', async function () {
   const newSymbol = 'TEST'
-  const issueHex = issue(
-    issuerPrivateKey,
-    utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
-    utils.getUtxo(contractTxid, contractTx, 0),
-    utils.getUtxo(contractTxid, contractTx, 1),
-    fundingPrivateKey,
-    true,
-    newSymbol,
-    2
-  )
-  const issueTxid = await broadcast(issueHex)
-  const tokenId = await utils.getToken(issueTxid)
-  let response = await utils.getTokenResponse(tokenId)
-  expect(response.symbol).to.equal(symbol)
-  expect(response.contract_txs).to.contain(contractTxid)
-  expect(response.issuance_txs).to.contain(issueTxid)
-  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
-  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+  try {
+    issue(
+      issuerPrivateKey,
+      utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+      utils.getUtxo(contractTxid, contractTx, 0),
+      utils.getUtxo(contractTxid, contractTx, 1),
+      fundingPrivateKey,
+      true,
+      newSymbol,
+      2
+    )
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.contain('The symbol in the contract must equal symbol passed to issue')
+  }
+  // const issueTxid = await broadcast(issueHex)
+  // const tokenId = await utils.getToken(issueTxid)
+  // const response = await utils.getTokenResponse(tokenId)
+  // expect(response.symbol).to.equal(symbol)
+  // expect(response.contract_txs).to.contain(contractTxid)
+  // expect(response.issuance_txs).to.contain(issueTxid)
+  // expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
+  // expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
+  // expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+  // expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
 })
 
-
 it('Issue - Incorrect Issue Private Key Throws Error', async function () {
-
   const incorrectPrivateKey = bsv.PrivateKey()
   const issueHex = issue(
     incorrectPrivateKey,
@@ -387,11 +379,11 @@ it('Issue - Issue to Address with a negative token amount(?)', async function ()
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Invalid Argument: Output satoshis is not a natural number')
+    expect(e.message).to.eql('issueInfo satoshis < 1')
   }
 })
 
-//should we validate that balance in issue info is a postive integer?
+// should we validate that balance in issue info is a postive integer?
 it('Issue - Issue to Address with Zero Tokens Throws Errror', async function () {
   try {
     issue(
@@ -404,11 +396,11 @@ it('Issue - Issue to Address with Zero Tokens Throws Errror', async function () 
       symbol,
       2
     )
-    assert(false)
-    return
+    // assert(false, 'Issue should have failed')
+    // return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Some Error')
+    expect(e.message).to.eql('issueInfo satoshis < 1')
   }
 })
 
@@ -451,7 +443,6 @@ it('Issue - Issue with Incorrect Balance (More Than) Throws Error', async functi
     expect(e.message).to.eql('total out amount 13000 must equal total in amount 10000')
   }
 })
-
 
 it('Issue - Empty Issue Info Throws Error', async function () {
   try {
@@ -500,12 +491,10 @@ it('Issue - Invalid Issue Address (Too Short) throws error', async function () {
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Invalid Address string provided')
+    expect(e.message).to.eql('issueInfo address must be between 26 and 35')
   }
 })
 
-//throwing a 'Checksum mismatch' error - if i am reading code correctly it should validate address first 
-//and trigger > ADDRESS_MAX_LENGTH  error
 it('Issue - Invalid Issue Address (Too Long) throws error', async function () {
   issueInfo = [
     {
@@ -534,7 +523,7 @@ it('Issue - Invalid Issue Address (Too Long) throws error', async function () {
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Some Error')
+    expect(e.message).to.eql('issueInfo address must be between 26 and 35')
   }
 })
 
@@ -557,7 +546,6 @@ it('Issue - Issue Amount Decimal Throws Error', async function () {
     expect(e.message).to.eql('Invalid Argument: Output satoshis is not a natural number')
   }
 })
-
 
 it('Issue - Non Array Issue Info Throws Error', async function () {
   try {
@@ -643,7 +631,7 @@ it('Issue - Null Issuer Private Key Throws Error', async function () {
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Cannot read property \'publicKey\' of null')
+    expect(e.message).to.eql('Issuer private key is null')
   }
 })
 
@@ -703,10 +691,10 @@ it('Issue - Null Payment Private Key Throws Error', async function () {
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Cannot read property \'publicKey\' of null')
+    expect(e.message).to.eql('Payment UTXO provided but payment private key is null')
   }
 })
-//needs fixed
+
 it('Issue - Null isSplittable Throws Error', async function () {
   try {
     issue(
@@ -723,10 +711,10 @@ it('Issue - Null isSplittable Throws Error', async function () {
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Some Error')
+    expect(e.message).to.eql('isSplittable must be a boolean value')
   }
 })
-//needs fixed
+
 it('Issue - Null Symbol Throws Error', async function () {
   try {
     issue(
@@ -743,10 +731,10 @@ it('Issue - Null Symbol Throws Error', async function () {
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Some Error')
+    expect(e.message).to.eql('Invalid Symbol. Must be between 1 and 128 long and contain alpahnumeric, \'-\', \'_\' chars.')
   }
 })
-//needs fixed
+
 it('Issue - Null Version Throws Error', async function () {
   try {
     issue(
@@ -763,7 +751,7 @@ it('Issue - Null Version Throws Error', async function () {
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.contain('invalid protocol version')
+    expect(e.message).to.contain('Invalid version. Must be 2')
   }
 })
 
@@ -783,7 +771,7 @@ it('Issue - Invalid Version Throws Error 1', async function () {
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.contain('invalid protocol version')
+    expect(e.message).to.contain('Invalid version. Must be 2')
   }
 })
 
@@ -803,11 +791,11 @@ it('Issue - Invalid Version Throws Error 2', async function () {
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.contain('invalid protocol version')
+    expect(e.message).to.contain('Invalid version. Must be 2')
   }
 })
 
-async function setup() {
+async function setup () {
   issuerPrivateKey = bsv.PrivateKey()
   fundingPrivateKey = bsv.PrivateKey()
   bobPrivateKey = bsv.PrivateKey()
@@ -818,8 +806,8 @@ async function setup() {
   aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
   bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
   symbol = 'TAALT'
-  supply = 10000
-  schema = utils.schema(publicKeyHash, symbol, supply)
+  const supply = 10000
+  const schema = utils.schema(publicKeyHash, symbol, supply)
 
   const contractHex = contract(
     issuerPrivateKey,

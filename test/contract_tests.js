@@ -180,7 +180,7 @@ it('Contract - Null Funding Private Key With Funding UTXO Throws Error', async f
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Payment UTXIs provided but payment private key is null')
+    expect(e.message).to.eql('Payment UTXOs provided but payment private key is null')
   }
 })
 
@@ -343,8 +343,8 @@ it('Contract - Invalid Char Symbol Throws Error 1 ', async function () {
 })
 
 it('Contract - Invalid Char Symbol Throws Error 2', async function () {
-  invalidCharsSymbol = '&@invalid\"\'+='
-  invalidSchema = utils.schema(publicKeyHash, invalidCharsSymbol, supply)
+  const invalidCharsSymbol = '&@invalid\"\'+='
+  const invalidSchema = utils.schema(publicKeyHash, invalidCharsSymbol, supply)
   try {
     contract(
       issuerPrivateKey,
