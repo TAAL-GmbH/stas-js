@@ -28,7 +28,6 @@ let publicKeyHash
 let issueTxid
 let issueTx
 
-
 beforeEach(async function () {
 
   await setup()
@@ -59,7 +58,6 @@ it('Successful RedeemSplit With 2 Split', async function () {
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(1400)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(4400)
 })
-
 
 it('Successful RedeemSplit With 3 Split', async function () {
 
@@ -157,7 +155,7 @@ it('Successful RedeemSplit With No Fees', async function () {
   return false // tokens left + redemption = 10001
 })
 
-it("RedeemSplit - No Split Completes Successfully", async function () {
+it('RedeemSplit - No Split Completes Successfully', async function () {
 
   const rsBobAmount = issueTx.vout[0].value / 2
   const rSplitDestinations = []
@@ -180,7 +178,7 @@ it("RedeemSplit - No Split Completes Successfully", async function () {
 })
 
 //needs fixed - throwing 'Output satoshis is not a natural number' 
-it("RedeemSplit - Add Too Much To Split Throws Error", async function () {
+it('RedeemSplit - Add Too Much To Split Throws Error', async function () {
 
   const bobAmount = issueTx.vout[0].value * 2
   const splitDestinations = []
@@ -203,7 +201,7 @@ it("RedeemSplit - Add Too Much To Split Throws Error", async function () {
   }
 })
 
-it("RedeemSplit - Address Too Short Throws Error", async function () {
+it('RedeemSplit - Address Too Short Throws Error', async function () {
 
   const bobAmount1 = issueTx.vout[0].value / 2
   const bobAmount2 = issueTx.vout[0].value - bobAmount1
@@ -230,7 +228,7 @@ it("RedeemSplit - Address Too Short Throws Error", async function () {
 
 //throwing a 'Checksum mismatch' error - if i am reading code correctly it should validate address first 
 //and trigger > ADDRESS_MAX_LENGTH  error
-it("RedeemSplit - Address Too Long Throws Error", async function () {
+it('RedeemSplit - Address Too Long Throws Error', async function () {
 
   const bobAmount1 = issueTx.vout[0].value / 2
   const bobAmount2 = issueTx.vout[0].value - bobAmount1
@@ -255,7 +253,6 @@ it("RedeemSplit - Address Too Long Throws Error", async function () {
     expect(e.message).to.eql('Invalid Address string provided')
   }
 })
-
 
 it('RedeemSplit - Incorrect Owner Private Key Throws Error', async function () {
 
@@ -344,8 +341,7 @@ it('RedeemSplit - Incorrect Public Key Throws Error', async function () {
   }
 })
 
-
-it("RedeemSplit - Splitting Into Too Many Tokens Throws Error", async function () {
+it('RedeemSplit - Splitting Into Too Many Tokens Throws Error', async function () {
 
   const bobAmount = issueTx.vout[0].value / 5
   const splitDestinations = []
@@ -372,8 +368,8 @@ it("RedeemSplit - Splitting Into Too Many Tokens Throws Error", async function (
   }
 })
 
-it("RedeemSplit - Null Token Owner Private Key Throws Error", async function () {
-
+// eslint-disable-next-line no-undef
+it('RedeemSplit - Null Token Owner Private Key Throws Error', async function () {
   const bobAmount = issueTx.vout[0].value / 2
   const splitDestinations = []
   splitDestinations[0] = { address: bobAddr, amount: bobAmount }
@@ -381,7 +377,7 @@ it("RedeemSplit - Null Token Owner Private Key Throws Error", async function () 
 
   const issueOutFundingVout = issueTx.vout.length - 1
   try {
-    redeemHex = redeemSplit(
+    redeemSplit(
       null,
       issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
@@ -393,11 +389,11 @@ it("RedeemSplit - Null Token Owner Private Key Throws Error", async function () 
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Some Error')
+    expect(e.message).to.eql('issuer private key is null')
   }
 })
 
-it("RedeemSplit - Null STAS UTXO Throws Error", async function () {
+it('RedeemSplit - Null STAS UTXO Throws Error', async function () {
 
   const bobAmount = issueTx.vout[0].value / 2
   const splitDestinations = []
@@ -422,16 +418,10 @@ it("RedeemSplit - Null STAS UTXO Throws Error", async function () {
   }
 })
 
-it("RedeemSplit - Null Split Destinations Throws Error", async function () {
-
-  const bobAmount = issueTx.vout[0].value / 2
-  const splitDestinations = []
-  splitDestinations[0] = { address: bobAddr, amount: bobAmount }
-  splitDestinations[1] = { address: bobAddr, amount: bobAmount }
-
+it('RedeemSplit - Null Split Destinations Throws Error', async function () {
   const issueOutFundingVout = issueTx.vout.length - 1
   try {
-    redeemHex = redeemSplit(
+    redeemSplit(
       alicePrivateKey,
       issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
@@ -443,12 +433,11 @@ it("RedeemSplit - Null Split Destinations Throws Error", async function () {
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Some Error')
+    expect(e.message).to.eql('split destinations is null')
   }
 })
 
-
-it("RedeemSplit - Null Funding Private Key Throws Error", async function () {
+it('RedeemSplit - Null Funding Private Key Throws Error', async function () {
 
   const bobAmount = issueTx.vout[0].value / 2
   const splitDestinations = []
@@ -457,7 +446,7 @@ it("RedeemSplit - Null Funding Private Key Throws Error", async function () {
 
   const issueOutFundingVout = issueTx.vout.length - 1
   try {
-    redeemHex = redeemSplit(
+    redeemSplit(
       alicePrivateKey,
       issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
@@ -469,12 +458,35 @@ it("RedeemSplit - Null Funding Private Key Throws Error", async function () {
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Cannot read property \'publicKey\' of null')
+    expect(e.message).to.eql('payment private key is null')
   }
 })
 
+it('RedeemSplit - Null Contract Public Key Throws Error', async function () {
+  const bobAmount = issueTx.vout[0].value / 2
+  const splitDestinations = []
+  splitDestinations[0] = { address: bobAddr, amount: bobAmount }
+  splitDestinations[1] = { address: bobAddr, amount: bobAmount }
 
-async function setup() {
+  const issueOutFundingVout = issueTx.vout.length - 1
+  try {
+    redeemSplit(
+      alicePrivateKey,
+      null,
+      utils.getUtxo(issueTxid, issueTx, 0),
+      splitDestinations,
+      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
+      null
+    )
+    assert(false)
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('contract public key is null')
+  }
+})
+
+async function setup () {
 
   issuerPrivateKey = bsv.PrivateKey()
   fundingPrivateKey = bsv.PrivateKey()
