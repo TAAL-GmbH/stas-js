@@ -26,19 +26,19 @@ beforeEach(async function () {
   await setup()
 })
 
-// it('Contract - Successful With Fees', async function () {
-//   const contractHex = contract(
-//     issuerPrivateKey,
-//     contractUtxos,
-//     fundingUtxos,
-//     fundingPrivateKey,
-//     schema,
-//     supply
-//   )
-//   const contractTxid = await broadcast(contractHex)
-//   const amount = await utils.getVoutAmount(contractTxid, 0)
-//   expect(amount).to.equal(supply / 100000000)
-// })
+it('Contract - Successful With Fees', async function () {
+  const contractHex = contract(
+    issuerPrivateKey,
+    contractUtxos,
+    fundingUtxos,
+    fundingPrivateKey,
+    schema,
+    supply
+  )
+  const contractTxid = await broadcast(contractHex)
+  const amount = await utils.getVoutAmount(contractTxid, 0)
+  expect(amount).to.equal(supply / 100000000)
+})
 
 it('Contract - Successful No Fees', async function () {
   const contractHex = contract(
@@ -54,7 +54,7 @@ it('Contract - Successful No Fees', async function () {
   expect(amount).to.equal(supply / 100000000)
 })
 
-it('Contract - Successful No Fees Empty Arrays', async function () {
+it('Contract - Successful No Fees Empty Array', async function () {
   const contractHex = contract(
     issuerPrivateKey,
     contractUtxos,
@@ -68,7 +68,7 @@ it('Contract - Successful No Fees Empty Arrays', async function () {
   expect(amount).to.equal(supply / 100000000)
 })
 
-it('Contract - Duplicate Private Keys Throws Error', async function () {
+it('Contract - Wrong Funding Private Key Throws Error', async function () {
   const contractHex = contract(
     fundingPrivateKey,
     contractUtxos,
@@ -201,7 +201,7 @@ it('Contract - Null Schema Throws Error', async function () {
     expect(e.message).to.eql('Schema is null')
   }
 })
-// needs fixed
+
 it('Contract - Null Supply Throws Error', async function () {
   try {
     contract(
@@ -400,7 +400,6 @@ it('Contract - Null Symbol In Schema Throws Error', async function () {
   }
 })
 
-// needs fixed
 it('Contract - Empty Symbol In Schema Throws Error', async function () {
   try {
     contract(

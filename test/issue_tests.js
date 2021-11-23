@@ -239,7 +239,31 @@ it('Issue - Successful Issue Token With Split No Fee', async function () {
     2
   )
   const issueTxid = await broadcast(issueHex)
-  const tokenId = await utils.getToken(issueTxid) // token issuance currently delayed
+  const tokenId = await utils.getToken(issueTxid)
+  const response = await utils.getTokenResponse(tokenId)
+  expect(response.symbol).to.equal(symbol)
+  expect(response.contract_txs).to.contain(contractTxid)
+  expect(response.issuance_txs).to.contain(issueTxid)
+  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
+  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+})
+// needs fixed
+it('Issue - Succesful Empty Funding UTXO', async function () {
+
+  issue(
+    issuerPrivateKey,
+    utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+    utils.getUtxo(contractTxid, contractTx, 0),
+    [],
+    null,
+    true,
+    symbol,
+    2
+  )
+  const issueTxid = await broadcast(issueHex)
+  const tokenId = await utils.getToken(issueTxid)
   const response = await utils.getTokenResponse(tokenId)
   expect(response.symbol).to.equal(symbol)
   expect(response.contract_txs).to.contain(contractTxid)
@@ -305,20 +329,12 @@ it('Issue - Incorrect Issue Different Symbol 1', async function () {
       newSymbol,
       2
     )
+    assert(false)
+    return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
     expect(e.message).to.contain('The symbol in the contract must equal symbol passed to issue')
   }
-  // const issueTxid = await broadcast(issueHex)
-  // const tokenId = await utils.getToken(issueTxid)
-  // const response = await utils.getTokenResponse(tokenId)
-  // expect(response.symbol).to.equal(symbol)
-  // expect(response.contract_txs).to.contain(contractTxid)
-  // expect(response.issuance_txs).to.contain(issueTxid)
-  // expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
-  // expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
-  // expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
-  // expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
 })
 
 it('Issue - Incorrect Issue Private Key Throws Error', async function () {
@@ -336,6 +352,7 @@ it('Issue - Incorrect Issue Private Key Throws Error', async function () {
   try {
     await broadcast(issueHex)
     assert(false)
+    return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
     expect(e.response.data).to.contain('mandatory-script-verify-flag-failed (Script failed an OP_EQUALVERIFY operation)')
@@ -357,6 +374,7 @@ it('Issue - Incorrect Funding Private Key Throws Error', async function () {
   try {
     await broadcast(issueHex)
     assert(false)
+    return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
     expect(e.response.data).to.contain('mandatory-script-verify-flag-failed (Script failed an OP_EQUALVERIFY operation)')
@@ -383,7 +401,6 @@ it('Issue - Issue to Address with a negative token amount(?)', async function ()
   }
 })
 
-// should we validate that balance in issue info is a postive integer?
 it('Issue - Issue to Address with Zero Tokens Throws Errror', async function () {
   try {
     issue(
@@ -396,8 +413,8 @@ it('Issue - Issue to Address with Zero Tokens Throws Errror', async function () 
       symbol,
       2
     )
-    // assert(false, 'Issue should have failed')
-    // return
+    assert(false, 'Issue should have failed')
+    return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
     expect(e.message).to.eql('issueInfo satoshis < 1')
@@ -596,25 +613,6 @@ it('Issue - Empty Contract UTXO Info Throws Error', async function () {
   }
 })
 
-it('Issue - Empty Payment UTXO Info Throws Error', async function () {
-  try {
-    issue(
-      issuerPrivateKey,
-      utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
-      utils.getUtxo(contractTxid, contractTx, 0),
-      [],
-      fundingPrivateKey,
-      true,
-      symbol,
-      2
-    )
-    assert(false)
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Invalid Argument: Output satoshis is not a natural number')
-  }
-})
-
 it('Issue - Null Issuer Private Key Throws Error', async function () {
   try {
     issue(
@@ -795,7 +793,7 @@ it('Issue - Invalid Version Throws Error 2', async function () {
   }
 })
 
-async function setup () {
+async function setup() {
   issuerPrivateKey = bsv.PrivateKey()
   fundingPrivateKey = bsv.PrivateKey()
   bobPrivateKey = bsv.PrivateKey()
