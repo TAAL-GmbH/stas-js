@@ -9,13 +9,13 @@ const {
     transfer,
     split,
     redeem
-} = require('./../index')
+} = require('../index')
 
 const {
     getTransaction,
     getFundsFromFaucet,
     broadcast
-} = require('./../index').utils
+} = require('../index').utils
 
 
 
