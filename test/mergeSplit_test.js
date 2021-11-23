@@ -86,7 +86,6 @@ it('MergeSplit - Successful MergeSplit No Fees', async function () {
   console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
 })
 
-
 it('MergeSplit - Incorrect Destination 1 Satoshi Amount', async function () {
   await setup() // contract, issue, transfer then split
 
@@ -118,7 +117,6 @@ it('MergeSplit - Incorrect Destination 2 Satoshi Amount', async function () {
   await setup() // contract, issue, transfer then split
 
   const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
-  const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
 
   const mergeSplitHex = mergeSplit(
     alicePrivateKey,
@@ -276,7 +274,7 @@ it('MergeSplit - Attempt to MergeSplit Less Than Two Tokens Throws Error', async
   const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
   const incorrectPrivateKey = bsv.PrivateKey()
   try {
-    mergeSplitHex = mergeSplit(
+    mergeSplit(
       incorrectPrivateKey,
       issuerPrivateKey.publicKey,
       [{
@@ -308,7 +306,7 @@ it('MergeSplit - Invalid Address Destination Address 1 Throws Error', async func
   const invalidAddr = '1MSCReQT9E4GpxuK1K'
 
   try {
-    mergeSplitHex = mergeSplit(
+    mergeSplit(
       issuerPrivateKey,
       issuerPrivateKey.publicKey,
       utils.getMergeSplitUtxo(splitTxObj, splitTx),
@@ -335,7 +333,7 @@ it('MergeSplit - Invalid Address Destination Address 2 Throws Error', async func
   const invalidAddr = '1MSCReQT9E4GpxuK1K'
 
   try {
-    mergeSplitHex = mergeSplit(
+    mergeSplit(
       issuerPrivateKey,
       issuerPrivateKey.publicKey,
       utils.getMergeSplitUtxo(splitTxObj, splitTx),
@@ -353,15 +351,14 @@ it('MergeSplit - Invalid Address Destination Address 2 Throws Error', async func
     expect(e.message).to.eql('Invalid Address string provided')
   }
 })
-//needs fixed
+
 it('MergeSplit - Null Issuer Private Key Throws Error', async function () {
   await setup() // contract, issue, transfer then split
 
   const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
   const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
-
   try {
-    mergeSplitHex = mergeSplit(
+    mergeSplit(
       null,
       issuerPrivateKey.publicKey,
       utils.getMergeSplitUtxo(splitTxObj, splitTx),
@@ -376,11 +373,10 @@ it('MergeSplit - Null Issuer Private Key Throws Error', async function () {
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Some Error')
+    expect(e.message).to.eql('Token owner private key is null')
   }
 })
 
-//needs fixed
 it('MergeSplit - Null STAS Merge UTXO Throws Error', async function () {
   await setup() // contract, issue, transfer then split
 
@@ -388,7 +384,7 @@ it('MergeSplit - Null STAS Merge UTXO Throws Error', async function () {
   const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
 
   try {
-    mergeSplitHex = mergeSplit(
+    mergeSplit(
       issuerPrivateKey,
       issuerPrivateKey.publicKey,
       null,
@@ -403,7 +399,7 @@ it('MergeSplit - Null STAS Merge UTXO Throws Error', async function () {
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Some Error')
+    expect(e.message).to.eql('MergeUtxos is invalid')
   }
 })
 
@@ -414,7 +410,7 @@ it('MergeSplit - Null Destination Address 1 Throws Error', async function () {
   const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
 
   try {
-    mergeSplitHex = mergeSplit(
+    mergeSplit(
       issuerPrivateKey,
       issuerPrivateKey.publicKey,
       utils.getMergeSplitUtxo(splitTxObj, splitTx),
@@ -440,7 +436,7 @@ it('MergeSplit - Null Satoshi Amount 1 Throws Error', async function () {
   const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
 
   try {
-    mergeSplitHex = mergeSplit(
+    mergeSplit(
       issuerPrivateKey,
       issuerPrivateKey.publicKey,
       utils.getMergeSplitUtxo(splitTxObj, splitTx),
@@ -466,7 +462,7 @@ it('MergeSplit - Null Destination Address 2 Throws Error', async function () {
   const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
 
   try {
-    mergeSplitHex = mergeSplit(
+    mergeSplit(
       issuerPrivateKey,
       issuerPrivateKey.publicKey,
       utils.getMergeSplitUtxo(splitTxObj, splitTx),
@@ -485,13 +481,12 @@ it('MergeSplit - Null Destination Address 2 Throws Error', async function () {
   }
 })
 
-
 it('MergeSplit - Null Satoshi Amount 2 Throws Error', async function () {
   await setup() // contract, issue, transfer then split
 
   const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
   try {
-    mergeSplitHex = mergeSplit(
+    mergeSplit(
       issuerPrivateKey,
       issuerPrivateKey.publicKey,
       utils.getMergeSplitUtxo(splitTxObj, splitTx),
@@ -510,7 +505,6 @@ it('MergeSplit - Null Satoshi Amount 2 Throws Error', async function () {
   }
 })
 
-
 it('MergeSplit - Null Funding Private Key Throws Error', async function () {
   await setup() // contract, issue, transfer then split
 
@@ -518,7 +512,7 @@ it('MergeSplit - Null Funding Private Key Throws Error', async function () {
   const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
 
   try {
-    mergeSplitHex = mergeSplit(
+    mergeSplit(
       issuerPrivateKey,
       issuerPrivateKey.publicKey,
       utils.getMergeSplitUtxo(splitTxObj, splitTx),
@@ -533,14 +527,11 @@ it('MergeSplit - Null Funding Private Key Throws Error', async function () {
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Cannot read property \'publicKey\' of null')
+    expect(e.message).to.eql('Payment UTXO provided but payment private key is null')
   }
 })
 
-
-
-async function setup() {
-
+async function setup () {
   issuerPrivateKey = bsv.PrivateKey()
   fundingPrivateKey = bsv.PrivateKey()
   bobPrivateKey = bsv.PrivateKey()
