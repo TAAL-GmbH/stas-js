@@ -446,7 +446,7 @@ it('RedeemSplit - Null Funding Private Key Throws Error', async function () {
 
   const issueOutFundingVout = issueTx.vout.length - 1
   try {
-    redeemHex = redeemSplit(
+    redeemSplit(
       alicePrivateKey,
       issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
@@ -458,7 +458,7 @@ it('RedeemSplit - Null Funding Private Key Throws Error', async function () {
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Cannot read property \'publicKey\' of null')
+    expect(e.message).to.eql('payment private key is null')
   }
 })
 
