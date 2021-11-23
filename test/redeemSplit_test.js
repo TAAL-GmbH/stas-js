@@ -177,15 +177,14 @@ it('RedeemSplit - No Split Completes Successfully', async function () {
   expect(await utils.getTokenBalance(bobAddr)).to.equal(6500)
 })
 
-//needs fixed - throwing 'Output satoshis is not a natural number' 
+// eslint-disable-next-line no-undef
 it('RedeemSplit - Add Too Much To Split Throws Error', async function () {
-
   const bobAmount = issueTx.vout[0].value * 2
   const splitDestinations = []
   splitDestinations[0] = { address: bobAddr, amount: bobAmount }
   const issueOutFundingVout = issueTx.vout.length - 1
   try {
-    const redeemHex = redeemSplit(
+    redeemSplit(
       alicePrivateKey,
       issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
@@ -197,7 +196,7 @@ it('RedeemSplit - Add Too Much To Split Throws Error', async function () {
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Some Error')
+    expect(e.message).to.eql('Output satoshis cannot be greater or equal than total input satoshis')
   }
 })
 
