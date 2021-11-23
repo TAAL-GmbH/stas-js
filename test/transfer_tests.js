@@ -28,16 +28,17 @@ let bobAddr
 let symbol
 let issueTxid
 let issueTx
+let issueOutFundingVout
 
 beforeEach(async function () {
 
   await setup() //contract and issue
+  issueOutFundingVout = issueTx.vout.length - 1
 });
 
 
 it("Transfer - Successful With Fee 1", async function () {
 
-  const issueOutFundingVout = issueTx.vout.length - 1
   const incorrectPK = bsv.PrivateKey()
 
   const transferHex = transfer(
@@ -49,7 +50,6 @@ it("Transfer - Successful With Fee 1", async function () {
     fundingPrivateKey
   )
   const transferTxid = await broadcast(transferHex)
-  console.log(transferTxid)
   const tokenId = await utils.getToken(transferTxid)
   let response = await utils.getTokenResponse(tokenId)
   expect(response.symbol).to.equal(symbol)
@@ -59,8 +59,6 @@ it("Transfer - Successful With Fee 1", async function () {
 })
 
 it("Transfer - Successful With Fee 2", async function () {
-
-  const issueOutFundingVout = issueTx.vout.length - 1
 
   const transferHex = transfer(
     alicePrivateKey,
@@ -85,8 +83,6 @@ it("Transfer - Successful With Fee 3", async function () {
 
   const davePrivateKey = bsv.PrivateKey()
   const daveAddr = davePrivateKey.toAddress(process.env.NETWORK).toString()
-  const issueOutFundingVout = issueTx.vout.length - 1
-
   const transferHex = transfer(
     bobPrivateKey,
     issuerPrivateKey.publicKey,
@@ -105,10 +101,7 @@ it("Transfer - Successful With Fee 3", async function () {
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
 })
 
-
 it("Transfer - Successful With Fee 4", async function () {
-
-  const issueOutFundingVout = issueTx.vout.length - 1
 
   const transferHex = transfer(
     bobPrivateKey,
@@ -127,6 +120,27 @@ it("Transfer - Successful With Fee 4", async function () {
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
 })
 
+it("Transfer -  Transfer To Issuer Address (Splitable) Throws Error", async function () {
+
+  issuerAddr = issuerPrivateKey.toAddress(process.env.NETWORK).toString()
+  const transferHex = transfer(
+    issuerPrivateKey,
+    issuerPrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 1),
+    issuerAddr,
+    utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
+    fundingPrivateKey
+  )
+  try {
+    await broadcast(transferHex)
+    assert(false)
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.response.data).to.contain('mandatory-script-verify-flag-failed')
+  }
+
+})
 
 it("Transfer - Successful No Fee", async function () {
 
@@ -150,9 +164,7 @@ it("Transfer - Successful No Fee", async function () {
 
 it("Transfer - Invalid Issuer Private Key Throws Error", async function () {
 
-  const issueOutFundingVout = issueTx.vout.length - 1
   const incorrectPK = bsv.PrivateKey()
-
   const transferHex = transfer(
     incorrectPK,
     issuerPrivateKey.publicKey,
@@ -173,9 +185,7 @@ it("Transfer - Invalid Issuer Private Key Throws Error", async function () {
 
 it("Transfer - Invalid Funding Private Key Throws Error", async function () {
 
-  const issueOutFundingVout = issueTx.vout.length - 1
   const incorrectPK = bsv.PrivateKey()
-
   const transferHex = transfer(
     bobPrivateKey,
     issuerPrivateKey.publicKey,
@@ -196,7 +206,6 @@ it("Transfer - Invalid Funding Private Key Throws Error", async function () {
 
 it("Transfer - Address Validation - Too Few Chars", async function () {
 
-  const issueOutFundingVout = issueTx.vout.length - 1
   const invalidAddr = '1MSCReQT9E4GpxuK1K7uyD5q'
   try {
     transferHex = transfer(
@@ -217,10 +226,8 @@ it("Transfer - Address Validation - Too Few Chars", async function () {
 
 //needs fixed - throwing 'Checksum mismatch'  - can we validate address similar to issue?
 it("Transfer -  Address Validation - Too Many Chars", async function () {
-
-  const issueOutFundingVout = issueTx.vout.length - 1
+  
   const invalidAddr = '1MSCReQT9E4GpxuK1K7uyD5qF1EmznXjkrmoFCgGtkmhyaL2frwff84p2bwTf3FDpkZcCgGtkmhyaL2frwff84p2bwTf3FDpkZcCgGtkmhy'
-
   try {
     transferHex = transfer(
       bobPrivateKey,
@@ -240,8 +247,6 @@ it("Transfer -  Address Validation - Too Many Chars", async function () {
 
 
 it("Transfer - Incorrect STAS UTXO Amount Throws Error", async function () {
-
-  const issueOutFundingVout = issueTx.vout.length - 1
 
   const transferHex = transfer(
     bobPrivateKey,
@@ -268,8 +273,6 @@ it("Transfer - Incorrect STAS UTXO Amount Throws Error", async function () {
 
 it("Transfer - Incorrect Payment UTXO Amount Throws Error", async function () {
 
-  const issueOutFundingVout = issueTx.vout.length - 1
-
   const transferHex = transfer(
     bobPrivateKey,
     issuerPrivateKey.publicKey,
@@ -295,7 +298,6 @@ it("Transfer - Incorrect Payment UTXO Amount Throws Error", async function () {
 //needs fixed
 it("Transfer - Null Token Owner Private Key Throws Error", async function () {
 
-  const issueOutFundingVout = issueTx.vout.length - 1
   try {
     transferHex = transfer(
       null,
@@ -315,7 +317,6 @@ it("Transfer - Null Token Owner Private Key Throws Error", async function () {
 //needs fixed
 it("Transfer - Null Contract Public Key Throws Error", async function () {
 
-  const issueOutFundingVout = issueTx.vout.length - 1
   try {
     transferHex = transfer(
       bobPrivateKey,
@@ -335,7 +336,6 @@ it("Transfer - Null Contract Public Key Throws Error", async function () {
 
 it("Transfer - Null STAS UTXO Throws Error", async function () {
 
-  const issueOutFundingVout = issueTx.vout.length - 1
   try {
     transferHex = transfer(
       bobPrivateKey,
@@ -355,7 +355,6 @@ it("Transfer - Null STAS UTXO Throws Error", async function () {
 
 it("Transfer - Null Destination Address Throws Error", async function () {
 
-  const issueOutFundingVout = issueTx.vout.length - 1
   try {
     transferHex = transfer(
       bobPrivateKey,
@@ -375,7 +374,6 @@ it("Transfer - Null Destination Address Throws Error", async function () {
 
 it("Transfer - Null Funding Private Key Throws Error", async function () {
 
-  const issueOutFundingVout = issueTx.vout.length - 1
   try {
     transferHex = transfer(
       bobPrivateKey,
