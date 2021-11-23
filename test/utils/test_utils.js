@@ -331,18 +331,24 @@ async function broadcastMapi (tx) {
   } catch (error) {
     console.log(error)
   }
-  console.log(response)
-  return response
+  let txid = response.data.payload
+  const split = txid.split('txid":"')[1]
+  txid = split.split('"')[0]
+  console.log(txid)
+  return txid
 }
 
 async function getTransactionMainNet (txid) {
   const url = `https://api.whatsonchain.com/v1/bsv/main/tx/hash/${txid}`
-
-  const response = await axios({
+  let response
+  try {
+   response = await axios({
     method: 'get',
     url
   })
-
+  }catch(error){
+    console.log(error)
+  }
   return response.data
 }
 
