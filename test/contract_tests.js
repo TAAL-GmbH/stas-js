@@ -69,15 +69,36 @@ it('Contract - Successful No Fees Empty Array', async function () {
 })
 
 it('Contract - Wrong Funding Private Key Throws Error', async function () {
+
+  incorrectPrivateKey = bsv.PrivateKey()
   const contractHex = contract(
-    fundingPrivateKey,
+    issuerPrivateKey,
     contractUtxos,
     fundingUtxos,
-    fundingPrivateKey,
+    incorrectPrivateKey,  
     schema,
     supply
   )
+  try {
+    await broadcast(contractHex)
+    assert(false)
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.response.data).to.contain('mandatory-script-verify-flag-failed')
+  }
+})
 
+it('Contract - Wrong Contract Private Key Throws Error', async function () {
+
+  incorrectPrivateKey = bsv.PrivateKey()
+  const contractHex = contract(
+    incorrectPrivateKey, 
+    contractUtxos,
+    fundingUtxos,
+    fundingPrivateKey,  
+    schema,
+    supply
+  )
   try {
     await broadcast(contractHex)
     assert(false)
