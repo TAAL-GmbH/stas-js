@@ -120,6 +120,25 @@ it("Transfer - Successful With Fee 4", async function () {
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
 })
 
+it("Transfer - Successful No Fee", async function () {
+
+  const transferHex = transfer(
+    bobPrivateKey,
+    issuerPrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 1),
+    aliceAddr,
+    null,
+    null
+  )
+  const transferTxid = await broadcast(transferHex)
+  const tokenId = await utils.getToken(transferTxid)
+  let response = await utils.getTokenResponse(tokenId)
+  expect(response.symbol).to.equal(symbol)
+  expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
+})
+
 it("Transfer -  Transfer To Issuer Address (Splitable) Throws Error", async function () {
 
   issuerAddr = issuerPrivateKey.toAddress(process.env.NETWORK).toString()
@@ -141,26 +160,6 @@ it("Transfer -  Transfer To Issuer Address (Splitable) Throws Error", async func
   }
 
 })
-
-it("Transfer - Successful No Fee", async function () {
-
-  const transferHex = transfer(
-    bobPrivateKey,
-    issuerPrivateKey.publicKey,
-    utils.getUtxo(issueTxid, issueTx, 1),
-    aliceAddr,
-    null,
-    null
-  )
-  const transferTxid = await broadcast(transferHex)
-  const tokenId = await utils.getToken(transferTxid)
-  let response = await utils.getTokenResponse(tokenId)
-  expect(response.symbol).to.equal(symbol)
-  expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
-})
-
 
 it("Transfer - Invalid Issuer Private Key Throws Error", async function () {
 
