@@ -26,47 +26,48 @@ beforeEach(async function () {
   await setup()
 })
 
-// it('Contract - Successful With Fees', async function () {
-//   const contractHex = contract(
-//     issuerPrivateKey,
-//     contractUtxos,
-//     fundingUtxos,
-//     fundingPrivateKey,
-//     schema,
-//     supply
-//   )
-//   const contractTxid = await broadcast(contractHex)
-//   const amount = await utils.getVoutAmount(contractTxid, 0)
-//   expect(amount).to.equal(supply / 100000000)
-// })
+tags('something')
+it('Contract - Successful With Fees', async function () {
+  const contractHex = contract(
+    issuerPrivateKey,
+    contractUtxos,
+    fundingUtxos,
+    fundingPrivateKey,
+    schema,
+    supply
+  )
+  const contractTxid = await broadcast(contractHex)
+  const amount = await utils.getVoutAmount(contractTxid, 0)
+  expect(amount).to.equal(supply / 100000000)
+})
 
-// it('Contract - Successful No Fees', async function () {
-//   const contractHex = contract(
-//     issuerPrivateKey,
-//     contractUtxos,
-//     null,
-//     null,
-//     schema,
-//     supply
-//   )
-//   const contractTxid = await broadcast(contractHex)
-//   const amount = await utils.getVoutAmount(contractTxid, 0)
-//   expect(amount).to.equal(supply / 100000000)
-// })
+it('Contract - Successful No Fees', async function () {
+  const contractHex = contract(
+    issuerPrivateKey,
+    contractUtxos,
+    null,
+    null,
+    schema,
+    supply
+  )
+  const contractTxid = await broadcast(contractHex)
+  const amount = await utils.getVoutAmount(contractTxid, 0)
+  expect(amount).to.equal(supply / 100000000)
+})
 
-// it('Contract - Successful No Fees Empty Array', async function () {
-//   const contractHex = contract(
-//     issuerPrivateKey,
-//     contractUtxos,
-//     [],
-//     fundingPrivateKey,
-//     schema,
-//     supply
-//   )
-//   const contractTxid = await broadcast(contractHex)
-//   const amount = await utils.getVoutAmount(contractTxid, 0)
-//   expect(amount).to.equal(supply / 100000000)
-// })
+it('Contract - Successful No Fees Empty Array', async function () {
+  const contractHex = contract(
+    issuerPrivateKey,
+    contractUtxos,
+    [],
+    fundingPrivateKey,
+    schema,
+    supply
+  )
+  const contractTxid = await broadcast(contractHex)
+  const amount = await utils.getVoutAmount(contractTxid, 0)
+  expect(amount).to.equal(supply / 100000000)
+})
 
 it('Contract - Wrong Funding Private Key Throws Error', async function () {
 
