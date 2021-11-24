@@ -24,8 +24,8 @@ const {
 it("Full Life Cycle Test On Mainnet With 4 Issuance Addresses", async function () {
 
     // per-run modifiable values
-    const contractUtxo = await getUtxoMainNet('', true)
-    const feeUtxo = await getUtxoMainNet('', false)
+    const contractUtxo = await getUtxoMainNet('17WYiaND4U88fKkt1tSa142gFSquRsXkpP', true)
+    const feeUtxo = await getUtxoMainNet('17WYiaND4U88fKkt1tSa142gFSquRsXkpP', false)
 
     const inputUtxoid = contractUtxo[0] // the input utxo
     const inputUtxoIdVoutIndex = contractUtxo[1]
@@ -298,3 +298,35 @@ it("Full Life Cycle Test On Mainnet With 4 Issuance Addresses", async function (
     expect(await utils.getTokenBalance(daveAddr)).to.equal(2000)
 
 })
+
+
+async function getUtxoMainNet(address, forContract) {
+    const url = `https://api.whatsonchain.com/v1/bsv/main/address/${address}/unspent`
+  
+    const response = await axios({
+      method: 'get',
+      url
+    })
+    let array = []
+    if (forContract) {
+      for (var key in response.data) {
+        if (response.data[key].value == 449435) {
+          array.push(response.data[key].tx_hash)
+          array.push(response.data[key].tx_pos)
+          break
+        }
+      }
+    } else {
+      for (var key in response.data) {
+        if (response.data[key].value == 81106) {
+          array.push(response.data[key].tx_hash)
+          array.push(response.data[key].tx_pos)
+          break
+        }
+      }
+  
+    }
+    console.log(array)
+    return array
+  }
+  

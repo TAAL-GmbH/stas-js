@@ -1,5 +1,5 @@
 const expect = require('chai').expect
-const utils = require('../utils/test_utils')
+const utils = require('../../utils/test_utils')
 const bsv = require('bsv')
 const axios = require('axios')
 require('dotenv').config()
@@ -12,89 +12,23 @@ const {
   merge,
   mergeSplit,
   redeem
-} = require('../../index')
+} = require('../../../index')
 
 const {
   SATS_PER_BITCOIN
-} = require('../../index').utils
+} = require('../../../index').utils
 
 // eslint-disable-next-line no-undef
-it('Mainnet LifeCycle Test 1 broadcast via MAPI', async function () {
+it('Mainnet LifeCycle Test 1 broadcast via WOC', async function () {
 
-  const wait = 5000 // set wait to ensure mapi tx has reached woc
+  // per-run modifiable values
+  const contractUtxo = await getUtxoMainNet('', true)
+  const feeUtxo = await getUtxoMainNet('', false)
 
-  address = ''
-  rsp = await utils.getUnspentMainNet(address)
-  let array = []
-  for (var key in rsp.data) {
-    if (rsp.data[key].value > 1200000) {
-      array.push(rsp.data[key].tx_hash)
-      array.push(rsp.data[key].tx_pos)
-      array.push(rsp.data[key].value)
-    }
-  }
-  console.log(array)
-  const amount3 = (Math.round(array[2] / 2)) - 5000 //5000 removed to cover tx fee
-
-  const inputTxID = array[0] // id of tx to be used as UTXO
-  const destinationAddress = address // address we are sending sats to 
-  const changeAddress = address // address that change from tx is returned to
-  const satAmount = amount3 // the amount in satoshes we are sending
-  const senderPrivateKey = process.env.ISSUERWIF // private key of owner of UTXO to sign transaction
-
-  const inputTx = await utils.getTransactionMainNet(inputTxID)
-  const inputVout = array[1]  // which output of UTXO we are consuming
-
-  const utxo = new bsv.Transaction.UnspentOutput({
-    txId: inputTxID,
-    outputIndex: inputVout,
-    address: inputTx.vout[inputVout].scriptPubKey.addresses[0],
-    script: inputTx.vout[inputVout].scriptPubKey.hex,
-    satoshis: array[2]
-  })
-  const transaction = new bsv.Transaction()
-    .from(utxo)
-    .to(destinationAddress, satAmount)
-    .change(changeAddress)
-    .sign(senderPrivateKey)
-  console.log(transaction.toString()) // if broadcast fails goto 'https://whatsonchain.com/broadcast' and put in tx hex to check error
-
-  const txid = await utils.broadcastMapi(transaction.toString())
-  await new Promise(r => setTimeout(r, wait))
-  const tx = await utils.getTransactionMainNet(txid)
-  console.log(tx)
-  console.log(Math.round(tx.vout[0].value * SATS_PER_BITCOIN))
-
-  response2 = await utils.getUnspentMainNet(address)
-
-  let contractArray = []
-  for (var key in response2.data) {
-    if (response2.data[key].value == Math.round(tx.vout[0].value * SATS_PER_BITCOIN)) {
-      contractArray.push(response2.data[key].tx_hash)
-      contractArray.push(response2.data[key].tx_pos)
-      break
-    }
-  }
-
-  response3 = await utils.getUnspentMainNet(address)
-  let feeArray = []
-  for (var key in response3.data) {
-    if (response3.data[key].value > Math.round(tx.vout[1].value * SATS_PER_BITCOIN)) {
-      feeArray.push(response3.data[key].tx_hash)
-      feeArray.push(response3.data[key].tx_pos)
-      break
-    }
-  }
-
-
-
-  console.log(contractArray)
-  console.log(feeArray)
-
-  const inputUtxoid = contractArray[0] // the input utxo
-  const inputUtxoIdVoutIndex = contractArray[1]
-  const inputUtxoidFee = feeArray[0] // the fee utxo
-  const inputUtxoIdFeeVoutIndex = feeArray[1]
+  const inputUtxoid = contractUtxo[0] // the input utxo
+  const inputUtxoIdVoutIndex = contractUtxo[1]
+  const inputUtxoidFee = feeUtxo[0] // the fee utxo
+  const inputUtxoIdFeeVoutIndex = feeUtxo[1]
   const symbol = 'test-' + randomSymbol(10) // Use a unique symbol every test run to ensure that token balances can be checked correctly
 
   console.log('token symbol:', symbol)
@@ -102,6 +36,8 @@ it('Mainnet LifeCycle Test 1 broadcast via MAPI', async function () {
   const supply = 10000
   const bobsInitialSathoshis = 6000
   const aliceInitialSatoshis = supply - bobsInitialSathoshis
+
+  const wait = 1000 // set wait before token balance check in case of delay
 
   const issuerWif = process.env.ISSUERWIF // the issuer of the contract and pays fees
   const bobWif = process.env.BOBWIF
@@ -140,10 +76,12 @@ it('Mainnet LifeCycle Test 1 broadcast via MAPI', async function () {
     schema,
     supply
   )
-  const contractTxid = await utils.broadcastMapi(contractHex)
+  const contractTxid = await utils.broadcastToMainNet(contractHex)
   console.log(`Contract TX:     ${contractTxid}`)
-  await new Promise(r => setTimeout(r, wait))
   const contractTx = await utils.getTransactionMainNet(contractTxid)
+
+  // eslint-disable-next-line promise/param-names
+  await new Promise(r => setTimeout(r, wait))
 
   const issueHex = issue(
     issuerPrivateKey,
@@ -155,16 +93,17 @@ it('Mainnet LifeCycle Test 1 broadcast via MAPI', async function () {
     symbol,
     2
   )
-  const issueTxid = await utils.broadcastMapi(issueHex)
+  const issueTxid = await utils.broadcastToMainNet(issueHex)
   console.log(`Issue TX:        ${issueTxid}`)
-  await new Promise(r => setTimeout(r, wait))
   const issueTx = await utils.getTransactionMainNet(issueTxid)
   const tokenId = await utils.getTokenMainNet(issueTxid)
   console.log(`Token ID:        ${tokenId}`)
-  await new Promise(r => setTimeout(r, wait))
   const response = await utils.getTokenResponseMainNet(tokenId, symbol)
   expect(response.symbol).to.equal(symbol)
   console.log("token issued")
+  // eslint-disable-next-line promise/param-names
+  await new Promise(r => setTimeout(r, wait))
+
   expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(6000)
   expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(4000)
   console.log('Bob Balance  ' + await utils.getTokenBalanceMainNet(bobAddr, symbol))
@@ -180,10 +119,11 @@ it('Mainnet LifeCycle Test 1 broadcast via MAPI', async function () {
     utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
     issuerPrivateKey
   )
-  const transferTxid = await utils.broadcastMapi(transferHex)
+  const transferTxid = await utils.broadcastToMainNet(transferHex)
   console.log(`Transfer TX:     ${transferTxid}`)
-  await new Promise(r => setTimeout(r, wait))
   const transferTx = await utils.getTransactionMainNet(transferTxid)
+
+  await new Promise(r => setTimeout(r, wait))
   expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(0)
   expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(10000)
   console.log('Bob Balance  ' + await utils.getTokenBalanceMainNet(bobAddr, symbol))
@@ -204,10 +144,11 @@ it('Mainnet LifeCycle Test 1 broadcast via MAPI', async function () {
     utils.getUtxo(transferTxid, transferTx, 1),
     issuerPrivateKey
   )
-  const splitTxid = await utils.broadcastMapi(splitHex)
-  await new Promise(r => setTimeout(r, wait))
+  const splitTxid = await utils.broadcastToMainNet(splitHex)
   console.log(`Split TX:        ${splitTxid}`)
   const splitTx = await utils.getTransactionMainNet(splitTxid)
+  await new Promise(r => setTimeout(r, wait))
+
   expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(6000)
   expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(4000)
   console.log('Bob Balance  ' + await utils.getTokenBalanceMainNet(bobAddr, symbol))
@@ -224,10 +165,11 @@ it('Mainnet LifeCycle Test 1 broadcast via MAPI', async function () {
     utils.getUtxo(splitTxid, splitTx, 2),
     issuerPrivateKey
   )
-  const mergeTxid = await utils.broadcastMapi(mergeHex)
+  const mergeTxid = await utils.broadcastToMainNet(mergeHex)
   console.log(`Merge TX:        ${mergeTxid}`)
-  await new Promise(r => setTimeout(r, wait))
   const mergeTx = await utils.getTransactionMainNet(mergeTxid)
+
+  await new Promise(r => setTimeout(r, wait))
   expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(0)
   expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(10000)
   console.log('Bob Balance  ' + await utils.getTokenBalanceMainNet(bobAddr, symbol))
@@ -248,10 +190,11 @@ it('Mainnet LifeCycle Test 1 broadcast via MAPI', async function () {
     utils.getUtxo(mergeTxid, mergeTx, 1),
     issuerPrivateKey
   )
-  const splitTxid2 = await utils.broadcastMapi(splitHex2)
-  await new Promise(r => setTimeout(r, wait))
+  const splitTxid2 = await utils.broadcastToMainNet(splitHex2)
   console.log(`Split TX2:       ${splitTxid2}`)
   const splitTx2 = await utils.getTransactionMainNet(splitTxid2)
+
+  await new Promise(r => setTimeout(r, wait))
   expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(6000)
   expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(4000)
   console.log('Bob Balance  ' + await utils.getTokenBalanceMainNet(bobAddr, symbol))
@@ -260,8 +203,8 @@ it('Mainnet LifeCycle Test 1 broadcast via MAPI', async function () {
   // Now mergeSplit
   const splitTxObj2 = new bsv.Transaction(splitHex2)
 
-  const bobAmountSatoshis = Math.floor(splitTx2.vout[0].value * SATS_PER_BITCOIN)
-  const aliceAmountSatoshis = Math.floor(splitTx2.vout[1].value * SATS_PER_BITCOIN)
+  const aliceAmountSatoshis = Math.floor(splitTx2.vout[0].value * SATS_PER_BITCOIN) / 2
+  const bobAmountSatoshis = Math.floor(splitTx2.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx2.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
 
   const mergeSplitHex = mergeSplit(
     bobsPrivateKey,
@@ -274,16 +217,17 @@ it('Mainnet LifeCycle Test 1 broadcast via MAPI', async function () {
     utils.getUtxo(splitTxid2, splitTx2, 2),
     issuerPrivateKey
   )
-  const mergeSplitTxid = await utils.broadcastMapi(mergeSplitHex)
+
+  const mergeSplitTxid = await utils.broadcastToMainNet(mergeSplitHex)
   console.log(`MergeSplit TX:   ${mergeSplitTxid}`)
-  await new Promise(r => setTimeout(r, wait))
   const mergeSplitTx = await utils.getTransactionMainNet(mergeSplitTxid)
-  // expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(3000)
-  // expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(3000)
+
+  await new Promise(r => setTimeout(r, wait))
+  expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(4500)
+  expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(5500)
   console.log('Bob Balance  ' + await utils.getTokenBalanceMainNet(bobAddr, symbol))
   console.log('Alice Balance  ' + await utils.getTokenBalanceMainNet(aliceAddr, symbol))
 
-  //redeem Bon's Token
   const redeemHex = redeem(
     bobsPrivateKey,
     issuerPrivateKey.publicKey,
@@ -291,29 +235,10 @@ it('Mainnet LifeCycle Test 1 broadcast via MAPI', async function () {
     utils.getUtxo(mergeSplitTxid, mergeSplitTx, 2),
     issuerPrivateKey
   )
-  const redeemTxid = await utils.broadcastMapi(redeemHex)
+  const redeemTxid = await utils.broadcastToMainNet(redeemHex)
   console.log(`Redeem TX:       ${redeemTxid}`)
-  await new Promise(r => setTimeout(r, wait))
-  const redeemTx = await utils.getTransactionMainNet(redeemTxid)
-  // expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(0)
-  // expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(5500)
-  console.log('Bob Balance  ' + await utils.getTokenBalanceMainNet(bobAddr, symbol))
-  console.log('Alice Balance  ' + await utils.getTokenBalanceMainNet(aliceAddr, symbol))
-
-  //redeem Alice's Token
-  const redeemHex2 = redeem(
-    alicePrivateKey,
-    issuerPrivateKey.publicKey,
-    utils.getUtxo(mergeSplitTxid, mergeSplitTx, 1),
-    utils.getUtxo(redeemTxid, redeemTx, 1),
-    issuerPrivateKey
-  )
-  const redeemTxid2 = await utils.broadcastMapi(redeemHex2)
-  console.log(`Redeem TX2:       ${redeemTxid2}`)
-  await new Promise(r => setTimeout(r, wait))
-
-  // expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(0)
-  // expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(0)
+  expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(0)
+  expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(5500)
   console.log('Bob Balance  ' + await utils.getTokenBalanceMainNet(bobAddr, symbol))
   console.log('Alice Balance  ' + await utils.getTokenBalanceMainNet(aliceAddr, symbol))
 })
@@ -329,5 +254,7 @@ function randomSymbol(length) {
   return result;
 }
 
+
+  
 
 

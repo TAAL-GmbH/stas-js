@@ -1,5 +1,9 @@
 const axios = require('axios')
+const bsv = require('bsv')
 require('dotenv').config()
+const {
+  SATS_PER_BITCOIN
+} = require('../../index').utils
 
 function schema(publicKeyHash, symbol, supply) {
   const schema = {
@@ -391,6 +395,7 @@ async function getTokenResponseMainNet(tokenId, symbol) {
 }
 
 async function getUtxoMainNet(address, forContract) {
+
   const url = `https://api.whatsonchain.com/v1/bsv/main/address/${address}/unspent`
 
   const response = await axios({
@@ -399,7 +404,7 @@ async function getUtxoMainNet(address, forContract) {
   })
   let array = []
   if (forContract) {
-    for (var key in response.data) {  
+    for (var key in response.data) {
       if (response.data[key].value == 1505139) {
         array.push(response.data[key].tx_hash)
         array.push(response.data[key].tx_pos)
@@ -409,7 +414,7 @@ async function getUtxoMainNet(address, forContract) {
   } else {
     for (var key in response.data) {
       if (response.data[key].value == 1495253) {
-   //  if ((response.data[key].value > 900000) && (response.data[key].value < 1300000)) {
+        //  if ((response.data[key].value > 900000) && (response.data[key].value < 1300000)) {
         array.push(response.data[key].tx_hash)
         array.push(response.data[key].tx_pos)
         break
@@ -420,6 +425,72 @@ async function getUtxoMainNet(address, forContract) {
   console.log(array)
   return array
 }
+
+async function setupMainNetTest(address, wait, valueOfSats) {
+
+  rsp = await getUnspentMainNet(address)
+  let array = []
+  for (var key in rsp.data) {
+    if (rsp.data[key].value > valueOfSats) {
+      array.push(rsp.data[key].tx_hash)
+      array.push(rsp.data[key].tx_pos)
+      array.push(rsp.data[key].value)
+      break
+    }
+  }
+  const amount3 = (Math.round(array[2] / 2)) - 5000 //5000 removed to cover tx fee
+
+  const inputTxID = array[0] // id of tx to be used as UTXO
+  const destinationAddress = address // address we are sending sats to 
+  const changeAddress = address // address that change from tx is returned to
+  const satAmount = amount3 // the amount in satoshes we are sending
+  const senderPrivateKey = process.env.ISSUERWIF // private key of owner of UTXO to sign transaction
+
+  const inputTx = await getTransactionMainNet(inputTxID)
+  const inputVout = array[1]  // which output of UTXO we are consuming
+
+  const utxo = new bsv.Transaction.UnspentOutput({
+    txId: inputTxID,
+    outputIndex: inputVout,
+    address: inputTx.vout[inputVout].scriptPubKey.addresses[0],
+    script: inputTx.vout[inputVout].scriptPubKey.hex,
+    satoshis: array[2]
+  })
+  const transaction = new bsv.Transaction()
+    .from(utxo)
+    .to(destinationAddress, satAmount)
+    .change(changeAddress)
+    .sign(senderPrivateKey)
+  console.log(transaction.toString()) // if broadcast fails goto 'https://whatsonchain.com/broadcast' and put in tx hex to check error
+
+  const txid = await broadcastMapi(transaction.toString())
+  await new Promise(r => setTimeout(r, wait))
+  const tx = await getTransactionMainNet(txid)
+  console.log(tx)
+  console.log(Math.round(tx.vout[0].value * SATS_PER_BITCOIN))
+
+  response2 = await getUnspentMainNet(address)
+
+  let responseArray = []
+  for (var key in response2.data) {
+    if (response2.data[key].value == Math.round(tx.vout[0].value * SATS_PER_BITCOIN)) {
+      responseArray.push(response2.data[key].tx_hash)
+      responseArray.push(response2.data[key].tx_pos)
+      break
+    }
+  }
+
+  response3 = await getUnspentMainNet(address)
+  for (var key in response3.data) {
+    if (response3.data[key].value > Math.round(tx.vout[1].value * SATS_PER_BITCOIN)) {
+      responseArray.push(response3.data[key].tx_hash)
+      responseArray.push(response3.data[key].tx_pos)
+      break
+    }
+  }
+  return responseArray
+}
+
 
 async function getUnspentMainNet(address) {
   const url = `https://api.whatsonchain.com/v1/bsv/main/address/${address}/unspent`
@@ -455,5 +526,6 @@ module.exports = {
   getTokenMainNet,
   getTokenResponseMainNet,
   getUtxoMainNet,
-  getUnspentMainNet
+  getUnspentMainNet,
+  setupMainNetTest
 }
