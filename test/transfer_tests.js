@@ -59,7 +59,7 @@ describe('regression, testnet', function () {
     expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
   })
 
-  describe('failing', function () {
+  describe('failing, 1416', function () {
     it("Transfer - Successful With Fee 2", async function () {
 
       const transferHex = transfer(

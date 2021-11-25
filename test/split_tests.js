@@ -36,7 +36,7 @@ beforeEach(async function () {
 });
 
 describe('regression, testnet', function () {
-    describe('failing', function () {
+    describe('failing, 1416', function () {
         it("Split - Successful Split Into Two Tokens With Fee", async function () {
 
             issuerAddr = issuerPrivateKey.toAddress(process.env.NETWORK).toString()
@@ -67,7 +67,7 @@ describe('regression, testnet', function () {
             expect(await utils.getTokenBalance(bobAddr)).to.equal(10000)
         })
     })
-    describe('failing', function () {
+    describe('failing, 1416', function () {
         it("Split - Successful Split Into Three Tokens", async function () {
 
             const bobAmount = issueTx.vout[0].value / 2
@@ -97,7 +97,7 @@ describe('regression, testnet', function () {
             expect(await utils.getTokenBalance(bobAddr)).to.equal(8250)
         })
     })
-    describe('failing', function () {
+    describe('failing, 1416', function () {
         it("Split - Successful Split Into Four Tokens 1", async function () {
 
             const bobAmount = issueTx.vout[0].value / 4
@@ -128,7 +128,7 @@ describe('regression, testnet', function () {
             expect(await utils.getTokenBalance(bobAddr)).to.equal(8250)
         })
     })
-    describe('failing', function () {
+    describe('failing, 1416', function () {
         it("Split - Successful Split Into Four Tokens 2", async function () {
 
             const davePrivateKey = bsv.PrivateKey()

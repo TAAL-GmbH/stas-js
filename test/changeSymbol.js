@@ -20,7 +20,8 @@ const {
   SATS_PER_BITCOIN
 } = require('../index').utils
 
-describe('regression, testnet', function () {
+describe('regression, testnet, failing, 1428', function () {
+  
   it('Changed Symbol in issue functions', async function () {
     const issuerPrivateKey = bsv.PrivateKey()
     const fundingPrivateKey = bsv.PrivateKey()

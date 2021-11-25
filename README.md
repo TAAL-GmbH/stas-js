@@ -47,6 +47,7 @@ Files with specific names contain tests targeting a specific test case (eg merge
 npm test  --  --grep 'Successful Merge With Fee'  // run specific test 
 npm test .\test\merge_tests.js //run specific test file
 npm test //run all tests
+mocha --grep 'regression' --timeout 10000 // run all tests tagged with 'regression' 
 ```
 
 All transactions are submitted to Taalnet, a private BSV blockchain that is maintained for testing STAS tokens.  All tokens created can be viewed at https://taalnet.whatsonchain.com/tokens

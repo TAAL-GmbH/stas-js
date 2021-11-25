@@ -40,7 +40,8 @@ beforeEach(async function () {
 })
 
 describe('regression, testnet', function () {
-  describe('failing', function () {
+  describe('failing, 1416', function () {
+
     it('Merge - Successful Merge With Fee', async function () {
       const mergeHex = merge(
         bobPrivateKey,
@@ -63,7 +64,7 @@ describe('regression, testnet', function () {
       expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
     })
   })
-  describe('failing', function () {
+  describe('failing, 1416', function () {
     it('Merge - Successful Merge With Fee 2', async function () {
       const mergeHex = merge(
         bobPrivateKey,
@@ -86,7 +87,7 @@ describe('regression, testnet', function () {
       expect(await utils.getTokenBalance(bobAddr)).to.equal(10000)
     })
   })
-  describe('failing', function () {
+  describe('failing, 1416', function () {
     it('Merge - Merge With No Fee', async function () {
       const mergeHex = merge(
         bobPrivateKey,
