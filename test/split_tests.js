@@ -56,7 +56,6 @@ describe('regression, testnet', function () {
                 utils.getUtxo(issueTxid, issueTx, 2),
                 fundingPrivateKey
             )
-            console.log(splitHex)
             const splitTxid = await broadcast(splitHex)
             let noOfTokens = await utils.countNumOfTokens(splitTxid, true)
             expect(splitDestinations).to.have.length(noOfTokens) //ensure that tx output contains 2 values

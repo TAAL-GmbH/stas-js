@@ -58,6 +58,7 @@ describe('regression, testnet', function () {
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
     expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
   })
+
   describe('failing', function () {
     it("Transfer - Successful With Fee 2", async function () {
 
@@ -80,7 +81,7 @@ describe('regression, testnet', function () {
       expect(await utils.getTokenBalance(bobAddr)).to.equal(10000)
     })
   })
-  describe('failing', function () {
+
     it("Transfer - Successful With Fee 3", async function () {
 
       const davePrivateKey = bsv.PrivateKey()
@@ -102,8 +103,7 @@ describe('regression, testnet', function () {
       expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
       expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
     })
-  })
-  describe('failing', function () {
+
     it("Transfer - Successful With Fee 4", async function () {
 
       const transferHex = transfer(
@@ -122,8 +122,7 @@ describe('regression, testnet', function () {
       expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
       expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
     })
-  })
-  describe('failing', function () {
+
     it("Transfer - Successful No Fee", async function () {
 
       const transferHex = transfer(
@@ -142,7 +141,7 @@ describe('regression, testnet', function () {
       expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
       expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
     })
-  })
+
   it("Transfer -  Transfer To Issuer Address (Splitable) Throws Error", async function () {
 
     issuerAddr = issuerPrivateKey.toAddress(process.env.NETWORK).toString()
