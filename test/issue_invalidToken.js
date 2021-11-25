@@ -49,36 +49,36 @@ beforeEach(async function () {
   contractTx = await getTransaction(contractTxid)
 })
 
-
-it('Attempt to issue invalid token', async function () {
-  const issueHex = issue(
-    issuerPrivateKey,
-    issueInfo(),
-    contractUtxo(),
-    paymentUtxo(),
-    fundingPrivateKey,
-    true,
-    symbol,
-    2
-  )
-  const issueTxid = await broadcast(issueHex)
-  const tokenId = await getToken(issueTxid)
-  const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/token/' + tokenId + '/TAALT'
-  try {
-    await axios({
-      method: 'get',
-      url,
-      auth: {
-        username: process.env.API_USERNAME,
-        password: process.env.API_PASSWORD
-      }
-    })
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Request failed with status code 404')
-  }
+describe('regression, testnet', function () {
+  it('Attempt to issue invalid token', async function () {
+    const issueHex = issue(
+      issuerPrivateKey,
+      issueInfo(),
+      contractUtxo(),
+      paymentUtxo(),
+      fundingPrivateKey,
+      true,
+      symbol,
+      2
+    )
+    const issueTxid = await broadcast(issueHex)
+    const tokenId = await getToken(issueTxid)
+    const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/token/' + tokenId + '/TAALT'
+    try {
+      await axios({
+        method: 'get',
+        url,
+        auth: {
+          username: process.env.API_USERNAME,
+          password: process.env.API_PASSWORD
+        }
+      })
+    } catch (e) {
+      expect(e).to.be.instanceOf(Error)
+      expect(e.message).to.eql('Request failed with status code 404')
+    }
+  })
 })
-
 async function getToken(txid) {
   const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/tx/hash/' + txid
   const response = await axios({

@@ -38,73 +38,75 @@ beforeEach(async function () {
     await setup() // set up contract
 })
 
-it("Attempt to Issue More Tokens Than Supply Without SDK Validation", async function () {
+describe('regression, testnet', function () {
 
-    let issueHex
-    try {
-        issueHex = issueUtil.issueWithoutValiation(
-            issuerPrivateKey,
-            utils.getIssueInfo(aliceAddr, 10000, bobAddr, 3000),
-            utils.getUtxo(contractTxid, contractTx, 0),
-            utils.getUtxo(contractTxid, contractTx, 1),
-            fundingPrivateKey,
-            false,
-            symbol,
-            2
-        )
-    } catch (e) {
-        console.log('error issuing token', e)
-        return
-    }
-    try {
-        await broadcast(issueHex)
-        assert(false)
-        return
-    } catch (e) {
-        expect(e).to.be.instanceOf(Error)
-        expect(e.message).to.eql('Request failed with status code 400')
-    }
+    it("Attempt to Issue More Tokens Than Supply Without SDK Validation", async function () {
+
+        let issueHex
+        try {
+            issueHex = issueUtil.issueWithoutValiation(
+                issuerPrivateKey,
+                utils.getIssueInfo(aliceAddr, 10000, bobAddr, 3000),
+                utils.getUtxo(contractTxid, contractTx, 0),
+                utils.getUtxo(contractTxid, contractTx, 1),
+                fundingPrivateKey,
+                false,
+                symbol,
+                2
+            )
+        } catch (e) {
+            console.log('error issuing token', e)
+            return
+        }
+        try {
+            await broadcast(issueHex)
+            assert(false)
+            return
+        } catch (e) {
+            expect(e).to.be.instanceOf(Error)
+            expect(e.message).to.eql('Request failed with status code 400')
+        }
+    })
+
+    //needs fixed - Token is issued when issued with less token than supply
+    it("Attempt to Issue Less Tokens Than Supply Without SDK Validation", async function () {
+
+        let issueHex
+        try {
+            issueHex = issueUtil.issueWithoutValiation(
+                issuerPrivateKey,
+                utils.getIssueInfo(aliceAddr, 1000, bobAddr, 3000),
+                utils.getUtxo(contractTxid, contractTx, 0),
+                utils.getUtxo(contractTxid, contractTx, 1),
+                fundingPrivateKey,
+                false,
+                symbol,
+                2
+            )
+        } catch (e) {
+            console.log('error issuing token', e)
+            return
+        }
+        const issueTxid = await broadcast(issueHex)
+        const issueTx = await getTransaction(issueTxid)
+        const tokenId = await utils.getToken(issueTxid)
+        console.log(`Token ID:        ${tokenId}`)
+        let response = await utils.getTokenResponse(tokenId)  //token issuance fails intermittingly
+        expect(response.symbol).to.equal(symbol)
+        expect(response.contract_txs).to.contain(contractTxid)
+        expect(response.issuance_txs).to.contain(issueTxid)
+        expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00001) //reduced amounts
+        expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003) //reduced amounts
+        try {
+            await broadcast(issueHex)
+            assert(false)
+            return
+        } catch (e) {
+            expect(e).to.be.instanceOf(Error)
+            expect(e.message).to.eql('Request failed with status code 400')
+        }
+    })
 })
-
-//needs fixed - Token is issued when issued with less token than supply
-it("Attempt to Issue Less Tokens Than Supply Without SDK Validation", async function () {
-
-    let issueHex
-    try {
-        issueHex = issueUtil.issueWithoutValiation(
-            issuerPrivateKey,
-            utils.getIssueInfo(aliceAddr, 1000, bobAddr, 3000),
-            utils.getUtxo(contractTxid, contractTx, 0),
-            utils.getUtxo(contractTxid, contractTx, 1),
-            fundingPrivateKey,
-            false,
-            symbol,
-            2
-        )
-    } catch (e) {
-        console.log('error issuing token', e)
-        return
-    }
-    const issueTxid = await broadcast(issueHex)
-    const issueTx = await getTransaction(issueTxid)
-    const tokenId = await utils.getToken(issueTxid)
-    console.log(`Token ID:        ${tokenId}`)
-    let response = await utils.getTokenResponse(tokenId)  //token issuance fails intermittingly
-    expect(response.symbol).to.equal(symbol)
-    expect(response.contract_txs).to.contain(contractTxid)
-    expect(response.issuance_txs).to.contain(issueTxid)
-    expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00001) //reduced amounts
-    expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003) //reduced amounts
-    try {
-        await broadcast(issueHex)
-        assert(false)
-        return
-    } catch (e) {
-        expect(e).to.be.instanceOf(Error)
-        expect(e.message).to.eql('Request failed with status code 400')
-    }
-})
-
 
 async function setup() {
     const bobPrivateKey = bsv.PrivateKey()
