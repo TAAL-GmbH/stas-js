@@ -1,7 +1,8 @@
 const expect = require("chai").expect
-const utils = require('./utils/test_utils')
+const utils = require('../../utils/test_utils')
 const bsv = require('bsv')
 require('dotenv').config()
+
 
 const {
     contract,
@@ -11,35 +12,29 @@ const {
     merge,
     mergeSplit,
     redeem
-} = require('../index')
+} = require('../../../index')
 
 const {
-    getTransaction,
-    getFundsFromFaucet,
-    broadcast,
     SATS_PER_BITCOIN
-} = require('../index').utils
+} = require('../../../index').utils
 
 
 it("Full Life Cycle Test On Mainnet With 4 Issuance Addresses", async function () {
 
-    // per-run modifiable values
-    const contractUtxo = await getUtxoMainNet('17WYiaND4U88fKkt1tSa142gFSquRsXkpP', true)
-    const feeUtxo = await getUtxoMainNet('17WYiaND4U88fKkt1tSa142gFSquRsXkpP', false)
+    const wait = 10000 // set wait to ensure mapi tx has reached woc
 
-    const inputUtxoid = contractUtxo[0] // the input utxo
-    const inputUtxoIdVoutIndex = contractUtxo[1]
-    const inputUtxoidFee = feeUtxo[0] // the fee utxo
-    const inputUtxoIdFeeVoutIndex = feeUtxo[1]
-    const symbol = 'test-' + randomSymbol(10) // Use a unique symbol every test run to ensure that token balances can be checked correctly
+    const address = ''
+    const satsAmountForContract_and_Fees = 0 
+    const responseArray = await utils.setupMainNetTest(address, wait, satsAmountForContract_and_Fees)
+    console.log(responseArray)
+
+    const inputUtxoid = responseArray[0] // the input utxo
+    const inputUtxoIdVoutIndex = responseArray[1]
+    const inputUtxoidFee = responseArray[2] // the fee utxo
+    const inputUtxoIdFeeVoutIndex = responseArray[3]
+    const symbol = 'test-' + utils.randomSymbol(10) // Use a unique symbol every test run to ensure that token balances can be checked correctly
 
     console.log('token symbol:', symbol)
-
-    const supply = 10000
-    const bobsInitialSathoshis = 6000
-    const aliceInitialSatoshis = supply - bobsInitialSathoshis
-
-    const wait = 1000 // set wait before token balance check in case of delay
 
     const issuerWif = process.env.ISSUERWIF // the issuer of the contract and pays fees
     const bobWif = process.env.BOBWIF
@@ -48,10 +43,10 @@ it("Full Life Cycle Test On Mainnet With 4 Issuance Addresses", async function (
     const emmaPrivateKey = bsv.PrivateKey()
 
     const issuerPrivateKey = bsv.PrivateKey.fromWIF(issuerWif)
-    const bobsPrivateKey = bsv.PrivateKey.fromWIF(bobWif)
+    const bobPrivateKey = bsv.PrivateKey.fromWIF(bobWif)
     const alicePrivateKey = bsv.PrivateKey.fromWIF(aliceWif)
 
-    const bobAddr = bobsPrivateKey.toAddress('mainnet').toString()
+    const bobAddr = bobPrivateKey.toAddress('mainnet').toString()
     const aliceAddr = alicePrivateKey.toAddress('mainnet').toString()
     const daveAddr = davePrivateKey.toAddress('mainnet').toString()
     const emmaAddr = emmaPrivateKey.toAddress('mainnet').toString()
@@ -64,8 +59,7 @@ it("Full Life Cycle Test On Mainnet With 4 Issuance Addresses", async function (
     const inputUtxoFee = await utils.getTransactionMainNet(inputUtxoidFee)
 
     const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
-    const supply = 10000
-    const symbol = 'TAALT'
+    const supply = 20000
     const schema = utils.schema(publicKeyHash, symbol, supply)
 
     const contractHex = contract(
@@ -88,27 +82,28 @@ it("Full Life Cycle Test On Mainnet With 4 Issuance Addresses", async function (
     )
     const contractTxid = await utils.broadcastMapi(contractHex)
     console.log(`Contract TX:     ${contractTxid}`)
+    await new Promise(r => setTimeout(r, wait))
     const contractTx = await utils.getTransactionMainNet(contractTxid)
 
     const issueInfo = [
         {
             addr: aliceAddr,
-            satoshis: 5000,
+            satoshis: 7000,
             data: 'one'
         },
         {
             addr: bobAddr,
-            satoshis: 3000,
+            satoshis: 6000,
             data: 'two'
         },
         {
             addr: daveAddr,
-            satoshis: 2000,
+            satoshis: 4000,
             data: 'three'
         },
         {
             addr: emmaAddr,
-            satoshis: 2000,
+            satoshis: 3000,
             data: 'four'
         }
     ]
@@ -118,15 +113,17 @@ it("Full Life Cycle Test On Mainnet With 4 Issuance Addresses", async function (
         issueInfo,
         utils.getUtxo(contractTxid, contractTx, 0),
         utils.getUtxo(contractTxid, contractTx, 1),
-        fundingPrivateKey,
+        issuerPrivateKey,
         true,
         symbol,
         2
     )
-    //const issueTxid = await utils.broadcastToMainNet(issueHex)
+    const issueTxid = await utils.broadcastMapi(issueHex)
+    await new Promise(r => setTimeout(r, wait))
     const issueTx = await utils.getTransactionMainNet(issueTxid)
     const tokenId = await utils.getTokenMainNet(issueTxid)
     console.log(`Token ID:        ${tokenId}`)
+    await new Promise(r => setTimeout(r, wait))
     const response = await utils.getTokenResponseMainNet(tokenId, symbol)
     expect(response.symbol).to.equal(symbol)
     console.log("token issued")
@@ -134,10 +131,10 @@ it("Full Life Cycle Test On Mainnet With 4 Issuance Addresses", async function (
     console.log("Bob Balance " + await utils.getTokenBalanceMainNet(bobAddr, symbol))
     console.log("Dave Balance " + await utils.getTokenBalanceMainNet(daveAddr, symbol))
     console.log("Emma Balance " + await utils.getTokenBalanceMainNet(emmaAddr, symbol))
-    expect(await utils.getTokenBalanceMainNet(aliceAddr)).to.equal(5000)
-    expect(await utils.getTokenBalanceMainNet(bobAddr)).to.equal(3000)
-    expect(await utils.getTokenBalanceMainNet(daveAddr)).to.equal(2000)
-    expect(await utils.getTokenBalanceMainNet(emmaAddr)).to.equal(2000)
+    expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(7000)
+    expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(6000)
+    expect(await utils.getTokenBalanceMainNet(daveAddr, symbol)).to.equal(4000)
+    expect(await utils.getTokenBalanceMainNet(emmaAddr, symbol)).to.equal(3000)
 
     const issueOutFundingVout = issueTx.vout.length - 1
 
@@ -147,27 +144,27 @@ it("Full Life Cycle Test On Mainnet With 4 Issuance Addresses", async function (
         utils.getUtxo(issueTxid, issueTx, 1),
         aliceAddr,
         utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-        fundingPrivateKey
+        issuerPrivateKey
     )
-    //const transferTxid = await utils.broadcastToMainNet(transferHex)
+    const transferTxid = await utils.broadcastMapi(transferHex)
+    await new Promise(r => setTimeout(r, wait))
     console.log(`Transfer TX:     ${transferTxid}`)
     const transferTx = await utils.getTransactionMainNet(transferTxid)
     console.log("Alice Balance " + await utils.getTokenBalanceMainNet(aliceAddr, symbol))
     console.log("Bob Balance " + await utils.getTokenBalanceMainNet(bobAddr, symbol))
     console.log("Dave Balance " + await utils.getTokenBalanceMainNet(daveAddr, symbol))
     console.log("Emma Balance " + await utils.getTokenBalanceMainNet(emmaAddr, symbol))
-    expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(8000)
+    expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(13000)
     expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(0)
-    expect(await utils.getTokenBalanceMainNet(daveAddr, symbol)).to.equal(2000)
-    expect(await utils.getTokenBalanceMainNet(emmaAddr, symbol)).to.equal(2000)
+    expect(await utils.getTokenBalanceMainNet(daveAddr, symbol)).to.equal(4000)
+    expect(await utils.getTokenBalanceMainNet(emmaAddr, symbol)).to.equal(3000)
 
     // Split tokens into 2 - both payable to Bob...
     const bobAmount1 = transferTx.vout[0].value / 2
-    const bobAmount2 = transferTx.vout[0].value - bobAmount1
+
     const splitDestinations = []
     splitDestinations[0] = { address: bobAddr, amount: bobAmount1 }
-    splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
-    splitDestinations[2] = { address: bobAddr, amount: bobAmount2 }
+    splitDestinations[1] = { address: bobAddr, amount: bobAmount1 }
 
     const splitHex = split(
         alicePrivateKey,
@@ -175,9 +172,10 @@ it("Full Life Cycle Test On Mainnet With 4 Issuance Addresses", async function (
         utils.getUtxo(transferTxid, transferTx, 0),
         splitDestinations,
         utils.getUtxo(transferTxid, transferTx, 1),
-        fundingPrivateKey
+        issuerPrivateKey
     )
-    // const splitTxid = await utils.broadcastToMainNet(splitHex)
+    const splitTxid = await utils.broadcastMapi(splitHex)
+    await new Promise(r => setTimeout(r, wait))
     console.log(`Split TX:        ${splitTxid}`)
     const splitTx = await utils.getTransactionMainNet(splitTxid)
     await new Promise(r => setTimeout(r, wait))
@@ -185,10 +183,10 @@ it("Full Life Cycle Test On Mainnet With 4 Issuance Addresses", async function (
     console.log("Bob Balance " + await utils.getTokenBalanceMainNet(bobAddr, symbol))
     console.log("Dave Balance " + await utils.getTokenBalanceMainNet(daveAddr, symbol))
     console.log("Emma Balance " + await utils.getTokenBalanceMainNet(emmaAddr, symbol))
-    expect(await utils.getTokenBalance(aliceAddr, symbol)).to.equal(5000)
-    expect(await utils.getTokenBalance(bobAddr, symbol)).to.equal(3000)
-    expect(await utils.getTokenBalance(daveAddr, symbol)).to.equal(2000)
-    expect(await utils.getTokenBalance(daveAddr, symbol)).to.equal(2000)
+    expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(7000)
+    expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(6000)
+    expect(await utils.getTokenBalanceMainNet(daveAddr, symbol)).to.equal(4000)
+    expect(await utils.getTokenBalanceMainNet(emmaAddr, symbol)).to.equal(3000)
 
     // Now let's merge the last split back together
     const splitTxObj = new bsv.Transaction(splitHex)
@@ -199,25 +197,21 @@ it("Full Life Cycle Test On Mainnet With 4 Issuance Addresses", async function (
         utils.getMergeUtxo(splitTxObj),
         aliceAddr,
         utils.getUtxo(splitTxid, splitTx, 2),
-        fundingPrivateKey
+        issuerPrivateKey
     )
 
-    //const mergeTxid = await utils.broadcastToMainNet(mergeHex)
+    const mergeTxid = await utils.broadcastMapi(mergeHex)
+    await new Promise(r => setTimeout(r, wait))
     console.log(`Merge TX:        ${mergeTxid}`)
     const mergeTx = await utils.getTransactionMainNet(mergeTxid)
-    const tokenIdMerge = await utils.getToken(issueTxid)
-    let responseMerge = await utils.getTokenResponse(tokenIdMerge)
-    expect(responseMerge.symbol).to.equal(symbol)
-    expect(responseMerge.contract_txs).to.contain(contractTxid)
-    expect(responseMerge.issuance_txs).to.contain(issueTxid)
     console.log("Alice Balance " + await utils.getTokenBalanceMainNet(aliceAddr, symbol))
     console.log("Bob Balance " + await utils.getTokenBalanceMainNet(bobAddr, symbol))
     console.log("Dave Balance " + await utils.getTokenBalanceMainNet(daveAddr, symbol))
     console.log("Emma Balance " + await utils.getTokenBalanceMainNet(emmaAddr, symbol))
-    expect(await utils.getTokenBalance(aliceAddr, symbol)).to.equal(5000)
-    expect(await utils.getTokenBalance(bobAddr, symbol)).to.equal(3000)
-    expect(await utils.getTokenBalance(daveAddr, symbol)).to.equal(2000)
-    expect(await utils.getTokenBalance(daveAddr, symbol)).to.equal(2000)
+    expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(13000)
+    expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(0)
+    expect(await utils.getTokenBalanceMainNet(daveAddr, symbol)).to.equal(4000)
+    expect(await utils.getTokenBalanceMainNet(emmaAddr, symbol)).to.equal(3000)
 
     // Split again - both payable to Alice...
     const amount = mergeTx.vout[0].value / 2
@@ -232,9 +226,10 @@ it("Full Life Cycle Test On Mainnet With 4 Issuance Addresses", async function (
         utils.getUtxo(mergeTxid, mergeTx, 0),
         split2Destinations,
         utils.getUtxo(mergeTxid, mergeTx, 1),
-        fundingPrivateKey
+        issuerPrivateKey
     )
-    // const splitTxid2 = await utils.broadcastToMainNet(splitHex2)
+    const splitTxid2 = await utils.broadcastMapi(splitHex2)
+    await new Promise(r => setTimeout(r, wait))
     console.log(`Split TX2:       ${splitTxid2}`)
     const splitTx2 = await utils.getTransactionMainNet(splitTxid2)
     await new Promise(r => setTimeout(r, wait))
@@ -242,17 +237,17 @@ it("Full Life Cycle Test On Mainnet With 4 Issuance Addresses", async function (
     console.log("Bob Balance " + await utils.getTokenBalanceMainNet(bobAddr, symbol))
     console.log("Dave Balance " + await utils.getTokenBalanceMainNet(daveAddr, symbol))
     console.log("Emma Balance " + await utils.getTokenBalanceMainNet(emmaAddr, symbol))
-    expect(await utils.getTokenBalance(aliceAddr, symbol)).to.equal(5000)
-    expect(await utils.getTokenBalance(bobAddr, symbol)).to.equal(3000)
-    expect(await utils.getTokenBalance(daveAddr, symbol)).to.equal(2000)
-    expect(await utils.getTokenBalance(daveAddr, symbol)).to.equal(2000)
+    expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(7000)
+    expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(6000)
+    expect(await utils.getTokenBalanceMainNet(daveAddr, symbol)).to.equal(4000)
+    expect(await utils.getTokenBalanceMainNet(emmaAddr, symbol)).to.equal(3000)
 
 
     // Now mergeSplit
     const splitTxObj2 = new bsv.Transaction(splitHex2)
 
-    const aliceAmountSatoshis = Math.floor(splitTx2.vout[0].value * SATS_PER_BITCOIN) / 2
-    const bobAmountSatoshis = Math.floor(splitTx2.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx2.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
+    const bobAmountSatoshis = Math.floor(splitTx2.vout[0].value * SATS_PER_BITCOIN)
+    const aliceAmountSatoshis = Math.floor(splitTx2.vout[1].value * SATS_PER_BITCOIN)
 
     const mergeSplitHex = mergeSplit(
         bobPrivateKey,
@@ -263,21 +258,20 @@ it("Full Life Cycle Test On Mainnet With 4 Issuance Addresses", async function (
         bobAddr,
         bobAmountSatoshis,
         utils.getUtxo(splitTxid2, splitTx2, 2),
-        fundingPrivateKey
+        issuerPrivateKey
     )
-
-    const mergeSplitTxid = await broadcast(mergeSplitHex)
+    const mergeSplitTxid = await utils.broadcastMapi(mergeSplitHex)
+    await new Promise(r => setTimeout(r, wait))
     console.log(`MergeSplit TX:   ${mergeSplitTxid}`)
-    const mergeSplitTx = await getTransaction(mergeSplitTxid)
-    expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075)
-    expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
-    console.log("Alice Balance " + await utils.getTokenBalance(aliceAddr))
-    console.log("Bob Balance " + await utils.getTokenBalance(bobAddr))
-    console.log("dave Balance " + await utils.getTokenBalance(daveAddr))
-    expect(await utils.getTokenBalance(aliceAddr)).to.equal(5750)
-    expect(await utils.getTokenBalance(bobAddr)).to.equal(2250)
-    expect(await utils.getTokenBalance(daveAddr)).to.equal(2000)
-
+    const mergeSplitTx = await utils.getTransactionMainNet(mergeSplitTxid)
+    console.log("Alice Balance " + await utils.getTokenBalanceMainNet(aliceAddr, symbol))
+    console.log("Bob Balance " + await utils.getTokenBalanceMainNet(bobAddr, symbol))
+    console.log("Dave Balance " + await utils.getTokenBalanceMainNet(daveAddr, symbol))
+    console.log("Emma Balance " + await utils.getTokenBalanceMainNet(emmaAddr, symbol))
+    expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(10000)
+    expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(3000)
+    expect(await utils.getTokenBalanceMainNet(daveAddr, symbol)).to.equal(4000)
+    expect(await utils.getTokenBalanceMainNet(emmaAddr, symbol)).to.equal(3000)
 
     // Alice wants to redeem the money from bob...
     const redeemHex = redeem(
@@ -285,48 +279,84 @@ it("Full Life Cycle Test On Mainnet With 4 Issuance Addresses", async function (
         issuerPrivateKey.publicKey,
         utils.getUtxo(mergeSplitTxid, mergeSplitTx, 0),
         utils.getUtxo(mergeSplitTxid, mergeSplitTx, 2),
-        fundingPrivateKey
+        issuerPrivateKey
     )
-    const redeemTxid = await broadcast(redeemHex)
+    const redeemTxid = await utils.broadcastMapi(redeemHex)
+    await new Promise(r => setTimeout(r, wait))
     console.log(`Redeem TX:       ${redeemTxid}`)
-    expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.0000075)
-    console.log("Alice Balance " + await utils.getTokenBalance(aliceAddr))
-    console.log("Bob Balance " + await utils.getTokenBalance(bobAddr))
-    console.log("dave Balance " + await utils.getTokenBalance(daveAddr))
-    expect(await utils.getTokenBalance(aliceAddr)).to.equal(5000)
-    expect(await utils.getTokenBalance(bobAddr)).to.equal(2250)
-    expect(await utils.getTokenBalance(daveAddr)).to.equal(2000)
+    const redeemTx = await utils.getTransactionMainNet(redeemTxid)
+    console.log("Alice Balance " + await utils.getTokenBalanceMainNet(aliceAddr, symbol))
+    console.log("Bob Balance " + await utils.getTokenBalanceMainNet(bobAddr, symbol))
+    console.log("Dave Balance " + await utils.getTokenBalanceMainNet(daveAddr, symbol))
+    console.log("Emma Balance " + await utils.getTokenBalanceMainNet(emmaAddr, symbol))
+    expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(7000)
+    expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(3000)
+    expect(await utils.getTokenBalanceMainNet(daveAddr, symbol)).to.equal(4000)
+    expect(await utils.getTokenBalanceMainNet(emmaAddr, symbol)).to.equal(3000)
+
+    //redeem Bobs's Token
+    const redeemHex2 = redeem(
+        bobPrivateKey,
+        issuerPrivateKey.publicKey,
+        utils.getUtxo(mergeSplitTxid, mergeSplitTx, 1),
+        utils.getUtxo(redeemTxid, redeemTx, 1),
+        issuerPrivateKey
+    )
+    const redeemTxid2 = await utils.broadcastMapi(redeemHex2)
+    console.log(`Redeem TX2:       ${redeemTxid2}`)
+    await new Promise(r => setTimeout(r, wait))
+    const redeemTx2 = await utils.getTransactionMainNet(redeemTxid2)
+    console.log("Alice Balance " + await utils.getTokenBalanceMainNet(aliceAddr, symbol))
+    console.log("Bob Balance " + await utils.getTokenBalanceMainNet(bobAddr, symbol))
+    console.log("Dave Balance " + await utils.getTokenBalanceMainNet(daveAddr, symbol))
+    console.log("Emma Balance " + await utils.getTokenBalanceMainNet(emmaAddr, symbol))
+    expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(7000)
+    expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(0)
+    expect(await utils.getTokenBalanceMainNet(daveAddr, symbol)).to.equal(4000)
+    expect(await utils.getTokenBalanceMainNet(emmaAddr, symbol)).to.equal(3000)
+
+      //redeem Dave's Tokens
+      const redeemHex3 = redeem(
+        davePrivateKey,
+        issuerPrivateKey.publicKey,
+        utils.getUtxo(issueTxid, issueTx, 2),
+        utils.getUtxo(redeemTxid2, redeemTx2, 1),
+        issuerPrivateKey
+    )
+    const redeemTxid3 = await utils.broadcastMapi(redeemHex3)
+    console.log(`Redeem TX3:       ${redeemTxid3}`)
+    await new Promise(r => setTimeout(r, wait))
+    const redeemTx3 = await utils.getTransactionMainNet(redeemTxid3)
+    console.log("Alice Balance " + await utils.getTokenBalanceMainNet(aliceAddr, symbol))
+    console.log("Bob Balance " + await utils.getTokenBalanceMainNet(bobAddr, symbol))
+    console.log("Dave Balance " + await utils.getTokenBalanceMainNet(daveAddr, symbol))
+    console.log("Emma Balance " + await utils.getTokenBalanceMainNet(emmaAddr, symbol))
+    expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(7000)
+    expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(0)
+    expect(await utils.getTokenBalanceMainNet(daveAddr, symbol)).to.equal(0)
+    expect(await utils.getTokenBalanceMainNet(emmaAddr, symbol)).to.equal(3000)
+
+      //redeem Emmas's Tokens
+      const redeemHex4 = redeem(
+        emmaPrivateKey,
+        issuerPrivateKey.publicKey,
+        utils.getUtxo(issueTxid, issueTx, 3),
+        utils.getUtxo(redeemTxid3, redeemTx3, 1),
+        issuerPrivateKey
+    )
+    const redeemTxid4 = await utils.broadcastMapi(redeemHex4)
+    console.log(`Redeem TX4:       ${redeemTxid4}`)
+    await new Promise(r => setTimeout(r, wait))
+    console.log("Alice Balance " + await utils.getTokenBalanceMainNet(aliceAddr, symbol))
+    console.log("Bob Balance " + await utils.getTokenBalanceMainNet(bobAddr, symbol))
+    console.log("Dave Balance " + await utils.getTokenBalanceMainNet(daveAddr, symbol))
+    console.log("Emma Balance " + await utils.getTokenBalanceMainNet(emmaAddr, symbol))
+    expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(7000)
+    expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(0)
+    expect(await utils.getTokenBalanceMainNet(daveAddr, symbol)).to.equal(0)
+    expect(await utils.getTokenBalanceMainNet(emmaAddr, symbol)).to.equal(0)
+
 
 })
 
 
-async function getUtxoMainNet(address, forContract) {
-    const url = `https://api.whatsonchain.com/v1/bsv/main/address/${address}/unspent`
-  
-    const response = await axios({
-      method: 'get',
-      url
-    })
-    let array = []
-    if (forContract) {
-      for (var key in response.data) {
-        if (response.data[key].value == 449435) {
-          array.push(response.data[key].tx_hash)
-          array.push(response.data[key].tx_pos)
-          break
-        }
-      }
-    } else {
-      for (var key in response.data) {
-        if (response.data[key].value == 81106) {
-          array.push(response.data[key].tx_hash)
-          array.push(response.data[key].tx_pos)
-          break
-        }
-      }
-  
-    }
-    console.log(array)
-    return array
-  }
-  

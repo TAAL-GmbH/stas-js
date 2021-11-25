@@ -431,7 +431,7 @@ async function setupMainNetTest(address, wait, valueOfSats) {
   rsp = await getUnspentMainNet(address)
   let array = []
   for (var key in rsp.data) {
-    if (rsp.data[key].value > valueOfSats) {
+    if (rsp.data[key].value == valueOfSats) {
       array.push(rsp.data[key].tx_hash)
       array.push(rsp.data[key].tx_pos)
       array.push(rsp.data[key].value)
@@ -466,7 +466,6 @@ async function setupMainNetTest(address, wait, valueOfSats) {
   const txid = await broadcastMapi(transaction.toString())
   await new Promise(r => setTimeout(r, wait))
   const tx = await getTransactionMainNet(txid)
-  console.log(tx)
   console.log(Math.round(tx.vout[0].value * SATS_PER_BITCOIN))
 
   response2 = await getUnspentMainNet(address)
@@ -502,6 +501,17 @@ async function getUnspentMainNet(address) {
   return response
 }
 
+function randomSymbol(length) {
+  var result = '';
+  var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  var charactersLength = characters.length;
+  for (var i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() *
+      charactersLength));
+  }
+  return result;
+}
+
 
 module.exports = {
   schema,
@@ -527,5 +537,6 @@ module.exports = {
   getTokenResponseMainNet,
   getUtxoMainNet,
   getUnspentMainNet,
-  setupMainNetTest
+  setupMainNetTest,
+  randomSymbol
 }

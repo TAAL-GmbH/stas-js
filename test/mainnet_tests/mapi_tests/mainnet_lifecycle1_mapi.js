@@ -21,18 +21,18 @@ const {
 // eslint-disable-next-line no-undef
 it('Mainnet LifeCycle Test 1 broadcast via MAPI', async function () {
 
-  const wait = 5000 // set wait to ensure mapi tx has reached woc
+  const wait = 10000 // set wait to ensure mapi tx has reached woc
 
-  address = '17WYiaND4U88fKkt1tSa142gFSquRsXkpP'
-  const satsAmountForContract_and_Fees = 500000
-  responseArray = await utils.setupMainNetTest(address, wait, satsAmountForContract_and_Fees)
+  const address = ''
+  const satsAmountForContract_and_Fees = 0 // use exact amount to match utxo
+  const responseArray = await utils.setupMainNetTest(address, wait, satsAmountForContract_and_Fees)
   console.log(responseArray)
 
   const inputUtxoid = responseArray[0] // the input utxo
   const inputUtxoIdVoutIndex = responseArray[1]
   const inputUtxoidFee = responseArray[2] // the fee utxo
   const inputUtxoIdFeeVoutIndex = responseArray[3]
-  const symbol = 'test-' + randomSymbol(10) // Use a unique symbol every test run to ensure that token balances can be checked correctly
+  const symbol = 'test-' + utils.randomSymbol(10) // Use a unique symbol every test run to ensure that token balances can be checked correctly
 
   console.log('token symbol:', symbol)
 
@@ -215,8 +215,8 @@ it('Mainnet LifeCycle Test 1 broadcast via MAPI', async function () {
   console.log(`MergeSplit TX:   ${mergeSplitTxid}`)
   await new Promise(r => setTimeout(r, wait))
   const mergeSplitTx = await utils.getTransactionMainNet(mergeSplitTxid)
-  // expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(3000)
-  // expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(3000)
+  expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(3000)
+  expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(7000)
   console.log('Bob Balance  ' + await utils.getTokenBalanceMainNet(bobAddr, symbol))
   console.log('Alice Balance  ' + await utils.getTokenBalanceMainNet(aliceAddr, symbol))
 
@@ -232,8 +232,8 @@ it('Mainnet LifeCycle Test 1 broadcast via MAPI', async function () {
   console.log(`Redeem TX:       ${redeemTxid}`)
   await new Promise(r => setTimeout(r, wait))
   const redeemTx = await utils.getTransactionMainNet(redeemTxid)
-  // expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(0)
-  // expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(5500)
+  expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(0)
+  expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(7000)
   console.log('Bob Balance  ' + await utils.getTokenBalanceMainNet(bobAddr, symbol))
   console.log('Alice Balance  ' + await utils.getTokenBalanceMainNet(aliceAddr, symbol))
 
@@ -249,22 +249,13 @@ it('Mainnet LifeCycle Test 1 broadcast via MAPI', async function () {
   console.log(`Redeem TX2:       ${redeemTxid2}`)
   await new Promise(r => setTimeout(r, wait))
 
-  // expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(0)
-  // expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(0)
+  expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(0)
+  expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(4000)
   console.log('Bob Balance  ' + await utils.getTokenBalanceMainNet(bobAddr, symbol))
   console.log('Alice Balance  ' + await utils.getTokenBalanceMainNet(aliceAddr, symbol))
 })
 
-function randomSymbol(length) {
-  var result = '';
-  var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  var charactersLength = characters.length;
-  for (var i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() *
-      charactersLength));
-  }
-  return result;
-}
+
 
 
 
