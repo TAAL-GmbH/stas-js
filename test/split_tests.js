@@ -38,12 +38,13 @@ beforeEach(async function () {
 
 it("Split - Successful Split Into Two Tokens With Fee", async function () {
 
+    issuerAddr = issuerPrivateKey.toAddress(process.env.NETWORK).toString()
     const bobAmount1 = issueTx.vout[0].value / 2
     const bobAmount2 = issueTx.vout[0].value - bobAmount1
     console.log(bobAmount1)
     console.log(bobAmount2)
     const splitDestinations = []
-    splitDestinations[0] = { address: bobAddr, amount: bobAmount1 } //3500 tokens
+    splitDestinations[0] = { address: aliceAddr, amount: bobAmount1 } //3500 tokens
     splitDestinations[1] = { address: bobAddr, amount: bobAmount2 } //3500 tokens
 
     const splitHex = split(
@@ -54,6 +55,7 @@ it("Split - Successful Split Into Two Tokens With Fee", async function () {
         utils.getUtxo(issueTxid, issueTx, 2),
         fundingPrivateKey
     )
+    console.log(splitHex)
     const splitTxid = await broadcast(splitHex)
     let noOfTokens = await utils.countNumOfTokens(splitTxid, true)
     expect(splitDestinations).to.have.length(noOfTokens) //ensure that tx output contains 2 values
@@ -64,6 +66,7 @@ it("Split - Successful Split Into Two Tokens With Fee", async function () {
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
     expect(await utils.getTokenBalance(bobAddr)).to.equal(10000)
 })
+
 it("Split - Successful Split Into Three Tokens", async function () {
 
     const bobAmount = issueTx.vout[0].value / 2
@@ -329,7 +332,6 @@ it("Split - Negative Integer Sats to Split Throws Error", async function () {
     }
 })
 
-
 it("Split - Add Too Much To Split Throws Error", async function () {
 
     const bobAmount = issueTx.vout[0].value * 2
@@ -364,7 +366,6 @@ it("Split - Address Too Long Throws Error", async function () {
     const splitDestinations = []
     splitDestinations[0] = { address: '1LF2wNCBT9dp5jN7fa6xSAaUGjJ5Pyz5VGaUG', amount: bobAmount1 }
     splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
-    const incorrectPrivateKey = bsv.PrivateKey()
     try {
         splitHex = split(
             alicePrivateKey,
@@ -382,15 +383,14 @@ it("Split - Address Too Long Throws Error", async function () {
     }
 })
 
-it("Split - Address Too Short Throws Error", async function () {
+it("Split - Send to Issuer Address Throws Error", async function () {
 
     const bobAmount1 = issueTx.vout[0].value / 2
     const bobAmount2 = issueTx.vout[0].value - bobAmount1
-    console.log(bobAddr)
+    const issuerAddr = issuerPrivateKey.toAddress(process.env.NETWORK).toString()
     const splitDestinations = []
-    splitDestinations[0] = { address: '1LF2wNCBT9dp5jN7fa6xSAaU', amount: bobAmount1 }
-    splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
-    const incorrectPrivateKey = bsv.PrivateKey()
+    splitDestinations[0] = { address: issuerAddr, amount: bobAmount1 }
+    splitDestinations[1] = { address: issuerAddr, amount: bobAmount2 }
     try {
         splitHex = split(
             alicePrivateKey,
@@ -400,13 +400,43 @@ it("Split - Address Too Short Throws Error", async function () {
             utils.getUtxo(issueTxid, issueTx, 2),
             fundingPrivateKey
         )
+        await broadcast(splitHex)
         assert(false)
         return
     } catch (e) {
         expect(e).to.be.instanceOf(Error)
-        expect(e.message).to.eql('Invalid Address string provided')
+        expect(e.response.data).to.contain('mandatory-script-verify-flag-failed (Script evaluated without error but finished with a false/empty top stack element)')
     }
 })
+
+it("Split - Incorrect Owner Private Key Throws Error", async function () {
+
+    const bobAmount1 = issueTx.vout[0].value / 2
+    const bobAmount2 = issueTx.vout[0].value - bobAmount1
+    const splitDestinations = []
+    splitDestinations[0] = { address: bobAddr, amount: bobAmount1 }
+    splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
+    const incorrectPrivateKey = bsv.PrivateKey()
+
+    const splitHex = split(
+        incorrectPrivateKey,
+        issuerPrivateKey.publicKey,
+        utils.getUtxo(issueTxid, issueTx, 0),
+        splitDestinations,
+        utils.getUtxo(issueTxid, issueTx, 2),
+        fundingPrivateKey
+    )
+    try {
+        await broadcast(splitHex)
+        assert(false)
+        return
+    } catch (e) {
+        expect(e).to.be.instanceOf(Error)
+        expect(e.message).to.eql('Request failed with status code 400')
+    }
+})
+
+
 it("Split - Incorrect Owner Private Key Throws Error", async function () {
 
     const bobAmount1 = issueTx.vout[0].value / 2
