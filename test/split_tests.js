@@ -538,7 +538,6 @@ it("Split - Null  STAS UTXO Throws Error", async function () {
     }
 })
 
-
 it("Split - Null Split Addresses Throws Error", async function () {
     try {
         splitHex = split(

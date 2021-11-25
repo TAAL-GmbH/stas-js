@@ -90,44 +90,6 @@ it('Successful RedeemSplit With 3 Split', async function () {
   expect(await utils.getTokenBalance(daveAddr)).to.equal(700)
 })
 
-//throws error as redeem address is counted  - probably not a defect, check with Liam
-it('Successful RedeemSplit With 4 Split', async function () {
-
-  const davePrivateKey = bsv.PrivateKey()
-  daveAddr = davePrivateKey.toAddress(process.env.NETWORK).toString()
-  const emmaPrivateKey = bsv.PrivateKey()
-  emmaAddr = emmaPrivateKey.toAddress(process.env.NETWORK).toString()
-  const amount = issueTx.vout[0].value / 5
-  const rSplitDestinations = []
-  rSplitDestinations[0] = { address: bobAddr, amount: amount }
-  rSplitDestinations[1] = { address: aliceAddr, amount: amount }
-  rSplitDestinations[2] = { address: daveAddr, amount: amount }
-  rSplitDestinations[3] = { address: emmaAddr, amount: amount }
-
-  const redeemSplitHex = redeemSplit(
-    alicePrivateKey,
-    issuerPrivateKey.publicKey,
-    utils.getUtxo(issueTxid, issueTx, 0),
-    rSplitDestinations,
-    utils.getUtxo(issueTxid, issueTx, 2),
-    fundingPrivateKey
-  )
-  const redeemTxid = await broadcast(redeemSplitHex)
-  expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000028)
-  expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000028)
-  expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.000028)
-  expect(await utils.getVoutAmount(redeemTxid, 3)).to.equal(0.000028)
-  expect(await utils.getVoutAmount(redeemTxid, 4)).to.equal(0.000028)
-  console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
-  console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
-  console.log('Dave Balance ' + await utils.getTokenBalance(daveAddr))
-  console.log('Dave Balance ' + await utils.getTokenBalance(emmaAddr))
-  // expect(await utils.getTokenBalance(aliceAddr)).to.equal(700)
-  // expect(await utils.getTokenBalance(bobAddr)).to.equal(3700)
-  // expect(await utils.getTokenBalance(daveAddr)).to.equal(700)
-  // expect(await utils.getTokenBalance(emmaAddr)).to.equal(700)
-})
-
 it('Successful RedeemSplit With No Fees', async function () {
 
   const rsBobAmount = issueTx.vout[0].value / 3
@@ -177,6 +139,35 @@ it('RedeemSplit - No Split Completes Successfully', async function () {
   expect(await utils.getTokenBalance(bobAddr)).to.equal(6500)
 })
 
+it('RedeemSplit - Too Many Outputs Throws Error', async function () {
+
+  const davePrivateKey = bsv.PrivateKey()
+  daveAddr = davePrivateKey.toAddress(process.env.NETWORK).toString()
+  const emmaPrivateKey = bsv.PrivateKey()
+  emmaAddr = emmaPrivateKey.toAddress(process.env.NETWORK).toString()
+  const amount = issueTx.vout[0].value / 5
+  const rSplitDestinations = []
+  rSplitDestinations[0] = { address: bobAddr, amount: amount }
+  rSplitDestinations[1] = { address: aliceAddr, amount: amount }
+  rSplitDestinations[2] = { address: daveAddr, amount: amount }
+  rSplitDestinations[3] = { address: emmaAddr, amount: amount }
+  try {
+    redeemSplitHex = redeemSplit(
+      alicePrivateKey,
+      issuerPrivateKey.publicKey,
+      utils.getUtxo(issueTxid, issueTx, 0),
+      rSplitDestinations,
+      utils.getUtxo(issueTxid, issueTx, 2),
+      fundingPrivateKey
+    )
+    assert(false)
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Must have less than 5 segments')
+  }
+})
+
 //needs fixed - throwing 'Output satoshis is not a natural number' 
 it('RedeemSplit - Add Too Much To Split Throws Error', async function () {
 
@@ -185,7 +176,7 @@ it('RedeemSplit - Add Too Much To Split Throws Error', async function () {
   splitDestinations[0] = { address: bobAddr, amount: bobAmount }
   const issueOutFundingVout = issueTx.vout.length - 1
   try {
-    const redeemHex = redeemSplit(
+    redeemHex = redeemSplit(
       alicePrivateKey,
       issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
@@ -210,7 +201,7 @@ it('RedeemSplit - Address Too Short Throws Error', async function () {
   splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
   const issueOutFundingVout = issueTx.vout.length - 1
   try {
-    const redeemHex = redeemSplit(
+     redeemHex = redeemSplit(
       alicePrivateKey,
       issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
@@ -238,7 +229,7 @@ it('RedeemSplit - Address Too Long Throws Error', async function () {
   splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
   const issueOutFundingVout = issueTx.vout.length - 1
   try {
-    const redeemHex = redeemSplit(
+     redeemHex = redeemSplit(
       alicePrivateKey,
       issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
@@ -253,6 +244,27 @@ it('RedeemSplit - Address Too Long Throws Error', async function () {
     expect(e.message).to.eql('Invalid Address string provided')
   }
 })
+
+// check with liam - we can split to issuer address
+it('RedeemSplit - Send to Issuer Address Throws Error', async function () {
+
+  const amount = issueTx.vout[0].value / 5
+  const issuerAddr = issuerPrivateKey.toAddress(process.env.NETWORK).toString()
+  const rSplitDestinations = []
+  rSplitDestinations[0] = { address: issuerAddr, amount: amount }
+  rSplitDestinations[1] = { address: issuerAddr, amount: amount }
+
+  const redeemSplitHex = redeemSplit(
+    alicePrivateKey,
+    issuerPrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 0),
+    rSplitDestinations,
+    utils.getUtxo(issueTxid, issueTx, 2),
+    fundingPrivateKey
+  )
+  const redeemTxid = await broadcast(redeemSplitHex)
+  console.log(redeemTxid)
+  })
 
 it('RedeemSplit - Incorrect Owner Private Key Throws Error', async function () {
 
@@ -272,7 +284,6 @@ it('RedeemSplit - Incorrect Owner Private Key Throws Error', async function () {
     utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
     fundingPrivateKey
   )
-
   try {
     await broadcast(redeemHex)
     assert(false)
@@ -486,7 +497,7 @@ it('RedeemSplit - Null Contract Public Key Throws Error', async function () {
   }
 })
 
-async function setup () {
+async function setup() {
 
   issuerPrivateKey = bsv.PrivateKey()
   fundingPrivateKey = bsv.PrivateKey()
