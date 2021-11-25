@@ -40,116 +40,146 @@ beforeEach(async function () {
 })
 
 describe('regression, testnet', function () {
-
-  it('Merge - Successful Merge With Fee', async function () {
-    const mergeHex = merge(
-      bobPrivateKey,
-      issuerPrivateKey.publicKey,
-      utils.getMergeUtxo(splitTxObj),
-      aliceAddr,
-      utils.getUtxo(splitTxid, splitTx, 2),
-      fundingPrivateKey
-    )
-    const mergeTxid = await broadcast(mergeHex)
-    const tokenIdMerge = await utils.getToken(mergeTxid)
-    const response = await utils.getTokenResponse(tokenIdMerge)
-    expect(response.symbol).to.equal('TAALT')
-    expect(response.contract_txs).to.contain(contractTxid)
-    expect(response.issuance_txs).to.contain(issueTxid)
-    expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007)
-    console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
-    console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
-    expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
-    expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+  describe('failing', function () {
+    it('Merge - Successful Merge With Fee', async function () {
+      const mergeHex = merge(
+        bobPrivateKey,
+        issuerPrivateKey.publicKey,
+        utils.getMergeUtxo(splitTxObj),
+        aliceAddr,
+        utils.getUtxo(splitTxid, splitTx, 2),
+        fundingPrivateKey
+      )
+      const mergeTxid = await broadcast(mergeHex)
+      const tokenIdMerge = await utils.getToken(mergeTxid)
+      const response = await utils.getTokenResponse(tokenIdMerge)
+      expect(response.symbol).to.equal('TAALT')
+      expect(response.contract_txs).to.contain(contractTxid)
+      expect(response.issuance_txs).to.contain(issueTxid)
+      expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007)
+      console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
+      console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
+      expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+      expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+    })
   })
-
-  it('Merge - Successful Merge With Fee 2', async function () {
-    const mergeHex = merge(
-      bobPrivateKey,
-      issuerPrivateKey.publicKey,
-      utils.getMergeUtxo(splitTxObj),
-      bobAddr,
-      utils.getUtxo(splitTxid, splitTx, 2),
-      fundingPrivateKey
-    )
-    const mergeTxid = await broadcast(mergeHex)
-    const tokenIdMerge = await utils.getToken(mergeTxid)
-    const response = await utils.getTokenResponse(tokenIdMerge)
-    expect(response.symbol).to.equal('TAALT')
-    expect(response.contract_txs).to.contain(contractTxid)
-    expect(response.issuance_txs).to.contain(issueTxid)
-    expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007)
-    console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
-    console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
-    expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
-    expect(await utils.getTokenBalance(bobAddr)).to.equal(10000)
+  describe('failing', function () {
+    it('Merge - Successful Merge With Fee 2', async function () {
+      const mergeHex = merge(
+        bobPrivateKey,
+        issuerPrivateKey.publicKey,
+        utils.getMergeUtxo(splitTxObj),
+        bobAddr,
+        utils.getUtxo(splitTxid, splitTx, 2),
+        fundingPrivateKey
+      )
+      const mergeTxid = await broadcast(mergeHex)
+      const tokenIdMerge = await utils.getToken(mergeTxid)
+      const response = await utils.getTokenResponse(tokenIdMerge)
+      expect(response.symbol).to.equal('TAALT')
+      expect(response.contract_txs).to.contain(contractTxid)
+      expect(response.issuance_txs).to.contain(issueTxid)
+      expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007)
+      console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
+      console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
+      expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
+      expect(await utils.getTokenBalance(bobAddr)).to.equal(10000)
+    })
   })
-
-  it('Merge - Merge With No Fee', async function () {
-    const mergeHex = merge(
-      bobPrivateKey,
-      issuerPrivateKey.publicKey,
-      utils.getMergeUtxo(splitTxObj),
-      aliceAddr,
-      null,
-      null
-    )
-    const mergeTxid = await broadcast(mergeHex)
-    const tokenIdMerge = await utils.getToken(mergeTxid)
-    const response = await utils.getTokenResponse(tokenIdMerge)
-    expect(response.symbol).to.equal('TAALT')
-    expect(response.contract_txs).to.contain(contractTxid)
-    expect(response.issuance_txs).to.contain(issueTxid)
-    console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
-    console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
-    expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007)
-    expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
-    expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+  describe('failing', function () {
+    it('Merge - Merge With No Fee', async function () {
+      const mergeHex = merge(
+        bobPrivateKey,
+        issuerPrivateKey.publicKey,
+        utils.getMergeUtxo(splitTxObj),
+        aliceAddr,
+        null,
+        null
+      )
+      const mergeTxid = await broadcast(mergeHex)
+      const tokenIdMerge = await utils.getToken(mergeTxid)
+      const response = await utils.getTokenResponse(tokenIdMerge)
+      expect(response.symbol).to.equal('TAALT')
+      expect(response.contract_txs).to.contain(contractTxid)
+      expect(response.issuance_txs).to.contain(issueTxid)
+      console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
+      console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
+      expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007)
+      expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+      expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+    })
   })
+    it('Merge - Incorrect Owner Private Key Throws Error', async function () {
+      const incorrectPrivateKey = bsv.PrivateKey()
+      const mergeHex = merge(
+        incorrectPrivateKey,
+        issuerPrivateKey.publicKey,
+        utils.getMergeUtxo(splitTxObj),
+        aliceAddr,
+        utils.getUtxo(splitTxid, splitTx, 2),
+        fundingPrivateKey
+      )
+      try {
+        await broadcast(mergeHex)
+        assert(false)
+        return
+      } catch (e) {
+        expect(e).to.be.instanceOf(Error)
+        expect(e.response.data).to.contain('mandatory-script-verify-flag-failed (Script failed an OP_EQUALVERIFY operation)')
+      }
+    })
 
-  it('Merge - Incorrect Owner Private Key Throws Error', async function () {
-    const incorrectPrivateKey = bsv.PrivateKey()
-    const mergeHex = merge(
-      incorrectPrivateKey,
-      issuerPrivateKey.publicKey,
-      utils.getMergeUtxo(splitTxObj),
-      aliceAddr,
-      utils.getUtxo(splitTxid, splitTx, 2),
-      fundingPrivateKey
-    )
-    try {
-      await broadcast(mergeHex)
-      assert(false)
-      return
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error)
-      expect(e.response.data).to.contain('mandatory-script-verify-flag-failed (Script failed an OP_EQUALVERIFY operation)')
-    }
-  })
+    it('Merge - Incorrect Funding Private Key Throws Error', async function () {
+      const incorrectPrivateKey = bsv.PrivateKey()
+      const mergeHex = merge(
+        bobPrivateKey,
+        issuerPrivateKey.publicKey,
+        utils.getMergeUtxo(splitTxObj),
+        aliceAddr,
+        utils.getUtxo(splitTxid, splitTx, 2),
+        incorrectPrivateKey
+      )
+      try {
+        await broadcast(mergeHex)
+        assert(false)
+        return
+      } catch (e) {
+        expect(e).to.be.instanceOf(Error)
+        expect(e.response.data).to.contain('mandatory-script-verify-flag-failed (Script failed an OP_EQUALVERIFY operation)')
+      }
+    })
 
-  it('Merge - Incorrect Funding Private Key Throws Error', async function () {
-    const incorrectPrivateKey = bsv.PrivateKey()
-    const mergeHex = merge(
-      bobPrivateKey,
-      issuerPrivateKey.publicKey,
-      utils.getMergeUtxo(splitTxObj),
-      aliceAddr,
-      utils.getUtxo(splitTxid, splitTx, 2),
-      incorrectPrivateKey
-    )
-    try {
-      await broadcast(mergeHex)
-      assert(false)
-      return
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error)
-      expect(e.response.data).to.contain('mandatory-script-verify-flag-failed (Script failed an OP_EQUALVERIFY operation)')
-    }
-  })
+    it('Merge - Attempt to Merge More Than 2 Tokens', async function () {
+      try {
+        merge(
+          bobPrivateKey,
+          issuerPrivateKey.publicKey,
+          [{
+            tx: splitTxObj,
+            vout: 0
+          },
+          {
+            tx: splitTxObj,
+            vout: 1
+          },
+          {
+            tx: splitTxObj,
+            vout: 2
+          }],
+          aliceAddr,
+          utils.getUtxo(splitTxid, splitTx, 2),
+          fundingPrivateKey
+        )
+        assert(false)
+        return
+      } catch (e) {
+        expect(e).to.be.instanceOf(Error)
+        expect(e.message).to.eql('This function can only merge exactly 2 STAS tokens')
+      }
+    })
 
-  it('Merge - Attempt to Merge More Than 2 Tokens', async function () {
-    try {
-      merge(
+    it('Merge - Attempt to Merge More Than 2 Tokens Without SDK Validation', async function () {
+      const mergeHex = mergeUtil.mergeWithoutValidation(
         bobPrivateKey,
         issuerPrivateKey.publicKey,
         [{
@@ -168,155 +198,127 @@ describe('regression, testnet', function () {
         utils.getUtxo(splitTxid, splitTx, 2),
         fundingPrivateKey
       )
-      assert(false)
-      return
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('This function can only merge exactly 2 STAS tokens')
-    }
-  })
+      try {
+        await broadcast(mergeHex)
+        assert(false)
+        return
+      } catch (e) {
+        expect(e).to.be.instanceOf(Error)
+        expect(e.message).to.eql('Request failed with status code 400')
+      }
+    })
 
-  it('Merge - Attempt to Merge More Than 2 Tokens Without SDK Validation', async function () {
-    const mergeHex = mergeUtil.mergeWithoutValidation(
-      bobPrivateKey,
-      issuerPrivateKey.publicKey,
-      [{
-        tx: splitTxObj,
-        vout: 0
-      },
-      {
-        tx: splitTxObj,
-        vout: 1
-      },
-      {
-        tx: splitTxObj,
-        vout: 2
-      }],
-      aliceAddr,
-      utils.getUtxo(splitTxid, splitTx, 2),
-      fundingPrivateKey
-    )
-    try {
-      await broadcast(mergeHex)
-      assert(false)
-      return
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('Request failed with status code 400')
-    }
-  })
+    it('Merge - Attempt to Merge Less Than Two Tokens', async function () {
+      try {
+        merge(
+          bobPrivateKey,
+          issuerPrivateKey.publicKey,
+          [{
+            tx: splitTxObj,
+            vout: 0
+          }],
+          aliceAddr,
+          utils.getUtxo(splitTxid, splitTx, 2),
+          fundingPrivateKey
+        )
+        assert(false)
+        return
+      } catch (e) {
+        expect(e).to.be.instanceOf(Error)
+        expect(e.message).to.eql('This function can only merge exactly 2 STAS tokens')
+      }
+    })
 
-  it('Merge - Attempt to Merge Less Than Two Tokens', async function () {
-    try {
-      merge(
-        bobPrivateKey,
-        issuerPrivateKey.publicKey,
-        [{
-          tx: splitTxObj,
-          vout: 0
-        }],
-        aliceAddr,
-        utils.getUtxo(splitTxid, splitTx, 2),
-        fundingPrivateKey
-      )
-      assert(false)
-      return
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('This function can only merge exactly 2 STAS tokens')
-    }
-  })
+    it('Merge - Null Token Owner Private Key Throws Error', async function () {
+      try {
+        merge(
+          null,
+          issuerPrivateKey.publicKey,
+          utils.getMergeUtxo(splitTxObj),
+          aliceAddr,
+          utils.getUtxo(splitTxid, splitTx, 2),
+          fundingPrivateKey
+        )
+        assert(false)
+        return
+      } catch (e) {
+        expect(e).to.be.instanceOf(Error)
+        expect(e.message).to.eql('Token owner private key is null')
+      }
+    })
 
-  it('Merge - Null Token Owner Private Key Throws Error', async function () {
-    try {
-      merge(
-        null,
-        issuerPrivateKey.publicKey,
-        utils.getMergeUtxo(splitTxObj),
-        aliceAddr,
-        utils.getUtxo(splitTxid, splitTx, 2),
-        fundingPrivateKey
-      )
-      assert(false)
-      return
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('Token owner private key is null')
-    }
-  })
+    it('Merge - Issuer Public Key Throws Error', async function () {
+      try {
+        merge(
+          bobPrivateKey,
+          null,
+          utils.getMergeUtxo(splitTxObj),
+          aliceAddr,
+          utils.getUtxo(splitTxid, splitTx, 2),
+          fundingPrivateKey
+        )
+        assert(false)
+        return
+      } catch (e) {
+        expect(e).to.be.instanceOf(Error)
+        expect(e.message).to.eql('Contract public key is null')
+      }
+    })
 
-  it('Merge - Issuer Public Key Throws Error', async function () {
-    try {
-      merge(
-        bobPrivateKey,
-        null,
-        utils.getMergeUtxo(splitTxObj),
-        aliceAddr,
-        utils.getUtxo(splitTxid, splitTx, 2),
-        fundingPrivateKey
-      )
-      assert(false)
-      return
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('Contract public key is null')
-    }
-  })
+    it('Merge - Null Merge STAS UTXO Throws Error', async function () {
+      try {
+        merge(
+          bobPrivateKey,
+          issuerPrivateKey.publicKey,
+          null,
+          aliceAddr,
+          utils.getUtxo(splitTxid, splitTx, 2),
+          fundingPrivateKey
+        )
+        assert(false)
+        return
+      } catch (e) {
+        expect(e).to.be.instanceOf(Error)
+        expect(e.message).to.eql('MergeUtxos is invalid')
+      }
+    })
 
-  it('Merge - Null Merge STAS UTXO Throws Error', async function () {
-    try {
-      merge(
-        bobPrivateKey,
-        issuerPrivateKey.publicKey,
-        null,
-        aliceAddr,
-        utils.getUtxo(splitTxid, splitTx, 2),
-        fundingPrivateKey
-      )
-      assert(false)
-      return
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('MergeUtxos is invalid')
-    }
-  })
+    it('Merge - Null Destination Address Throws Error', async function () {
+      try {
+        merge(
+          bobPrivateKey,
+          issuerPrivateKey.publicKey,
+          utils.getMergeUtxo(splitTxObj),
+          null,
+          utils.getUtxo(splitTxid, splitTx, 2),
+          fundingPrivateKey
+        )
+        assert(false)
+        return
+      } catch (e) {
+        expect(e).to.be.instanceOf(Error)
+        expect(e.message).to.contains('Destination address is null')
+      }
+    })
 
-  it('Merge - Null Destination Address Throws Error', async function () {
-    try {
-      merge(
-        bobPrivateKey,
-        issuerPrivateKey.publicKey,
-        utils.getMergeUtxo(splitTxObj),
-        null,
-        utils.getUtxo(splitTxid, splitTx, 2),
-        fundingPrivateKey
-      )
-      assert(false)
-      return
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.contains('Destination address is null')
-    }
+    it('Merge - Null Funding Private Key Throws Error', async function () {
+      try {
+        merge(
+          bobPrivateKey,
+          issuerPrivateKey.publicKey,
+          utils.getMergeUtxo(splitTxObj),
+          aliceAddr,
+          utils.getUtxo(splitTxid, splitTx, 2),
+          null
+        )
+        assert(false)
+        return
+      } catch (e) {
+        expect(e).to.be.instanceOf(Error)
+        expect(e.message).to.eql('Payment UTXO provided but payment private key is null')
+      }
+    })
   })
-
-  it('Merge - Null Funding Private Key Throws Error', async function () {
-    try {
-      merge(
-        bobPrivateKey,
-        issuerPrivateKey.publicKey,
-        utils.getMergeUtxo(splitTxObj),
-        aliceAddr,
-        utils.getUtxo(splitTxid, splitTx, 2),
-        null
-      )
-      assert(false)
-      return
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('Payment UTXO provided but payment private key is null')
-    }
-  })
-})
 
   async function setup() {
     issuerPrivateKey = bsv.PrivateKey()

@@ -251,31 +251,33 @@ describe('regression, testnet', function () {
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
     expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
   })
-  // needs fixed
-  it('Issue - Succesful Empty Funding UTXO', async function () {
 
-    issue(
-      issuerPrivateKey,
-      utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
-      utils.getUtxo(contractTxid, contractTx, 0),
-      [],
-      null,
-      true,
-      symbol,
-      2
-    )
-    const issueTxid = await broadcast(issueHex)
-    const tokenId = await utils.getToken(issueTxid)
-    const response = await utils.getTokenResponse(tokenId)
-    expect(response.symbol).to.equal(symbol)
-    expect(response.contract_txs).to.contain(contractTxid)
-    expect(response.issuance_txs).to.contain(issueTxid)
-    expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
-    expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
-    expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
-    expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+  describe('failing', function () {
+    it('Issue - Succesful Empty Funding UTXO', async function () {
+
+      issue(
+        issuerPrivateKey,
+        utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+        utils.getUtxo(contractTxid, contractTx, 0),
+        [],
+        null,
+        true,
+        symbol,
+        2
+      )
+      const issueTxid = await broadcast(issueHex)
+      const tokenId = await utils.getToken(issueTxid)
+      const response = await utils.getTokenResponse(tokenId)
+      expect(response.symbol).to.equal(symbol)
+      expect(response.contract_txs).to.contain(contractTxid)
+      expect(response.issuance_txs).to.contain(issueTxid)
+      expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
+      expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
+      expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+      expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+    })
   })
-
+  
   it('Issue - Successful Issue Token 10 Addresses', async function () {
     const pk1 = bsv.PrivateKey()
     const add1 = pk1.toAddress(process.env.NETWORK).toString()

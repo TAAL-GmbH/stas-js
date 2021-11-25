@@ -34,22 +34,25 @@ beforeEach(async function () {
 })
 
 describe('regression, testnet', function () {
+  
+  describe('failing', function () {
 
-  it('Redeem - Successful Redeem 1', async function () {
+    it('Redeem - Successful Redeem 1', async function () {
 
-    const redeemHex = redeem(
-      alicePrivateKey,
-      issuerPrivateKey.publicKey,
-      utils.getUtxo(issueTxid, issueTx, 0),
-      utils.getUtxo(issueTxid, issueTx, 2),
-      fundingPrivateKey
-    )
-    const redeemTxid = await broadcast(redeemHex)
-    expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007)
-    console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
-    console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
-    expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
-    expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+      const redeemHex = redeem(
+        alicePrivateKey,
+        issuerPrivateKey.publicKey,
+        utils.getUtxo(issueTxid, issueTx, 0),
+        utils.getUtxo(issueTxid, issueTx, 2),
+        fundingPrivateKey
+      )
+      const redeemTxid = await broadcast(redeemHex)
+      expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007)
+      console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
+      console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
+      expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
+      expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+    })
   })
 
   it('Redeem - Successful Redeem 2', async function () {
@@ -69,37 +72,41 @@ describe('regression, testnet', function () {
     expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
   })
 
-  it('Redeem - Successful Redeem No Fee', async function () {
-    const redeemHex = redeem(
-      alicePrivateKey,
-      issuerPrivateKey.publicKey,
-      utils.getUtxo(issueTxid, issueTx, 0),
-      null,
-      fundingPrivateKey
-    )
-    const redeemTxid = await broadcast(redeemHex)
-    expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007)
-    console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
-    console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
-    expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
-    expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+  describe('failing', function () {
+    it('Redeem - Successful Redeem No Fee', async function () {
+      const redeemHex = redeem(
+        alicePrivateKey,
+        issuerPrivateKey.publicKey,
+        utils.getUtxo(issueTxid, issueTx, 0),
+        null,
+        fundingPrivateKey
+      )
+      const redeemTxid = await broadcast(redeemHex)
+      expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007)
+      console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
+      console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
+      expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
+      expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+    })
   })
 
-  //Needs fixed
-  it('Redeem - Successful Redeem No Fee Empty Array', async function () {
-    const redeemHex = redeem(
-      alicePrivateKey,
-      issuerPrivateKey.publicKey,
-      utils.getUtxo(issueTxid, issueTx, 0),
-      [],
-      null
-    )
-    const redeemTxid = await broadcast(redeemHex)
-    expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.0000075)
-    console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
-    console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
-    expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
-    expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+  describe('failing', function () {
+    //Needs fixed
+    it('Redeem - Successful Redeem No Fee Empty Array', async function () {
+      const redeemHex = redeem(
+        alicePrivateKey,
+        issuerPrivateKey.publicKey,
+        utils.getUtxo(issueTxid, issueTx, 0),
+        [],
+        null
+      )
+      const redeemTxid = await broadcast(redeemHex)
+      expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.0000075)
+      console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
+      console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
+      expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
+      expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+    })
   })
 
   it('Redeem - Incorrect Stas UTXO Amount Throws Error', async function () {
@@ -213,6 +220,7 @@ describe('regression, testnet', function () {
     }
   })
 
+  describe('failing', function () {
   //needs fixed
   it('Redeem - Null Token Owner Private Key Throws Error', async function () {
 
@@ -231,6 +239,7 @@ describe('regression, testnet', function () {
       expect(e.message).to.eql('Some Error')
     }
   })
+})
   it('Redeem - Null STAS UTXO Throws Error', async function () {
 
     try {
@@ -268,42 +277,42 @@ describe('regression, testnet', function () {
   })
 })
 
-  async function setup() {
+async function setup() {
 
-    issuerPrivateKey = bsv.PrivateKey()
-    fundingPrivateKey = bsv.PrivateKey()
-    bobPrivateKey = bsv.PrivateKey()
-    alicePrivateKey = bsv.PrivateKey()
-    contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
-    fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
-    publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
-    bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
-    aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
-    const symbol = 'TAALT'
-    const supply = 10000
-    const schema = utils.schema(publicKeyHash, symbol, supply)
+  issuerPrivateKey = bsv.PrivateKey()
+  fundingPrivateKey = bsv.PrivateKey()
+  bobPrivateKey = bsv.PrivateKey()
+  alicePrivateKey = bsv.PrivateKey()
+  contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
+  fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
+  publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
+  bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
+  aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
+  const symbol = 'TAALT'
+  const supply = 10000
+  const schema = utils.schema(publicKeyHash, symbol, supply)
 
-    const contractHex = contract(
-      issuerPrivateKey,
-      contractUtxos,
-      fundingUtxos,
-      fundingPrivateKey,
-      schema,
-      supply
-    )
-    const contractTxid = await broadcast(contractHex)
-    const contractTx = await getTransaction(contractTxid)
+  const contractHex = contract(
+    issuerPrivateKey,
+    contractUtxos,
+    fundingUtxos,
+    fundingPrivateKey,
+    schema,
+    supply
+  )
+  const contractTxid = await broadcast(contractHex)
+  const contractTx = await getTransaction(contractTxid)
 
-    const issueHex = issue(
-      issuerPrivateKey,
-      utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
-      utils.getUtxo(contractTxid, contractTx, 0),
-      utils.getUtxo(contractTxid, contractTx, 1),
-      fundingPrivateKey,
-      true,
-      symbol,
-      2
-    )
-    issueTxid = await broadcast(issueHex)
-    issueTx = await getTransaction(issueTxid)
-  }
+  const issueHex = issue(
+    issuerPrivateKey,
+    utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+    utils.getUtxo(contractTxid, contractTx, 0),
+    utils.getUtxo(contractTxid, contractTx, 1),
+    fundingPrivateKey,
+    true,
+    symbol,
+    2
+  )
+  issueTxid = await broadcast(issueHex)
+  issueTx = await getTransaction(issueTxid)
+}
