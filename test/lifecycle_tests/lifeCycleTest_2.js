@@ -1,5 +1,5 @@
 const expect = require("chai").expect
-const utils = require('./utils/test_utils')
+const utils = require('../utils/test_utils')
 const bsv = require('bsv')
 require('dotenv').config()
 
@@ -11,14 +11,14 @@ const {
   merge,
   mergeSplit,
   redeem
-} = require('../index')
+} = require('../../index')
 
 const {
   getTransaction,
   getFundsFromFaucet,
   broadcast,
   SATS_PER_BITCOIN
-} = require('../index').utils
+} = require('../../index').utils
 
 describe('regression, testnet', function () {
 

@@ -1,19 +1,19 @@
 const expect = require('chai').expect
 const assert = require('chai').assert
-const utils = require('./utils/test_utils')
+const utils = require('../utils/test_utils')
 const bsv = require('bsv')
 require('dotenv').config()
 
 const {
   contract,
   issue
-} = require('../index')
+} = require('../../index')
 
 const {
   getTransaction,
   getFundsFromFaucet,
   broadcast
-} = require('../index').utils
+} = require('../../index').utils
 
 let issuerPrivateKey
 let fundingPrivateKey

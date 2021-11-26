@@ -1,5 +1,6 @@
 const expect = require("chai").expect
-const utils = require('./utils/test_utils')
+const utils = require('../utils/test_utils')
+
 const bsv = require('bsv')
 require('dotenv').config()
 
@@ -11,13 +12,13 @@ const {
   merge,
   mergeSplit,
   redeem
-} = require('./../index')
+} = require('../../index')
 
 const {
   getTransaction,
   getFundsFromFaucet,
   broadcast
-} = require('./../index').utils
+} = require('../../index').utils
 
 describe('regression, testnet', function () {
   it("Full Life Cycle Test With No Fees", async function () {
