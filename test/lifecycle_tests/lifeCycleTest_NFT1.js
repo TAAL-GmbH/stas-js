@@ -50,7 +50,6 @@ describe('regression, testnet', function () {
     let amount = await utils.getVoutAmount(contractTxid, 0)
     expect(amount).to.equal(supply / 100000000)
 
-
     let issueHex
     try {
       issueHex = issue(
@@ -77,10 +76,10 @@ describe('regression, testnet', function () {
     expect(response.issuance_txs).to.contain(issueTxid)
     expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
     expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
-
+    expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+    expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
 
     const issueOutFundingVout = issueTx.vout.length - 1
-
     const transferHex = transfer(
       bobPrivateKey,
       issuerPrivateKey.publicKey,
@@ -93,7 +92,8 @@ describe('regression, testnet', function () {
     console.log(`Transfer TX:     ${transferTxid}`)
     const transferTx = await getTransaction(transferTxid)
     expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
-
+    expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
+    expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
 
     // Split tokens into 2 - both payable to Bob...
     const bobAmount1 = transferTx.vout[0].value / 2
@@ -130,5 +130,8 @@ describe('regression, testnet', function () {
     const redeemTxid = await broadcast(redeemHex)
     console.log(`Redeem TX:       ${redeemTxid}`)
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00003)
+    expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+    expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
+
   })
 })
