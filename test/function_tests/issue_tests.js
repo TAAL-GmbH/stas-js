@@ -229,6 +229,31 @@ describe('regression, testnet', function () {
     expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
   })
 
+  it('Issue - Issue to Issuer Address - should this fail?', async function () {
+
+    const issuerAddr = issuerPrivateKey.toAddress(process.env.NETWORK).toString()
+    const issueHex = issue(
+      issuerPrivateKey,
+      utils.getIssueInfo(issuerAddr, 7000, bobAddr, 3000),
+      utils.getUtxo(contractTxid, contractTx, 0),
+      utils.getUtxo(contractTxid, contractTx, 1),
+      fundingPrivateKey,
+      false,
+      symbol,
+      2
+    )
+    const issueTxid = await broadcast(issueHex)
+    const tokenId = await utils.getToken(issueTxid)
+    const response = await utils.getTokenResponse(tokenId)
+    expect(response.symbol).to.equal(symbol)
+    expect(response.contract_txs).to.contain(contractTxid)
+    expect(response.issuance_txs).to.contain(issueTxid)
+    expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
+    expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
+    expect(await utils.getTokenBalance(issuerAddr)).to.equal(7000)
+    expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+  })
+
   it('Issue - Successful Issue Token With Split No Fee', async function () {
     const issueHex = issue(
       issuerPrivateKey,
