@@ -1,11 +1,11 @@
 const expect = require('chai').expect
 const assert = require('chai').assert
-const utils = require('./utils/test_utils')
+const utils = require('../utils/test_utils')
 const chai = require('chai')
 const axios = require('axios')
 const bsv = require('bsv')
-const util = require('../lib/stas')
-const mergeUtil = require('./utils/mergeWithoutValidation')
+const util = require('../../lib/stas')
+const mergeUtil = require('../utils/mergeWithoutValidation')
 require('dotenv').config()
 
 const {
@@ -17,13 +17,13 @@ const {
   mergeSplit,
   redeem
 
-} = require('../index')
+} = require('../../index')
 
 const {
   getTransaction,
   getFundsFromFaucet,
   broadcast
-} = require('../index').utils
+} = require('../../index').utils
 
 // Work In Progress
 it('Merge Invalid Token', async function () {

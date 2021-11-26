@@ -1,5 +1,5 @@
 const expect = require("chai").expect
-const utils = require('./utils/test_utils')
+const utils = require('../utils/test_utils')
 const bsv = require('bsv')
 require('dotenv').config()
 
@@ -11,16 +11,16 @@ const {
   merge,
   mergeSplit,
   redeem
-} = require('../index')
+} = require('../../index')
 
 const {
   getTransaction,
   getFundsFromFaucet,
   broadcast,
   SATS_PER_BITCOIN
-} = require('../index').utils
+} = require('../../index').utils
 
-describe('regression, testnet', function () {
+describe('regression, testnet, dust', function () {
 
   it("Full Life Cycle Test Low Dust 1", async function () {
     const issuerPrivateKey = bsv.PrivateKey()

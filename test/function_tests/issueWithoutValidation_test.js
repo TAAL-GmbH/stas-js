@@ -1,20 +1,20 @@
 const expect = require("chai").expect
 const assert = require('chai').assert
-const utils = require('./utils/test_utils')
+const utils = require('../utils/test_utils')
 const bsv = require('bsv')
-const issueUtil = require('./utils/issueWithoutValidation')
+const issueUtil = require('../utils/issueWithoutValidation')
 require('dotenv').config()
 
 
 const {
     contract,
-} = require('../index')
+} = require('../../index')
 
 const {
     getTransaction,
     getFundsFromFaucet,
     broadcast
-} = require('../index').utils
+} = require('../../index').utils
 
 /*
 These tests bypass the issue amount checks in the sdk

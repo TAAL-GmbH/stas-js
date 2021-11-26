@@ -1,8 +1,8 @@
 const expect = require("chai").expect
-const utils = require('./utils/test_utils')
+const utils = require('../utils/test_utils')
 const chai = require('chai')
 const bsv = require('bsv')
-const mergeUtil = require('./utils/mergeWithoutValidation')
+const mergeUtil = require('../utils/mergeWithoutValidation')
 require('dotenv').config()
 
 const {
@@ -11,13 +11,13 @@ const {
   transfer,
   split,
   merge
-} = require('../index')
+} = require('../../index')
 
 const {
   getTransaction,
   getFundsFromFaucet,
   broadcast
-} = require('../index').utils
+} = require('../../index').utils
 
 const issuerPrivateKey = bsv.PrivateKey()
 const fundingPrivateKey = bsv.PrivateKey()
