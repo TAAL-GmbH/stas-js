@@ -27,7 +27,6 @@ beforeEach(async function () {
 })
 
 describe('regression, testnet', function () {
-
   it('Contract - Successful With Fees', async function () {
     const contractHex = contract(
       issuerPrivateKey,
@@ -71,8 +70,7 @@ describe('regression, testnet', function () {
   })
 
   it('Contract - Wrong Funding Private Key Throws Error', async function () {
-
-    incorrectPrivateKey = bsv.PrivateKey()
+    const incorrectPrivateKey = bsv.PrivateKey()
     const contractHex = contract(
       issuerPrivateKey,
       contractUtxos,
@@ -91,8 +89,7 @@ describe('regression, testnet', function () {
   })
 
   it('Contract - Wrong Contract Private Key Throws Error', async function () {
-
-    incorrectPrivateKey = bsv.PrivateKey()
+    const incorrectPrivateKey = bsv.PrivateKey()
     const contractHex = contract(
       incorrectPrivateKey,
       contractUtxos,
@@ -346,8 +343,8 @@ describe('regression, testnet', function () {
   })
 
   it('Contract - Invalid Char Symbol Throws Error 1 ', async function () {
-    invalidCharsSymbol = '!invalid..;'
-    invalidSchema = utils.schema(publicKeyHash, invalidCharsSymbol, supply)
+    const invalidCharsSymbol = '!invalid..;'
+    const invalidSchema = utils.schema(publicKeyHash, invalidCharsSymbol, supply)
     try {
       contract(
         issuerPrivateKey,
@@ -386,8 +383,8 @@ describe('regression, testnet', function () {
   })
 
   it('Contract - Symbol Greater than 128 Bytes Throws Error', async function () {
-    invalidSymbol = 'CallmeIshmaelSomeyearsagosdnevermindhowlongpreciselyhavinglittleornomoneyinmypurseandnothingparticulartointerestmeotoadasdfasfgg1'
-    invalidSchema = utils.schema(publicKeyHash, invalidSymbol, supply)
+    const invalidSymbol = 'CallmeIshmaelSomeyearsagosdnevermindhowlongpreciselyhavinglittleornomoneyinmypurseandnothingparticulartointerestmeotoadasdfasfgg1'
+    const invalidSchema = utils.schema(publicKeyHash, invalidSymbol, supply)
     try {
       contract(
         issuerPrivateKey,
@@ -440,9 +437,29 @@ describe('regression, testnet', function () {
       expect(e.message).to.eql('Invalid Symbol. Must be between 1 and 128 long and contain alpahnumeric, \'-\', \'_\' chars.')
     }
   })
+
+  it('Does not allow a supply that is not  divisible by satsPerToken', async function () {
+    try {
+      schema.satsPerToken = 50
+
+      contract(
+        issuerPrivateKey,
+        contractUtxos,
+        fundingUtxos,
+        fundingPrivateKey,
+        schema,
+        75
+      )
+      assert(false)
+      return
+    } catch (e) {
+      expect(e).to.be.instanceOf(Error)
+      expect(e.message).to.eql('Token amount 75 must be divisible by satsPerToken 50')
+    }
+  })
 })
 
-async function setup() {
+async function setup () {
   issuerPrivateKey = bsv.PrivateKey()
   fundingPrivateKey = bsv.PrivateKey()
   contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
@@ -451,7 +468,7 @@ async function setup() {
   schema = utils.schema(publicKeyHash, symbol, supply)
 }
 
-function schemaNullSymbol() {
+function schemaNullSymbol () {
   return {
     name: 'Taal Token',
     tokenId: `${publicKeyHash}`,
