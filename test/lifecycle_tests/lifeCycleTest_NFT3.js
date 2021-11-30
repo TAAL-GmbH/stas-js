@@ -19,7 +19,7 @@ const {
 
 
 describe('regression, testnet', function () {
-  
+
   it("Full Life Cycle Test NFT 3", async function () {
 
     const issuerPrivateKey = bsv.PrivateKey()
@@ -28,13 +28,16 @@ describe('regression, testnet', function () {
     const aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
     const bobPrivateKey = bsv.PrivateKey()
     const bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
+    const davePrivate = bsv.PrivateKey()
+    const daveAddr = davePrivate.toAddress(process.env.NETWORK).toString()
     const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
     const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
     const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
-    const supply = 10000
+    const supply = 14000
+    const satsPerSupply = 1000
     const symbol = 'TAALT'
 
-    const schema = utils.schema(publicKeyHash, symbol, supply)
+    const schema = schemaSatsPerToken(publicKeyHash, symbol, supply, satsPerSupply)
 
     const contractHex = contract(
       issuerPrivateKey,
@@ -50,11 +53,29 @@ describe('regression, testnet', function () {
     let amount = await utils.getVoutAmount(contractTxid, 0)
     expect(amount).to.equal(supply / 100000000)
 
+    const issueInfo = [
+      {
+        addr: aliceAddr,
+        satoshis: 8000,
+        data: 'one'
+      },
+      {
+        addr: bobAddr,
+        satoshis: 4000,
+        data: 'two'
+      },
+      {
+        addr: daveAddr,
+        satoshis: 2000,
+        data: 'three'
+      }
+    ]
+
     let issueHex
     try {
       issueHex = issue(
         issuerPrivateKey,
-        utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+        issueInfo,
         utils.getUtxo(contractTxid, contractTx, 0),
         utils.getUtxo(contractTxid, contractTx, 1),
         fundingPrivateKey,
@@ -74,28 +95,35 @@ describe('regression, testnet', function () {
     expect(response.symbol).to.equal(symbol)
     expect(response.contract_txs).to.contain(contractTxid)
     expect(response.issuance_txs).to.contain(issueTxid)
-    expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
-    expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
-    expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
-    expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+    expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00008)
+    expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00004)
+    expect(await utils.getVoutAmount(issueTxid, 2)).to.equal(0.00002)
+    console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
+    console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
+    console.log('Dave Balance ' + await utils.getTokenBalance(daveAddr))
+    expect(await utils.getTokenBalance(aliceAddr)).to.equal(8000)
+    expect(await utils.getTokenBalance(bobAddr)).to.equal(4000)
+    expect(await utils.getTokenBalance(daveAddr)).to.equal(2000)
 
     const issueOutFundingVout = issueTx.vout.length - 1
+
     const transferHex = transfer(
-      bobPrivateKey,
+      alicePrivateKey,
       issuerPrivateKey.publicKey,
-      utils.getUtxo(issueTxid, issueTx, 1),
-      aliceAddr,
+      utils.getUtxo(issueTxid, issueTx, 0),
+      bobAddr,
       utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
       fundingPrivateKey
     )
     const transferTxid = await broadcast(transferHex)
     console.log(`Transfer TX:     ${transferTxid}`)
     const transferTx = await getTransaction(transferTxid)
-    expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
-    expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
-    expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
+    expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00008)
+    expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
+    expect(await utils.getTokenBalance(bobAddr)).to.equal(12000)
+    expect(await utils.getTokenBalance(daveAddr)).to.equal(2000)
 
-    // Split tokens into 2 - both payable to Bob...
+    // Attempt to split - throws error
     const bobAmount1 = transferTx.vout[0].value / 2
     const bobAmount2 = transferTx.vout[0].value - bobAmount1
     const splitDestinations = []
@@ -110,7 +138,6 @@ describe('regression, testnet', function () {
       utils.getUtxo(transferTxid, transferTx, 1),
       fundingPrivateKey
     )
-
     try {
       await broadcast(splitHex)
       assert(false)
@@ -120,18 +147,57 @@ describe('regression, testnet', function () {
     }
 
     const redeemHex = redeem(
-      alicePrivateKey,
+      bobPrivateKey,
       issuerPrivateKey.publicKey,
       utils.getUtxo(transferTxid, transferTx, 0),
       utils.getUtxo(transferTxid, transferTx, 1),
       fundingPrivateKey
     )
-
     const redeemTxid = await broadcast(redeemHex)
     console.log(`Redeem TX:       ${redeemTxid}`)
-    expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00003)
-    expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
-    expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
-
+    expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00008)
+    expect(await utils.getTokenBalance(bobAddr)).to.equal(4000)
+    expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
+    expect(await utils.getTokenBalance(daveAddr)).to.equal(2000)
   })
 })
+
+function schemaSatsPerToken(publicKeyHash, symbol, supply, satsPerToken) {
+
+  return schema = {
+    name: 'Taal Token',
+    tokenId: `${publicKeyHash}`,
+    protocolId: 'To be decided',
+    symbol: symbol,
+    description: 'Example token on private Taalnet',
+    image: 'https://www.taal.com/wp-content/themes/taal_v2/img/favicon/favicon-96x96.png',
+    totalSupply: supply,
+    decimals: 0,
+    satsPerToken: satsPerToken,
+    properties: {
+      legal: {
+        terms: '© 2020 TAAL TECHNOLOGIES SEZC\nALL RIGHTS RESERVED. ANY USE OF THIS SOFTWARE IS SUBJECT TO TERMS AND CONDITIONS OF LICENSE. USE OF THIS SOFTWARE WITHOUT LICENSE CONSTITUTES INFRINGEMENT OF INTELLECTUAL PROPERTY. FOR LICENSE DETAILS OF THE SOFTWARE, PLEASE REFER TO: www.taal.com/stas-token-license-agreement',
+        licenceId: '1234'
+      },
+      issuer: {
+        organisation: 'Taal Technologies SEZC',
+        legalForm: 'Limited Liability Public Company',
+        governingLaw: 'CA',
+        mailingAddress: '1 Volcano Stret, Canada',
+        issuerCountry: 'CYM',
+        jurisdiction: '',
+        email: 'info@taal.com'
+      },
+      meta: {
+        schemaId: 'token1',
+        website: 'https://taal.com',
+        legal: {
+          terms: 'blah blah'
+        },
+        media: {
+          type: 'mp4'
+        }
+      }
+    }
+  }
+}
