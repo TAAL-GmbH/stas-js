@@ -1,48 +1,204 @@
 const expect = require('chai').expect
 const assert = require('chai').assert
 const bsv = require('bsv')
+const utils = require('../utils/test_utils')
 require('dotenv').config()
 
 const {
     contract,
+    issue
 } = require('../../index')
 
 const {
+    broadcast,
+    getTransaction,
     getFundsFromFaucet,
 } = require('../../index').utils
 
 
 describe('regression, testnet, failing, 1427', function () {
 
-    it('Supply Not Divisble By Sats Per Token Throws Error', async function () {
+    it('Issued Amount For 1 Issuer Not Divisble By Sats Per Token Throws Error', async function () {
         const issuerPrivateKey = bsv.PrivateKey()
         const fundingPrivateKey = bsv.PrivateKey()
+        const alicePrivateKey = bsv.PrivateKey()
+        const aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
+        const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
+        const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
+        const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
+        const supply = 7500
+        const symbol = 'TAALT'
+        const satsPerToken = 1000 // not divisible into issued sats
+        const schema = schemaSatsPerToken(publicKeyHash, symbol, satsPerToken)
+
+        const contractHex = contract(
+            issuerPrivateKey,
+            contractUtxos,
+            fundingUtxos,
+            fundingPrivateKey,
+            schema,
+            supply
+        )
+        const contractTxid = await broadcast(contractHex)
+        const contractTx = await getTransaction(contractTxid)
+
+        const issueInfo = [
+            {
+                addr: aliceAddr,
+                satoshis: 7500, //not divisible by satsPerToken
+                data: 'one'
+            }
+        ]
+
+        try {
+            issueHex = issue(
+                issuerPrivateKey,
+                issueInfo,
+                utils.getUtxo(contractTxid, contractTx, 0),
+                utils.getUtxo(contractTxid, contractTx, 1),
+                fundingPrivateKey,
+                true,
+                symbol,
+                2
+            )
+            assert(false)
+            return
+        } catch (e) {
+            expect(e).to.be.instanceOf(Error)
+            expect(e.message).to.eql('some error')
+        }
+    })
+})
+
+describe('regression, testnet, failing, 1427', function () {
+
+    it('Issued Amount For 2 Issuers Not Divisble By Sats Per Token Throws Error', async function () {
+        const issuerPrivateKey = bsv.PrivateKey()
+        const fundingPrivateKey = bsv.PrivateKey()
+        const alicePrivateKey = bsv.PrivateKey()
+        const aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
+        const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
+        const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
+        const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
+        const supply = 7500
+        const symbol = 'TAALT'
+        const satsPerToken = 1000 // not divisible into issued sats
+        const schema = schemaSatsPerToken(publicKeyHash, symbol, satsPerToken)
+
+        const contractHex = contract(
+            issuerPrivateKey,
+            contractUtxos,
+            fundingUtxos,
+            fundingPrivateKey,
+            schema,
+            supply
+        )
+        const contractTxid = await broadcast(contractHex)
+        const contractTx = await getTransaction(contractTxid)
+
+        const issueInfo = [
+            {
+                addr: aliceAddr,
+                satoshis: 5500, //not divisible by satsPerToken
+                data: 'one'
+            },
+            {
+                addr: aliceAddr,
+                satoshis: 2000, // is divisible by satsPerToken
+                data: 'one'
+            }
+        ]
+
+        try {
+            issueHex = issue(
+                issuerPrivateKey,
+                issueInfo,
+                utils.getUtxo(contractTxid, contractTx, 0),
+                utils.getUtxo(contractTxid, contractTx, 1),
+                fundingPrivateKey,
+                true,
+                symbol,
+                2
+            )
+            assert(false)
+            return
+        } catch (e) {
+            expect(e).to.be.instanceOf(Error)
+            expect(e.message).to.eql('some error')
+        }
+    })
+})
+
+describe('regression, testnet, failing, 1427', function () {
+
+    it('Issued Amount For 4 Issuers Not Divisble By Sats Per Token Throws Error', async function () {
+
+        const issuerPrivateKey = bsv.PrivateKey()
+        const fundingPrivateKey = bsv.PrivateKey()
+        const alicePrivateKey = bsv.PrivateKey()
+        const aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
         const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
         const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
         const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
         const supply = 10000
         const symbol = 'TAALT'
-        const satsPerToken = 3
+        const satsPerToken = 500 // not divisible into issued sats
         const schema = schemaSatsPerToken(publicKeyHash, symbol, satsPerToken)
 
+        const contractHex = contract(
+            issuerPrivateKey,
+            contractUtxos,
+            fundingUtxos,
+            fundingPrivateKey,
+            schema,
+            supply
+        )
+        const contractTxid = await broadcast(contractHex)
+        const contractTx = await getTransaction(contractTxid)
+
+        const issueInfo = [
+            {
+                addr: aliceAddr,
+                satoshis: 5000, //is divisible by satsPerToken
+                data: 'one'
+            },
+            {
+                addr: aliceAddr,
+                satoshis: 4000, // is divisible by satsPerToken
+                data: 'one'
+            },
+            {
+                addr: aliceAddr,
+                satoshis: 600, // is not divisible by satsPerToken
+                data: 'one'
+            },
+            {
+                addr: aliceAddr,
+                satoshis: 400, // is not divisible by satsPerToken
+                data: 'one'
+            }
+
+        ]
         try {
-            contractHex = contract(
+            issueHex = issue(
                 issuerPrivateKey,
-                contractUtxos,
-                fundingUtxos,
+                issueInfo,
+                utils.getUtxo(contractTxid, contractTx, 0),
+                utils.getUtxo(contractTxid, contractTx, 1),
                 fundingPrivateKey,
-                schema,
-                supply
+                true,
+                symbol,
+                2
             )
-            assert(false, 'No error thrown, something went wrong')
+            assert(false)
             return
         } catch (e) {
             expect(e).to.be.instanceOf(Error)
-            expect(e.message).to.contain('some error')
+            expect(e.message).to.eql('some error')
         }
     })
-
 })
+
 
 function schemaSatsPerToken(publicKeyHash, symbol, supply, satsPerToken) {
 
