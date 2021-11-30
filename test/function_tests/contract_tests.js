@@ -438,7 +438,8 @@ describe('regression, testnet', function () {
     }
   })
 
-  it('Does not allow a supply that is not  divisible by satsPerToken', async function () {
+  it('Contract - Supply Not Divisible by satsPerToken Throws Error 1', async function () {
+
     try {
       schema.satsPerToken = 50
 
@@ -459,7 +460,54 @@ describe('regression, testnet', function () {
   })
 })
 
-async function setup () {
+
+it('Contract - Supply Not Divisible by satsPerToken Throws Error 2', async function () {
+
+  try {
+    schema.satsPerToken = 66
+
+    contract(
+      issuerPrivateKey,
+      contractUtxos,
+      fundingUtxos,
+      fundingPrivateKey,
+      schema,
+      1000
+    )
+    assert(false)
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Token amount 1000 must be divisible by satsPerToken 66')
+  }
+})
+
+//misleading error being thrown - we should have an error that satsPertoken cannot be greater than supply
+describe('failing', function () {
+
+  it('Contract - satsPerToken > Supply Throws Error', async function () {
+
+    try {
+      schema.satsPerToken = 2000
+
+      contract(
+        issuerPrivateKey,
+        contractUtxos,
+        fundingUtxos,
+        fundingPrivateKey,
+        schema,
+        1000
+      )
+      assert(false)
+      return
+    } catch (e) {
+      expect(e).to.be.instanceOf(Error)
+      expect(e.message).to.eql('Some Error')
+    }
+  })
+
+})
+async function setup() {
   issuerPrivateKey = bsv.PrivateKey()
   fundingPrivateKey = bsv.PrivateKey()
   contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
@@ -468,7 +516,7 @@ async function setup () {
   schema = utils.schema(publicKeyHash, symbol, supply)
 }
 
-function schemaNullSymbol () {
+function schemaNullSymbol() {
   return {
     name: 'Taal Token',
     tokenId: `${publicKeyHash}`,
