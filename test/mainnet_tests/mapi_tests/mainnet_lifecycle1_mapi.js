@@ -18,7 +18,6 @@ const {
   SATS_PER_BITCOIN
 } = require('../../../index').utils
 
-// eslint-disable-next-line no-undef
 it('Mainnet LifeCycle Test 1 broadcast via MAPI', async function () {
 
   const wait = 10000 // set wait to ensure mapi tx has reached woc
@@ -26,7 +25,6 @@ it('Mainnet LifeCycle Test 1 broadcast via MAPI', async function () {
   const address = ''
   const satsAmountForContract_and_Fees = 0 // use exact amount to match utxo
   const responseArray = await utils.setupMainNetTest(address, wait, satsAmountForContract_and_Fees)
-  console.log(responseArray)
 
   const inputUtxoid = responseArray[0] // the input utxo
   const inputUtxoIdVoutIndex = responseArray[1]
