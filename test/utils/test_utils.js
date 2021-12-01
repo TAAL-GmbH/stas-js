@@ -192,7 +192,7 @@ async function getTokenResponse(tokenId) {
     })
   } catch (e) {
     console.log('Token Not Found: ' + e)
-    return
+    return 'Token Not Found'
   }
   return response.data.token
 }
