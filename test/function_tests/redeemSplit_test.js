@@ -34,7 +34,30 @@ beforeEach(async function () {
 })
 
 describe('regression, testnet', function () {
+
+  it('Successful RedeemSplit With 1 Split', async function () {
+
+    const amount = issueTx.vout[0].value / 2
+    const rSplitDestinations = []
+    rSplitDestinations[0] = { address: bobAddr, amount: amount }
+
+    const redeemSplitHex = redeemSplit(
+      alicePrivateKey,
+      issuerPrivateKey.publicKey,
+      utils.getUtxo(issueTxid, issueTx, 0),
+      rSplitDestinations,
+      utils.getUtxo(issueTxid, issueTx, 2),
+      fundingPrivateKey
+    )
+    const redeemTxid = await broadcast(redeemSplitHex)
+    expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000035) // first utxo goes to redemption address
+    expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000035) 
+    console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
+    expect(await utils.getTokenBalance(bobAddr)).to.equal(6500)
+  })
+
   describe('failing', function () {
+  
     it('Successful RedeemSplit With 2 Split', async function () {
 
       const amount = issueTx.vout[0].value / 5
@@ -51,7 +74,6 @@ describe('regression, testnet', function () {
         fundingPrivateKey
       )
       const redeemTxid = await broadcast(redeemSplitHex)
-      console.log(redeemTxid)
       expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000042) // first utxo goes to redemption address
       expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000014)
       expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.000014)
@@ -61,6 +83,7 @@ describe('regression, testnet', function () {
       expect(await utils.getTokenBalance(bobAddr)).to.equal(4400)
     })
   })
+
   describe('failing', function () {
     it('Successful RedeemSplit With 3 Split', async function () {
 
@@ -170,6 +193,7 @@ describe('regression, testnet', function () {
         expect(e.message).to.eql('Must have less than 5 segments')
       }
     })
+
     describe('failing', function () {
     //needs fixed - throwing 'Output satoshis is not a natural number' 
     it('RedeemSplit - Add Too Much To Split Throws Error', async function () {
@@ -248,6 +272,7 @@ describe('regression, testnet', function () {
       }
     })
   })
+
     // check with liam - we can split to issuer address
     it('RedeemSplit - Send to Issuer Address Throws Error', async function () {
 
