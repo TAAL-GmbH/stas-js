@@ -24,7 +24,7 @@ const {
 
 describe('regression, testnet', function () {
 
-    it('Full Life Cycle Test 1', async function () {
+    it('Incorrect Token Id Does Not Issue A Token', async function () {
         const issuerPrivateKey = bsv.PrivateKey()
         const fundingPrivateKey = bsv.PrivateKey()
 
