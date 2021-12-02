@@ -1,11 +1,14 @@
 const bsv = require('bsv')
 const util = require('../../lib/stas')
-const mergeUtil = require('../utils/mergeWithoutValidation')
+const utils = require('../utils/test_utils')
 require('dotenv').config()
 
 const {
   contract,
   issue,
+  merge,
+  split,
+  transfer
 } = require('../../index')
 
 const {
@@ -13,9 +16,10 @@ const {
   getFundsFromFaucet,
   broadcast
 } = require('../../index').utils
+// const { utils } = require('mocha')
 
-// Work In Progress
-it('Merge Invalid Token', async function () {
+it('Merge Invalid Token Invalidates both token untxos', async function () {
+
   const issuerPrivateKey = bsv.PrivateKey()
   const fundingPrivateKey = bsv.PrivateKey()
 
@@ -27,50 +31,18 @@ it('Merge Invalid Token', async function () {
 
   const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
   const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
+  const fundingUtxos2 = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
 
-  const invalidTxUtxoPK = bsv.PrivateKey()
-  let invalidTxUtxo = await getFundsFromFaucet(invalidTxUtxoPK.toAddress(process.env.NETWORK).toString())
+  const attackerPrivateKey = bsv.PrivateKey()
+  let attackerFundsUtxo = await getFundsFromFaucet(attackerPrivateKey.toAddress(process.env.NETWORK).toString())
+  const attackerAddress = attackerPrivateKey.toAddress(process.env.NETWORK).toString()
+  console.log(`Attacker Address: ${attackerAddress}`)
 
   const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
+  const attackerPublicKeyHash = bsv.crypto.Hash.sha256ripemd160(attackerPrivateKey.publicKey.toBuffer()).toString('hex')
   const supply = 10000
   const symbol = 'TAALT'
-
-  const schema = {
-    name: 'Taal Token',
-    tokenId: `${publicKeyHash}`,
-    protocolId: 'To be decided',
-    symbol: symbol,
-    description: 'Example token on private Taalnet',
-    image: 'https://www.taal.com/wp-content/themes/taal_v2/img/favicon/favicon-96x96.png',
-    totalSupply: supply,
-    decimals: 0,
-    satsPerToken: 1,
-    properties: {
-      legal: {
-        terms: '© 2020 TAAL TECHNOLOGIES SEZC\nALL RIGHTS RESERVED. ANY USE OF THIS SOFTWARE IS SUBJECT TO TERMS AND CONDITIONS OF LICENSE. USE OF THIS SOFTWARE WITHOUT LICENSE CONSTITUTES INFRINGEMENT OF INTELLECTUAL PROPERTY. FOR LICENSE DETAILS OF THE SOFTWARE, PLEASE REFER TO: www.taal.com/stas-token-license-agreement',
-        licenceId: '1234'
-      },
-      issuer: {
-        organisation: 'Taal Technologies SEZC',
-        legalForm: 'Limited Liability Public Company',
-        governingLaw: 'CA',
-        mailingAddress: '1 Volcano Stret, Canada',
-        issuerCountry: 'CYM',
-        jurisdiction: '',
-        email: 'info@taal.com'
-      },
-      meta: {
-        schemaId: 'token1',
-        website: 'https://taal.com',
-        legal: {
-          terms: 'blah blah'
-        },
-        media: {
-          type: 'mp4'
-        }
-      }
-    }
-  }
+  const schema = utils.schema(publicKeyHash, symbol, supply)
 
   const contractHex = contract(
     issuerPrivateKey,
@@ -126,35 +98,56 @@ it('Merge Invalid Token', async function () {
   console.log(`Issue TX:        ${issueTxid}`)
   const issueTx = await getTransaction(issueTxid)
 
-  const splitTxObj1 = new bsv.Transaction(issueHex)
+  const transferhex = transfer(
+    alicePrivateKey,
+    issuerPrivateKey.publicKey,
+    {
+      txid: issueTxid,
+      vout: 0,
+      scriptPubKey: issueTx.vout[0].scriptPubKey.hex,
+      amount: issueTx.vout[0].value
+    },
+    attackerAddress,
+    fundingUtxos2,
+    fundingPrivateKey
+  )
 
-  invalidTxUtxo = invalidTxUtxo[0]
+  const transferTxid = await broadcast(transferhex)
+  console.log(`Transfer TX:     ${transferTxid}`)
+  const transfertx = await getTransaction(transferTxid)
+
+  const validSplit = new bsv.Transaction(transferhex)
+
+  hexSymbol = Buffer.from(symbol).toString('hex')
+  attackerFundsUtxo = attackerFundsUtxo[0]
+  console.log(attackerFundsUtxo)
   const tx = new bsv.Transaction()
-  tx.from(invalidTxUtxo)
-  const stasScript = util.getStasScript(alicePrivateKey.publicKey, issuerPrivateKey.publicKey, 2, null, true, symbol)
+  tx.from(attackerFundsUtxo)
+  const stasScript = util.getStasScript(attackerPublicKeyHash, issuerPrivateKey.publicKey, 2, null, true, hexSymbol)
   tx.addOutput(new bsv.Transaction.Output({
-    script: stasScript,
-    satoshis: (Math.round(invalidTxUtxo.amount * 1e8))
+    script: transfertx.vout[0].scriptPubKey.hex,
+    satoshis: (Math.round(attackerFundsUtxo.amount * 1e8))
   }))
-  tx.sign(invalidTxUtxoPK)
+  tx.sign(attackerPrivateKey)
 
   const txId = await broadcast(tx.serialize(true))
   const txOut = await getTransaction(txId)
 
-  const splitTxObj2 = new bsv.Transaction(tx.serialize(true))
+  const attackerObj = new bsv.Transaction(tx.serialize(true))
 
-  const mergeHex = mergeUtil.mergeWithoutValidation(
-    alicePrivateKey,
+
+  const mergeHex = merge(
+    attackerPrivateKey,
     issuerPrivateKey.publicKey,
     [{
-      tx: splitTxObj1,
+      tx: validSplit,
       vout: 0
     },
     {
-      tx: splitTxObj2,
+      tx: attackerObj,
       vout: 0
     }],
-    aliceAddr,
+    attackerAddress,
     {
       txid: issueTxid,
       vout: 2,
@@ -163,6 +156,8 @@ it('Merge Invalid Token', async function () {
     },
     fundingPrivateKey
   )
+  const mergeTxId = await broadcast(mergeHex)
+  console.log(`Merge TX: ${mergeTxId}`)
 
-  await broadcast(mergeHex)
+  
 })
