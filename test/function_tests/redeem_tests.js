@@ -79,24 +79,24 @@ describe('regression, testnet', function () {
         )
       } catch (e) {
         expect(e).to.be.instanceOf(Error)
-        expect(e.message).to.eql('Payment private key provided but payment UTXO is null or empty')
+        expect(e.message).to.eql('Payment private key provided but payment UTXO is null')
       }
     })
   })
 
   describe('failing', function () {
-    it('Redeem - Successful Redeem No Fee Empty Array', async function () {
+    it('Redeem - Successful Redeem No Fee null object', async function () {
       try {
         redeem(
           alicePrivateKey,
           issuerPrivateKey.publicKey,
           utils.getUtxo(issueTxid, issueTx, 0),
-          [],
+          null,
           fundingPrivateKey
         )
       } catch (e) {
         expect(e).to.be.instanceOf(Error)
-        expect(e.message).to.eql('Payment private key provided but payment UTXO is null or empty')
+        expect(e.message).to.eql('Payment private key provided but payment UTXO is null')
       }
     })
   })
