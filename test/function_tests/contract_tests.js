@@ -236,7 +236,7 @@ describe('regression, testnet', function () {
       return
     } catch (e) {
       expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('Invalid Argument: Output satoshis is not a natural number')
+      expect(e.message).to.eql('Token amount null is less than satsPerToken 1')
     }
   })
 
@@ -254,7 +254,7 @@ describe('regression, testnet', function () {
       return
     } catch (e) {
       expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('Invalid Argument: Output satoshis is not a natural number')
+      expect(e.message).to.eql('Token amount -100 is less than satsPerToken 1')
     }
   })
 
@@ -439,7 +439,6 @@ describe('regression, testnet', function () {
   })
 
   it('Contract - Supply Not Divisible by satsPerToken Throws Error 1', async function () {
-
     try {
       schema.satsPerToken = 50
 
@@ -460,9 +459,7 @@ describe('regression, testnet', function () {
   })
 })
 
-
 it('Contract - Supply Not Divisible by satsPerToken Throws Error 2', async function () {
-
   try {
     schema.satsPerToken = 66
 
@@ -480,13 +477,10 @@ it('Contract - Supply Not Divisible by satsPerToken Throws Error 2', async funct
     expect(e).to.be.instanceOf(Error)
     expect(e.message).to.eql('Token amount 1000 must be divisible by satsPerToken 66')
   }
-})
 
-//misleading error being thrown - we should have an error that satsPertoken cannot be greater than supply
-describe('failing', function () {
+  // misleading error being thrown - we should have an error that satsPertoken cannot be greater than supply
 
   it('Contract - satsPerToken > Supply Throws Error', async function () {
-
     try {
       schema.satsPerToken = 2000
 
@@ -502,12 +496,12 @@ describe('failing', function () {
       return
     } catch (e) {
       expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('Some Error')
+      expect(e.message).to.eql('Token amount 1000 is less than satsPerToken 2000')
     }
   })
-
 })
-async function setup() {
+
+async function setup () {
   issuerPrivateKey = bsv.PrivateKey()
   fundingPrivateKey = bsv.PrivateKey()
   contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
@@ -516,7 +510,7 @@ async function setup() {
   schema = utils.schema(publicKeyHash, symbol, supply)
 }
 
-function schemaNullSymbol() {
+function schemaNullSymbol () {
   return {
     name: 'Taal Token',
     tokenId: `${publicKeyHash}`,
