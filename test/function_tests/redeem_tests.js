@@ -67,37 +67,51 @@ describe('regression, testnet', function () {
     expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
   })
 
-  describe('failing', function () {
-    it('Redeem - Successful Redeem No Fee UTXO but funding pk provided', async function () {
-      try {
-        redeem(
-          alicePrivateKey,
-          issuerPrivateKey.publicKey,
-          utils.getUtxo(issueTxid, issueTx, 0),
-          null,
-          fundingPrivateKey
-        )
-      } catch (e) {
-        expect(e).to.be.instanceOf(Error)
-        expect(e.message).to.eql('Payment private key provided but payment UTXO is null')
-      }
-    })
+  it('Redeem -  No Fee UTXO but funding pk provided throws error', async function () {
+    try {
+      redeem(
+        alicePrivateKey,
+        issuerPrivateKey.publicKey,
+        utils.getUtxo(issueTxid, issueTx, 0),
+        null,
+        fundingPrivateKey
+      )
+    } catch (e) {
+      expect(e).to.be.instanceOf(Error)
+      expect(e.message).to.eql('Payment private key provided but payment UTXO is null')
+    }
   })
 
+  it('Redeem - Successful Redeem No Fee ', async function () {
+    const redeemHex = redeem(
+      alicePrivateKey,
+      issuerPrivateKey.publicKey,
+      utils.getUtxo(issueTxid, issueTx, 0),
+      null,
+      null
+    )
+    const redeemTxid = await broadcast(redeemHex)
+    expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007)
+    console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
+    console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
+    expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
+    expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+  })
   describe('failing', function () {
-    it('Redeem - Successful Redeem No Fee null object', async function () {
-      try {
-        redeem(
-          alicePrivateKey,
-          issuerPrivateKey.publicKey,
-          utils.getUtxo(issueTxid, issueTx, 0),
-          null,
-          fundingPrivateKey
-        )
-      } catch (e) {
-        expect(e).to.be.instanceOf(Error)
-        expect(e.message).to.eql('Payment private key provided but payment UTXO is null')
-      }
+    it('Redeem - Successful Redeem No Fee Empty Array ', async function () {
+      const redeemHex = redeem(
+        alicePrivateKey,
+        issuerPrivateKey.publicKey,
+        utils.getUtxo(issueTxid, issueTx, 0),
+        [],
+        null
+      )
+      const redeemTxid = await broadcast(redeemHex)
+      expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007)
+      console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
+      console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
+      expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
+      expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
     })
   })
 
@@ -212,25 +226,23 @@ describe('regression, testnet', function () {
     }
   })
 
-  describe('failing', function () {
-  // needs fixed
-    it('Redeem - Null Token Owner Private Key Throws Error', async function () {
-      try {
-        redeem(
-          null,
-          issuerPrivateKey.publicKey,
-          utils.getUtxo(issueTxid, issueTx, 0),
-          utils.getUtxo(issueTxid, issueTx, 2),
-          fundingPrivateKey
-        )
-        assert(false)
-        return
-      } catch (e) {
-        expect(e).to.be.instanceOf(Error)
-        expect(e.message).to.eql('Token owner private key is null')
-      }
-    })
+  it('Redeem - Null Token Owner Private Key Throws Error', async function () {
+    try {
+      redeem(
+        null,
+        issuerPrivateKey.publicKey,
+        utils.getUtxo(issueTxid, issueTx, 0),
+        utils.getUtxo(issueTxid, issueTx, 2),
+        fundingPrivateKey
+      )
+      assert(false)
+      return
+    } catch (e) {
+      expect(e).to.be.instanceOf(Error)
+      expect(e.message).to.eql('Token owner private key is null')
+    }
   })
+
   it('Redeem - Null STAS UTXO Throws Error', async function () {
     try {
       redeem(
@@ -266,7 +278,7 @@ describe('regression, testnet', function () {
   })
 })
 
-async function setup () {
+async function setup() {
   issuerPrivateKey = bsv.PrivateKey()
   fundingPrivateKey = bsv.PrivateKey()
   bobPrivateKey = bsv.PrivateKey()

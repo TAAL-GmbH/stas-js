@@ -59,8 +59,8 @@ describe('regression, testnet', function () {
       expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000035)
       console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
       console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
-      expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
-      expect(await utils.getTokenBalance(bobAddr)).to.equal(10000)
+      expect(await utils.getTokenBalance(aliceAddr)).to.equal(3500)
+      expect(await utils.getTokenBalance(bobAddr)).to.equal(6500)
     })
   })
   describe('failing, 1416', function () {
@@ -94,12 +94,12 @@ describe('regression, testnet', function () {
   })
   describe('failing, 1416', function () {
     it('Split - Successful Split Into Four Tokens 1', async function () {
-      const bobAmount = issueTx.vout[0].value / 4
+      const amount = issueTx.vout[0].value / 4
       const splitDestinations = []
-      splitDestinations[0] = { address: bobAddr, amount: bobAmount }
-      splitDestinations[1] = { address: bobAddr, amount: bobAmount }
-      splitDestinations[2] = { address: bobAddr, amount: bobAmount }
-      splitDestinations[3] = { address: bobAddr, amount: bobAmount }
+      splitDestinations[0] = { address: aliceAddr, amount: amount }
+      splitDestinations[1] = { address: bobAddr, amount: amount }
+      splitDestinations[2] = { address: bobAddr, amount: amount }
+      splitDestinations[3] = { address: bobAddr, amount: amount }
 
       const splitHex = split(
         alicePrivateKey,
@@ -200,12 +200,11 @@ describe('regression, testnet', function () {
       expect(splitDestinations).to.have.length(noOfTokens) // ensure that tx output contains 2 values
       expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035)
       expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000035)
-      expect(await utils.getTokenBalance(aliceAddr)).to.equal(1750)
-      expect(await utils.getTokenBalance(bobAddr)).to.equal(8250)
+      expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
+      expect(await utils.getTokenBalance(bobAddr)).to.equal(10000)
     })
   })
   describe('failing', function () {
-    // needs fixed
     it('Split - Successful Split Into Two Tokens With No Fee Empty Array', async function () {
       const bobAmount1 = issueTx.vout[0].value / 2
       const bobAmount2 = issueTx.vout[0].value - bobAmount1
@@ -226,8 +225,8 @@ describe('regression, testnet', function () {
       expect(splitDestinations).to.have.length(noOfTokens) // ensure that tx output contains 2 values
       expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035)
       expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000035)
-      expect(await utils.getTokenBalance(aliceAddr)).to.equal(1750)
-      expect(await utils.getTokenBalance(bobAddr)).to.equal(8250)
+      expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
+      expect(await utils.getTokenBalance(bobAddr)).to.equal(10000)
     })
   })
   it('Split - Splitting Into Too Many Tokens Throws Error', async function () {
@@ -273,8 +272,7 @@ describe('regression, testnet', function () {
       expect(e.message).to.eql('split destinations array is null or empty')
     }
   })
-  describe('failing', function () {
-    // should we validate in SDK?
+
     it('Split - Add Zero Sats to Split Throws Error', async function () {
       const splitDestinations = []
       splitDestinations[0] = { address: bobAddr, amount: 0 }
@@ -296,9 +294,7 @@ describe('regression, testnet', function () {
         expect(e.message).to.eql('Invalid ammount in split destination')
       }
     })
-  })
-  describe('failing', function () {
-    // should we validate in SDK?
+
     it('Split - Negative Integer Sats to Split Throws Error', async function () {
       const splitDestinations = []
       splitDestinations[0] = { address: bobAddr, amount: -0.00015 }
@@ -320,7 +316,7 @@ describe('regression, testnet', function () {
         expect(e.message).to.eql('Invalid ammount in split destination')
       }
     })
-  })
+
   it('Split - Add Too Much To Split Throws Error', async function () {
     const bobAmount = issueTx.vout[0].value * 2
     const splitDestinations = []
@@ -343,9 +339,7 @@ describe('regression, testnet', function () {
       expect(e.message).to.eql('Request failed with status code 400')
     }
   })
-  describe('failing', function () {
-    // throwing a 'Checksum mismatch' error - if i am reading code correctly it should validate address first
-    // and trigger > ADDRESS_MAX_LENGTH  error
+
     it('Split - Address Too Long Throws Error', async function () {
       const bobAmount1 = issueTx.vout[0].value / 2
       const bobAmount2 = issueTx.vout[0].value - bobAmount1
@@ -369,7 +363,7 @@ describe('regression, testnet', function () {
         expect(e.message).to.eql('Invalid Address in split destination')
       }
     })
-  })
+
   it('Split - Send to Issuer Address Throws Error', async function () {
     const bobAmount1 = issueTx.vout[0].value / 2
     const bobAmount2 = issueTx.vout[0].value - bobAmount1
@@ -472,7 +466,7 @@ describe('regression, testnet', function () {
       expect(e.message).to.eql('Request failed with status code 400')
     }
   })
-  describe('failing', function () {
+
     it('Split - Null Token Owner Private Key Throws Error', async function () {
       const bobAmount1 = issueTx.vout[0].value / 2
       const bobAmount2 = issueTx.vout[0].value - bobAmount1
@@ -495,7 +489,6 @@ describe('regression, testnet', function () {
         expect(e.message).to.eql('Token owner private key is null')
       }
     })
-  })
 
   it('Split - Null  STAS UTXO Throws Error', async function () {
     const bobAmount1 = issueTx.vout[0].value / 2
@@ -519,7 +512,7 @@ describe('regression, testnet', function () {
       expect(e.message).to.eql('Invalid Argument: Must provide an object from where to extract data')
     }
   })
-  describe('failing', function () {
+
     it('Split - Null Split Addresses Throws Error', async function () {
       try {
         split(
@@ -537,7 +530,7 @@ describe('regression, testnet', function () {
         expect(e.message).to.eql('split destinations array is null or empty')
       }
     })
-  })
+
   it('Split - Null Funding Private Key Throws Error', async function () {
     const bobAmount1 = issueTx.vout[0].value / 2
     const bobAmount2 = issueTx.vout[0].value - bobAmount1

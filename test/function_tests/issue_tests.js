@@ -229,7 +229,7 @@ describe('regression, testnet', function () {
     expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
   })
 
-  it('Issue - Issue to Issuer Address - should this fail?', async function () {
+  it('Issue - Issue to Issuer Address', async function () {
 
     const issuerAddr = issuerPrivateKey.toAddress(process.env.NETWORK).toString()
     const issueHex = issue(

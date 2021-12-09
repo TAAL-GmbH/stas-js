@@ -56,7 +56,6 @@ describe('regression, testnet', function () {
     expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
   })
 
-  describe('failing, 1416', function () {
     it('Transfer - Successful With Fee 2', async function () {
       const transferHex = transfer(
         alicePrivateKey,
@@ -66,6 +65,7 @@ describe('regression, testnet', function () {
         utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
         fundingPrivateKey
       )
+      
       const transferTxid = await broadcast(transferHex)
       const tokenId = await utils.getToken(transferTxid)
       const response = await utils.getTokenResponse(tokenId)
@@ -76,7 +76,6 @@ describe('regression, testnet', function () {
       expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
       expect(await utils.getTokenBalance(bobAddr)).to.equal(10000)
     })
-  })
 
   it('Transfer - Successful With Fee 3', async function () {
     const davePrivateKey = bsv.PrivateKey()
@@ -213,9 +212,8 @@ describe('regression, testnet', function () {
       expect(e.message).to.eql('Invalid destination address')
     }
   })
-  describe('failing', function () {
-    // needs fixed - throwing 'Checksum mismatch'  - can we validate address similar to issue?
-    it('Transfer -  Address Validation - Too Many Chars', async function () {
+
+    it('Transfer -  Address Validation - Too Many Chars throws error', async function () {
       const invalidAddr = '1MSCReQT9E4GpxuK1K7uyD5qF1EmznXjkrmoFCgGtkmhyaL2frwff84p2bwTf3FDpkZcCgGtkmhyaL2frwff84p2bwTf3FDpkZcCgGtkmhy'
       try {
         transfer(
@@ -233,7 +231,7 @@ describe('regression, testnet', function () {
         expect(e.message).to.eql('Invalid destination address')
       }
     })
-  })
+
   it('Transfer - Incorrect STAS UTXO Amount Throws Error', async function () {
     const transferHex = transfer(
       bobPrivateKey,
@@ -282,8 +280,6 @@ describe('regression, testnet', function () {
     }
   })
 
-  describe('failing', function () {
-  // needs fixed
     it('Transfer - Null Token Owner Private Key Throws Error', async function () {
       try {
         transfer(
@@ -301,7 +297,6 @@ describe('regression, testnet', function () {
         expect(e.message).to.eql('Token owner private key is null')
       }
     })
-  })
 
   it('Transfer - Null STAS UTXO Throws Error', async function () {
     try {
