@@ -2,14 +2,16 @@ const bsv = require('bsv')
 require('dotenv').config()
 
 const {
-  contract,
-  issue,
-  transfer,
-  split,
-  merge,
-  mergeSplit,
-  redeem
+  contractWithCallback,
+  issueWithCallback,
+  transferWithCallback,
+  splitWithCallback,
+  mergeWithCallback,
+  mergeSplitWithCallback,
+  redeemWithCallback
 } = require('./index')
+
+const { sighash } = require('./lib/stas')
 
 const {
   getTransaction,
@@ -20,12 +22,17 @@ const {
 
 ;(async () => {
   const issuerPrivateKey = bsv.PrivateKey()
+  const issuerPublicKey = issuerPrivateKey.publicKey
+
   const fundingPrivateKey = bsv.PrivateKey()
+  const fundingPublicKey = fundingPrivateKey.publicKey
 
   const alicePrivateKey = bsv.PrivateKey()
+  const alicePublicKey = alicePrivateKey.publicKey
   const aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
 
   const bobPrivateKey = bsv.PrivateKey()
+  const bobPublicKey = bobPrivateKey.publicKey
   const bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
 
   const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
@@ -77,14 +84,26 @@ const {
     }
   }
 
+  const ownerSignCallback = (tx) => {
+    tx.sign(issuerPrivateKey)
+  }
+
+  const paymentSignCallback = (tx) => {
+    tx.sign(fundingPrivateKey)
+  }
+
+  // return contractWithCallback(privateKey.publicKey, inputUtxos, paymentUtxos, paymentPrivateKey ? paymentPrivateKey.publicKey : null, schema, tokenSatoshis, ownerSignCallback, paymentSignCallback)
+
   // change goes back to the fundingPrivateKey
-  const contractHex = contract(
-    issuerPrivateKey,
+  const contractHex = contractWithCallback(
+    issuerPublicKey,
     contractUtxos,
     fundingUtxos,
-    fundingPrivateKey,
+    fundingPublicKey,
     schema,
-    supply
+    supply,
+    ownerSignCallback,
+    paymentSignCallback
   )
   const contractTxid = await broadcast(contractHex)
   console.log(`Contract TX:     ${contractTxid}`)
@@ -102,10 +121,24 @@ const {
       data: 'two'
     }
   ]
+
+  const issuerSignatureCallback = (tx, i, script, satoshis) => {
+    return bsv.Transaction.sighash.sign(tx, issuerPrivateKey, sighash, i, script, satoshis)
+  }
+  const aliceSignatureCallback = (tx, i, script, satoshis) => {
+    return bsv.Transaction.sighash.sign(tx, alicePrivateKey, sighash, i, script, satoshis)
+  }
+  const bobSignatureCallback = (tx, i, script, satoshis) => {
+    return bsv.Transaction.sighash.sign(tx, bobPrivateKey, sighash, i, script, satoshis)
+  }
+  const paymentSignatureCallback = (tx, i, script, satoshis) => {
+    return bsv.Transaction.sighash.sign(tx, fundingPrivateKey, sighash, i, script, satoshis)
+  }
+
   let issueHex
   try {
-    issueHex = issue(
-      issuerPrivateKey,
+    issueHex = issueWithCallback(
+      issuerPublicKey,
       issueInfo,
       {
         txid: contractTxid,
@@ -119,9 +152,12 @@ const {
         scriptPubKey: contractTx.vout[1].scriptPubKey.hex,
         amount: contractTx.vout[1].value
       },
-      fundingPrivateKey,
+      fundingPublicKey,
       true, // isSplittable
-      symbol
+      symbol,
+      issuerSignatureCallback,
+      paymentSignatureCallback
+
     )
   } catch (e) {
     console.log('error issuing token', e)
@@ -133,9 +169,8 @@ const {
 
   const issueOutFundingVout = issueTx.vout.length - 1
 
-  const transferHex = transfer(
-    bobPrivateKey,
-    issuerPrivateKey.publicKey,
+  const transferHex = transferWithCallback(
+    bobPublicKey,
     {
       txid: issueTxid,
       vout: 1,
@@ -149,7 +184,9 @@ const {
       scriptPubKey: issueTx.vout[issueOutFundingVout].scriptPubKey.hex,
       amount: issueTx.vout[issueOutFundingVout].value
     },
-    fundingPrivateKey
+    fundingPublicKey,
+    bobSignatureCallback,
+    paymentSignatureCallback
   )
   const transferTxid = await broadcast(transferHex)
   console.log(`Transfer TX:     ${transferTxid}`)
@@ -162,9 +199,8 @@ const {
   splitDestinations[0] = { address: bobAddr, amount: bobAmount1 }
   splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
 
-  const splitHex = split(
-    alicePrivateKey,
-    issuerPrivateKey.publicKey,
+  const splitHex = splitWithCallback(
+    alicePublicKey,
     {
       txid: transferTxid,
       vout: 0,
@@ -178,7 +214,9 @@ const {
       scriptPubKey: transferTx.vout[1].scriptPubKey.hex,
       amount: transferTx.vout[1].value
     },
-    fundingPrivateKey
+    fundingPublicKey,
+    aliceSignatureCallback,
+    paymentSignatureCallback
   )
   const splitTxid = await broadcast(splitHex)
   console.log(`Split TX:        ${splitTxid}`)
@@ -187,9 +225,8 @@ const {
   // Now let's merge the last split back together
   const splitTxObj = new bsv.Transaction(splitHex)
 
-  const mergeHex = merge(
-    bobPrivateKey,
-    issuerPrivateKey.publicKey,
+  const mergeHex = mergeWithCallback(
+    bobPublicKey,
     [{
       tx: splitTxObj,
       vout: 0
@@ -205,7 +242,9 @@ const {
       scriptPubKey: splitTx.vout[2].scriptPubKey.hex,
       amount: splitTx.vout[2].value
     },
-    fundingPrivateKey
+    fundingPublicKey,
+    bobSignatureCallback,
+    paymentSignatureCallback
   )
 
   const mergeTxid = await broadcast(mergeHex)
@@ -220,9 +259,8 @@ const {
   split2Destinations[0] = { address: aliceAddr, amount: aliceAmount1 }
   split2Destinations[1] = { address: aliceAddr, amount: aliceAmount2 }
 
-  const splitHex2 = split(
-    alicePrivateKey,
-    issuerPrivateKey.publicKey,
+  const splitHex2 = splitWithCallback(
+    alicePublicKey,
     {
       txid: mergeTxid,
       vout: 0,
@@ -236,7 +274,10 @@ const {
       scriptPubKey: mergeTx.vout[1].scriptPubKey.hex,
       amount: mergeTx.vout[1].value
     },
-    fundingPrivateKey
+    fundingPublicKey,
+    aliceSignatureCallback,
+    paymentSignatureCallback
+
   )
   const splitTxid2 = await broadcast(splitHex2)
   console.log(`Split TX2:       ${splitTxid2}`)
@@ -248,9 +289,8 @@ const {
   const aliceAmountSatoshis = Math.floor(splitTx2.vout[0].value * SATS_PER_BITCOIN) / 2
   const bobAmountSatoshis = Math.floor(splitTx2.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx2.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
 
-  const mergeSplitHex = mergeSplit(
-    alicePrivateKey,
-    issuerPrivateKey.publicKey,
+  const mergeSplitHex = mergeSplitWithCallback(
+    alicePublicKey,
     [{
       tx: splitTxObj2,
       scriptPubKey: splitTx2.vout[0].scriptPubKey.hex,
@@ -274,7 +314,9 @@ const {
       scriptPubKey: splitTx2.vout[2].scriptPubKey.hex,
       amount: splitTx2.vout[2].value
     },
-    fundingPrivateKey
+    fundingPublicKey,
+    aliceSignatureCallback,
+    paymentSignatureCallback
   )
 
   const mergeSplitTxid = await broadcast(mergeSplitHex)
@@ -282,8 +324,8 @@ const {
   const mergeSplitTx = await getTransaction(mergeSplitTxid)
 
   // Alice wants to redeem the money from bob...
-  const redeemHex = redeem(
-    alicePrivateKey,
+  const redeemHex = redeemWithCallback(
+    alicePublicKey,
     issuerPrivateKey.publicKey,
     {
       txid: mergeSplitTxid,
@@ -297,7 +339,9 @@ const {
       scriptPubKey: mergeSplitTx.vout[2].scriptPubKey.hex,
       amount: mergeSplitTx.vout[2].value
     },
-    fundingPrivateKey
+    fundingPublicKey,
+    aliceSignatureCallback,
+    paymentSignatureCallback
   )
   const redeemTxid = await broadcast(redeemHex)
   console.log(`Redeem TX:       ${redeemTxid}`)

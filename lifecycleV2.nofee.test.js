@@ -114,7 +114,7 @@ const {
     null,
     null,
     true, // isSplittable
-    2 // STAS version
+    symbol
   )
   let issueTxid = ''
   try {
