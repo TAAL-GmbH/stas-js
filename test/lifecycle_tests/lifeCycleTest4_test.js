@@ -149,8 +149,8 @@ describe('regression, testnet', function () {
     expect(responseMerge.issuance_txs).to.contain(issueTxid)
     console.log("Alice Balance " + await utils.getTokenBalance(aliceAddr))
     console.log("Bob Balance " + await utils.getTokenBalance(bobAddr))
-    expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
-    expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+    expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
+    expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
 
     const amount = mergeTx.vout[0].value / 2
 
@@ -201,8 +201,8 @@ describe('regression, testnet', function () {
     expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
     console.log("Alice Balance " + await utils.getTokenBalance(aliceAddr))
     console.log("Bob Balance " + await utils.getTokenBalance(bobAddr))
-    expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
-    expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
+    expect(await utils.getTokenBalance(aliceAddr)).to.equal(7750)
+    expect(await utils.getTokenBalance(bobAddr)).to.equal(2250)
 
 
     // Alice wants to redeem the money from bob...
@@ -217,7 +217,7 @@ describe('regression, testnet', function () {
     console.log(`Redeem TX:       ${redeemTxid}`)
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.0000075)
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
-    expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+    expect(await utils.getTokenBalance(bobAddr)).to.equal(2250)
   })
 })
 

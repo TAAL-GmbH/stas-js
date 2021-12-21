@@ -72,6 +72,7 @@ describe('regression, testnet', function () {
     const tokenId = await utils.getToken(issueTxid)
     console.log(`issueTxid:        ${issueTxid}`)
     console.log(`Token ID:        ${tokenId}`)
+    await new Promise(r => setTimeout(r, 5000))
     let response = await utils.getTokenResponse(tokenId)  //token issuance fails
     console.log(response.symbol)
   })
