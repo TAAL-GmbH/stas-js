@@ -382,7 +382,7 @@ describe('regression, testnet', function () {
     }
   })
 
-  // eslint-disable-next-line no-undef
+  //needs fixed
   it('RedeemSplit - Null Token Owner Private Key Throws Error', async function () {
     const bobAmount = issueTx.vout[0].value / 2
     const splitDestinations = []

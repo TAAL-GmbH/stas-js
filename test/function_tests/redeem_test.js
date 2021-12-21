@@ -67,20 +67,6 @@ describe('regression, testnet', function () {
     expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
   })
 
-  it('Redeem -  No Fee UTXO but funding pk provided throws error', async function () {
-    try {
-      redeem(
-        alicePrivateKey,
-        issuerPrivateKey.publicKey,
-        utils.getUtxo(issueTxid, issueTx, 0),
-        null,
-        fundingPrivateKey
-      )
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('Payment private key provided but payment UTXO is null')
-    }
-  })
 
   it('Redeem - Successful Redeem No Fee ', async function () {
     const redeemHex = redeem(
@@ -97,6 +83,7 @@ describe('regression, testnet', function () {
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
     expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
   })
+
   describe('failing', function () {
     it('Redeem - Successful Redeem No Fee Empty Array ', async function () {
       const redeemHex = redeem(
@@ -260,7 +247,22 @@ describe('regression, testnet', function () {
     }
   })
 
-  it('Redeem - Funding Private Key Throws Error', async function () {
+  it('Redeem -  No Fee UTXO but funding pk provided throws error', async function () {
+    try {
+      redeem(
+        alicePrivateKey,
+        issuerPrivateKey.publicKey,
+        utils.getUtxo(issueTxid, issueTx, 0),
+        null,
+        fundingPrivateKey
+      )
+    } catch (e) {
+      expect(e).to.be.instanceOf(Error)
+      expect(e.message).to.eql('Payment key provided but payment UTXO is null')
+    }
+  })
+
+  it('Redeem - Null Funding Private Key Throws Error', async function () {
     try {
       redeem(
         alicePrivateKey,
@@ -273,7 +275,7 @@ describe('regression, testnet', function () {
       return
     } catch (e) {
       expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('Payment UTXO provided but payment private key is null')
+      expect(e.message).to.eql('Payment UTXO provided but payment key is null')
     }
   })
 })

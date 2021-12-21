@@ -125,7 +125,7 @@ describe('regression, testnet, failing, 1545', function () {
     console.log(attackerFundsUtxo)
     const tx = new bsv.Transaction()
     tx.from(attackerFundsUtxo)
-    const stasScript = util.getStasScript(attackerPublicKeyHash, issuerPrivateKey.publicKey, 2, null, true, hexSymbol)
+    const stasScript = util.getStasScript(attackerPublicKeyHash, issuerPrivateKey.publicKey, null, true, hexSymbol)
     tx.addOutput(new bsv.Transaction.Output({
       script: transfertx.vout[0].scriptPubKey.hex,
       satoshis: (Math.round(attackerFundsUtxo.amount * 1e8))

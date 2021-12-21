@@ -20,7 +20,7 @@ const ADDRESS_MAX_LENGTH = 35
    isSplittable is a flag which sets whether the token can be split into further parts.
    version is the version of the STAS script, currently only version 2 is available.
 */
-function issueWithoutValiation (privateKey, issueInfo, contractUtxo, paymentUtxo, paymentPrivateKey, isSplittable, symbol, version) {
+function issueWithoutValiation (privateKey, issueInfo, contractUtxo, paymentUtxo, paymentPrivateKey, isSplittable, symbol) {
   if (!isIssueInfoValid(issueInfo)) {
     throw new Error('issueInfo is invalid')
   }
@@ -57,7 +57,7 @@ function issueWithoutValiation (privateKey, issueInfo, contractUtxo, paymentUtxo
       hexSymbol = Buffer.from(symbol).toString('hex')
     }
     // Add the issuing output
-    const stasScript = getStasScript(pubKeyHash, privateKey.publicKey, version, data, isSplittable, hexSymbol)
+    const stasScript = getStasScript(pubKeyHash, privateKey.publicKey, data, isSplittable, hexSymbol)
 
     tx.addOutput(new bsv.Transaction.Output({
       script: stasScript,

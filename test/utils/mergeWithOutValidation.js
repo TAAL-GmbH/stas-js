@@ -41,7 +41,7 @@ function mergeWithoutValidation (tokenOwnerPrivateKey, contractPublicKey, mergeU
   })
   const version = getVersion(lockingScript)
   const destinationPubkeyHash = addressToPubkeyhash(destinationAddr)
-  const stasScript = getStasScript(destinationPubkeyHash, contractPublicKey, version, getScriptData(lockingScript, version), isSplittable(lockingScript), getSymbol(lockingScript))
+  const stasScript = getStasScript(destinationPubkeyHash, contractPublicKey, getScriptData(lockingScript, version), isSplittable(lockingScript), getSymbol(lockingScript))
 
   const tx = new bsv.Transaction()
 

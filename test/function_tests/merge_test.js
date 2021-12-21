@@ -40,7 +40,6 @@ beforeEach(async function () {
 })
 
 describe('regression, testnet', function () {
-  describe('failing, 1416', function () {
 
     it('Merge - Successful Merge With Fee', async function () {
       const mergeHex = merge(
@@ -64,7 +63,7 @@ describe('regression, testnet', function () {
       expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
     })
   })
-  describe('failing, 1416', function () {
+
     it('Merge - Successful Merge With Fee 2', async function () {
       const mergeHex = merge(
         bobPrivateKey,
@@ -86,8 +85,7 @@ describe('regression, testnet', function () {
       expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
       expect(await utils.getTokenBalance(bobAddr)).to.equal(10000)
     })
-  })
-  describe('failing, 1416', function () {
+
     it('Merge - Merge With No Fee', async function () {
       const mergeHex = merge(
         bobPrivateKey,
@@ -109,7 +107,7 @@ describe('regression, testnet', function () {
       expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
       expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
     })
-  })
+
     it('Merge - Incorrect Owner Private Key Throws Error', async function () {
       const incorrectPrivateKey = bsv.PrivateKey()
       const mergeHex = merge(
@@ -248,24 +246,6 @@ describe('regression, testnet', function () {
       }
     })
 
-    it('Merge - Issuer Public Key Throws Error', async function () {
-      try {
-        merge(
-          bobPrivateKey,
-          null,
-          utils.getMergeUtxo(splitTxObj),
-          aliceAddr,
-          utils.getUtxo(splitTxid, splitTx, 2),
-          fundingPrivateKey
-        )
-        assert(false)
-        return
-      } catch (e) {
-        expect(e).to.be.instanceOf(Error)
-        expect(e.message).to.eql('Contract public key is null')
-      }
-    })
-
     it('Merge - Null Merge STAS UTXO Throws Error', async function () {
       try {
         merge(
@@ -316,10 +296,9 @@ describe('regression, testnet', function () {
         return
       } catch (e) {
         expect(e).to.be.instanceOf(Error)
-        expect(e.message).to.eql('Payment UTXO provided but payment private key is null')
+        expect(e.message).to.eql('Payment UTXO provided but payment key is null')
       }
     })
-  })
 
   async function setup() {
     issuerPrivateKey = bsv.PrivateKey()

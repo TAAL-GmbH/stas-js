@@ -529,7 +529,7 @@ describe('regression, testnet', function () {
         return
       } catch (e) {
         expect(e).to.be.instanceOf(Error)
-        expect(e.message).to.eql('Payment UTXO provided but payment private key is null')
+        expect(e.message).to.eql('Payment UTXO provided but payment key is null')
       }
     })
   })

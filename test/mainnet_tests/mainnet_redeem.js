@@ -29,7 +29,7 @@ it('Redeem STAS Utxo on MainNet', async function () {
     // console.log(bobPrivateKey.toString())
     // console.log(bobAddr)
 
-    const leonardWif = 'L24ym1g2YeUo85t5GZKzhZBMpra6DMgEKq5Y4KfVRxjsL3DFoG7m'
+    const leonardWif = 'Kzn3AnuGVa6bLe1Uwr5ufPXMYrBNAwQoQq9WYiGPp8woABFm5AaM'
     const liamWif = 'Kz3R33xHUF7pqDqfeyTwsEPPp8vmD8ZfuHy9PcbZnx3YphMSLnWb' // 1Aj1yWfGjBpCZQGBDHNMeFWMgUp3DgZMR5
     const bobWif = 'L49DxSSiJyJ3M6CK8ZByqTRWitqgBLtpsK3oqXAzBCWXydRun9gi'
     // // leonard 1CyHC1dnGBYjQycx9cipPws9gwPePMHQdT
@@ -42,7 +42,7 @@ it('Redeem STAS Utxo on MainNet', async function () {
     const leonardAddress = '1CyHC1dnGBYjQycx9cipPws9gwPePMHQdT'
     const bobAddr = '16xgaXKtZWmP9AXe3SYwQtY6uJnU6ZGGqA'
 
-    const inputTxID = '38631786d9780f5e101b76738003aed1da64948ef44786064e8eae63cdd89a10'
+    const inputTxID = '09892d36a3198c495b7603c53b1b45f37b8c1b4d758393e621a830f6480504da'
     const inputUtxo = await utils.getTransactionMainNet(inputTxID)
 
     const redeemHex = redeem(

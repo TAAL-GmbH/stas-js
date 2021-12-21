@@ -52,13 +52,14 @@ describe('regression, testnet', function () {
     const response = await utils.getTokenResponse(tokenId)
     expect(response.symbol).to.equal(symbol)
     expect(response.contract_txs).to.contain(contractTxid)
-    // expect(response.issuance_txs).to.contain(issueTxid)
+    console.log(response)
+    expect(response.issuance_txs).to.contain(issueTxid)
     expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
     expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
     expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
   })
-
+ 
   it('Issue - Successful Issue Token With Split And Fee 2', async function () {
     const issueInfo = [
       {
@@ -81,7 +82,7 @@ describe('regression, testnet', function () {
     const response = await utils.getTokenResponse(tokenId)
     expect(response.symbol).to.equal(symbol)
     expect(response.contract_txs).to.contain(contractTxid)
-    // expect(response.issuance_txs).to.contain(issueTxid)
+    expect(response.issuance_txs).to.contain(issueTxid)
     expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.0001)
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
   })
@@ -121,7 +122,7 @@ describe('regression, testnet', function () {
     const response = await utils.getTokenResponse(tokenId)
     expect(response.symbol).to.equal(symbol)
     expect(response.contract_txs).to.contain(contractTxid)
-    // expect(response.issuance_txs).to.contain(issueTxid)
+    expect(response.issuance_txs).to.contain(issueTxid)
     expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00006)
     expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00002)
     expect(await utils.getVoutAmount(issueTxid, 2)).to.equal(0.00002)
@@ -171,7 +172,7 @@ describe('regression, testnet', function () {
     const response = await utils.getTokenResponse(tokenId)
     expect(response.symbol).to.equal(symbol)
     expect(response.contract_txs).to.contain(contractTxid)
-    // expect(response.issuance_txs).to.contain(issueTxid)
+    expect(response.issuance_txs).to.contain(issueTxid)
     expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00004)
     expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
     expect(await utils.getVoutAmount(issueTxid, 2)).to.equal(0.00002)
@@ -197,7 +198,7 @@ describe('regression, testnet', function () {
     const response = await utils.getTokenResponse(tokenId)
     expect(response.symbol).to.equal(symbol)
     expect(response.contract_txs).to.contain(contractTxid)
-    // expect(response.issuance_txs).to.contain(issueTxid)
+    expect(response.issuance_txs).to.contain(issueTxid)
     expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
     expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
@@ -218,7 +219,7 @@ describe('regression, testnet', function () {
     const response = await utils.getTokenResponse(tokenId)
     expect(response.symbol).to.equal(symbol)
     expect(response.contract_txs).to.contain(contractTxid)
-    // expect(response.issuance_txs).to.contain(issueTxid)
+    expect(response.issuance_txs).to.contain(issueTxid)
     expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
     expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
@@ -241,7 +242,7 @@ describe('regression, testnet', function () {
     const response = await utils.getTokenResponse(tokenId)
     expect(response.symbol).to.equal(symbol)
     expect(response.contract_txs).to.contain(contractTxid)
-    // expect(response.issuance_txs).to.contain(issueTxid)
+    expect(response.issuance_txs).to.contain(issueTxid)
     expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
     expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
     expect(await utils.getTokenBalance(issuerAddr)).to.equal(7000)
@@ -270,60 +271,59 @@ describe('regression, testnet', function () {
     expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
   })
 
-  describe('failing', function () {
-    it('Issue - Succesful Empty Funding UTXO', async function () {
-      const issueHex = issue(
-        issuerPrivateKey,
-        utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
-        utils.getUtxo(contractTxid, contractTx, 0),
-        null,
-        null,
-        true,
-        symbol
-      )
-      const issueTxid = await broadcast(issueHex)
-      const tokenId = await utils.getToken(issueTxid)
-      const response = await utils.getTokenResponse(tokenId)
-      expect(response.symbol).to.equal(symbol)
-      expect(response.contract_txs).to.contain(contractTxid)
-      // expect(response.issuance_txs).to.contain(issueTxid)
-      expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
-      expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
-      expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
-      expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
-    })
 
-    it('Issue - Succesful Empty Funding UTXO with callback', async function () {
-      const ownerSignatureCallback = (tx, i, script, satoshis) => {
-        return bsv.Transaction.sighash.sign(tx, issuerPrivateKey, sighash, i, script, satoshis)
-      }
+  it('Issue - Succesful Empty Funding UTXO', async function () {
+    const issueHex = issue(
+      issuerPrivateKey,
+      utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+      utils.getUtxo(contractTxid, contractTx, 0),
+      null,
+      null,
+      true,
+      symbol
+    )
+    const issueTxid = await broadcast(issueHex)
+    const tokenId = await utils.getToken(issueTxid)
+    const response = await utils.getTokenResponse(tokenId)
+    expect(response.symbol).to.equal(symbol)
+    expect(response.contract_txs).to.contain(contractTxid)
+    expect(response.issuance_txs).to.contain(issueTxid)
+    expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
+    expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
+    expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+    expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+  })
 
-      const issueHex = issueWithCallback(
-        issuerPrivateKey.publicKey,
-        utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
-        utils.getUtxo(contractTxid, contractTx, 0),
-        null,
-        null,
-        true,
-        symbol,
-        ownerSignatureCallback,
-        null
-      )
-      let issueTxid
-      try {
-        issueTxid = await broadcast(issueHex)
-      } catch (e) {
-        console.log(e)
-      }
-      const tokenId = await utils.getToken(issueTxid)
-      const response = await utils.getTokenResponse(tokenId)
-      expect(response.symbol).to.equal(symbol)
-      expect(response.contract_txs).to.contain(contractTxid)
-      expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
-      expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
-      expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
-      expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
-    })
+  it('Issue - Succesful Empty Funding UTXO with callback', async function () {
+    const ownerSignatureCallback = (tx, i, script, satoshis) => {
+      return bsv.Transaction.sighash.sign(tx, issuerPrivateKey, sighash, i, script, satoshis)
+    }
+
+    const issueHex = issueWithCallback(
+      issuerPrivateKey.publicKey,
+      utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+      utils.getUtxo(contractTxid, contractTx, 0),
+      null,
+      null,
+      true,
+      symbol,
+      ownerSignatureCallback,
+      null
+    )
+    let issueTxid
+    try {
+      issueTxid = await broadcast(issueHex)
+    } catch (e) {
+      console.log(e)
+    }
+    const tokenId = await utils.getToken(issueTxid)
+    const response = await utils.getTokenResponse(tokenId)
+    expect(response.symbol).to.equal(symbol)
+    expect(response.contract_txs).to.contain(contractTxid)
+    expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
+    expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
+    expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+    expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
   })
 
   it('Issue - Successful Issue Token 10 Addresses', async function () {
@@ -358,7 +358,7 @@ describe('regression, testnet', function () {
     const response = await utils.getTokenResponse(tokenId)
     expect(response.symbol).to.equal(symbol)
     expect(response.contract_txs).to.contain(contractTxid)
-    // expect(response.issuance_txs).to.contain(issueTxid)
+    expect(response.issuance_txs).to.contain(issueTxid)
 
     for (let i = 1; i < 10; i++) {
       expect(await utils.getVoutAmount(issueTxid, i)).to.equal(0.00001)
@@ -767,68 +767,9 @@ describe('regression, testnet', function () {
     }
   })
 
-  //   it('Issue - Null Version Throws Error', async function () {
-  //     try {
-  //       issue(
-  //         issuerPrivateKey,
-  //         utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
-  //         utils.getUtxo(contractTxid, contractTx, 0),
-  //         utils.getUtxo(contractTxid, contractTx, 1),
-  //         fundingPrivateKey,
-  //         true,
-  //         symbol,
-  //         null
-  //       )
-  //       assert(false)
-  //       return
-  //     } catch (e) {
-  //       expect(e).to.be.instanceOf(Error)
-  //       expect(e.message).to.contain('Invalid version. Must be 2')
-  //     }
-  //   })
-
-  //   it('Issue - Invalid Version Throws Error 1', async function () {
-  //     try {
-  //       issue(
-  //         issuerPrivateKey,
-  //         utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
-  //         utils.getUtxo(contractTxid, contractTx, 0),
-  //         utils.getUtxo(contractTxid, contractTx, 1),
-  //         fundingPrivateKey,
-  //         true,
-  //         symbol,
-  //         1
-  //       )
-  //       assert(false)
-  //       return
-  //     } catch (e) {
-  //       expect(e).to.be.instanceOf(Error)
-  //       expect(e.message).to.contain('Invalid version. Must be 2')
-  //     }
-  //   })
-
-//   it('Issue - Invalid Version Throws Error 2', async function () {
-//     try {
-//       issue(
-//         issuerPrivateKey,
-//         utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
-//         utils.getUtxo(contractTxid, contractTx, 0),
-//         utils.getUtxo(contractTxid, contractTx, 1),
-//         fundingPrivateKey,
-//         true,
-//         symbol,
-//         3
-//       )
-//       assert(false)
-//       return
-//     } catch (e) {
-//       expect(e).to.be.instanceOf(Error)
-//       expect(e.message).to.contain('Invalid version. Must be 2')
-//     }
-//   })
 })
 
-async function setup () {
+async function setup() {
   issuerPrivateKey = bsv.PrivateKey()
   fundingPrivateKey = bsv.PrivateKey()
   bobPrivateKey = bsv.PrivateKey()
