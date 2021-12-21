@@ -28,7 +28,7 @@ function testGetStasScript () {
   //  getStasScript (destinationPublicKeyHash, redemptionPublicKey, version, data, isSplittable, symbol) {
   const data = Buffer.from('one').toString('hex')
   const symbol = Buffer.from('TAALT').toString('hex')
-  const got = getStasScript(publicKeyHash, testPrivateKey.publicKey, 2, data, true, symbol)
+  const got = getStasScript(publicKeyHash, testPrivateKey.publicKey, data, true, symbol)
   assert.equal(got, expected)
 }
 
