@@ -7,7 +7,8 @@ require('dotenv').config()
 const {
   contract,
   issue,
-  redeem
+  redeem,
+  redeemWithCallback
 } = require('../../index')
 
 const {
@@ -15,6 +16,8 @@ const {
   getFundsFromFaucet,
   broadcast
 } = require('../../index').utils
+
+const { sighash } = require('../../lib/stas')
 
 let issuerPrivateKey
 let fundingPrivateKey
@@ -28,28 +31,36 @@ let aliceAddr
 let issueTxid
 let issueTx
 
+
+const aliceSignatureCallback = (tx, i, script, satoshis) => {
+  return bsv.Transaction.sighash.sign(tx, alicePrivateKey, sighash, i, script, satoshis)
+}
+const paymentSignatureCallback = (tx, i, script, satoshis) => {
+  return bsv.Transaction.sighash.sign(tx, fundingPrivateKey, sighash, i, script, satoshis)
+}
+
 beforeEach(async function () {
   await setup()
 })
 
 describe('regression, testnet', function () {
-  describe('failing', function () {
-    it('Redeem - Successful Redeem 1', async function () {
-      const redeemHex = redeem(
-        alicePrivateKey,
-        issuerPrivateKey.publicKey,
-        utils.getUtxo(issueTxid, issueTx, 0),
-        utils.getUtxo(issueTxid, issueTx, 2),
-        fundingPrivateKey
-      )
-      const redeemTxid = await broadcast(redeemHex)
-      expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007)
-      console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
-      console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
-      expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
-      expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
-    })
+
+  it('Redeem - Successful Redeem 1', async function () {
+    const redeemHex = redeem(
+      alicePrivateKey,
+      issuerPrivateKey.publicKey,
+      utils.getUtxo(issueTxid, issueTx, 0),
+      utils.getUtxo(issueTxid, issueTx, 2),
+      fundingPrivateKey
+    )
+    const redeemTxid = await broadcast(redeemHex)
+    expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007)
+    console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
+    console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
+    expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
+    expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
   })
+
 
   it('Redeem - Successful Redeem 2', async function () {
     const redeemHex = redeem(
@@ -75,6 +86,44 @@ describe('regression, testnet', function () {
       utils.getUtxo(issueTxid, issueTx, 0),
       null,
       null
+    )
+    const redeemTxid = await broadcast(redeemHex)
+    expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007)
+    console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
+    console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
+    expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
+    expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+  })
+
+  it('Redeem - Successful Redeem With Callback and Fee', async function () {
+
+    const redeemHex = redeemWithCallback(
+      alicePrivateKey.publicKey,
+      issuerPrivateKey.publicKey,
+      utils.getUtxo(issueTxid, issueTx, 0),
+      utils.getUtxo(issueTxid, issueTx, 2),
+      fundingPrivateKey.publicKey,
+      aliceSignatureCallback,
+      paymentSignatureCallback,
+    )
+    const redeemTxid = await broadcast(redeemHex)
+    expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007)
+    console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
+    console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
+    expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
+    expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+  })
+
+  it('Redeem - Successful Redeem With Callback and No Fee', async function () {
+
+    const redeemHex = redeemWithCallback(
+      alicePrivateKey.publicKey,
+      issuerPrivateKey.publicKey,
+      utils.getUtxo(issueTxid, issueTx, 0),
+      null,
+      null,
+      aliceSignatureCallback,
+      null,
     )
     const redeemTxid = await broadcast(redeemHex)
     expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007)
