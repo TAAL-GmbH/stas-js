@@ -32,6 +32,13 @@ let aliceAddr
 let bobAddr
 let symbol
 
+const issuerSignatureCallback = (tx, i, script, satoshis) => {
+  return bsv.Transaction.sighash.sign(tx, issuerPrivateKey, sighash, i, script, satoshis)
+}
+const paymentSignatureCallback = (tx, i, script, satoshis) => {
+  return bsv.Transaction.sighash.sign(tx, fundingPrivateKey, sighash, i, script, satoshis)
+}
+
 beforeEach(async function () {
   await setup() // set up contract
 })
@@ -59,7 +66,7 @@ describe('regression, testnet', function () {
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
     expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
   })
- 
+
   it('Issue - Successful Issue Token With Split And Fee 2', async function () {
     const issueInfo = [
       {
@@ -264,13 +271,12 @@ describe('regression, testnet', function () {
     const response = await utils.getTokenResponse(tokenId)
     expect(response.symbol).to.equal(symbol)
     expect(response.contract_txs).to.contain(contractTxid)
-    // expect(response.issuance_txs).to.contain(issueTxid)
+    expect(response.issuance_txs).to.contain(issueTxid)
     expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
     expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
     expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
   })
-
 
   it('Issue - Succesful Empty Funding UTXO', async function () {
     const issueHex = issue(
@@ -294,10 +300,34 @@ describe('regression, testnet', function () {
     expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
   })
 
-  it('Issue - Succesful Empty Funding UTXO with callback', async function () {
-    const ownerSignatureCallback = (tx, i, script, satoshis) => {
-      return bsv.Transaction.sighash.sign(tx, issuerPrivateKey, sighash, i, script, satoshis)
-    }
+
+  it('Issue - Successful Callback with Fee', async function () {
+
+    const issueHex = issueWithCallback(
+      issuerPrivateKey.publicKey,
+      utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+      utils.getUtxo(contractTxid, contractTx, 0),
+      utils.getUtxo(contractTxid, contractTx, 1),
+      fundingPrivateKey.publicKey,
+      true,
+      symbol,
+      issuerSignatureCallback,
+      paymentSignatureCallback,
+    )
+    const issueTxid = await broadcast(issueHex)
+    const tokenId = await utils.getToken(issueTxid)
+    const response = await utils.getTokenResponse(tokenId)
+    expect(response.symbol).to.equal(symbol)
+    expect(response.contract_txs).to.contain(contractTxid)
+    expect(response.issuance_txs).to.contain(issueTxid)
+    expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
+    expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
+    expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+    expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+  })
+
+
+  it('Issue - Successful No Fee with callback', async function () {
 
     const issueHex = issueWithCallback(
       issuerPrivateKey.publicKey,
@@ -307,7 +337,7 @@ describe('regression, testnet', function () {
       null,
       true,
       symbol,
-      ownerSignatureCallback,
+      issuerSignatureCallback,
       null
     )
     let issueTxid

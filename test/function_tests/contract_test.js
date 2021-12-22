@@ -5,13 +5,22 @@ const bsv = require('bsv')
 require('dotenv').config()
 
 const {
-  contract
+  contract, contractWithCallback
 } = require('../../index')
 
 const {
   getFundsFromFaucet,
   broadcast
 } = require('../../index').utils
+
+const ownerSignCallback = (tx) => {
+  tx.sign(issuerPrivateKey)
+}
+
+const paymentSignCallback = (tx) => {
+  tx.sign(fundingPrivateKey)
+}
+
 
 let issuerPrivateKey
 let fundingPrivateKey
@@ -63,6 +72,40 @@ describe('regression, testnet', function () {
       fundingPrivateKey,
       schema,
       supply
+    )
+    const contractTxid = await broadcast(contractHex)
+    const amount = await utils.getVoutAmount(contractTxid, 0)
+    expect(amount).to.equal(supply / 100000000)
+  })
+
+  it('Contract - Successful With Callback Fee', async function () {
+
+    const contractHex = contractWithCallback(
+      issuerPrivateKey.publicKey,
+      contractUtxos,
+      fundingUtxos,
+      fundingPrivateKey.publicKey,
+      schema,
+      supply,
+      ownerSignCallback,
+      paymentSignCallback
+    )
+    const contractTxid = await broadcast(contractHex)
+    const amount = await utils.getVoutAmount(contractTxid, 0)
+    expect(amount).to.equal(supply / 100000000)
+  })
+
+  it('Contract - Successful With Callback No Fee', async function () {
+
+    const contractHex = contractWithCallback(
+      issuerPrivateKey.publicKey,
+      contractUtxos,
+      null,
+      null,
+      schema,
+      supply,
+      ownerSignCallback,
+      null
     )
     const contractTxid = await broadcast(contractHex)
     const amount = await utils.getVoutAmount(contractTxid, 0)
@@ -501,7 +544,7 @@ it('Contract - Supply Not Divisible by satsPerToken Throws Error 2', async funct
   })
 })
 
-async function setup () {
+async function setup() {
   issuerPrivateKey = bsv.PrivateKey()
   fundingPrivateKey = bsv.PrivateKey()
   contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
@@ -510,7 +553,7 @@ async function setup () {
   schema = utils.schema(publicKeyHash, symbol, supply)
 }
 
-function schemaNullSymbol () {
+function schemaNullSymbol() {
   return {
     name: 'Taal Token',
     tokenId: `${publicKeyHash}`,

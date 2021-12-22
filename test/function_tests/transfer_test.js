@@ -7,7 +7,8 @@ require('dotenv').config()
 const {
   contract,
   issue,
-  transfer
+  transfer,
+  transferWithCallback
 } = require('../../index')
 
 const {
@@ -15,6 +16,8 @@ const {
   getFundsFromFaucet,
   broadcast
 } = require('../../index').utils
+
+const { sighash } = require('../../lib/stas')
 
 let issuerPrivateKey
 let fundingPrivateKey
@@ -30,18 +33,31 @@ let issueTxid
 let issueTx
 let issueOutFundingVout
 
+const issuerSignatureCallback = (tx, i, script, satoshis) => {
+  return bsv.Transaction.sighash.sign(tx, issuerPrivateKey, sighash, i, script, satoshis)
+}
+const aliceSignatureCallback = (tx, i, script, satoshis) => {
+  return bsv.Transaction.sighash.sign(tx, alicePrivateKey, sighash, i, script, satoshis)
+}
+const bobSignatureCallback = (tx, i, script, satoshis) => {
+  return bsv.Transaction.sighash.sign(tx, bobPrivateKey, sighash, i, script, satoshis)
+}
+const paymentSignatureCallback = (tx, i, script, satoshis) => {
+  return bsv.Transaction.sighash.sign(tx, fundingPrivateKey, sighash, i, script, satoshis)
+}
+
 beforeEach(async function () {
   await setup() // contract and issue
   issueOutFundingVout = issueTx.vout.length - 1
 })
 
 describe('regression, testnet', function () {
-  it('Transfer - Successful With Fee 1', async function () {
-    const incorrectPK = bsv.PrivateKey()
 
+  it('Transfer - Successful With Fee 1', async function () {
+    
     const transferHex = transfer(
       bobPrivateKey,
-      incorrectPK.publicKey,
+      issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 1),
       aliceAddr,
       utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
@@ -132,6 +148,47 @@ describe('regression, testnet', function () {
     expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
     expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
+  })
+
+  it('Transfer - Successful Callback With Fee', async function () {
+
+    const transferHex = transferWithCallback(
+      bobPrivateKey.publicKey,
+      utils.getUtxo(issueTxid, issueTx, 1),
+      bobAddr,
+      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
+      fundingPrivateKey.publicKey,
+      bobSignatureCallback,
+      paymentSignatureCallback
+    )
+    const transferTxid = await broadcast(transferHex)
+    const tokenId = await utils.getToken(transferTxid)
+    const response = await utils.getTokenResponse(tokenId)
+    expect(response.symbol).to.equal(symbol)
+    expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
+    expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+    expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+  })
+
+  
+  it('Transfer - Successful Callback With No Fee', async function () {
+    
+    const transferHex = transferWithCallback(
+      bobPrivateKey.publicKey,
+      utils.getUtxo(issueTxid, issueTx, 1),
+      bobAddr,
+      null,
+      null,
+      bobSignatureCallback,
+      null 
+      )
+    const transferTxid = await broadcast(transferHex)
+    const tokenId = await utils.getToken(transferTxid)
+    const response = await utils.getTokenResponse(tokenId)
+    expect(response.symbol).to.equal(symbol)
+    expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
+    expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+    expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
   })
 
   it('Transfer -  Transfer To Issuer Address (Splitable) Throws Error', async function () {
