@@ -109,7 +109,6 @@ describe('regression, testnet', function () {
     //transfer from bob to alice
     const transferHex = transfer(
       bobPrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
       aliceAddr,
       utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
@@ -126,7 +125,6 @@ describe('regression, testnet', function () {
     //transfer from Dave to Emma
     const transferHex2 = transfer(
       alicePrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 1),
       emmaAddr,
       fundingUtxos2,
@@ -159,7 +157,6 @@ describe('regression, testnet', function () {
 
     const transferHex4 = transfer(
       emmaPrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 3),
       bobAddr,
       fundingUtxos4,

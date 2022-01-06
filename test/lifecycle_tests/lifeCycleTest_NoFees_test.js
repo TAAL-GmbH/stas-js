@@ -62,7 +62,7 @@ describe('regression, testnet', function () {
     console.log(issueTxid)
     const tokenId = await utils.getToken(issueTxid)
     console.log(`Token ID:        ${tokenId}`)
-    let response = await utils.getTokenResponse(tokenId)  //token issuance fails intermittingly
+    let response = await utils.getTokenResponse(tokenId) 
     expect(response.symbol).to.equal(symbol)
     expect(response.contract_txs).to.contain(contractTxid)
     expect(response.issuance_txs).to.contain(issueTxid)
@@ -71,12 +71,11 @@ describe('regression, testnet', function () {
     await new Promise(r => setTimeout(r, 5000));
     console.log("Alice Balance " + await utils.getTokenBalance(aliceAddr))
     console.log("Bob Balance " + await utils.getTokenBalance(bobAddr))
-    // expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000) 
-    // expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+    expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000) 
+    expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
 
     const transferHex = transfer(
       bobPrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 1),
       aliceAddr,
       null,
@@ -96,7 +95,6 @@ describe('regression, testnet', function () {
 
     const splitHex = split(
       alicePrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getUtxo(transferTxid, transferTx, 0),
       splitDestinations,
       null,
@@ -112,7 +110,6 @@ describe('regression, testnet', function () {
 
     const mergeHex = merge(
       bobPrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getMergeUtxo(splitTxObj),
       aliceAddr,
       null,
@@ -122,12 +119,12 @@ describe('regression, testnet', function () {
     const mergeTxid = await broadcast(mergeHex)
     const mergeTx = await getTransaction(mergeTxid)
     expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00003)
-    // const tokenIdMerge = await utils.getToken(issueTxid)
-    // let responseMerge = await utils.getTokenResponse(tokenIdMerge)
-    // console.log(responseMerge.token)
-    // expect(responseMerge.token.symbol).to.equal(symbol)
-    // expect(responseMerge.token.contract_txs).to.contain(contractTxid)
-    // expect(responseMerge.token.issuance_txs).to.contain(issueTxid)
+    const tokenIdMerge = await utils.getToken(mergeTxid)
+    let responseMerge = await utils.getTokenResponse(tokenIdMerge)
+    console.log(responseMerge.token)
+    expect(responseMerge.symbol).to.equal(symbol)
+    expect(responseMerge.contract_txs).to.contain(contractTxid)
+    expect(responseMerge.issuance_txs).to.contain(issueTxid)
 
     // Split again - both payable to Alice...
     const aliceAmount1 = mergeTx.vout[0].value / 2
@@ -139,7 +136,6 @@ describe('regression, testnet', function () {
 
     const splitHex2 = split(
       alicePrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getUtxo(mergeTxid, mergeTx, 0),
       split2Destinations,
       null,
@@ -158,7 +154,6 @@ describe('regression, testnet', function () {
 
     const mergeSplitHex = mergeSplit(
       alicePrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getMergeSplitUtxo(splitTxObj2, splitTx2),
       aliceAddr,
       aliceAmountSatoshis,

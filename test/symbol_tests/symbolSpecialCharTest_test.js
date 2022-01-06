@@ -61,7 +61,7 @@ describe('regression, testnet', function () {
     const issueTx = await getTransaction(issueTxid)
     const tokenId = await utils.getToken(issueTxid)
     console.log(`Token ID:        ${tokenId}`)
-    const response = await utils.getTokenResponse(tokenId) // token issuance fails intermittingly
+    const response = await utils.getTokenResponse(tokenId)
     expect(response.symbol).to.equal(symbol)
     expect(response.contract_txs).to.contain(contractTxid)
     expect(response.issuance_txs).to.contain(issueTxid)
@@ -75,6 +75,7 @@ describe('regression, testnet', function () {
 
 
   it('Symbol Special Char Test 2', async function () {
+
     const issuerPrivateKey = bsv.PrivateKey()
     const fundingPrivateKey = bsv.PrivateKey()
 
@@ -118,7 +119,7 @@ describe('regression, testnet', function () {
     const issueTx = await getTransaction(issueTxid)
     const tokenId = await utils.getToken(issueTxid)
     console.log(`Token ID:        ${tokenId}`)
-    const response = await utils.getTokenResponse(tokenId) // token issuance fails intermittingly
+    const response = await utils.getTokenResponse(tokenId) 
     expect(response.symbol).to.equal(symbol)
     expect(response.contract_txs).to.contain(contractTxid)
     expect(response.issuance_txs).to.contain(issueTxid)

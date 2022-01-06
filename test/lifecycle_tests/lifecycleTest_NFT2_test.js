@@ -91,7 +91,6 @@ describe('regression, testnet', function () {
 
     const transferHex = transfer(
       alicePrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
       bobAddr,
       utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
@@ -113,7 +112,6 @@ describe('regression, testnet', function () {
 
     const splitHex = split(
       alicePrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getUtxo(transferTxid, transferTx, 0),
       splitDestinations,
       utils.getUtxo(transferTxid, transferTx, 1),

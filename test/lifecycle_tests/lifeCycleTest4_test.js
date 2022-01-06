@@ -83,7 +83,6 @@ describe('regression, testnet', function () {
 
     const transferHex = transfer(
       bobPrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 1),
       aliceAddr,
       utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
@@ -131,7 +130,6 @@ describe('regression, testnet', function () {
 
     const mergeHex = merge(
       bobPrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getMergeUtxo(splitTxObj),
       aliceAddr,
       utils.getUtxo(splitTxid, splitTx, 2),
@@ -160,7 +158,6 @@ describe('regression, testnet', function () {
 
     const splitHex2 = split(
       alicePrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getUtxo(mergeTxid, mergeTx, 0),
       split2Destinations,
       utils.getUtxo(mergeTxid, mergeTx, 1),
@@ -184,7 +181,6 @@ describe('regression, testnet', function () {
 
     const mergeSplitHex = mergeSplit(
       bobPrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getMergeSplitUtxo(splitTxObj2, splitTx2),
       aliceAddr,
       aliceAmountSatoshis,

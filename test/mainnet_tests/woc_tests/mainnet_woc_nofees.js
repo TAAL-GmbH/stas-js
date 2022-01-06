@@ -102,7 +102,6 @@ it('Mainnet LifeCycle Test 1 broadcast via WOC With No Fees', async function () 
 
     const transferHex = transfer(
         bobsPrivateKey,
-        issuerPrivateKey.publicKey,
         utils.getUtxo(issueTxid, issueTx, 0),
         aliceAddr,
         null,
@@ -126,7 +125,6 @@ it('Mainnet LifeCycle Test 1 broadcast via WOC With No Fees', async function () 
 
     const splitHex = split(
         alicePrivateKey,
-        issuerPrivateKey.publicKey,
         utils.getUtxo(transferTxid, transferTx, 0),
         splitDestinations,
         null,
@@ -147,7 +145,6 @@ it('Mainnet LifeCycle Test 1 broadcast via WOC With No Fees', async function () 
 
     const mergeHex = merge(
         bobsPrivateKey,
-        issuerPrivateKey.publicKey,
         utils.getMergeUtxo(splitTxObj),
         aliceAddr,
         null,
@@ -170,7 +167,6 @@ it('Mainnet LifeCycle Test 1 broadcast via WOC With No Fees', async function () 
 
     const splitHex2 = split(
         alicePrivateKey,
-        issuerPrivateKey.publicKey,
         utils.getUtxo(mergeTxid, mergeTx, 0),
         split2Destinations,
         null,
@@ -192,7 +188,6 @@ it('Mainnet LifeCycle Test 1 broadcast via WOC With No Fees', async function () 
 
     const mergeSplitHex = mergeSplit(
         bobsPrivateKey,
-        issuerPrivateKey.publicKey,
         utils.getMergeSplitUtxo(splitTxObj2, splitTx2),
         bobAddr,
         bobAmountSatoshis,

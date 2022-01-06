@@ -83,7 +83,6 @@ describe('regression, testnet, dust', function () {
 
     const transferHex = transfer(
       bobPrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 1),
       aliceAddr,
       utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
@@ -109,7 +108,6 @@ describe('regression, testnet, dust', function () {
 
     const splitHex = split(
       alicePrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getUtxo(transferTxid, transferTx, 0),
       splitDestinations,
       utils.getUtxo(transferTxid, transferTx, 1),
@@ -122,15 +120,14 @@ describe('regression, testnet, dust', function () {
     expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.00000015)
     console.log("Alice Balance " + await utils.getTokenBalance(aliceAddr))
     console.log("Bob Balance " + await utils.getTokenBalance(bobAddr))
-    // expect(await utils.getTokenBalance(aliceAddr)).to.equal(100)
-    // expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
+    expect(await utils.getTokenBalance(aliceAddr)).to.equal(100)
+    expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
 
     // Now let's merge the last split back together
     const splitTxObj = new bsv.Transaction(splitHex)
 
     const mergeHex = merge(
       bobPrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getMergeUtxo(splitTxObj),
       aliceAddr,
       utils.getUtxo(splitTxid, splitTx, 2),
@@ -143,8 +140,8 @@ describe('regression, testnet, dust', function () {
     expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.0000003)
     console.log("Alice Balance " + await utils.getTokenBalance(aliceAddr))
     console.log("Bob Balance " + await utils.getTokenBalance(bobAddr))
-    // expect(await utils.getTokenBalance(aliceAddr)).to.equal(100)
-    // expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
+    expect(await utils.getTokenBalance(aliceAddr)).to.equal(100)
+    expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
 
     // Split again - both payable to Alice...
     const aliceAmount1 = mergeTx.vout[0].value / 2
@@ -156,7 +153,6 @@ describe('regression, testnet, dust', function () {
 
     const splitHex2 = split(
       alicePrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getUtxo(mergeTxid, mergeTx, 0),
       split2Destinations,
       utils.getUtxo(mergeTxid, mergeTx, 1),
@@ -169,8 +165,8 @@ describe('regression, testnet, dust', function () {
     expect(await utils.getVoutAmount(splitTxid2, 1)).to.equal(0.00000015)
     console.log("Alice Balance " + await utils.getTokenBalance(aliceAddr))
     console.log("Bob Balance " + await utils.getTokenBalance(bobAddr))
-    // expect(await utils.getTokenBalance(aliceAddr)).to.equal(100)
-    // expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
+    expect(await utils.getTokenBalance(aliceAddr)).to.equal(100)
+    expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
 
     // Now mergeSplit
     const splitTxObj2 = new bsv.Transaction(splitHex2)
@@ -180,7 +176,6 @@ describe('regression, testnet, dust', function () {
 
     const mergeSplitHex = mergeSplit(
       alicePrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getMergeSplitUtxo(splitTxObj2, splitTx2),
       aliceAddr,
       aliceAmountSatoshis,

@@ -105,7 +105,6 @@ describe('regression, testnet', function () {
 
     const transferHex = transfer(
       bobPrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 1),
       aliceAddr,
       utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
@@ -131,7 +130,6 @@ describe('regression, testnet', function () {
 
     const splitHex = split(
       alicePrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getUtxo(transferTxid, transferTx, 0),
       splitDestinations,
       utils.getUtxo(transferTxid, transferTx, 1),
@@ -156,7 +154,6 @@ describe('regression, testnet', function () {
 
     const mergeHex = merge(
       bobPrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getMergeUtxo(splitTxObj),
       aliceAddr,
       {
@@ -191,7 +188,6 @@ console.log(mergeHex)
 
     const splitHex2 = split(
       alicePrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getUtxo(mergeTxid, mergeTx, 0),
       split2Destinations,
       utils.getUtxo(mergeTxid, mergeTx, 1),
@@ -210,13 +206,11 @@ console.log(mergeHex)
 
     // Now mergeSplit
     const splitTxObj2 = new bsv.Transaction(splitHex2)
-
     const aliceAmountSatoshis = Math.floor(splitTx2.vout[0].value * SATS_PER_BITCOIN) / 2
     const bobAmountSatoshis = Math.floor(splitTx2.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx2.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
 
     const mergeSplitHex = mergeSplit(
       bobPrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getMergeSplitUtxo(splitTxObj2, splitTx2),
       aliceAddr,
       aliceAmountSatoshis,
