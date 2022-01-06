@@ -102,7 +102,6 @@ describe('regression, testnet, failing, 1545', function () {
 
     const transferhex = transfer(
       alicePrivateKey,
-      issuerPrivateKey.publicKey,
       {
         txid: issueTxid,
         vout: 0,
@@ -137,7 +136,6 @@ describe('regression, testnet, failing, 1545', function () {
 
     const mergeHex = merge(
       attackerPrivateKey,
-      issuerPrivateKey.publicKey,
       [{
         tx: validSplit,
         vout: 0

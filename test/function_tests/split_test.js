@@ -57,7 +57,6 @@ describe('regression, testnet', function () {
 
     const splitHex = split(
       alicePrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
       splitDestinations,
       utils.getUtxo(issueTxid, issueTx, 2),
@@ -85,7 +84,6 @@ describe('regression, testnet', function () {
 
     const splitHex = split(
       alicePrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
       splitDestinations,
       utils.getUtxo(issueTxid, issueTx, 2),
@@ -114,7 +112,6 @@ describe('regression, testnet', function () {
 
     const splitHex = split(
       alicePrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
       splitDestinations,
       utils.getUtxo(issueTxid, issueTx, 2),
@@ -149,7 +146,6 @@ describe('regression, testnet', function () {
 
     const splitHex = split(
       alicePrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
       splitDestinations,
       utils.getUtxo(issueTxid, issueTx, 2),
@@ -180,7 +176,6 @@ describe('regression, testnet', function () {
 
     const splitHex = split(
       alicePrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
       splitDestinations,
       utils.getUtxo(issueTxid, issueTx, 2),
@@ -202,7 +197,6 @@ describe('regression, testnet', function () {
 
     const splitHex = split(
       alicePrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
       splitDestinations,
       null,
@@ -228,7 +222,6 @@ describe('regression, testnet', function () {
 
     const splitHex = split(
       alicePrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
       splitDestinations,
       null,
@@ -315,7 +308,6 @@ describe('regression, testnet', function () {
     try {
       split(
         alicePrivateKey,
-        issuerPrivateKey.publicKey,
         utils.getUtxo(issueTxid, issueTx, 0),
         splitDestinations,
         utils.getUtxo(issueTxid, issueTx, 2),
@@ -334,7 +326,6 @@ describe('regression, testnet', function () {
     try {
       split(
         alicePrivateKey,
-        issuerPrivateKey.publicKey,
         utils.getUtxo(issueTxid, issueTx, 0),
         splitDestinations,
         utils.getUtxo(issueTxid, issueTx, 2),
@@ -356,7 +347,6 @@ describe('regression, testnet', function () {
     try {
       split(
         alicePrivateKey,
-        issuerPrivateKey.publicKey,
         utils.getUtxo(issueTxid, issueTx, 0),
         splitDestinations,
         utils.getUtxo(issueTxid, issueTx, 2),
@@ -378,7 +368,6 @@ describe('regression, testnet', function () {
     try {
       split(
         alicePrivateKey,
-        issuerPrivateKey.publicKey,
         utils.getUtxo(issueTxid, issueTx, 0),
         splitDestinations,
         utils.getUtxo(issueTxid, issueTx, 2),
@@ -399,7 +388,6 @@ describe('regression, testnet', function () {
 
     const splitHex = split(
       alicePrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
       splitDestinations,
       utils.getUtxo(issueTxid, issueTx, 2),
@@ -425,7 +413,6 @@ describe('regression, testnet', function () {
     try {
       split(
         alicePrivateKey,
-        issuerPrivateKey.publicKey,
         utils.getUtxo(issueTxid, issueTx, 0),
         splitDestinations,
         utils.getUtxo(issueTxid, issueTx, 2),
@@ -449,7 +436,6 @@ describe('regression, testnet', function () {
     try {
       const splitHex = split(
         alicePrivateKey,
-        issuerPrivateKey.publicKey,
         utils.getUtxo(issueTxid, issueTx, 0),
         splitDestinations,
         utils.getUtxo(issueTxid, issueTx, 2),
@@ -474,7 +460,6 @@ describe('regression, testnet', function () {
 
     const splitHex = split(
       incorrectPrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
       splitDestinations,
       utils.getUtxo(issueTxid, issueTx, 2),
@@ -500,7 +485,6 @@ describe('regression, testnet', function () {
 
     const splitHex = split(
       incorrectPrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
       splitDestinations,
       utils.getUtxo(issueTxid, issueTx, 2),
@@ -526,7 +510,6 @@ describe('regression, testnet', function () {
 
     const splitHex = split(
       alicePrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
       splitDestinations,
       utils.getUtxo(issueTxid, issueTx, 2),
@@ -551,7 +534,6 @@ describe('regression, testnet', function () {
     try {
       split(
         null,
-        issuerPrivateKey.publicKey,
         utils.getUtxo(issueTxid, issueTx, 0),
         splitDestinations,
         utils.getUtxo(issueTxid, issueTx, 2),
@@ -574,7 +556,6 @@ describe('regression, testnet', function () {
     try {
       split(
         alicePrivateKey,
-        issuerPrivateKey.publicKey,
         null,
         splitDestinations,
         utils.getUtxo(issueTxid, issueTx, 2),
@@ -592,7 +573,6 @@ describe('regression, testnet', function () {
     try {
       split(
         alicePrivateKey,
-        issuerPrivateKey.publicKey,
         utils.getUtxo(issueTxid, issueTx, 0),
         null,
         utils.getUtxo(issueTxid, issueTx, 2),
@@ -615,7 +595,6 @@ describe('regression, testnet', function () {
     try {
       split(
         alicePrivateKey,
-        issuerPrivateKey.publicKey,
         utils.getUtxo(issueTxid, issueTx, 0),
         splitDestinations,
         utils.getUtxo(issueTxid, issueTx, 2),

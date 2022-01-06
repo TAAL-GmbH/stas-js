@@ -74,7 +74,6 @@ describe('regression, testnet', function () {
 
         const transferHex = transfer(
             bobPrivateKey,
-            issuerPrivateKey.publicKey,
             utils.getUtxo(issueTxid, issueTx, 1),
             issuerAddr,
             utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),

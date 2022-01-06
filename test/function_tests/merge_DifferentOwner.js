@@ -167,7 +167,6 @@ describe('regression, testnet', function () {
 
     const transferHex = transfer(
       bobPrivateKey,
-      issuerPrivateKey.publicKey,
       {
         txid: issueTxid,
         vout: 1,
@@ -196,7 +195,6 @@ describe('regression, testnet', function () {
 
     const splitHex = split(
       alicePrivateKey,
-      issuerPrivateKey.publicKey,
       {
         txid: transferTxid,
         vout: 0,
@@ -295,7 +293,6 @@ describe('regression, testnet', function () {
 
     const transferHex = transfer(
       bobPrivateKey,
-      issuerPrivateKey.publicKey,
       {
         txid: issueTxid,
         vout: 1,
@@ -324,7 +321,6 @@ describe('regression, testnet', function () {
 
     const splitHex = split(
       alicePrivateKey,
-      issuerPrivateKey.publicKey,
       {
         txid: transferTxid,
         vout: 0,

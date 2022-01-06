@@ -57,7 +57,6 @@ describe('regression, testnet', function () {
     
     const transferHex = transfer(
       bobPrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 1),
       aliceAddr,
       utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
@@ -75,7 +74,6 @@ describe('regression, testnet', function () {
     it('Transfer - Successful With Fee 2', async function () {
       const transferHex = transfer(
         alicePrivateKey,
-        issuerPrivateKey.publicKey,
         utils.getUtxo(issueTxid, issueTx, 0),
         bobAddr,
         utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
@@ -98,7 +96,6 @@ describe('regression, testnet', function () {
     const daveAddr = davePrivateKey.toAddress(process.env.NETWORK).toString()
     const transferHex = transfer(
       bobPrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 1),
       daveAddr,
       utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
@@ -117,7 +114,6 @@ describe('regression, testnet', function () {
   it('Transfer - Successful With Fee 4', async function () {
     const transferHex = transfer(
       bobPrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 1),
       bobAddr,
       utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
@@ -135,7 +131,6 @@ describe('regression, testnet', function () {
   it('Transfer - Successful No Fee', async function () {
     const transferHex = transfer(
       bobPrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 1),
       aliceAddr,
       null,
@@ -195,7 +190,6 @@ describe('regression, testnet', function () {
     const issuerAddr = issuerPrivateKey.toAddress(process.env.NETWORK).toString()
     const transferHex = transfer(
       issuerPrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 1),
       issuerAddr,
       utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
@@ -215,7 +209,6 @@ describe('regression, testnet', function () {
     const incorrectPK = bsv.PrivateKey()
     const transferHex = transfer(
       incorrectPK,
-      issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 1),
       aliceAddr,
       utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
@@ -235,7 +228,6 @@ describe('regression, testnet', function () {
     const incorrectPK = bsv.PrivateKey()
     const transferHex = transfer(
       bobPrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 1),
       aliceAddr,
       utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
@@ -256,7 +248,6 @@ describe('regression, testnet', function () {
     try {
       transfer(
         bobPrivateKey,
-        issuerPrivateKey.publicKey,
         utils.getUtxo(issueTxid, issueTx, 1),
         invalidAddr,
         utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
@@ -275,7 +266,6 @@ describe('regression, testnet', function () {
       try {
         transfer(
           bobPrivateKey,
-          issuerPrivateKey.publicKey,
           utils.getUtxo(issueTxid, issueTx, 1),
           invalidAddr,
           utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
@@ -292,7 +282,6 @@ describe('regression, testnet', function () {
   it('Transfer - Incorrect STAS UTXO Amount Throws Error', async function () {
     const transferHex = transfer(
       bobPrivateKey,
-      issuerPrivateKey.publicKey,
       {
         txid: issueTxid,
         vout: 1,
@@ -316,7 +305,6 @@ describe('regression, testnet', function () {
   it('Transfer - Incorrect Payment UTXO Amount Throws Error', async function () {
     const transferHex = transfer(
       bobPrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 1),
       aliceAddr,
       {
@@ -341,7 +329,6 @@ describe('regression, testnet', function () {
       try {
         transfer(
           null,
-          issuerPrivateKey.publicKey,
           utils.getUtxo(issueTxid, issueTx, 1),
           aliceAddr,
           utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
@@ -359,7 +346,6 @@ describe('regression, testnet', function () {
     try {
       transfer(
         bobPrivateKey,
-        issuerPrivateKey.publicKey,
         null,
         aliceAddr,
         utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
@@ -377,7 +363,6 @@ describe('regression, testnet', function () {
     try {
       transfer(
         bobPrivateKey,
-        issuerPrivateKey.publicKey,
         utils.getUtxo(issueTxid, issueTx, 1),
         null,
         utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
@@ -395,7 +380,6 @@ describe('regression, testnet', function () {
     try {
       transfer(
         bobPrivateKey,
-        issuerPrivateKey.publicKey,
         utils.getUtxo(issueTxid, issueTx, 1),
         aliceAddr,
         utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),

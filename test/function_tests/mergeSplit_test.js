@@ -55,7 +55,6 @@ describe('regression, testnet', function () {
 
     const mergeSplitHex = mergeSplit(
       bobPrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getMergeSplitUtxo(splitTxObj, splitTx),
       aliceAddr,
       aliceAmountSatoshis,
@@ -81,7 +80,6 @@ describe('regression, testnet', function () {
 
     const mergeSplitHex = mergeSplit(
       bobPrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getMergeSplitUtxo(splitTxObj, splitTx),
       aliceAddr,
       aliceAmountSatoshis,
@@ -163,7 +161,6 @@ describe('regression, testnet', function () {
 
     const mergeSplitHex = mergeSplit(
       alicePrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getMergeSplitUtxo(splitTxObj, splitTx),
       aliceAddr,
       100,
@@ -189,7 +186,6 @@ describe('regression, testnet', function () {
 
     const mergeSplitHex = mergeSplit(
       alicePrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getMergeSplitUtxo(splitTxObj, splitTx),
       aliceAddr,
       aliceAmountSatoshis,
@@ -216,7 +212,6 @@ describe('regression, testnet', function () {
 
     const mergeSplitHex = mergeSplit(
       incorrectPrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getMergeSplitUtxo(splitTxObj, splitTx),
       aliceAddr,
       aliceAmountSatoshis,
@@ -244,7 +239,6 @@ describe('regression, testnet', function () {
 
     const mergeSplitHex = mergeSplit(
       issuerPrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getMergeSplitUtxo(splitTxObj, splitTx),
       aliceAddr,
       aliceAmountSatoshis,
@@ -272,7 +266,6 @@ describe('regression, testnet', function () {
 
     const mergeSplitHex = mergeSplit(
       issuerPrivateKey,
-      incorrectPrivateKey.publicKey,
       utils.getMergeSplitUtxo(splitTxObj, splitTx),
       aliceAddr,
       aliceAmountSatoshis,
@@ -300,7 +293,6 @@ describe('regression, testnet', function () {
     try {
       mergeSplitHex = mergeSplit(
         incorrectPrivateKey,
-        issuerPrivateKey.publicKey,
         [{
           tx: splitTxObj,
           scriptPubKey: splitTx.vout[0].scriptPubKey.hex,
@@ -345,7 +337,6 @@ describe('regression, testnet', function () {
     try {
       mergeSplit(
         incorrectPrivateKey,
-        issuerPrivateKey.publicKey,
         [{
           tx: splitTxObj,
           scriptPubKey: splitTx.vout[0].scriptPubKey.hex,
@@ -377,7 +368,6 @@ describe('regression, testnet', function () {
     try {
       mergeSplit(
         issuerPrivateKey,
-        issuerPrivateKey.publicKey,
         utils.getMergeSplitUtxo(splitTxObj, splitTx),
         invalidAddr,
         aliceAmountSatoshis,
@@ -404,7 +394,6 @@ describe('regression, testnet', function () {
     try {
       mergeSplit(
         issuerPrivateKey,
-        issuerPrivateKey.publicKey,
         utils.getMergeSplitUtxo(splitTxObj, splitTx),
         aliceAddr,
         aliceAmountSatoshis,
@@ -429,7 +418,6 @@ describe('regression, testnet', function () {
     try {
       mergeSplit(
         null,
-        issuerPrivateKey.publicKey,
         utils.getMergeSplitUtxo(splitTxObj, splitTx),
         aliceAddr,
         aliceAmountSatoshis,
@@ -455,7 +443,6 @@ describe('regression, testnet', function () {
     try {
       mergeSplit(
         issuerPrivateKey,
-        issuerPrivateKey.publicKey,
         null,
         aliceAddr,
         aliceAmountSatoshis,
@@ -481,7 +468,6 @@ describe('regression, testnet', function () {
     try {
       mergeSplit(
         issuerPrivateKey,
-        issuerPrivateKey.publicKey,
         utils.getMergeSplitUtxo(splitTxObj, splitTx),
         null,
         aliceAmountSatoshis,
@@ -507,7 +493,6 @@ describe('regression, testnet', function () {
     try {
       mergeSplit(
         issuerPrivateKey,
-        issuerPrivateKey.publicKey,
         utils.getMergeSplitUtxo(splitTxObj, splitTx),
         aliceAddr,
         null,
@@ -533,7 +518,6 @@ describe('regression, testnet', function () {
     try {
       mergeSplit(
         issuerPrivateKey,
-        issuerPrivateKey.publicKey,
         utils.getMergeSplitUtxo(splitTxObj, splitTx),
         aliceAddr,
         aliceAmountSatoshis,
@@ -557,7 +541,6 @@ describe('regression, testnet', function () {
     try {
       mergeSplit(
         issuerPrivateKey,
-        issuerPrivateKey.publicKey,
         utils.getMergeSplitUtxo(splitTxObj, splitTx),
         aliceAddr,
         aliceAmountSatoshis,
@@ -583,7 +566,6 @@ describe('regression, testnet', function () {
     try {
       mergeSplit(
         issuerPrivateKey,
-        issuerPrivateKey.publicKey,
         utils.getMergeSplitUtxo(splitTxObj, splitTx),
         aliceAddr,
         aliceAmountSatoshis,
@@ -602,6 +584,7 @@ describe('regression, testnet', function () {
 })
 
 async function setup() {
+
   issuerPrivateKey = bsv.PrivateKey()
   fundingPrivateKey = bsv.PrivateKey()
   bobPrivateKey = bsv.PrivateKey()
@@ -642,7 +625,6 @@ async function setup() {
 
   const transferHex = transfer(
     bobPrivateKey,
-    issuerPrivateKey.publicKey,
     utils.getUtxo(issueTxid, issueTx, 1),
     aliceAddr,
     utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
@@ -659,7 +641,6 @@ async function setup() {
 
   const splitHex = split(
     alicePrivateKey,
-    issuerPrivateKey.publicKey,
     utils.getUtxo(transferTxid, transferTx, 0),
     splitDestinations,
     utils.getUtxo(transferTxid, transferTx, 1),

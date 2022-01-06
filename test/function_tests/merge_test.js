@@ -61,7 +61,6 @@ describe('regression, testnet', function () {
   it('Merge - Successful Merge With Fee', async function () {
     const mergeHex = merge(
       bobPrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getMergeUtxo(splitTxObj),
       aliceAddr,
       utils.getUtxo(splitTxid, splitTx, 2),
@@ -84,7 +83,6 @@ describe('regression, testnet', function () {
 it('Merge - Successful Merge With Fee 2', async function () {
   const mergeHex = merge(
     bobPrivateKey,
-    issuerPrivateKey.publicKey,
     utils.getMergeUtxo(splitTxObj),
     bobAddr,
     utils.getUtxo(splitTxid, splitTx, 2),
@@ -106,7 +104,6 @@ it('Merge - Successful Merge With Fee 2', async function () {
 it('Merge - Merge With No Fee', async function () {
   const mergeHex = merge(
     bobPrivateKey,
-    issuerPrivateKey.publicKey,
     utils.getMergeUtxo(splitTxObj),
     aliceAddr,
     null,
@@ -173,13 +170,10 @@ it('Merge - Successful Merge With Callback And No Fee', async function () {
   expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
 })
 
-
-
 it('Merge - Incorrect Owner Private Key Throws Error', async function () {
   const incorrectPrivateKey = bsv.PrivateKey()
   const mergeHex = merge(
     incorrectPrivateKey,
-    issuerPrivateKey.publicKey,
     utils.getMergeUtxo(splitTxObj),
     aliceAddr,
     utils.getUtxo(splitTxid, splitTx, 2),
@@ -199,7 +193,6 @@ it('Merge - Incorrect Funding Private Key Throws Error', async function () {
   const incorrectPrivateKey = bsv.PrivateKey()
   const mergeHex = merge(
     bobPrivateKey,
-    issuerPrivateKey.publicKey,
     utils.getMergeUtxo(splitTxObj),
     aliceAddr,
     utils.getUtxo(splitTxid, splitTx, 2),
@@ -219,7 +212,6 @@ it('Merge - Attempt to Merge More Than 2 Tokens', async function () {
   try {
     merge(
       bobPrivateKey,
-      issuerPrivateKey.publicKey,
       [{
         tx: splitTxObj,
         vout: 0
@@ -247,7 +239,6 @@ it('Merge - Attempt to Merge More Than 2 Tokens', async function () {
 it('Merge - Attempt to Merge More Than 2 Tokens Without SDK Validation', async function () {
   const mergeHex = mergeUtil.mergeWithoutValidation(
     bobPrivateKey,
-    issuerPrivateKey.publicKey,
     [{
       tx: splitTxObj,
       vout: 0
@@ -278,7 +269,6 @@ it('Merge - Attempt to Merge Less Than Two Tokens', async function () {
   try {
     merge(
       bobPrivateKey,
-      issuerPrivateKey.publicKey,
       [{
         tx: splitTxObj,
         vout: 0
@@ -299,7 +289,6 @@ it('Merge - Null Token Owner Private Key Throws Error', async function () {
   try {
     merge(
       null,
-      issuerPrivateKey.publicKey,
       utils.getMergeUtxo(splitTxObj),
       aliceAddr,
       utils.getUtxo(splitTxid, splitTx, 2),
@@ -317,7 +306,6 @@ it('Merge - Null Merge STAS UTXO Throws Error', async function () {
   try {
     merge(
       bobPrivateKey,
-      issuerPrivateKey.publicKey,
       null,
       aliceAddr,
       utils.getUtxo(splitTxid, splitTx, 2),
@@ -335,7 +323,6 @@ it('Merge - Null Destination Address Throws Error', async function () {
   try {
     merge(
       bobPrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getMergeUtxo(splitTxObj),
       null,
       utils.getUtxo(splitTxid, splitTx, 2),
@@ -353,7 +340,6 @@ it('Merge - Null Funding Private Key Throws Error', async function () {
   try {
     merge(
       bobPrivateKey,
-      issuerPrivateKey.publicKey,
       utils.getMergeUtxo(splitTxObj),
       aliceAddr,
       utils.getUtxo(splitTxid, splitTx, 2),
@@ -415,7 +401,6 @@ async function setup() {
 
   const splitHex = split(
     alicePrivateKey,
-    issuerPrivateKey.publicKey,
     utils.getUtxo(issueTxid, issueTx, 0),
     splitDestinations,
     utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
