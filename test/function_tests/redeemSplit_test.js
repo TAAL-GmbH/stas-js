@@ -7,7 +7,8 @@ require('dotenv').config()
 const {
   contract,
   issue,
-  redeemSplit
+  redeemSplit,
+  redeemSplitWithCallback
 } = require('../../index')
 
 const {
@@ -382,7 +383,6 @@ describe('regression, testnet', function () {
     }
   })
 
-  //needs fixed
   it('RedeemSplit - Null Token Owner Private Key Throws Error', async function () {
     const bobAmount = issueTx.vout[0].value / 2
     const splitDestinations = []
@@ -403,7 +403,7 @@ describe('regression, testnet', function () {
       return
     } catch (e) {
       expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('issuer private key is null')
+      expect(e.message).to.eql('Token owner private key is null')
     }
   })
 
