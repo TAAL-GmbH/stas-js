@@ -112,6 +112,7 @@ const {
     },
     fundingPrivateKey,
     false, // isSplittable
+    symbol,
     2 // STAS version
   )
   const issueTxid = await broadcast(issueHex)
@@ -122,7 +123,6 @@ const {
 
   const transferHex = transfer(
     bobPrivateKey,
-    issuerPrivateKey.publicKey,
     {
       txid: issueTxid,
       vout: 1,
@@ -151,7 +151,6 @@ const {
 
   const splitHex = split(
     alicePrivateKey,
-    issuerPrivateKey.publicKey,
     {
       txid: transferTxid,
       vout: 0,

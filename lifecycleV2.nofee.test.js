@@ -128,7 +128,6 @@ const {
 
   const transferHex = transfer(
     bobPrivateKey,
-    issuerPrivateKey.publicKey,
     {
       txid: issueTxid,
       vout: 1,
@@ -158,7 +157,6 @@ const {
 
   const splitHex = split(
     alicePrivateKey,
-    issuerPrivateKey.publicKey,
     {
       txid: transferTxid,
       vout: 0,
@@ -177,7 +175,6 @@ const {
 
   const mergeHex = merge(
     bobPrivateKey,
-    issuerPrivateKey.publicKey,
     [{
       tx: splitTxObj,
       vout: 0
@@ -205,7 +202,6 @@ const {
 
   const splitHex2 = split(
     alicePrivateKey,
-    issuerPrivateKey.publicKey,
     {
       txid: mergeTxid,
       vout: 0,
@@ -228,7 +224,6 @@ const {
 
   const mergeSplitHex = mergeSplit(
     alicePrivateKey,
-    issuerPrivateKey.publicKey,
     [{
       tx: splitTxObj2,
       scriptPubKey: splitTx2.vout[0].scriptPubKey.hex,
