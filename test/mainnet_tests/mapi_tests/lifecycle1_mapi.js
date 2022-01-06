@@ -109,7 +109,6 @@ it('Mainnet LifeCycle Test 1 broadcast via MAPI', async function () {
 
   const transferHex = transfer(
     bobsPrivateKey,
-    issuerPrivateKey.publicKey,
     utils.getUtxo(issueTxid, issueTx, 0),
     aliceAddr,
     utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
@@ -133,7 +132,6 @@ it('Mainnet LifeCycle Test 1 broadcast via MAPI', async function () {
 
   const splitHex = split(
     alicePrivateKey,
-    issuerPrivateKey.publicKey,
     utils.getUtxo(transferTxid, transferTx, 0),
     splitDestinations,
     utils.getUtxo(transferTxid, transferTx, 1),
@@ -153,7 +151,6 @@ it('Mainnet LifeCycle Test 1 broadcast via MAPI', async function () {
 
   const mergeHex = merge(
     bobsPrivateKey,
-    issuerPrivateKey.publicKey,
     utils.getMergeUtxo(splitTxObj),
     aliceAddr,
     utils.getUtxo(splitTxid, splitTx, 2),
@@ -177,7 +174,6 @@ it('Mainnet LifeCycle Test 1 broadcast via MAPI', async function () {
 
   const splitHex2 = split(
     alicePrivateKey,
-    issuerPrivateKey.publicKey,
     utils.getUtxo(mergeTxid, mergeTx, 0),
     split2Destinations,
     utils.getUtxo(mergeTxid, mergeTx, 1),
@@ -200,7 +196,6 @@ it('Mainnet LifeCycle Test 1 broadcast via MAPI', async function () {
 
   const mergeSplitHex = mergeSplit(
     bobsPrivateKey,
-    issuerPrivateKey.publicKey,
     utils.getMergeSplitUtxo(splitTxObj2, splitTx2),
     bobAddr,
     bobAmountSatoshis,
