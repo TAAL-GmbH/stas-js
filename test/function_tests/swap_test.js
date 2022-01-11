@@ -94,7 +94,14 @@ describe('atomic swap', function () {
       bobPrivateKey, tokenASplitHex, 0, tokenASplitTxObj.outputs[0].satoshis, tokenBSplitTxObj.outputs[0].satoshis,
       fundingUTXO, fundingPrivateKey)
 
-    console.log('allInOneSwapHex: ', allInOneSwapHex)
+    const swapTxid = await broadcast(allInOneSwapHex)
+    console.log('swaptxid', swapTxid)
+    const tokenId = await utils.getToken(swapTxid)
+    console.log(`Token ID:        ${tokenId}`)
+    await new Promise(r => setTimeout(r, 5000))
+    const response = await utils.getTokenWithSymbol(tokenId, 'TOKENA')
+    expect(response.symbol).to.equal('TOKENA')
+    // add second token check
   })
 
   it('Swap - 3 step token-token swap', async function () {
@@ -144,6 +151,15 @@ describe('atomic swap', function () {
 
     const fullySignedSwapHex = makerSignSwapOffer(takerSignedSwapHex, tokenBSplitHex, tokenASplitHex, 0, alicePrivateKey, bobPublicKeyHash, paymentPublicKeyHash, fundingUTXO)
     console.log('fullySignedSwapHex: ', fullySignedSwapHex)
+
+    const swapTxid = await broadcast(fullySignedSwapHex)
+    console.log('swaptxid', swapTxid)
+    const tokenId = await utils.getToken(swapTxid)
+    console.log(`Token ID:        ${tokenId}`)
+    await new Promise(r => setTimeout(r, 5000))
+    const response = await utils.getTokenWithSymbol(tokenId, 'TOKENA')
+    expect(response.symbol).to.equal('TOKENA')
+    // add second token check
   })
 
   it('Swap - 3 step token-p2pkh swap', async function () {
@@ -199,6 +215,66 @@ describe('atomic swap', function () {
 
     const fullySignedSwapHex = makerSignSwapOffer(takerSignedSwapHex, tokenBSplitHex, takerInputTx, bobUtxos[0].vout, alicePrivateKey, bobPublicKeyHash, paymentPublicKeyHash, fundingUTXO)
     console.log('fullySignedSwapHex: ', fullySignedSwapHex)
+  })
+
+  it('Swap - 3 step p2pkh-token swap', async function () {
+    const makerStasTx = bsv.Transaction(tokenBSplitHex)
+
+    // first get some funds
+    const bobUtxos = await getFundsFromFaucet(bobPrivateKey.toAddress(process.env.NETWORK).toString())
+    // get input transaction
+    const takerInputTx = await getRawTransaction(bobUtxos[0].txid)
+
+    const makerInputSatoshis = tokenBSplitTxObj.outputs[0].satoshis
+    const takerOutputSatoshis = makerInputSatoshis
+    const makerOutputSatoshis = Math.floor(bobUtxos[0].amount * 1E8)
+    const takerInputSatoshis = makerOutputSatoshis
+
+    const alicePublicKeyHash = bsv.crypto.Hash.sha256ripemd160(alicePrivateKey.publicKey.toBuffer()).toString('hex')
+    const bobPublicKeyHash = bsv.crypto.Hash.sha256ripemd160(bobPrivateKey.publicKey.toBuffer()).toString('hex')
+
+    const makerInputUtxo = {
+      txId: tokenBSplitTxid,
+      outputIndex: 0,
+      script: makerStasTx.outputs[0].script,
+      satoshis: makerInputSatoshis
+    }
+
+    console.log('t makerInputSatoshis: ', makerInputSatoshis)
+    console.log('t takerOutputSatoshis: ', takerOutputSatoshis)
+    console.log('t makerOutputSatoshis: ', makerOutputSatoshis)
+
+    const wantedInfo = { type: 'native', satoshis: makerOutputSatoshis }
+    const takerInputInfo = { type: 'native', utxo: bobUtxos[0], satoshis: takerInputSatoshis }
+
+    const unsignedSwapOfferHex = createUnsignedSwapOffer(
+      alicePrivateKey,
+      makerInputUtxo,
+      wantedInfo
+    )
+
+    // now bob takes the offer
+    const fundingUTXO = {
+      txid: tokenBSplitTxid,
+      vout: 2,
+      scriptPubKey: tokenBSplitTx.vout[2].scriptPubKey.hex,
+      amount: Math.floor(tokenBSplitTx.vout[2].value * 1E8)
+    }
+
+    const takerSignedSwapHex = acceptUnsignedNativeSwapOffer(unsignedSwapOfferHex, takerInputInfo, makerInputSatoshis, makerOutputSatoshis, tokenBSplitHex, 0,
+      bobPrivateKey, takerInputTx, bobUtxos[0].vout, takerOutputSatoshis, alicePublicKeyHash,
+      fundingUTXO, fundingPrivateKey)
+
+    const fullySignedSwapHex = makerSignSwapOffer(takerSignedSwapHex, tokenBSplitHex, takerInputTx, bobUtxos[0].vout, alicePrivateKey, bobPublicKeyHash, paymentPublicKeyHash, fundingUTXO)
+    console.log('fullySignedSwapHex: ', fullySignedSwapHex)
+
+    const swapTxid = await broadcast(fullySignedSwapHex)
+    console.log('swaptxid', swapTxid)
+    const tokenId = await utils.getToken(swapTxid)
+    console.log(`Token ID:        ${tokenId}`)
+    await new Promise(r => setTimeout(r, 5000))
+    const response = await utils.getTokenWithSymbol(tokenId, 'TOKENA')
+    expect(response.symbol).to.equal('TOKENA')
   })
 })
 
@@ -276,7 +352,6 @@ async function setup () {
 
   tokenASplitHex = split(
     bobPrivateKey,
-    tokenAIssuerPrivateKey.publicKey,
     utils.getUtxo(tokenAIssueTxid, tokenAIssueTx, 0),
     tokenASplitDestinations,
     utils.getUtxo(tokenAIssueTxid, tokenAIssueTx, tokenAIssueOutFundingVout),
@@ -331,7 +406,6 @@ async function setup () {
 
   tokenBSplitHex = split(
     alicePrivateKey,
-    tokenBIssuerPrivateKey.publicKey,
     utils.getUtxo(tokenBIssueTxid, tokenBIssueTx, 0),
     tokenBSplitDestinations,
     utils.getUtxo(tokenBIssueTxid, tokenBIssueTx, tokenBIssueOutFundingVout),
