@@ -46,8 +46,8 @@ const addr10 = pk10.toAddress(process.env.NETWORK).toString()
 console.log('addr3  ' + addr2)
 console.log('addr4  ' + addr3)
 
-describe('regression, testnet', function () {
-  it('Full Life Cycle Test With 10 Issuance Addresses', async function () {
+describe('regression, testnet', () => {
+  it('Full Life Cycle Test With 10 Issuance Addresses', async () => {
 
     const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
     const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
@@ -110,8 +110,8 @@ describe('regression, testnet', function () {
     expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00001)
     expect(await utils.getTokenBalance(addr2)).to.equal(0)
     expect(await utils.getTokenBalance(addr3)).to.equal(2000)
-    console.log('addr2 Balance ' + await utils.getTokenBalance(addr2))
-    console.log('addr3 Balance ' + await utils.getTokenBalance(addr3))
+    console.log('addr2 Balance ' + (await utils.getTokenBalance(addr2)))
+    console.log('addr3 Balance ' + (await utils.getTokenBalance(addr3)))
 
     const amount = transferTx.vout[0].value / 2
     const splitDestinations = []
@@ -130,8 +130,8 @@ describe('regression, testnet', function () {
     const splitTx = await getTransaction(splitTxid)
     expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000005)
     expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000005)
-    console.log('addr3 Balance ' + await utils.getTokenBalance(addr3))
-    console.log('addr4 Balance ' + await utils.getTokenBalance(addr4))
+    console.log('addr3 Balance ' + (await utils.getTokenBalance(addr3)))
+    console.log('addr4 Balance ' + (await utils.getTokenBalance(addr4)))
     expect(await utils.getTokenBalance(addr3)).to.equal(1000)
     expect(await utils.getTokenBalance(addr4)).to.equal(2000)
 
@@ -154,8 +154,8 @@ describe('regression, testnet', function () {
     expect(responseMerge.symbol).to.equal(symbol)
     expect(responseMerge.contract_txs).to.contain(contractTxid)
     expect(responseMerge.issuance_txs).to.contain(issueTxid)
-    console.log('addr2 Balance ' + await utils.getTokenBalance(addr4))
-    console.log('addr3 Balance ' + await utils.getTokenBalance(addr3))
+    console.log('addr2 Balance ' + (await utils.getTokenBalance(addr4)))
+    console.log('addr3 Balance ' + (await utils.getTokenBalance(addr3)))
     expect(await utils.getTokenBalance(addr2)).to.equal(0)
     expect(await utils.getTokenBalance(addr3)).to.equal(2000)
 
@@ -178,8 +178,8 @@ describe('regression, testnet', function () {
     const splitTx2 = await getTransaction(splitTxid2)
     expect(await utils.getVoutAmount(splitTxid2, 0)).to.equal(0.000005)
     expect(await utils.getVoutAmount(splitTxid2, 1)).to.equal(0.000005)
-    console.log('addr3 Balance ' + await utils.getTokenBalance(addr3))
-    console.log('addr5 Balance ' + await utils.getTokenBalance(addr5))
+    console.log('addr3 Balance ' + (await utils.getTokenBalance(addr3)))
+    console.log('addr5 Balance ' + (await utils.getTokenBalance(addr5)))
 
     // Now mergeSplit
     const splitTxObj2 = new bsv.Transaction(splitHex2)
@@ -203,9 +203,9 @@ describe('regression, testnet', function () {
     const mergeSplitTx = await getTransaction(mergeSplitTxid)
     expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000025)
     expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000075)
-    console.log('addr5 Balance ' + await utils.getTokenBalance(addr5))
-    console.log('addr6 Balance ' + await utils.getTokenBalance(addr6))
-    console.log('addr6 Balance ' + await utils.getTokenBalance(addr7))
+    console.log('addr5 Balance ' + (await utils.getTokenBalance(addr5)))
+    console.log('addr6 Balance ' + (await utils.getTokenBalance(addr6)))
+    console.log('addr6 Balance ' + (await utils.getTokenBalance(addr7)))
 
     // Alice wants to redeem the money from bob...
     const redeemHex = redeem(
@@ -218,8 +218,8 @@ describe('regression, testnet', function () {
     const redeemTxid = await broadcast(redeemHex)
     console.log(`Redeem TX:       ${redeemTxid}`)
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.0000025)
-    console.log('addr6 Balance ' + await utils.getTokenBalance(addr6))
-    console.log('addr7 Balance ' + await utils.getTokenBalance(addr7))
+    console.log('addr6 Balance ' + (await utils.getTokenBalance(addr6)))
+    console.log('addr7 Balance ' + (await utils.getTokenBalance(addr7)))
   })
 })
 

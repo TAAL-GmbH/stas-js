@@ -18,9 +18,9 @@ const {
 } = require('../../index').utils
 
 
-describe('regression, testnet', function () {
+describe('regression, testnet', () => {
   
-  it("Full Life Cycle Test NFT 3", async function () {
+  it("Full Life Cycle Test NFT 3", async () => {
 
     const issuerPrivateKey = bsv.PrivateKey()
     const fundingPrivateKey = bsv.PrivateKey()

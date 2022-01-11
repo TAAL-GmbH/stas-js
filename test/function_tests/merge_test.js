@@ -1,5 +1,4 @@
 const expect = require('chai').expect
-const assert = require('chai').assert
 const utils = require('../utils/test_utils')
 const bsv = require('bsv')
 const mergeUtil = require('../utils/mergeWithoutValidation')
@@ -52,13 +51,11 @@ const paymentSignatureCallback = (tx, i, script, satoshis) => {
   return bsv.Transaction.sighash.sign(tx, fundingPrivateKey, sighash, i, script, satoshis)
 }
 
-beforeEach(async function () {
+beforeEach(async () => {
   await setup()
 })
 
-describe('regression, testnet', function () {
-
-  it('Merge - Successful Merge With Fee', async function () {
+  it('Merge - Successful Merge With Fee', async () => {
     const mergeHex = merge(
       bobPrivateKey,
       utils.getMergeUtxo(splitTxObj),
@@ -73,14 +70,14 @@ describe('regression, testnet', function () {
     expect(response.contract_txs).to.contain(contractTxid)
     expect(response.issuance_txs).to.contain(issueTxid)
     expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007)
-    console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
-    console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
+    console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
+    console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
     expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
   })
-})
 
-it('Merge - Successful Merge With Fee 2', async function () {
+
+it('Merge - Successful Merge With Fee 2', async () => {
   const mergeHex = merge(
     bobPrivateKey,
     utils.getMergeUtxo(splitTxObj),
@@ -95,13 +92,13 @@ it('Merge - Successful Merge With Fee 2', async function () {
   expect(response.contract_txs).to.contain(contractTxid)
   expect(response.issuance_txs).to.contain(issueTxid)
   expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007)
-  console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
-  console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
+  console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
+  console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(10000)
 })
 
-it('Merge - Merge With No Fee', async function () {
+it('Merge - Merge With No Fee', async () => {
   const mergeHex = merge(
     bobPrivateKey,
     utils.getMergeUtxo(splitTxObj),
@@ -115,14 +112,14 @@ it('Merge - Merge With No Fee', async function () {
   expect(response.symbol).to.equal('TAALT')
   expect(response.contract_txs).to.contain(contractTxid)
   expect(response.issuance_txs).to.contain(issueTxid)
-  console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
-  console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
+  console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
+  console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
   expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007)
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
 })
 
-it('Merge - Successful Merge With Callback And Fee', async function () {
+it('Merge - Successful Merge With Callback And Fee', async () => {
 
   const mergeHex = mergeWithCallback(
     bobPrivateKey.publicKey,
@@ -140,13 +137,13 @@ it('Merge - Successful Merge With Callback And Fee', async function () {
   expect(response.contract_txs).to.contain(contractTxid)
   expect(response.issuance_txs).to.contain(issueTxid)
   expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007)
-  console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
-  console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
+  console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
+  console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
 })
 
-it('Merge - Successful Merge With Callback And No Fee', async function () {
+it('Merge - Successful Merge With Callback And No Fee', async () => {
 
   const mergeHex = mergeWithCallback(
     bobPrivateKey.publicKey,
@@ -164,13 +161,13 @@ it('Merge - Successful Merge With Callback And No Fee', async function () {
   expect(response.contract_txs).to.contain(contractTxid)
   expect(response.issuance_txs).to.contain(issueTxid)
   expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007)
-  console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
-  console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
+  console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
+  console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
 })
 
-it('Merge - Incorrect Owner Private Key Throws Error', async function () {
+it('Merge - Incorrect Owner Private Key Throws Error', async () => {
   const incorrectPrivateKey = bsv.PrivateKey()
   const mergeHex = merge(
     incorrectPrivateKey,
@@ -181,7 +178,7 @@ it('Merge - Incorrect Owner Private Key Throws Error', async function () {
   )
   try {
     await broadcast(mergeHex)
-    assert(false)
+    expect(false).toBeTruthy()
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
@@ -189,7 +186,7 @@ it('Merge - Incorrect Owner Private Key Throws Error', async function () {
   }
 })
 
-it('Merge - Incorrect Funding Private Key Throws Error', async function () {
+it('Merge - Incorrect Funding Private Key Throws Error', async () => {
   const incorrectPrivateKey = bsv.PrivateKey()
   const mergeHex = merge(
     bobPrivateKey,
@@ -200,7 +197,7 @@ it('Merge - Incorrect Funding Private Key Throws Error', async function () {
   )
   try {
     await broadcast(mergeHex)
-    assert(false)
+    expect(false).toBeTruthy()
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
@@ -208,7 +205,7 @@ it('Merge - Incorrect Funding Private Key Throws Error', async function () {
   }
 })
 
-it('Merge - Attempt to Merge More Than 2 Tokens', async function () {
+it('Merge - Attempt to Merge More Than 2 Tokens', async () => {
   try {
     merge(
       bobPrivateKey,
@@ -228,7 +225,7 @@ it('Merge - Attempt to Merge More Than 2 Tokens', async function () {
       utils.getUtxo(splitTxid, splitTx, 2),
       fundingPrivateKey
     )
-    assert(false)
+    expect(false).toBeTruthy()
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
@@ -236,36 +233,39 @@ it('Merge - Attempt to Merge More Than 2 Tokens', async function () {
   }
 })
 
-it('Merge - Attempt to Merge More Than 2 Tokens Without SDK Validation', async function () {
-  const mergeHex = mergeUtil.mergeWithoutValidation(
-    bobPrivateKey,
-    [{
-      tx: splitTxObj,
-      vout: 0
-    },
-    {
-      tx: splitTxObj,
-      vout: 1
-    },
-    {
-      tx: splitTxObj,
-      vout: 2
-    }],
-    aliceAddr,
-    utils.getUtxo(splitTxid, splitTx, 2),
-    fundingPrivateKey
-  )
-  try {
-    await broadcast(mergeHex)
-    assert(false)
-    return
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Request failed with status code 400')
+it(
+  'Merge - Attempt to Merge More Than 2 Tokens Without SDK Validation',
+  async () => {
+    const mergeHex = mergeUtil.mergeWithoutValidation(
+      bobPrivateKey,
+      [{
+        tx: splitTxObj,
+        vout: 0
+      },
+      {
+        tx: splitTxObj,
+        vout: 1
+      },
+      {
+        tx: splitTxObj,
+        vout: 2
+      }],
+      aliceAddr,
+      utils.getUtxo(splitTxid, splitTx, 2),
+      fundingPrivateKey
+    )
+    try {
+      await broadcast(mergeHex)
+      expect(false).toBeTruthy()
+      return
+    } catch (e) {
+      expect(e).to.be.instanceOf(Error)
+      expect(e.message).to.eql('Request failed with status code 400')
+    }
   }
-})
+)
 
-it('Merge - Attempt to Merge Less Than Two Tokens', async function () {
+it('Merge - Attempt to Merge Less Than Two Tokens', async () => {
   try {
     merge(
       bobPrivateKey,
@@ -277,7 +277,7 @@ it('Merge - Attempt to Merge Less Than Two Tokens', async function () {
       utils.getUtxo(splitTxid, splitTx, 2),
       fundingPrivateKey
     )
-    assert(false)
+    expect(false).toBeTruthy()
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
@@ -285,7 +285,7 @@ it('Merge - Attempt to Merge Less Than Two Tokens', async function () {
   }
 })
 
-it('Merge - Null Token Owner Private Key Throws Error', async function () {
+it('Merge - Null Token Owner Private Key Throws Error', async () => {
   try {
     merge(
       null,
@@ -294,7 +294,7 @@ it('Merge - Null Token Owner Private Key Throws Error', async function () {
       utils.getUtxo(splitTxid, splitTx, 2),
       fundingPrivateKey
     )
-    assert(false)
+    expect(false).toBeTruthy()
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
@@ -302,7 +302,7 @@ it('Merge - Null Token Owner Private Key Throws Error', async function () {
   }
 })
 
-it('Merge - Null Merge STAS UTXO Throws Error', async function () {
+it('Merge - Null Merge STAS UTXO Throws Error', async () => {
   try {
     merge(
       bobPrivateKey,
@@ -311,7 +311,7 @@ it('Merge - Null Merge STAS UTXO Throws Error', async function () {
       utils.getUtxo(splitTxid, splitTx, 2),
       fundingPrivateKey
     )
-    assert(false)
+    expect(false).toBeTruthy()
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
@@ -319,7 +319,7 @@ it('Merge - Null Merge STAS UTXO Throws Error', async function () {
   }
 })
 
-it('Merge - Null Destination Address Throws Error', async function () {
+it('Merge - Null Destination Address Throws Error', async () => {
   try {
     merge(
       bobPrivateKey,
@@ -328,7 +328,7 @@ it('Merge - Null Destination Address Throws Error', async function () {
       utils.getUtxo(splitTxid, splitTx, 2),
       fundingPrivateKey
     )
-    assert(false)
+    expect(false).toBeTruthy()
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
@@ -336,7 +336,7 @@ it('Merge - Null Destination Address Throws Error', async function () {
   }
 })
 
-it('Merge - Null Funding Private Key Throws Error', async function () {
+it('Merge - Null Funding Private Key Throws Error', async () => {
   try {
     merge(
       bobPrivateKey,
@@ -345,7 +345,7 @@ it('Merge - Null Funding Private Key Throws Error', async function () {
       utils.getUtxo(splitTxid, splitTx, 2),
       null
     )
-    assert(false)
+    expect(false).toBeTruthy()
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)

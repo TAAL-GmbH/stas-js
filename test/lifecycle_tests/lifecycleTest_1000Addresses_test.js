@@ -20,8 +20,8 @@ const {
   SATS_PER_BITCOIN
 } = require('../../index').utils
 
-describe('regression, testnet', function () {
-  it("Full Life Cycle Test With 1000 Issuance Addresses", async function () {
+describe('regression, testnet', () => {
+  it("Full Life Cycle Test With 1000 Issuance Addresses", async () => {
 
     const issuerPrivateKey = bsv.PrivateKey()
     const fundingPrivateKey = bsv.PrivateKey()

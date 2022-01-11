@@ -21,7 +21,7 @@ const {
 } = require('../../index').utils
 
 
-it('Redeem STAS Utxo on MainNet', async function () {
+it('Redeem STAS Utxo on MainNet', async () => {
 
 
     // const bobPrivateKey = bsv.PrivateKey()

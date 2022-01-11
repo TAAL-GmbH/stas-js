@@ -18,9 +18,9 @@ const {
 } = require('../../index').utils
 
 
-describe('regression, testnet', function () {
+describe('regression, testnet', () => {
 
-  it("Full Life Cycle Test NFT 3", async function () {
+  it("Full Life Cycle Test NFT 3", async () => {
 
     const issuerPrivateKey = bsv.PrivateKey()
     const fundingPrivateKey = bsv.PrivateKey()
@@ -98,9 +98,9 @@ describe('regression, testnet', function () {
     expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00008)
     expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00004)
     expect(await utils.getVoutAmount(issueTxid, 2)).to.equal(0.00002)
-    console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
-    console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
-    console.log('Dave Balance ' + await utils.getTokenBalance(daveAddr))
+    console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
+    console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
+    console.log('Dave Balance ' + (await utils.getTokenBalance(daveAddr)))
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(8000)
     expect(await utils.getTokenBalance(bobAddr)).to.equal(4000)
     expect(await utils.getTokenBalance(daveAddr)).to.equal(2000)

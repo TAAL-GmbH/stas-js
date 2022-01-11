@@ -1,5 +1,4 @@
 const expect = require("chai").expect
-const assert = require('chai').assert
 const utils = require('../utils/test_utils')
 const bsv = require('bsv')
 const issueUtil = require('../utils/issueWithoutValidation')
@@ -33,14 +32,14 @@ const issueAddr = issuerPrivateKey.toAddress(process.env.NETWORK).toString()
 const fundingAddr = fundingPrivateKey.toAddress(process.env.NETWORK).toString()
 
 
-beforeEach(async function () {
+beforeEach(async () => {
 
     await setup() // set up contract
 })
 
-describe('regression, testnet', function () {
-
-    it("Attempt to Issue More Tokens Than Supply Without SDK Validation", async function () {
+it(
+    "Attempt to Issue More Tokens Than Supply Without SDK Validation",
+    async () => {
 
         let issueHex
         try {
@@ -60,14 +59,14 @@ describe('regression, testnet', function () {
         }
         try {
             await broadcast(issueHex)
-            assert(false)
+            expect(false).toBeTruthy()
             return
         } catch (e) {
             expect(e).to.be.instanceOf(Error)
             expect(e.message).to.eql('Request failed with status code 400')
         }
-    })
-})
+    }
+)
 
 async function setup() {
     const bobPrivateKey = bsv.PrivateKey()

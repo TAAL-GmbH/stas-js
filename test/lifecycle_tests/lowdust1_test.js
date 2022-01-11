@@ -20,9 +20,9 @@ const {
   SATS_PER_BITCOIN
 } = require('../../index').utils
 
-describe('regression, testnet, dust', function () {
+describe('regression, testnet, dust', () => {
 
-  it("Full Life Cycle Test Low Dust 1", async function () {
+  it("Full Life Cycle Test Low Dust 1", async () => {
     const issuerPrivateKey = bsv.PrivateKey()
     const fundingPrivateKey = bsv.PrivateKey()
 
@@ -74,8 +74,8 @@ describe('regression, testnet, dust', function () {
     expect(response.issuance_txs).to.contain(issueTxid)
     expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.0000007)
     expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.0000003)
-    console.log("Alice Balance " + await utils.getTokenBalance(aliceAddr))
-    console.log("Bob Balance " + await utils.getTokenBalance(bobAddr))
+    console.log("Alice Balance " + (await utils.getTokenBalance(aliceAddr)))
+    console.log("Bob Balance " + (await utils.getTokenBalance(bobAddr)))
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(70)
     expect(await utils.getTokenBalance(bobAddr)).to.equal(30)
 
@@ -93,8 +93,8 @@ describe('regression, testnet, dust', function () {
     const transferTx = await getTransaction(transferTxid)
 
     expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.0000003)
-    console.log("Alice Balance " + await utils.getTokenBalance(aliceAddr))
-    console.log("Bob Balance " + await utils.getTokenBalance(bobAddr))
+    console.log("Alice Balance " + (await utils.getTokenBalance(aliceAddr)))
+    console.log("Bob Balance " + (await utils.getTokenBalance(bobAddr)))
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(100)
     expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
 
@@ -118,8 +118,8 @@ describe('regression, testnet, dust', function () {
     const splitTx = await getTransaction(splitTxid)
     expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.00000015)
     expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.00000015)
-    console.log("Alice Balance " + await utils.getTokenBalance(aliceAddr))
-    console.log("Bob Balance " + await utils.getTokenBalance(bobAddr))
+    console.log("Alice Balance " + (await utils.getTokenBalance(aliceAddr)))
+    console.log("Bob Balance " + (await utils.getTokenBalance(bobAddr)))
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(100)
     expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
 
@@ -138,8 +138,8 @@ describe('regression, testnet, dust', function () {
     console.log(`Merge TX:        ${mergeTxid}`)
     const mergeTx = await getTransaction(mergeTxid)
     expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.0000003)
-    console.log("Alice Balance " + await utils.getTokenBalance(aliceAddr))
-    console.log("Bob Balance " + await utils.getTokenBalance(bobAddr))
+    console.log("Alice Balance " + (await utils.getTokenBalance(aliceAddr)))
+    console.log("Bob Balance " + (await utils.getTokenBalance(bobAddr)))
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(100)
     expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
 
@@ -163,8 +163,8 @@ describe('regression, testnet, dust', function () {
     const splitTx2 = await getTransaction(splitTxid2)
     expect(await utils.getVoutAmount(splitTxid2, 0)).to.equal(0.00000015)
     expect(await utils.getVoutAmount(splitTxid2, 1)).to.equal(0.00000015)
-    console.log("Alice Balance " + await utils.getTokenBalance(aliceAddr))
-    console.log("Bob Balance " + await utils.getTokenBalance(bobAddr))
+    console.log("Alice Balance " + (await utils.getTokenBalance(aliceAddr)))
+    console.log("Bob Balance " + (await utils.getTokenBalance(bobAddr)))
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(100)
     expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
 
@@ -192,8 +192,8 @@ describe('regression, testnet, dust', function () {
     const mergeSplitTx = await getTransaction(mergeSplitTxid)
     expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075)
     expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
-    console.log("Alice Balance " + await utils.getTokenBalance(aliceAddr))
-    console.log("Bob Balance " + await utils.getTokenBalance(bobAddr))
+    console.log("Alice Balance " + (await utils.getTokenBalance(aliceAddr)))
+    console.log("Bob Balance " + (await utils.getTokenBalance(bobAddr)))
 
 
     // Alice wants to redeem the money from bob...

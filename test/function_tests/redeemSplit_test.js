@@ -1,5 +1,4 @@
 const expect = require('chai').expect
-const assert = require('chai').assert
 const utils = require('../utils/test_utils')
 const bsv = require('bsv')
 require('dotenv').config()
@@ -29,13 +28,11 @@ let publicKeyHash
 let issueTxid
 let issueTx
 
-beforeEach(async function () {
+beforeEach(async () => {
   await setup()
 })
 
-describe('regression, testnet', function () {
-
-  it('Successful RedeemSplit With 1 Split', async function () {
+  it('Successful RedeemSplit With 1 Split', async () => {
     const amount = issueTx.vout[0].value / 2
     const rSplitDestinations = []
     rSplitDestinations[0] = { address: bobAddr, amount: amount }
@@ -51,12 +48,12 @@ describe('regression, testnet', function () {
     const redeemTxid = await broadcast(redeemSplitHex)
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000035) // first utxo goes to redemption address
     expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000035)
-    console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
+    console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
     expect(await utils.getTokenBalance(bobAddr)).to.equal(6500)
   })
 
 
-    it('Successful RedeemSplit With 2 Split', async function () {
+    it('Successful RedeemSplit With 2 Split', async () => {
       const amount = issueTx.vout[0].value / 5
       const rSplitDestinations = []
       rSplitDestinations[0] = { address: bobAddr, amount: amount }
@@ -74,13 +71,13 @@ describe('regression, testnet', function () {
       expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000042) // first utxo goes to redemption address
       expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000014)
       expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.000014)
-      console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
-      console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
+      console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
+      console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
       expect(await utils.getTokenBalance(aliceAddr)).to.equal(1400)
       expect(await utils.getTokenBalance(bobAddr)).to.equal(4400)
     })
 
-    it('Successful RedeemSplit With 3 Split', async function () {
+    it('Successful RedeemSplit With 3 Split', async () => {
       const davePrivateKey = bsv.PrivateKey()
       const daveAddr = davePrivateKey.toAddress(process.env.NETWORK).toString()
       const amount = issueTx.vout[0].value / 10
@@ -102,15 +99,15 @@ describe('regression, testnet', function () {
       expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000007)
       expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.000007)
       expect(await utils.getVoutAmount(redeemTxid, 3)).to.equal(0.000007)
-      console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
-      console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
-      console.log('Dave Balance ' + await utils.getTokenBalance(daveAddr))
+      console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
+      console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
+      console.log('Dave Balance ' + (await utils.getTokenBalance(daveAddr)))
       expect(await utils.getTokenBalance(aliceAddr)).to.equal(700)
       expect(await utils.getTokenBalance(bobAddr)).to.equal(3700)
       expect(await utils.getTokenBalance(daveAddr)).to.equal(700)
     })
   
-  it('Successful RedeemSplit With No Fees', async function () {
+  it('Successful RedeemSplit With No Fees', async () => {
     const rsBobAmount = issueTx.vout[0].value / 3
     const rsAliceAmount1 = issueTx.vout[0].value / 3
     const rSplitDestinations = []
@@ -129,13 +126,13 @@ describe('regression, testnet', function () {
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00002334)
     expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.00002333)
     expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.00002333)
-    console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
-    console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
+    console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
+    console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(2333)
     expect(await utils.getTokenBalance(bobAddr)).to.equal(5333)
   })
 
-  it('RedeemSplit - No Split Completes Successfully', async function () {
+  it('RedeemSplit - No Split Completes Successfully', async () => {
     const rsBobAmount = issueTx.vout[0].value / 2
     const rSplitDestinations = []
     rSplitDestinations[0] = { address: bobAddr, amount: rsBobAmount }
@@ -150,13 +147,13 @@ describe('regression, testnet', function () {
     )
     const redeemTxid = await broadcast(redeemSplitHex)
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000035)
-    console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
-    console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
+    console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
+    console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
     expect(await utils.getTokenBalance(bobAddr)).to.equal(6500)
   })
 
-  it('RedeemSplit - Too Many Outputs Throws Error', async function () {
+  it('RedeemSplit - Too Many Outputs Throws Error', async () => {
     const davePrivateKey = bsv.PrivateKey()
     const daveAddr = davePrivateKey.toAddress(process.env.NETWORK).toString()
     const emmaPrivateKey = bsv.PrivateKey()
@@ -176,7 +173,7 @@ describe('regression, testnet', function () {
         utils.getUtxo(issueTxid, issueTx, 2),
         fundingPrivateKey
       )
-      assert(false)
+      expect(false).toBeTruthy()
       return
     } catch (e) {
       expect(e).to.be.instanceOf(Error)
@@ -184,7 +181,7 @@ describe('regression, testnet', function () {
     }
   })
 
-    it('RedeemSplit - Add Too Much To Split Throws Error', async function () {
+    it('RedeemSplit - Add Too Much To Split Throws Error', async () => {
       const bobAmount = issueTx.vout[0].value * 2
       const splitDestinations = []
       splitDestinations[0] = { address: bobAddr, amount: bobAmount }
@@ -198,7 +195,7 @@ describe('regression, testnet', function () {
           utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
           fundingPrivateKey
         )
-        assert(false)
+        expect(false).toBeTruthy()
         return
       } catch (e) {
         expect(e).to.be.instanceOf(Error)
@@ -207,7 +204,7 @@ describe('regression, testnet', function () {
     })
   
 
-  it('RedeemSplit - Address Too Short Throws Error', async function () {
+  it('RedeemSplit - Address Too Short Throws Error', async () => {
     const bobAmount1 = issueTx.vout[0].value / 2
     const bobAmount2 = issueTx.vout[0].value - bobAmount1
     const splitDestinations = []
@@ -223,7 +220,7 @@ describe('regression, testnet', function () {
         utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
         fundingPrivateKey
       )
-      assert(false)
+      expect(false).toBeTruthy()
       return
     } catch (e) {
       expect(e).to.be.instanceOf(Error)
@@ -231,7 +228,7 @@ describe('regression, testnet', function () {
     }
   })
 
-    it('RedeemSplit - Address Too Long Throws Error', async function () {
+    it('RedeemSplit - Address Too Long Throws Error', async () => {
       const bobAmount1 = issueTx.vout[0].value / 2
       const bobAmount2 = issueTx.vout[0].value - bobAmount1
       console.log(bobAddr)
@@ -248,7 +245,7 @@ describe('regression, testnet', function () {
           utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
           fundingPrivateKey
         )
-        assert(false)
+        expect(false).toBeTruthy()
         return
       } catch (e) {
         expect(e).to.be.instanceOf(Error)
@@ -257,7 +254,7 @@ describe('regression, testnet', function () {
     })
 
   // check with liam - we can split to issuer address
-  it('RedeemSplit - Send to Issuer Address Throws Error', async function () {
+  it('RedeemSplit - Send to Issuer Address Throws Error', async () => {
     const amount = issueTx.vout[0].value / 5
     const issuerAddr = issuerPrivateKey.toAddress(process.env.NETWORK).toString()
     const rSplitDestinations = []
@@ -276,61 +273,67 @@ describe('regression, testnet', function () {
     console.log(redeemTxid)
   })
 
-  it('RedeemSplit - Incorrect Owner Private Key Throws Error', async function () {
-    const bobAmount = issueTx.vout[0].value / 3
-    const splitDestinations = []
-    splitDestinations[0] = { address: bobAddr, amount: bobAmount }
-    splitDestinations[1] = { address: bobAddr, amount: bobAmount }
-    const issueOutFundingVout = issueTx.vout.length - 1
-    const incorrectPrivateKey = bsv.PrivateKey()
+  it(
+    'RedeemSplit - Incorrect Owner Private Key Throws Error',
+    async () => {
+      const bobAmount = issueTx.vout[0].value / 3
+      const splitDestinations = []
+      splitDestinations[0] = { address: bobAddr, amount: bobAmount }
+      splitDestinations[1] = { address: bobAddr, amount: bobAmount }
+      const issueOutFundingVout = issueTx.vout.length - 1
+      const incorrectPrivateKey = bsv.PrivateKey()
 
-    const redeemHex = redeemSplit(
-      incorrectPrivateKey,
-      issuerPrivateKey.publicKey,
-      utils.getUtxo(issueTxid, issueTx, 0),
-      splitDestinations,
-      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-      fundingPrivateKey
-    )
-    try {
-      await broadcast(redeemHex)
-      assert(false)
-      return
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('Request failed with status code 400')
+      const redeemHex = redeemSplit(
+        incorrectPrivateKey,
+        issuerPrivateKey.publicKey,
+        utils.getUtxo(issueTxid, issueTx, 0),
+        splitDestinations,
+        utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
+        fundingPrivateKey
+      )
+      try {
+        await broadcast(redeemHex)
+        expect(false).toBeTruthy()
+        return
+      } catch (e) {
+        expect(e).to.be.instanceOf(Error)
+        expect(e.message).to.eql('Request failed with status code 400')
+      }
     }
-  })
+  )
 
 
-  it('RedeemSplit - Incorrect Funding Private Key Throws Error', async function () {
-    const bobAmount = issueTx.vout[0].value / 4
-    const splitDestinations = []
-    splitDestinations[0] = { address: bobAddr, amount: bobAmount }
-    splitDestinations[1] = { address: bobAddr, amount: bobAmount }
-    const issueOutFundingVout = issueTx.vout.length - 1
-    const incorrectPrivateKey = bsv.PrivateKey()
+  it(
+    'RedeemSplit - Incorrect Funding Private Key Throws Error',
+    async () => {
+      const bobAmount = issueTx.vout[0].value / 4
+      const splitDestinations = []
+      splitDestinations[0] = { address: bobAddr, amount: bobAmount }
+      splitDestinations[1] = { address: bobAddr, amount: bobAmount }
+      const issueOutFundingVout = issueTx.vout.length - 1
+      const incorrectPrivateKey = bsv.PrivateKey()
 
-    const redeemHex = redeemSplit(
-      alicePrivateKey,
-      issuerPrivateKey.publicKey,
-      utils.getUtxo(issueTxid, issueTx, 0),
-      splitDestinations,
-      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-      incorrectPrivateKey
-    )
+      const redeemHex = redeemSplit(
+        alicePrivateKey,
+        issuerPrivateKey.publicKey,
+        utils.getUtxo(issueTxid, issueTx, 0),
+        splitDestinations,
+        utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
+        incorrectPrivateKey
+      )
 
-    try {
-      await broadcast(redeemHex)
-      assert(false)
-      return
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('Request failed with status code 400')
+      try {
+        await broadcast(redeemHex)
+        expect(false).toBeTruthy()
+        return
+      } catch (e) {
+        expect(e).to.be.instanceOf(Error)
+        expect(e.message).to.eql('Request failed with status code 400')
+      }
     }
-  })
+  )
 
-  it('RedeemSplit - Incorrect Public Key Throws Error', async function () {
+  it('RedeemSplit - Incorrect Public Key Throws Error', async () => {
     const bobAmount = issueTx.vout[0].value / 4
     const splitDestinations = []
     splitDestinations[0] = { address: bobAddr, amount: bobAmount }
@@ -349,7 +352,7 @@ describe('regression, testnet', function () {
 
     try {
       await broadcast(redeemHex)
-      assert(false)
+      expect(false).toBeTruthy()
       return
     } catch (e) {
       expect(e).to.be.instanceOf(Error)
@@ -357,33 +360,63 @@ describe('regression, testnet', function () {
     }
   })
 
-  it('RedeemSplit - Splitting Into Too Many Tokens Throws Error', async function () {
-    const bobAmount = issueTx.vout[0].value / 10
-    const splitDestinations = []
-    splitDestinations[0] = { address: bobAddr, amount: bobAmount }
-    splitDestinations[1] = { address: bobAddr, amount: bobAmount }
-    splitDestinations[2] = { address: bobAddr, amount: bobAmount }
-    splitDestinations[3] = { address: bobAddr, amount: bobAmount }
-    splitDestinations[4] = { address: bobAddr, amount: bobAmount }
-    const issueOutFundingVout = issueTx.vout.length - 1
-    try {
-      redeemSplit(
-        alicePrivateKey,
-        issuerPrivateKey.publicKey,
-        utils.getUtxo(issueTxid, issueTx, 0),
-        splitDestinations,
-        utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-        fundingPrivateKey
-      )
-      assert(false)
-      return
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('Must have less than 5 segments')
+  it(
+    'RedeemSplit - Splitting Into Too Many Tokens Throws Error',
+    async () => {
+      const bobAmount = issueTx.vout[0].value / 10
+      const splitDestinations = []
+      splitDestinations[0] = { address: bobAddr, amount: bobAmount }
+      splitDestinations[1] = { address: bobAddr, amount: bobAmount }
+      splitDestinations[2] = { address: bobAddr, amount: bobAmount }
+      splitDestinations[3] = { address: bobAddr, amount: bobAmount }
+      splitDestinations[4] = { address: bobAddr, amount: bobAmount }
+      const issueOutFundingVout = issueTx.vout.length - 1
+      try {
+        redeemSplit(
+          alicePrivateKey,
+          issuerPrivateKey.publicKey,
+          utils.getUtxo(issueTxid, issueTx, 0),
+          splitDestinations,
+          utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
+          fundingPrivateKey
+        )
+        expect(false).toBeTruthy()
+        return
+      } catch (e) {
+        expect(e).to.be.instanceOf(Error)
+        expect(e.message).to.eql('Must have less than 5 segments')
+      }
     }
-  })
+  )
 
-  it('RedeemSplit - Null Token Owner Private Key Throws Error', async function () {
+  it(
+    'RedeemSplit - Null Token Owner Private Key Throws Error',
+    async () => {
+      const bobAmount = issueTx.vout[0].value / 2
+      const splitDestinations = []
+      splitDestinations[0] = { address: bobAddr, amount: bobAmount }
+      splitDestinations[1] = { address: bobAddr, amount: bobAmount }
+
+      const issueOutFundingVout = issueTx.vout.length - 1
+      try {
+        redeemSplit(
+          null,
+          issuerPrivateKey.publicKey,
+          utils.getUtxo(issueTxid, issueTx, 0),
+          splitDestinations,
+          utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
+          fundingPrivateKey
+        )
+        expect(false).toBeTruthy()
+        return
+      } catch (e) {
+        expect(e).to.be.instanceOf(Error)
+        expect(e.message).to.eql('Token owner private key is null')
+      }
+    }
+  )
+
+  it('RedeemSplit - Null STAS UTXO Throws Error', async () => {
     const bobAmount = issueTx.vout[0].value / 2
     const splitDestinations = []
     splitDestinations[0] = { address: bobAddr, amount: bobAmount }
@@ -392,30 +425,6 @@ describe('regression, testnet', function () {
     const issueOutFundingVout = issueTx.vout.length - 1
     try {
       redeemSplit(
-        null,
-        issuerPrivateKey.publicKey,
-        utils.getUtxo(issueTxid, issueTx, 0),
-        splitDestinations,
-        utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-        fundingPrivateKey
-      )
-      assert(false)
-      return
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('Token owner private key is null')
-    }
-  })
-
-  it('RedeemSplit - Null STAS UTXO Throws Error', async function () {
-    const bobAmount = issueTx.vout[0].value / 2
-    const splitDestinations = []
-    splitDestinations[0] = { address: bobAddr, amount: bobAmount }
-    splitDestinations[1] = { address: bobAddr, amount: bobAmount }
-
-    const issueOutFundingVout = issueTx.vout.length - 1
-    try {
-      redeemSplit(
         alicePrivateKey,
         issuerPrivateKey.publicKey,
         null,
@@ -423,7 +432,7 @@ describe('regression, testnet', function () {
         utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
         fundingPrivateKey
       )
-      assert(false)
+      expect(false).toBeTruthy()
       return
     } catch (e) {
       expect(e).to.be.instanceOf(Error)
@@ -431,7 +440,7 @@ describe('regression, testnet', function () {
     }
   })
 
-  it('RedeemSplit - Null Split Destinations Throws Error', async function () {
+  it('RedeemSplit - Null Split Destinations Throws Error', async () => {
     const issueOutFundingVout = issueTx.vout.length - 1
     try {
       redeemSplit(
@@ -442,7 +451,7 @@ describe('regression, testnet', function () {
         utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
         fundingPrivateKey
       )
-      assert(false)
+      expect(false).toBeTruthy()
       return
     } catch (e) {
       expect(e).to.be.instanceOf(Error)
@@ -450,7 +459,7 @@ describe('regression, testnet', function () {
     }
   })
 
-  it('RedeemSplit - Null Funding Private Key Throws Error', async function () {
+  it('RedeemSplit - Null Funding Private Key Throws Error', async () => {
     const bobAmount = issueTx.vout[0].value / 2
     const splitDestinations = []
     splitDestinations[0] = { address: bobAddr, amount: bobAmount }
@@ -466,7 +475,7 @@ describe('regression, testnet', function () {
         utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
         null
       )
-      assert(false)
+      expect(false).toBeTruthy()
       return
     } catch (e) {
       expect(e).to.be.instanceOf(Error)
@@ -474,7 +483,7 @@ describe('regression, testnet', function () {
     }
   })
 
-  it('RedeemSplit - Null Contract Public Key Throws Error', async function () {
+  it('RedeemSplit - Null Contract Public Key Throws Error', async () => {
     const bobAmount = issueTx.vout[0].value / 2
     const splitDestinations = []
     splitDestinations[0] = { address: bobAddr, amount: bobAmount }
@@ -490,14 +499,13 @@ describe('regression, testnet', function () {
         utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
         null
       )
-      assert(false)
+      expect(false).toBeTruthy()
       return
     } catch (e) {
       expect(e).to.be.instanceOf(Error)
       expect(e.message).to.eql('contract public key is null')
     }
   })
-})
 
 async function setup () {
   issuerPrivateKey = bsv.PrivateKey()

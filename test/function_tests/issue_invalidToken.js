@@ -31,7 +31,7 @@ aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
 bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
 
 // We create contract with incorrect public key hash
-beforeEach(async function () {
+beforeEach(async () => {
   const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
   const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
   const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(incorrectPrivateKey.publicKey.toBuffer()).toString('hex')
@@ -49,8 +49,7 @@ beforeEach(async function () {
   contractTx = await getTransaction(contractTxid)
 })
 
-describe('regression, testnet', function () {
-  it('Attempt to issue invalid token', async function () {
+  it('Attempt to issue invalid token', async () => {
     const issueHex = issue(
       issuerPrivateKey,
       issueInfo(),
@@ -78,7 +77,7 @@ describe('regression, testnet', function () {
       expect(e.message).to.eql('Request failed with status code 404')
     }
   })
-})
+
 async function getToken(txid) {
   const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/tx/hash/' + txid
   const response = await axios({

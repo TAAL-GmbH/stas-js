@@ -1,5 +1,4 @@
 const expect = require('chai').expect
-const assert = require('chai').assert
 const utils = require('../utils/test_utils')
 const bsv = require('bsv')
 require('dotenv').config()
@@ -22,9 +21,9 @@ const {
 } = require('../../index').utils
 
 
-describe('regression, testnet', function () {
+describe('regression, testnet', () => {
 
-    it('Incorrect Token Id Does Not Issue A Token', async function () {
+    it('Incorrect Token Id Does Not Issue A Token', async () => {
         const issuerPrivateKey = bsv.PrivateKey()
         const fundingPrivateKey = bsv.PrivateKey()
 

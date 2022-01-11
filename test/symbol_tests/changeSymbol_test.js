@@ -15,9 +15,9 @@ const {
   broadcast,
 } = require('../../index').utils
 
-describe('regression, testnet', function () {
+describe('regression, testnet', () => {
 
-  it('Changed Symbol in issue functions', async function () {
+  it('Changed Symbol in issue functions', async () => {
 
     const issuerPrivateKey = bsv.PrivateKey()
     const fundingPrivateKey = bsv.PrivateKey()

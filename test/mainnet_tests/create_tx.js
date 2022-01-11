@@ -4,7 +4,7 @@ const bsv = require('bsv')
 require('dotenv').config()
 
 
-it('Create Tx to be used as UTXO', async function () {
+it('Create Tx to be used as UTXO', async () => {
 
 
   const newPk1 = bsv.PrivateKey()

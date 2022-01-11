@@ -19,7 +19,7 @@ const {
 } = require('../../../index').utils
 
 // eslint-disable-next-line no-undef
-it('Mainnet LifeCycle Test 1 broadcast via WOC', async function () {
+it('Mainnet LifeCycle Test 1 broadcast via WOC', async () => {
 
   // per-run modifiable values
   const contractUtxo = await getUtxoMainNet('', true)
@@ -106,8 +106,8 @@ it('Mainnet LifeCycle Test 1 broadcast via WOC', async function () {
 
   expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(6000)
   expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(4000)
-  console.log('Bob Balance  ' + await utils.getTokenBalanceMainNet(bobAddr, symbol))
-  console.log('Alice Balance  ' + await utils.getTokenBalanceMainNet(aliceAddr, symbol))
+  console.log('Bob Balance  ' + (await utils.getTokenBalanceMainNet(bobAddr, symbol)))
+  console.log('Alice Balance  ' + (await utils.getTokenBalanceMainNet(aliceAddr, symbol)))
 
   const issueOutFundingVout = issueTx.vout.length - 1
 
@@ -125,8 +125,8 @@ it('Mainnet LifeCycle Test 1 broadcast via WOC', async function () {
   await new Promise(r => setTimeout(r, wait))
   expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(0)
   expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(10000)
-  console.log('Bob Balance  ' + await utils.getTokenBalanceMainNet(bobAddr, symbol))
-  console.log('Alice Balance  ' + await utils.getTokenBalanceMainNet(aliceAddr, symbol))
+  console.log('Bob Balance  ' + (await utils.getTokenBalanceMainNet(bobAddr, symbol)))
+  console.log('Alice Balance  ' + (await utils.getTokenBalanceMainNet(aliceAddr, symbol)))
 
   // Split tokens into 2 - both payable to Bob...
   const bobAmount1 = transferTx.vout[0].value / 2
@@ -149,8 +149,8 @@ it('Mainnet LifeCycle Test 1 broadcast via WOC', async function () {
 
   expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(6000)
   expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(4000)
-  console.log('Bob Balance  ' + await utils.getTokenBalanceMainNet(bobAddr, symbol))
-  console.log('Alice Balance  ' + await utils.getTokenBalanceMainNet(aliceAddr, symbol))
+  console.log('Bob Balance  ' + (await utils.getTokenBalanceMainNet(bobAddr, symbol)))
+  console.log('Alice Balance  ' + (await utils.getTokenBalanceMainNet(aliceAddr, symbol)))
 
   // Now let's merge the last split back together
   const splitTxObj = new bsv.Transaction(splitHex)
@@ -169,8 +169,8 @@ it('Mainnet LifeCycle Test 1 broadcast via WOC', async function () {
   await new Promise(r => setTimeout(r, wait))
   expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(0)
   expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(10000)
-  console.log('Bob Balance  ' + await utils.getTokenBalanceMainNet(bobAddr, symbol))
-  console.log('Alice Balance  ' + await utils.getTokenBalanceMainNet(aliceAddr, symbol))
+  console.log('Bob Balance  ' + (await utils.getTokenBalanceMainNet(bobAddr, symbol)))
+  console.log('Alice Balance  ' + (await utils.getTokenBalanceMainNet(aliceAddr, symbol)))
 
   // Split again - both payable to Bob...
   const amount = mergeTx.vout[0].value / 2
@@ -193,8 +193,8 @@ it('Mainnet LifeCycle Test 1 broadcast via WOC', async function () {
   await new Promise(r => setTimeout(r, wait))
   expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(6000)
   expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(4000)
-  console.log('Bob Balance  ' + await utils.getTokenBalanceMainNet(bobAddr, symbol))
-  console.log('Alice Balance  ' + await utils.getTokenBalanceMainNet(aliceAddr, symbol))
+  console.log('Bob Balance  ' + (await utils.getTokenBalanceMainNet(bobAddr, symbol)))
+  console.log('Alice Balance  ' + (await utils.getTokenBalanceMainNet(aliceAddr, symbol)))
 
   // Now mergeSplit
   const splitTxObj2 = new bsv.Transaction(splitHex2)
@@ -220,8 +220,8 @@ it('Mainnet LifeCycle Test 1 broadcast via WOC', async function () {
   await new Promise(r => setTimeout(r, wait))
   expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(4500)
   expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(5500)
-  console.log('Bob Balance  ' + await utils.getTokenBalanceMainNet(bobAddr, symbol))
-  console.log('Alice Balance  ' + await utils.getTokenBalanceMainNet(aliceAddr, symbol))
+  console.log('Bob Balance  ' + (await utils.getTokenBalanceMainNet(bobAddr, symbol)))
+  console.log('Alice Balance  ' + (await utils.getTokenBalanceMainNet(aliceAddr, symbol)))
 
   const redeemHex = redeem(
     bobsPrivateKey,
@@ -234,8 +234,8 @@ it('Mainnet LifeCycle Test 1 broadcast via WOC', async function () {
   console.log(`Redeem TX:       ${redeemTxid}`)
   expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(0)
   expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(5500)
-  console.log('Bob Balance  ' + await utils.getTokenBalanceMainNet(bobAddr, symbol))
-  console.log('Alice Balance  ' + await utils.getTokenBalanceMainNet(aliceAddr, symbol))
+  console.log('Bob Balance  ' + (await utils.getTokenBalanceMainNet(bobAddr, symbol)))
+  console.log('Alice Balance  ' + (await utils.getTokenBalanceMainNet(aliceAddr, symbol)))
 })
 
 function randomSymbol(length) {

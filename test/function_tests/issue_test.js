@@ -1,5 +1,4 @@
 const expect = require('chai').expect
-const assert = require('chai').assert
 const utils = require('../utils/test_utils')
 const bsv = require('bsv')
 require('dotenv').config()
@@ -39,12 +38,11 @@ const paymentSignatureCallback = (tx, i, script, satoshis) => {
   return bsv.Transaction.sighash.sign(tx, fundingPrivateKey, sighash, i, script, satoshis)
 }
 
-beforeEach(async function () {
+beforeEach(async () => {
   await setup() // set up contract
 })
 
-describe('regression, testnet', function () {
-  it('Issue - Successful Issue Token With Split And Fee 1', async function () {
+  it('Issue - Successful Issue Token With Split And Fee 1', async () => {
     const issueHex = issue(
       issuerPrivateKey,
       utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
@@ -67,7 +65,7 @@ describe('regression, testnet', function () {
     expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
   })
 
-  it('Issue - Successful Issue Token With Split And Fee 2', async function () {
+  it('Issue - Successful Issue Token With Split And Fee 2', async () => {
     const issueInfo = [
       {
         addr: aliceAddr,
@@ -94,7 +92,7 @@ describe('regression, testnet', function () {
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
   })
 
-  it('Issue - Successful Issue Token With Split And Fee 3', async function () {
+  it('Issue - Successful Issue Token With Split And Fee 3', async () => {
     const davePrivateKey = bsv.PrivateKey()
     const daveAddr = davePrivateKey.toAddress(process.env.NETWORK).toString()
 
@@ -138,7 +136,7 @@ describe('regression, testnet', function () {
     expect(await utils.getTokenBalance(daveAddr)).to.equal(2000)
   })
 
-  it('Issue - Successful Issue Token With Split And Fee 4', async function () {
+  it('Issue - Successful Issue Token With Split And Fee 4', async () => {
     const davePrivateKey = bsv.PrivateKey()
     const daveAddr = davePrivateKey.toAddress(process.env.NETWORK).toString()
     const emmaPrivateKey = bsv.PrivateKey()
@@ -190,7 +188,7 @@ describe('regression, testnet', function () {
     expect(await utils.getTokenBalance(emmaAddr)).to.equal(1000)
   })
 
-  it('Issue - Successful Issue Token To Same Address', async function () {
+  it('Issue - Successful Issue Token To Same Address', async () => {
     const issueHex = issue(
       issuerPrivateKey,
       utils.getIssueInfo(aliceAddr, 7000, aliceAddr, 3000),
@@ -211,7 +209,7 @@ describe('regression, testnet', function () {
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
   })
 
-  it('Issue - Successful Issue Token Non Split', async function () {
+  it('Issue - Successful Issue Token Non Split', async () => {
     const issueHex = issue(
       issuerPrivateKey,
       utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
@@ -233,7 +231,7 @@ describe('regression, testnet', function () {
     expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
   })
 
-  it('Issue - Issue to Issuer Address', async function () {
+  it('Issue - Issue to Issuer Address', async () => {
     const issuerAddr = issuerPrivateKey.toAddress(process.env.NETWORK).toString()
     const issueHex = issue(
       issuerPrivateKey,
@@ -256,7 +254,7 @@ describe('regression, testnet', function () {
     expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
   })
 
-  it('Issue - Successful Issue Token With Split No Fee', async function () {
+  it('Issue - Successful Issue Token With Split No Fee', async () => {
     const issueHex = issue(
       issuerPrivateKey,
       utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
@@ -278,7 +276,7 @@ describe('regression, testnet', function () {
     expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
   })
 
-  it('Issue - Succesful Empty Funding UTXO', async function () {
+  it('Issue - Succesful Empty Funding UTXO', async () => {
     const issueHex = issue(
       issuerPrivateKey,
       utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
@@ -301,7 +299,7 @@ describe('regression, testnet', function () {
   })
 
 
-  it('Issue - Successful Callback with Fee', async function () {
+  it('Issue - Successful Callback with Fee', async () => {
 
     const issueHex = issueWithCallback(
       issuerPrivateKey.publicKey,
@@ -327,7 +325,7 @@ describe('regression, testnet', function () {
   })
 
 
-  it('Issue - Successful No Fee with callback', async function () {
+  it('Issue - Successful No Fee with callback', async () => {
 
     const issueHex = issueWithCallback(
       issuerPrivateKey.publicKey,
@@ -356,7 +354,7 @@ describe('regression, testnet', function () {
     expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
   })
 
-  it('Issue - Successful Issue Token 10 Addresses', async function () {
+  it('Issue - Successful Issue Token 10 Addresses', async () => {
     const pk1 = bsv.PrivateKey()
     const add1 = pk1.toAddress(process.env.NETWORK).toString()
     const pk2 = bsv.PrivateKey()
@@ -397,7 +395,7 @@ describe('regression, testnet', function () {
     expect(await utils.getTokenBalance(bobAddr)).to.equal(1000)
   })
 
-  it('Issue - Incorrect Issue Different Symbol 1', async function () {
+  it('Issue - Incorrect Issue Different Symbol 1', async () => {
     const newSymbol = 'TEST'
     try {
       issue(
@@ -409,7 +407,7 @@ describe('regression, testnet', function () {
         true,
         newSymbol
       )
-      assert(false)
+      expect(false).toBeTruthy()
       return
     } catch (e) {
       expect(e).to.be.instanceOf(Error)
@@ -417,7 +415,7 @@ describe('regression, testnet', function () {
     }
   })
 
-  it('Issue - Incorrect Issue Private Key Throws Error', async function () {
+  it('Issue - Incorrect Issue Private Key Throws Error', async () => {
     const incorrectPrivateKey = bsv.PrivateKey()
     const issueHex = issue(
       incorrectPrivateKey,
@@ -430,7 +428,7 @@ describe('regression, testnet', function () {
     )
     try {
       await broadcast(issueHex)
-      assert(false)
+      expect(false).toBeTruthy()
       return
     } catch (e) {
       expect(e).to.be.instanceOf(Error)
@@ -438,7 +436,7 @@ describe('regression, testnet', function () {
     }
   })
 
-  it('Issue - Incorrect Funding Private Key Throws Error', async function () {
+  it('Issue - Incorrect Funding Private Key Throws Error', async () => {
     const incorrectPrivateKey = bsv.PrivateKey()
     const issueHex = issue(
       issuerPrivateKey,
@@ -451,7 +449,7 @@ describe('regression, testnet', function () {
     )
     try {
       await broadcast(issueHex)
-      assert(false)
+      expect(false).toBeTruthy()
       return
     } catch (e) {
       expect(e).to.be.instanceOf(Error)
@@ -459,83 +457,95 @@ describe('regression, testnet', function () {
     }
   })
 
-  it('Issue - Issue to Address with a negative token amount(?)', async function () {
-    try {
-      issue(
-        issuerPrivateKey,
-        utils.getIssueInfo(aliceAddr, 13000, bobAddr, -3000),
-        utils.getUtxo(contractTxid, contractTx, 0),
-        utils.getUtxo(contractTxid, contractTx, 1),
-        fundingPrivateKey,
-        true,
-        symbol
-      )
-      assert(false)
-      return
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('issueInfo satoshis < 1')
+  it(
+    'Issue - Issue to Address with a negative token amount(?)',
+    async () => {
+      try {
+        issue(
+          issuerPrivateKey,
+          utils.getIssueInfo(aliceAddr, 13000, bobAddr, -3000),
+          utils.getUtxo(contractTxid, contractTx, 0),
+          utils.getUtxo(contractTxid, contractTx, 1),
+          fundingPrivateKey,
+          true,
+          symbol
+        )
+        expect(false).toBeTruthy()
+        return
+      } catch (e) {
+        expect(e).to.be.instanceOf(Error)
+        expect(e.message).to.eql('issueInfo satoshis < 1')
+      }
     }
-  })
+  )
 
-  it('Issue - Issue to Address with Zero Tokens Throws Errror', async function () {
-    try {
-      issue(
-        issuerPrivateKey,
-        utils.getIssueInfo(aliceAddr, 10000, bobAddr, 0),
-        utils.getUtxo(contractTxid, contractTx, 0),
-        utils.getUtxo(contractTxid, contractTx, 1),
-        fundingPrivateKey,
-        true,
-        symbol
-      )
-      assert(false, 'Issue should have failed')
-      return
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('issueInfo satoshis < 1')
+  it(
+    'Issue - Issue to Address with Zero Tokens Throws Errror',
+    async () => {
+      try {
+        issue(
+          issuerPrivateKey,
+          utils.getIssueInfo(aliceAddr, 10000, bobAddr, 0),
+          utils.getUtxo(contractTxid, contractTx, 0),
+          utils.getUtxo(contractTxid, contractTx, 1),
+          fundingPrivateKey,
+          true,
+          symbol
+        )
+        expect(false).toBeTruthy()
+        return
+      } catch (e) {
+        expect(e).to.be.instanceOf(Error)
+        expect(e.message).to.eql('issueInfo satoshis < 1')
+      }
     }
-  })
+  )
 
-  it('Issue - Issue with Incorrect Balance (Less Than) Throws Error', async function () {
-    try {
-      issue(
-        issuerPrivateKey,
-        utils.getIssueInfo(aliceAddr, 5000, bobAddr, 4000),
-        utils.getUtxo(contractTxid, contractTx, 0),
-        utils.getUtxo(contractTxid, contractTx, 1),
-        fundingPrivateKey,
-        true,
-        symbol
-      )
-      assert(false)
-      return
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('total out amount 9000 must equal total in amount 10000')
+  it(
+    'Issue - Issue with Incorrect Balance (Less Than) Throws Error',
+    async () => {
+      try {
+        issue(
+          issuerPrivateKey,
+          utils.getIssueInfo(aliceAddr, 5000, bobAddr, 4000),
+          utils.getUtxo(contractTxid, contractTx, 0),
+          utils.getUtxo(contractTxid, contractTx, 1),
+          fundingPrivateKey,
+          true,
+          symbol
+        )
+        expect(false).toBeTruthy()
+        return
+      } catch (e) {
+        expect(e).to.be.instanceOf(Error)
+        expect(e.message).to.eql('total out amount 9000 must equal total in amount 10000')
+      }
     }
-  })
+  )
 
-  it('Issue - Issue with Incorrect Balance (More Than) Throws Error', async function () {
-    try {
-      issue(
-        issuerPrivateKey,
-        utils.getIssueInfo(aliceAddr, 10000, bobAddr, 3000),
-        utils.getUtxo(contractTxid, contractTx, 0),
-        utils.getUtxo(contractTxid, contractTx, 1),
-        fundingPrivateKey,
-        true,
-        symbol
-      )
-      assert(false)
-      return
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('total out amount 13000 must equal total in amount 10000')
+  it(
+    'Issue - Issue with Incorrect Balance (More Than) Throws Error',
+    async () => {
+      try {
+        issue(
+          issuerPrivateKey,
+          utils.getIssueInfo(aliceAddr, 10000, bobAddr, 3000),
+          utils.getUtxo(contractTxid, contractTx, 0),
+          utils.getUtxo(contractTxid, contractTx, 1),
+          fundingPrivateKey,
+          true,
+          symbol
+        )
+        expect(false).toBeTruthy()
+        return
+      } catch (e) {
+        expect(e).to.be.instanceOf(Error)
+        expect(e.message).to.eql('total out amount 13000 must equal total in amount 10000')
+      }
     }
-  })
+  )
 
-  it('Issue - Empty Issue Info Throws Error', async function () {
+  it('Issue - Empty Issue Info Throws Error', async () => {
     try {
       issue(
         issuerPrivateKey,
@@ -546,7 +556,7 @@ describe('regression, testnet', function () {
         true,
         2
       )
-      assert(false)
+      expect(false).toBeTruthy()
       return
     } catch (e) {
       expect(e).to.be.instanceOf(Error)
@@ -554,69 +564,75 @@ describe('regression, testnet', function () {
     }
   })
 
-  it('Issue - Invalid Issue Address (Too Short) throws error', async function () {
-    issueInfo = [
-      {
-        addr: '1bc1qxy2kgdygjrsqtzq2',
-        satoshis: 7000,
-        data: 'One'
-      },
-      {
-        addr: bobAddr,
-        satoshis: 3000,
-        data: 'Two'
+  it(
+    'Issue - Invalid Issue Address (Too Short) throws error',
+    async () => {
+      issueInfo = [
+        {
+          addr: '1bc1qxy2kgdygjrsqtzq2',
+          satoshis: 7000,
+          data: 'One'
+        },
+        {
+          addr: bobAddr,
+          satoshis: 3000,
+          data: 'Two'
+        }
+      ]
+      try {
+        issue(
+          issuerPrivateKey,
+          issueInfo,
+          utils.getUtxo(contractTxid, contractTx, 0),
+          utils.getUtxo(contractTxid, contractTx, 1),
+          fundingPrivateKey,
+          true,
+          symbol
+        )
+        expect(false).toBeTruthy()
+        return
+      } catch (e) {
+        expect(e).to.be.instanceOf(Error)
+        expect(e.message).to.eql('issueInfo address must be between 26 and 35')
       }
-    ]
-    try {
-      issue(
-        issuerPrivateKey,
-        issueInfo,
-        utils.getUtxo(contractTxid, contractTx, 0),
-        utils.getUtxo(contractTxid, contractTx, 1),
-        fundingPrivateKey,
-        true,
-        symbol
-      )
-      assert(false)
-      return
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('issueInfo address must be between 26 and 35')
     }
-  })
+  )
 
-  it('Issue - Invalid Issue Address (Too Long) throws error', async function () {
-    issueInfo = [
-      {
-        addr: '1zP1eP5QGefi2DMPTfTL5SLmv7DivfNabc1qxymv7',
-        satoshis: 7000,
-        data: 'One'
-      },
-      {
-        addr: bobAddr,
-        satoshis: 3000,
-        data: 'Two'
+  it(
+    'Issue - Invalid Issue Address (Too Long) throws error',
+    async () => {
+      issueInfo = [
+        {
+          addr: '1zP1eP5QGefi2DMPTfTL5SLmv7DivfNabc1qxymv7',
+          satoshis: 7000,
+          data: 'One'
+        },
+        {
+          addr: bobAddr,
+          satoshis: 3000,
+          data: 'Two'
+        }
+      ]
+      try {
+        issue(
+          issuerPrivateKey,
+          issueInfo,
+          utils.getUtxo(contractTxid, contractTx, 0),
+          utils.getUtxo(contractTxid, contractTx, 1),
+          fundingPrivateKey,
+          true,
+          symbol
+        )
+        expect(false).toBeTruthy()
+        return
+      } catch (e) {
+        expect(e).to.be.instanceOf(Error)
+        expect(e.message).to.eql('issueInfo address must be between 26 and 35')
       }
-    ]
-    try {
-      issue(
-        issuerPrivateKey,
-        issueInfo,
-        utils.getUtxo(contractTxid, contractTx, 0),
-        utils.getUtxo(contractTxid, contractTx, 1),
-        fundingPrivateKey,
-        true,
-        symbol
-      )
-      assert(false)
-      return
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('issueInfo address must be between 26 and 35')
     }
-  })
+  )
 
-  it('Issue - Issue Amount Decimal Throws Error', async function () {
+  it('Issue - Issue Amount Decimal Throws Error', async () => {
     try {
       issue(
         issuerPrivateKey,
@@ -627,7 +643,7 @@ describe('regression, testnet', function () {
         true,
         symbol
       )
-      assert(false)
+      expect(false).toBeTruthy()
       return
     } catch (e) {
       expect(e).to.be.instanceOf(Error)
@@ -635,7 +651,7 @@ describe('regression, testnet', function () {
     }
   })
 
-  it('Issue - Non Array Issue Info Throws Error', async function () {
+  it('Issue - Non Array Issue Info Throws Error', async () => {
     try {
       issue(
         issuerPrivateKey,
@@ -655,7 +671,7 @@ describe('regression, testnet', function () {
         true,
         symbol
       )
-      assert(false)
+      expect(false).toBeTruthy()
       return
     } catch (e) {
       expect(e).to.be.instanceOf(Error)
@@ -663,7 +679,7 @@ describe('regression, testnet', function () {
     }
   })
 
-  it('Issue - Empty Contract UTXO Info Throws Error', async function () {
+  it('Issue - Empty Contract UTXO Info Throws Error', async () => {
     try {
       issue(
         issuerPrivateKey,
@@ -674,7 +690,7 @@ describe('regression, testnet', function () {
         true,
         symbol
       )
-      assert(false)
+      expect(false).toBeTruthy()
       return
     } catch (e) {
       expect(e).to.be.instanceOf(Error)
@@ -682,7 +698,7 @@ describe('regression, testnet', function () {
     }
   })
 
-  it('Issue - Null Issuer Private Key Throws Error', async function () {
+  it('Issue - Null Issuer Private Key Throws Error', async () => {
     try {
       issue(
         null,
@@ -693,7 +709,7 @@ describe('regression, testnet', function () {
         true,
         symbol
       )
-      assert(false)
+      expect(false).toBeTruthy()
       return
     } catch (e) {
       expect(e).to.be.instanceOf(Error)
@@ -701,7 +717,7 @@ describe('regression, testnet', function () {
     }
   })
 
-  it('Issue - Null Issue Info Throws Error', async function () {
+  it('Issue - Null Issue Info Throws Error', async () => {
     try {
       issue(
         issuerPrivateKey,
@@ -712,7 +728,7 @@ describe('regression, testnet', function () {
         true,
         symbol
       )
-      assert(false)
+      expect(false).toBeTruthy()
       return
     } catch (e) {
       expect(e).to.be.instanceOf(Error)
@@ -720,7 +736,7 @@ describe('regression, testnet', function () {
     }
   })
 
-  it('Issue - Null Contract UTXO Throws Error', async function () {
+  it('Issue - Null Contract UTXO Throws Error', async () => {
     try {
       issue(
         issuerPrivateKey,
@@ -732,7 +748,7 @@ describe('regression, testnet', function () {
         symbol,
         2
       )
-      assert(false)
+      expect(false).toBeTruthy()
       return
     } catch (e) {
       expect(e).to.be.instanceOf(Error)
@@ -740,7 +756,7 @@ describe('regression, testnet', function () {
     }
   })
 
-  it('Issue - Null Payment Private Key Throws Error', async function () {
+  it('Issue - Null Payment Private Key Throws Error', async () => {
     try {
       issue(
         issuerPrivateKey,
@@ -751,7 +767,7 @@ describe('regression, testnet', function () {
         true,
         symbol
       )
-      assert(false)
+      expect(false).toBeTruthy()
       return
     } catch (e) {
       expect(e).to.be.instanceOf(Error)
@@ -759,7 +775,7 @@ describe('regression, testnet', function () {
     }
   })
 
-  it('Issue - Null isSplittable Throws Error', async function () {
+  it('Issue - Null isSplittable Throws Error', async () => {
     try {
       issue(
         issuerPrivateKey,
@@ -770,7 +786,7 @@ describe('regression, testnet', function () {
         null,
         symbol
       )
-      assert(false)
+      expect(false).toBeTruthy()
       return
     } catch (e) {
       expect(e).to.be.instanceOf(Error)
@@ -778,7 +794,7 @@ describe('regression, testnet', function () {
     }
   })
 
-  it('Issue - Null Symbol Throws Error', async function () {
+  it('Issue - Null Symbol Throws Error', async () => {
     try {
       issue(
         issuerPrivateKey,
@@ -789,7 +805,7 @@ describe('regression, testnet', function () {
         true,
         null
       )
-      assert(false)
+      expect(false).toBeTruthy()
       return
     } catch (e) {
       expect(e).to.be.instanceOf(Error)
@@ -797,7 +813,6 @@ describe('regression, testnet', function () {
     }
   })
 
-})
 
 async function setup() {
   issuerPrivateKey = bsv.PrivateKey()

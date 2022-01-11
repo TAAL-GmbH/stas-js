@@ -15,77 +15,73 @@ const {
     broadcast
 } = require('../../index').utils
 
+it("Attemmpt to Transfer Non Splittable Token to Issuer", async () => {
 
-describe('regression, testnet', function () {
+    const issuerPrivateKey = bsv.PrivateKey()
+    const issuerAddr = issuerPrivateKey.toAddress(process.env.NETWORK).toString()
+    const fundingPrivateKey = bsv.PrivateKey()
+    const alicePrivateKey = bsv.PrivateKey()
+    const aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
+    const bobPrivateKey = bsv.PrivateKey()
+    const bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
+    const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
+    const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
+    const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
+    const supply = 10000
+    const symbol = 'TAALT'
 
-    it("Attemmpt to Transfer Non Splittable Token to Issuer", async function () {
+    const schema = utils.schema(publicKeyHash, symbol, supply)
 
-        const issuerPrivateKey = bsv.PrivateKey()
-        const issuerAddr = issuerPrivateKey.toAddress(process.env.NETWORK).toString()
-        const fundingPrivateKey = bsv.PrivateKey()
-        const alicePrivateKey = bsv.PrivateKey()
-        const aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
-        const bobPrivateKey = bsv.PrivateKey()
-        const bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
-        const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
-        const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
-        const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
-        const supply = 10000
-        const symbol = 'TAALT'
+    const contractHex = contract(
+        issuerPrivateKey,
+        contractUtxos,
+        fundingUtxos,
+        fundingPrivateKey,
+        schema,
+        supply
+    )
+    const contractTxid = await broadcast(contractHex)
+    console.log(`Contract TX:     ${contractTxid}`)
+    const contractTx = await getTransaction(contractTxid)
 
-        const schema = utils.schema(publicKeyHash, symbol, supply)
-
-        const contractHex = contract(
+    let issueHex
+    try {
+        issueHex = issue(
             issuerPrivateKey,
-            contractUtxos,
-            fundingUtxos,
+            utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+            utils.getUtxo(contractTxid, contractTx, 0),
+            utils.getUtxo(contractTxid, contractTx, 1),
             fundingPrivateKey,
-            schema,
-            supply
+            false,
+            symbol,
+            2
         )
-        const contractTxid = await broadcast(contractHex)
-        console.log(`Contract TX:     ${contractTxid}`)
-        const contractTx = await getTransaction(contractTxid)
+    } catch (e) {
+        console.log('error issuing token', e)
+        return
+    }
+    const issueTxid = await broadcast(issueHex)
+    console.log(`Issue TX:        ${issueTxid}`)
+    const issueTx = await getTransaction(issueTxid)
+    const tokenId = await utils.getToken(issueTxid)
+    let response = await utils.getTokenResponse(tokenId)
+    expect(response.symbol).to.equal(symbol)
 
-        let issueHex
-        try {
-            issueHex = issue(
-                issuerPrivateKey,
-                utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
-                utils.getUtxo(contractTxid, contractTx, 0),
-                utils.getUtxo(contractTxid, contractTx, 1),
-                fundingPrivateKey,
-                false,
-                symbol,
-                2
-            )
-        } catch (e) {
-            console.log('error issuing token', e)
-            return
-        }
-        const issueTxid = await broadcast(issueHex)
-        console.log(`Issue TX:        ${issueTxid}`)
-        const issueTx = await getTransaction(issueTxid)
-        const tokenId = await utils.getToken(issueTxid)
-        let response = await utils.getTokenResponse(tokenId)
-        expect(response.symbol).to.equal(symbol)
+    const issueOutFundingVout = issueTx.vout.length - 1
 
-        const issueOutFundingVout = issueTx.vout.length - 1
-
-        const transferHex = transfer(
-            bobPrivateKey,
-            utils.getUtxo(issueTxid, issueTx, 1),
-            issuerAddr,
-            utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-            fundingPrivateKey
-        )
-        try {
-            await broadcast(transferHex)
-            assert(false)
-            return
-        } catch (e) {
-            expect(e).to.be.instanceOf(Error)
-            expect(e.response.data).to.contain('mandatory-script-verify-flag-failed')
-        }
-    })
+    const transferHex = transfer(
+        bobPrivateKey,
+        utils.getUtxo(issueTxid, issueTx, 1),
+        issuerAddr,
+        utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
+        fundingPrivateKey
+    )
+    try {
+        await broadcast(transferHex)
+        assert(false)
+        return
+    } catch (e) {
+        expect(e).to.be.instanceOf(Error)
+        expect(e.response.data).to.contain('mandatory-script-verify-flag-failed')
+    }
 })

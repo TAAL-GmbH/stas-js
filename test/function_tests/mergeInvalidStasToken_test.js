@@ -18,9 +18,7 @@ const {
   broadcast
 } = require('../../index').utils
 
-describe('regression, testnet, failing, 1545', function () {
-
-  it('Merge Invalid Token Invalidates both token utxos', async function () {
+  it('Merge Invalid Token Invalidates both token utxos', async () => {
 
     const issuerPrivateKey = bsv.PrivateKey()
     const fundingPrivateKey = bsv.PrivateKey()
@@ -155,8 +153,7 @@ describe('regression, testnet, failing, 1545', function () {
     )
     const mergeTxId = await broadcast(mergeHex)
     console.log(`Merge TX: ${mergeTxId}`)
-    console.log('Bob Balance ' + await utils.getTokenBalance(attackerAddress))
+    console.log('Bob Balance ' + (await utils.getTokenBalance(attackerAddress)))
     expect(await utils.getTokenBalance(attackerAddress)).to.equal(0)
 
   })
-})

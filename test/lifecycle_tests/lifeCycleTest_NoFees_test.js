@@ -20,8 +20,8 @@ const {
   broadcast
 } = require('../../index').utils
 
-describe('regression, testnet', function () {
-  it("Full Life Cycle Test With No Fees", async function () {
+describe('regression, testnet', () => {
+  it("Full Life Cycle Test With No Fees", async () => {
 
     const issuerPrivateKey = bsv.PrivateKey()
     const alicePrivateKey = bsv.PrivateKey()
@@ -69,8 +69,8 @@ describe('regression, testnet', function () {
     expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
     expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
     await new Promise(r => setTimeout(r, 5000));
-    console.log("Alice Balance " + await utils.getTokenBalance(aliceAddr))
-    console.log("Bob Balance " + await utils.getTokenBalance(bobAddr))
+    console.log("Alice Balance " + (await utils.getTokenBalance(aliceAddr)))
+    console.log("Bob Balance " + (await utils.getTokenBalance(bobAddr)))
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000) 
     expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
 

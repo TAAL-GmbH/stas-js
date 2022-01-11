@@ -27,14 +27,13 @@ let fundingUtxos
 let publicKeyHash
 let contractTxid
 
-beforeEach(async function () {
-
+beforeEach(async () => {
+   
     await setup()
 })
 
-describe('regression, testnet', function () {
 
-    it('Symbol Size 40 Data Size Zero Bytes', async function () {
+    it('Symbol Size 40 Data Size Zero Bytes', async () => {
 
         let data = ''
         console.log("Data Size " + utils.byteCount(data))
@@ -64,7 +63,7 @@ describe('regression, testnet', function () {
         expect(response.symbol).to.equal(symbol)
     })
 
-    it('Symbol Size 40 Data Size 1 Byte', async function () {
+    it('Symbol Size 40 Data Size 1 Byte', async () => {
 
         let data = 'A'
         console.log("Data Size " + utils.byteCount(data))
@@ -94,7 +93,7 @@ describe('regression, testnet', function () {
         expect(response.symbol).to.equal(symbol)
     })
 
-    it('Symbol Size 40 Data Size < 75 Bytes', async function () {
+    it('Symbol Size 40 Data Size < 75 Bytes', async () => {
 
         let data = 'It was the best of times, it was the worst of times, it was the age of'
         console.log("Data Size " + utils.byteCount(data))
@@ -125,7 +124,7 @@ describe('regression, testnet', function () {
     })
 
 
-    it('Symbol Size 40 Data Size < 128 Bytes', async function () {
+    it('Symbol Size 40 Data Size < 128 Bytes', async () => {
 
         let data = 'It was the best of times, it was the worst of times, it was the age of wisdom. It was the best of times, it was the'
         console.log("Data Size " + utils.byteCount(data))
@@ -156,7 +155,7 @@ describe('regression, testnet', function () {
     })
 
 
-    it('Symbol Size 40 Data Size > 128 Bytes', async function () {
+    it('Symbol Size 40 Data Size > 128 Bytes', async () => {
 
         let data = 'It was the best of times, it was the worst of times, it was the age of wisdom. It was the best of times, it was the worst of'
         console.log("Data Size " + utils.byteCount(data))
@@ -187,7 +186,7 @@ describe('regression, testnet', function () {
     })
 
 
-    it('Symbol Size 40 Data Size > 32768 Bytes', async function () {
+    it('Symbol Size 40 Data Size > 32768 Bytes', async () => {
 
         console.log("Data Size " + utils.byteCount(utils.addData(33)))
         const issueInfo = [
@@ -216,7 +215,7 @@ describe('regression, testnet', function () {
         expect(response.symbol).to.equal(symbol)
     })
 
-    it('Symbol Size 40 Data Size < 32768 Bytes', async function () {
+    it('Symbol Size 40 Data Size < 32768 Bytes', async () => {
 
         console.log("Data Size " + utils.byteCount(utils.addData(32)))
 
@@ -247,7 +246,7 @@ describe('regression, testnet', function () {
     })
 
 
-    it('Symbol < 128 Data Size Large', async function () {
+    it('Symbol < 128 Data Size Large', async () => {
 
         console.log("Data Size " + utils.byteCount(utils.addData(1000)))
 
@@ -276,7 +275,6 @@ describe('regression, testnet', function () {
         const response = await utils.getTokenWithSymbol(tokenId, symbol)
         expect(response.symbol).to.equal(symbol)
     })
-})
 
     async function setup() {
 

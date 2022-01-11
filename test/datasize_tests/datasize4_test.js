@@ -28,370 +28,369 @@ let fundingUtxos
 let publicKeyHash
 let contractTxid
 
-beforeEach(async function () {
+beforeEach(async () => {
 
     await setup()
 })
 
-describe('regression, testnet', function () {
-    it('Symbol 1 Byte Data Size Zero Bytes', async function () {
+it('Symbol 1 Byte Data Size Zero Bytes', async () => {
 
-        let data = ''
-        console.log("Data Size " + utils.byteCount(data))
-        const issueInfo = [
-            {
-                addr: aliceAddr,
-                satoshis: 10000,
-                data: data
-            }
-        ]
-        const issueHex = issue(
-            issuerPrivateKey,
-            issueInfo,
-            utils.getUtxo(contractTxid, contractTx, 0),
-            utils.getUtxo(contractTxid, contractTx, 1),
-            fundingPrivateKey,
-            true,
-            symbol,
-            2
-        )
-        const issueTxid = await broadcast(issueHex)
-        const tokenId = await utils.getToken(issueTxid)
-        console.log(`issueTxid:        ${issueTxid}`)
-        console.log(`Token ID:        ${tokenId}`)
-        await new Promise(r => setTimeout(r, wait));
-        console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
-        expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
-        const response = await utils.getTokenWithSymbol(tokenId, symbol)
-        expect(response.symbol).to.equal(symbol)
-        const issueTx = await getTransaction(issueTxid)
+    let data = ''
+    console.log("Data Size " + utils.byteCount(data))
+    const issueInfo = [
+        {
+            addr: aliceAddr,
+            satoshis: 10000,
+            data: data
+        }
+    ]
+    const issueHex = issue(
+        issuerPrivateKey,
+        issueInfo,
+        utils.getUtxo(contractTxid, contractTx, 0),
+        utils.getUtxo(contractTxid, contractTx, 1),
+        fundingPrivateKey,
+        true,
+        symbol,
+        2
+    )
+    const issueTxid = await broadcast(issueHex)
+    const tokenId = await utils.getToken(issueTxid)
+    console.log(`issueTxid:        ${issueTxid}`)
+    console.log(`Token ID:        ${tokenId}`)
+    await new Promise(r => setTimeout(r, wait));
+    console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
+    expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
+    const response = await utils.getTokenWithSymbol(tokenId, symbol)
+    expect(response.symbol).to.equal(symbol)
+    const issueTx = await getTransaction(issueTxid)
 
-        const redeemHex = redeem(
-            alicePrivateKey,
-            issuerPrivateKey.publicKey,
-            utils.getUtxo(issueTxid, issueTx, 0),
-            utils.getUtxo(issueTxid, issueTx, 1),
-            fundingPrivateKey
-        )
-        const redeemTxid = await broadcast(redeemHex)
-        console.log(`Redeem TX:       ${redeemTxid}`)
-        expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00010000)
-        console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
-        expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
-    })
-
-    it('Symbol 1 Byte Data Size 1 Byte', async function () {
-
-        let data = 'A'
-        console.log("Data Size " + utils.byteCount(data))
-        const issueInfo = [
-            {
-                addr: aliceAddr,
-                satoshis: 10000,
-                data: data
-            }
-        ]
-        const issueHex = issue(
-            issuerPrivateKey,
-            issueInfo,
-            utils.getUtxo(contractTxid, contractTx, 0),
-            utils.getUtxo(contractTxid, contractTx, 1),
-            fundingPrivateKey,
-            true,
-            symbol,
-            2
-        )
-        const issueTxid = await broadcast(issueHex)
-        const tokenId = await utils.getToken(issueTxid)
-        console.log(`issueTxid:        ${issueTxid}`)
-        console.log(`Token ID:        ${tokenId}`)
-        await new Promise(r => setTimeout(r, wait));
-        const response = await utils.getTokenWithSymbol(tokenId, symbol)
-        expect(response.symbol).to.equal(symbol)
-        const issueTx = await getTransaction(issueTxid)
-
-        const redeemHex = redeem(
-            alicePrivateKey,
-            issuerPrivateKey.publicKey,
-            utils.getUtxo(issueTxid, issueTx, 0),
-            utils.getUtxo(issueTxid, issueTx, 1),
-            fundingPrivateKey
-        )
-        const redeemTxid = await broadcast(redeemHex)
-        console.log(`Redeem TX:       ${redeemTxid}`)
-        expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00010000)
-        console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
-        expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
-    })
-    it('Symbol 1 Byte Data Size < 75 Bytes', async function () {
-
-        let data = 'It was the best of times, it was the worst of times, it was the age of'
-        console.log("Data Size " + utils.byteCount(data))
-        const issueInfo = [
-            {
-                addr: aliceAddr,
-                satoshis: 10000,
-                data: data
-            }
-        ]
-        const issueHex = issue(
-            issuerPrivateKey,
-            issueInfo,
-            utils.getUtxo(contractTxid, contractTx, 0),
-            utils.getUtxo(contractTxid, contractTx, 1),
-            fundingPrivateKey,
-            true,
-            symbol,
-            2
-        )
-        const issueTxid = await broadcast(issueHex)
-        const tokenId = await utils.getToken(issueTxid)
-        console.log(`issueTxid:        ${issueTxid}`)
-        console.log(`Token ID:        ${tokenId}`)
-        await new Promise(r => setTimeout(r, wait));
-        const response = await utils.getTokenWithSymbol(tokenId, symbol)
-        expect(response.symbol).to.equal(symbol)
-        const issueTx = await getTransaction(issueTxid)
-
-        const redeemHex = redeem(
-            alicePrivateKey,
-            issuerPrivateKey.publicKey,
-            utils.getUtxo(issueTxid, issueTx, 0),
-            utils.getUtxo(issueTxid, issueTx, 1),
-            fundingPrivateKey
-        )
-        const redeemTxid = await broadcast(redeemHex)
-        console.log(`Redeem TX:       ${redeemTxid}`)
-        expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00010000)
-        console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
-        expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
-    })
-
-
-    it('Symbol 1 Byte Data Size < 128 Bytes', async function () {
-
-        let data = 'It was the best of times, it was the worst of times, it was the age of wisdom. It was the best of times, it was the'
-        console.log("Data Size " + utils.byteCount(data))
-        const issueInfo = [
-            {
-                addr: aliceAddr,
-                satoshis: 10000,
-                data: data
-            }
-        ]
-        const issueHex = issue(
-            issuerPrivateKey,
-            issueInfo,
-            utils.getUtxo(contractTxid, contractTx, 0),
-            utils.getUtxo(contractTxid, contractTx, 1),
-            fundingPrivateKey,
-            true,
-            symbol,
-            2
-        )
-        const issueTxid = await broadcast(issueHex)
-        const tokenId = await utils.getToken(issueTxid)
-        console.log(`issueTxid:        ${issueTxid}`)
-        console.log(`Token ID:        ${tokenId}`)
-        await new Promise(r => setTimeout(r, wait));
-        const response = await utils.getTokenWithSymbol(tokenId, symbol)
-        expect(response.symbol).to.equal(symbol)
-        const issueTx = await getTransaction(issueTxid)
-
-        const redeemHex = redeem(
-            alicePrivateKey,
-            issuerPrivateKey.publicKey,
-            utils.getUtxo(issueTxid, issueTx, 0),
-            utils.getUtxo(issueTxid, issueTx, 1),
-            fundingPrivateKey
-        )
-        const redeemTxid = await broadcast(redeemHex)
-        console.log(`Redeem TX:       ${redeemTxid}`)
-        expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00010000)
-        console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
-        expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
-    })
-
-
-    it('Symbol 1 Byte Data Size > 128 Bytes', async function () {
-
-        let data = 'It was the best of times, it was the worst of times, it was the age of wisdom. It was the best of times, it was the worst of'
-        console.log("Data Size " + utils.byteCount(data))
-        const issueInfo = [
-            {
-                addr: aliceAddr,
-                satoshis: 10000,
-                data: data
-            }
-        ]
-        const issueHex = issue(
-            issuerPrivateKey,
-            issueInfo,
-            utils.getUtxo(contractTxid, contractTx, 0),
-            utils.getUtxo(contractTxid, contractTx, 1),
-            fundingPrivateKey,
-            true,
-            symbol,
-            2
-        )
-        const issueTxid = await broadcast(issueHex)
-        const tokenId = await utils.getToken(issueTxid)
-        console.log(`issueTxid:        ${issueTxid}`)
-        console.log(`Token ID:        ${tokenId}`)
-        await new Promise(r => setTimeout(r, wait));
-        const response = await utils.getTokenWithSymbol(tokenId, symbol)
-        expect(response.symbol).to.equal(symbol)
-        const issueTx = await getTransaction(issueTxid)
-
-        const redeemHex = redeem(
-            alicePrivateKey,
-            issuerPrivateKey.publicKey,
-            utils.getUtxo(issueTxid, issueTx, 0),
-            utils.getUtxo(issueTxid, issueTx, 1),
-            fundingPrivateKey
-        )
-        const redeemTxid = await broadcast(redeemHex)
-        console.log(`Redeem TX:       ${redeemTxid}`)
-        expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00010000)
-        console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
-        expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
-    })
-
-
-    describe('failing', function () {
-        it('Symbol 1 Byte Data Size > 32768 Bytes', async function () {
-
-            console.log("Data Size " + utils.byteCount(utils.addData(33)))
-            const issueInfo = [
-                {
-                    addr: aliceAddr,
-                    satoshis: 10000,
-                    data: utils.addData(33)
-                }
-            ]
-            const issueHex = issue(
-                issuerPrivateKey,
-                issueInfo,
-                utils.getUtxo(contractTxid, contractTx, 0),
-                utils.getUtxo(contractTxid, contractTx, 1),
-                fundingPrivateKey,
-                true,
-                symbol,
-                2
-            )
-            const issueTxid = await broadcast(issueHex)
-            const tokenId = await utils.getToken(issueTxid)
-            console.log(`issueTxid:        ${issueTxid}`)
-            console.log(`Token ID:        ${tokenId}`)
-            await new Promise(r => setTimeout(r, wait));
-            const response = await utils.getTokenWithSymbol(tokenId, symbol)
-            expect(response.symbol).to.equal(symbol)
-            const issueTx = await getTransaction(issueTxid)
-
-            const redeemHex = redeem(
-                alicePrivateKey,
-                issuerPrivateKey.publicKey,
-                utils.getUtxo(issueTxid, issueTx, 0),
-                utils.getUtxo(issueTxid, issueTx, 1),
-                fundingPrivateKey
-            )
-            const redeemTxid = await broadcast(redeemHex)
-            console.log(`Redeem TX:       ${redeemTxid}`)
-            expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00010000)
-            console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
-            expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
-        })
-
-        it('Symbol 1 Byte Data Size < 32768 Bytes', async function () {
-
-            console.log("Data Size " + utils.byteCount(utils.addData(32)))
-
-            const issueInfo = [
-                {
-                    addr: aliceAddr,
-                    satoshis: 10000,
-                    data: utils.addData(32)
-                }
-            ]
-            const issueHex = issue(
-                issuerPrivateKey,
-                issueInfo,
-                utils.getUtxo(contractTxid, contractTx, 0),
-                utils.getUtxo(contractTxid, contractTx, 1),
-                fundingPrivateKey,
-                true,
-                symbol,
-                2
-            )
-            const issueTxid = await broadcast(issueHex)
-            const tokenId = await utils.getToken(issueTxid)
-            console.log(`issueTxid:        ${issueTxid}`)
-            console.log(`Token ID:        ${tokenId}`)
-            await new Promise(r => setTimeout(r, wait));
-            const response = await utils.getTokenWithSymbol(tokenId, symbol)
-            expect(response.symbol).to.equal(symbol)
-            const issueTx = await getTransaction(issueTxid)
-
-            const redeemHex = redeem(
-                alicePrivateKey,
-                issuerPrivateKey.publicKey,
-                utils.getUtxo(issueTxid, issueTx, 0),
-                utils.getUtxo(issueTxid, issueTx, 1),
-                fundingPrivateKey
-            )
-            const redeemTxid = await broadcast(redeemHex)
-            console.log(`Redeem TX:       ${redeemTxid}`)
-            expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00010000)
-            console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
-            expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
-        })
-
-
-        it('Symbol 1 Byte Data Size Large', async function () {
-
-            console.log(aliceAddr)
-
-            const issueInfo = [
-                {
-                    addr: aliceAddr,
-                    satoshis: 10000,
-                    data: utils.addData(1000)
-                }
-            ]
-            const issueHex = issue(
-                issuerPrivateKey,
-                issueInfo,
-                utils.getUtxo(contractTxid, contractTx, 0),
-                utils.getUtxo(contractTxid, contractTx, 1),
-                fundingPrivateKey,
-                true,
-                symbol,
-                2
-            )
-            const issueTxid = await broadcast(issueHex)
-            const tokenId = await utils.getToken(issueTxid)
-            console.log(`issueTxid:        ${issueTxid}`)
-            console.log(`Token ID:        ${tokenId}`)
-            await new Promise(r => setTimeout(r, wait));
-            const response = await utils.getTokenWithSymbol(tokenId, symbol)
-            expect(response.symbol).to.equal(symbol)
-            const issueTx = await getTransaction(issueTxid)
-
-            const redeemHex = redeem(
-                alicePrivateKey,
-                issuerPrivateKey.publicKey,
-                utils.getUtxo(issueTxid, issueTx, 0),
-                utils.getUtxo(issueTxid, issueTx, 1),
-                fundingPrivateKey
-            )
-            const redeemTxid = await broadcast(redeemHex)
-            console.log(`Redeem TX:       ${redeemTxid}`)
-            expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00010000)
-            console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
-            expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
-        })
-    })
+    const redeemHex = redeem(
+        alicePrivateKey,
+        issuerPrivateKey.publicKey,
+        utils.getUtxo(issueTxid, issueTx, 0),
+        utils.getUtxo(issueTxid, issueTx, 1),
+        fundingPrivateKey
+    )
+    const redeemTxid = await broadcast(redeemHex)
+    console.log(`Redeem TX:       ${redeemTxid}`)
+    expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00010000)
+    console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
+    expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
 })
+
+it('Symbol 1 Byte Data Size 1 Byte', async () => {
+
+    let data = 'A'
+    console.log("Data Size " + utils.byteCount(data))
+    const issueInfo = [
+        {
+            addr: aliceAddr,
+            satoshis: 10000,
+            data: data
+        }
+    ]
+    const issueHex = issue(
+        issuerPrivateKey,
+        issueInfo,
+        utils.getUtxo(contractTxid, contractTx, 0),
+        utils.getUtxo(contractTxid, contractTx, 1),
+        fundingPrivateKey,
+        true,
+        symbol,
+        2
+    )
+    const issueTxid = await broadcast(issueHex)
+    const tokenId = await utils.getToken(issueTxid)
+    console.log(`issueTxid:        ${issueTxid}`)
+    console.log(`Token ID:        ${tokenId}`)
+    await new Promise(r => setTimeout(r, wait));
+    const response = await utils.getTokenWithSymbol(tokenId, symbol)
+    expect(response.symbol).to.equal(symbol)
+    const issueTx = await getTransaction(issueTxid)
+
+    const redeemHex = redeem(
+        alicePrivateKey,
+        issuerPrivateKey.publicKey,
+        utils.getUtxo(issueTxid, issueTx, 0),
+        utils.getUtxo(issueTxid, issueTx, 1),
+        fundingPrivateKey
+    )
+    const redeemTxid = await broadcast(redeemHex)
+    console.log(`Redeem TX:       ${redeemTxid}`)
+    expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00010000)
+    console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
+    expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
+})
+
+it('Symbol 1 Byte Data Size < 75 Bytes', async () => {
+
+    let data = 'It was the best of times, it was the worst of times, it was the age of'
+    console.log("Data Size " + utils.byteCount(data))
+    const issueInfo = [
+        {
+            addr: aliceAddr,
+            satoshis: 10000,
+            data: data
+        }
+    ]
+    const issueHex = issue(
+        issuerPrivateKey,
+        issueInfo,
+        utils.getUtxo(contractTxid, contractTx, 0),
+        utils.getUtxo(contractTxid, contractTx, 1),
+        fundingPrivateKey,
+        true,
+        symbol,
+        2
+    )
+    const issueTxid = await broadcast(issueHex)
+    const tokenId = await utils.getToken(issueTxid)
+    console.log(`issueTxid:        ${issueTxid}`)
+    console.log(`Token ID:        ${tokenId}`)
+    await new Promise(r => setTimeout(r, wait));
+    const response = await utils.getTokenWithSymbol(tokenId, symbol)
+    expect(response.symbol).to.equal(symbol)
+    const issueTx = await getTransaction(issueTxid)
+
+    const redeemHex = redeem(
+        alicePrivateKey,
+        issuerPrivateKey.publicKey,
+        utils.getUtxo(issueTxid, issueTx, 0),
+        utils.getUtxo(issueTxid, issueTx, 1),
+        fundingPrivateKey
+    )
+    const redeemTxid = await broadcast(redeemHex)
+    console.log(`Redeem TX:       ${redeemTxid}`)
+    expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00010000)
+    console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
+    expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
+})
+
+
+it('Symbol 1 Byte Data Size < 128 Bytes', async () => {
+
+    let data = 'It was the best of times, it was the worst of times, it was the age of wisdom. It was the best of times, it was the'
+    console.log("Data Size " + utils.byteCount(data))
+    const issueInfo = [
+        {
+            addr: aliceAddr,
+            satoshis: 10000,
+            data: data
+        }
+    ]
+    const issueHex = issue(
+        issuerPrivateKey,
+        issueInfo,
+        utils.getUtxo(contractTxid, contractTx, 0),
+        utils.getUtxo(contractTxid, contractTx, 1),
+        fundingPrivateKey,
+        true,
+        symbol,
+        2
+    )
+    const issueTxid = await broadcast(issueHex)
+    const tokenId = await utils.getToken(issueTxid)
+    console.log(`issueTxid:        ${issueTxid}`)
+    console.log(`Token ID:        ${tokenId}`)
+    await new Promise(r => setTimeout(r, wait));
+    const response = await utils.getTokenWithSymbol(tokenId, symbol)
+    expect(response.symbol).to.equal(symbol)
+    const issueTx = await getTransaction(issueTxid)
+
+    const redeemHex = redeem(
+        alicePrivateKey,
+        issuerPrivateKey.publicKey,
+        utils.getUtxo(issueTxid, issueTx, 0),
+        utils.getUtxo(issueTxid, issueTx, 1),
+        fundingPrivateKey
+    )
+    const redeemTxid = await broadcast(redeemHex)
+    console.log(`Redeem TX:       ${redeemTxid}`)
+    expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00010000)
+    console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
+    expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
+})
+
+
+it('Symbol 1 Byte Data Size > 128 Bytes', async () => {
+
+    let data = 'It was the best of times, it was the worst of times, it was the age of wisdom. It was the best of times, it was the worst of'
+    console.log("Data Size " + utils.byteCount(data))
+    const issueInfo = [
+        {
+            addr: aliceAddr,
+            satoshis: 10000,
+            data: data
+        }
+    ]
+    const issueHex = issue(
+        issuerPrivateKey,
+        issueInfo,
+        utils.getUtxo(contractTxid, contractTx, 0),
+        utils.getUtxo(contractTxid, contractTx, 1),
+        fundingPrivateKey,
+        true,
+        symbol,
+        2
+    )
+    const issueTxid = await broadcast(issueHex)
+    const tokenId = await utils.getToken(issueTxid)
+    console.log(`issueTxid:        ${issueTxid}`)
+    console.log(`Token ID:        ${tokenId}`)
+    await new Promise(r => setTimeout(r, wait));
+    const response = await utils.getTokenWithSymbol(tokenId, symbol)
+    expect(response.symbol).to.equal(symbol)
+    const issueTx = await getTransaction(issueTxid)
+
+    const redeemHex = redeem(
+        alicePrivateKey,
+        issuerPrivateKey.publicKey,
+        utils.getUtxo(issueTxid, issueTx, 0),
+        utils.getUtxo(issueTxid, issueTx, 1),
+        fundingPrivateKey
+    )
+    const redeemTxid = await broadcast(redeemHex)
+    console.log(`Redeem TX:       ${redeemTxid}`)
+    expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00010000)
+    console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
+    expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
+})
+
+
+it('Symbol 1 Byte Data Size > 32768 Bytes', async () => {
+
+    console.log("Data Size " + utils.byteCount(utils.addData(33)))
+    const issueInfo = [
+        {
+            addr: aliceAddr,
+            satoshis: 10000,
+            data: utils.addData(33)
+        }
+    ]
+    const issueHex = issue(
+        issuerPrivateKey,
+        issueInfo,
+        utils.getUtxo(contractTxid, contractTx, 0),
+        utils.getUtxo(contractTxid, contractTx, 1),
+        fundingPrivateKey,
+        true,
+        symbol,
+        2
+    )
+    const issueTxid = await broadcast(issueHex)
+    const tokenId = await utils.getToken(issueTxid)
+    console.log(`issueTxid:        ${issueTxid}`)
+    console.log(`Token ID:        ${tokenId}`)
+    await new Promise(r => setTimeout(r, wait));
+    const response = await utils.getTokenWithSymbol(tokenId, symbol)
+    expect(response.symbol).to.equal(symbol)
+    const issueTx = await getTransaction(issueTxid)
+
+    const redeemHex = redeem(
+        alicePrivateKey,
+        issuerPrivateKey.publicKey,
+        utils.getUtxo(issueTxid, issueTx, 0),
+        utils.getUtxo(issueTxid, issueTx, 1),
+        fundingPrivateKey
+    )
+    const redeemTxid = await broadcast(redeemHex)
+    console.log(`Redeem TX:       ${redeemTxid}`)
+    expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00010000)
+    console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
+    expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
+})
+
+it('Symbol 1 Byte Data Size < 32768 Bytes', async () => {
+
+    console.log("Data Size " + utils.byteCount(utils.addData(32)))
+
+    const issueInfo = [
+        {
+            addr: aliceAddr,
+            satoshis: 10000,
+            data: utils.addData(32)
+        }
+    ]
+    const issueHex = issue(
+        issuerPrivateKey,
+        issueInfo,
+        utils.getUtxo(contractTxid, contractTx, 0),
+        utils.getUtxo(contractTxid, contractTx, 1),
+        fundingPrivateKey,
+        true,
+        symbol,
+        2
+    )
+    const issueTxid = await broadcast(issueHex)
+    const tokenId = await utils.getToken(issueTxid)
+    console.log(`issueTxid:        ${issueTxid}`)
+    console.log(`Token ID:        ${tokenId}`)
+    await new Promise(r => setTimeout(r, wait));
+    const response = await utils.getTokenWithSymbol(tokenId, symbol)
+    expect(response.symbol).to.equal(symbol)
+    const issueTx = await getTransaction(issueTxid)
+
+    const redeemHex = redeem(
+        alicePrivateKey,
+        issuerPrivateKey.publicKey,
+        utils.getUtxo(issueTxid, issueTx, 0),
+        utils.getUtxo(issueTxid, issueTx, 1),
+        fundingPrivateKey
+    )
+    const redeemTxid = await broadcast(redeemHex)
+    console.log(`Redeem TX:       ${redeemTxid}`)
+    expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00010000)
+    console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
+    expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
+})
+
+
+it('Symbol 1 Byte Data Size Large', async () => {
+
+    console.log(aliceAddr)
+
+    const issueInfo = [
+        {
+            addr: aliceAddr,
+            satoshis: 10000,
+            data: utils.addData(1000)
+        }
+    ]
+    const issueHex = issue(
+        issuerPrivateKey,
+        issueInfo,
+        utils.getUtxo(contractTxid, contractTx, 0),
+        utils.getUtxo(contractTxid, contractTx, 1),
+        fundingPrivateKey,
+        true,
+        symbol,
+        2
+    )
+    const issueTxid = await broadcast(issueHex)
+    const tokenId = await utils.getToken(issueTxid)
+    console.log(`issueTxid:        ${issueTxid}`)
+    console.log(`Token ID:        ${tokenId}`)
+    await new Promise(r => setTimeout(r, wait));
+    const response = await utils.getTokenWithSymbol(tokenId, symbol)
+    expect(response.symbol).to.equal(symbol)
+    const issueTx = await getTransaction(issueTxid)
+
+    const redeemHex = redeem(
+        alicePrivateKey,
+        issuerPrivateKey.publicKey,
+        utils.getUtxo(issueTxid, issueTx, 0),
+        utils.getUtxo(issueTxid, issueTx, 1),
+        fundingPrivateKey
+    )
+    const redeemTxid = await broadcast(redeemHex)
+    console.log(`Redeem TX:       ${redeemTxid}`)
+    expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00010000)
+    console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
+    expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
+})
+
+
 async function setup() {
 
     issuerPrivateKey = bsv.PrivateKey()
