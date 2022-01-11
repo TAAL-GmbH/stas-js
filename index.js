@@ -18,5 +18,6 @@ stas.merge = require('./lib/merge')
 stas.mergeWithCallback = require('./lib/mergeWithCallback')
 stas.mergeSplit = require('./lib/mergeSplit')
 stas.mergeSplitWithCallback = require('./lib/mergeSplitWithCallback')
+stas.swap = require('./lib/swap')
 
 stas.utils = require('./lib/utils')

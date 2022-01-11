@@ -5,7 +5,7 @@ const {
   SATS_PER_BITCOIN
 } = require('../../index').utils
 
-function schema(publicKeyHash, symbol, supply) {
+function schema (publicKeyHash, symbol, supply) {
   const schema = {
     name: 'Taal Token',
     tokenId: `${publicKeyHash}`,
@@ -45,7 +45,7 @@ function schema(publicKeyHash, symbol, supply) {
   return schema
 }
 
-function getIssueInfo(addr1, sat1, addr2, sat2) {
+function getIssueInfo (addr1, sat1, addr2, sat2) {
   return [
     {
       addr: addr1,
@@ -60,7 +60,7 @@ function getIssueInfo(addr1, sat1, addr2, sat2) {
   ]
 }
 
-function getUtxo(txid, tx, vout) {
+function getUtxo (txid, tx, vout) {
   return {
     txid: txid,
     vout: vout,
@@ -69,7 +69,7 @@ function getUtxo(txid, tx, vout) {
   }
 }
 
-function getMergeUtxo(splitTxObj) {
+function getMergeUtxo (splitTxObj) {
   return [{
     tx: splitTxObj,
     vout: 0
@@ -80,7 +80,7 @@ function getMergeUtxo(splitTxObj) {
   }]
 }
 
-function getMergeSplitUtxo(splitTxObj, splitTx) {
+function getMergeSplitUtxo (splitTxObj, splitTx) {
   return [{
     tx: splitTxObj,
     scriptPubKey: splitTx.vout[0].scriptPubKey.hex,
@@ -93,7 +93,7 @@ function getMergeSplitUtxo(splitTxObj, splitTx) {
   }]
 }
 
-function getTenIssueInfo(add1, add2, add3, add4, add5, add6, add7, add8, add9, add10) {
+function getTenIssueInfo (add1, add2, add3, add4, add5, add6, add7, add8, add9, add10) {
   return [
     {
       addr: add1,
@@ -148,7 +148,7 @@ function getTenIssueInfo(add1, add2, add3, add4, add5, add6, add7, add8, add9, a
   ]
 }
 
-async function getVoutAmount(txid, vout) {
+async function getVoutAmount (txid, vout) {
   const url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/tx/hash/${txid}`
   const response = await axios({
     method: 'get',
@@ -161,7 +161,7 @@ async function getVoutAmount(txid, vout) {
   return response.data.vout[vout].value
 }
 
-async function getToken(txid) {
+async function getToken (txid) {
   const url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/tx/hash/${txid}`
   const response = await axios({
     method: 'get',
@@ -178,7 +178,7 @@ async function getToken(txid) {
   return tokenId
 }
 
-async function getTokenResponse(tokenId) {
+async function getTokenResponse (tokenId) {
   let response
   try {
     const url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/token/${tokenId}/TAALT`
@@ -197,7 +197,7 @@ async function getTokenResponse(tokenId) {
   return response.data.token
 }
 
-async function getTokenWithSymbol(tokenId, symbol) {
+async function getTokenWithSymbol (tokenId, symbol) {
   const url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/token/${tokenId}/${symbol}`
   console.log(url)
   let response
@@ -217,7 +217,7 @@ async function getTokenWithSymbol(tokenId, symbol) {
   return response.data.token
 }
 
-async function getTokenBalance(address) {
+async function getTokenBalance (address) {
   const url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/address/${address}/tokens`
   const response = await axios({
     method: 'get',
@@ -231,7 +231,7 @@ async function getTokenBalance(address) {
   return response.data.tokens[0].balance
 }
 
-async function countNumOfTokens(txid, isThereAFee) {
+async function countNumOfTokens (txid, isThereAFee) {
   const url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/tx/hash/${txid}`
   const response = await axios({
     method: 'get',
@@ -253,7 +253,7 @@ async function countNumOfTokens(txid, isThereAFee) {
   } else { return count }
 }
 
-async function getAmount(txid, vout) {
+async function getAmount (txid, vout) {
   const url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/tx/hash/${txid}`
   const response = await axios({
     method: 'get',
@@ -268,7 +268,7 @@ async function getAmount(txid, vout) {
   return amount
 }
 
-function addData(sizeIn1000bytes) {
+function addData (sizeIn1000bytes) {
   let data
   for (let i = 0; i < sizeIn1000bytes; i++) {
     data += 'CallmeIshmaelSomeyearsagonevermindhowlongpreciselyhavinglittleornomoneyinmypurseandnothingparticulartointerestmeonshoreIthoughtIwouldsailaboutalittleandseethewaterypartoftheworldItisawayIhaveofdrivingoffthespleenandregulatingthecirculationWheneverIfindmyselfgrowinggrimaboutthemouthwheneveritisadampdrizzlyNovemberinmysoulwheneverIfindmyselfinvoluntarilypausingbeforecoffinwarehousesandbringinguptherearofeveryfuneralImeetandespeciallywhenevermyhyposgetsuchanupperhandofmethatitrequiresastrongmoralprincipletopreventmefromdeliberatelysteppingintothestreetandmethodicallyknockingpeopleshatsoffthenIaccountithightimetozzgettoseaassoonasIcan.Thisismysubstituteforpistolandball.WithaphilosophicalflourishCatothrowshimselfuponhisswordIquietlytaketotheshipThereisnothingsurprisinginthisIftheybutknewit,almostallmenintheirdegreesometimeorothercherishverynearlythesamefeelingstowardstheoceanwithmeCallmeIshmaelSomeyearsagonevermindhowlongpreciselyhavinglittleornomoneyinmypurseCallmeIshmaelSomeyears'
@@ -276,11 +276,11 @@ function addData(sizeIn1000bytes) {
   return data
 }
 
-function byteCount(s) {
+function byteCount (s) {
   return encodeURI(s).split(/%..|./).length - 1
 }
 
-async function broadcastToMainNet(tx) {
+async function broadcastToMainNet (tx) {
   if (Buffer.isBuffer(tx)) {
     tx = tx.toString('hex')
   }
@@ -316,22 +316,22 @@ async function broadcastToMainNet(tx) {
   return txid
 }
 
-async function broadcastMapi(tx) {
+async function broadcastMapi (tx) {
   const url = 'https://mapi.taal.com/mapi/tx'
   let response
   try {
     response = await
-      axios({
-        headers: {
-          Authorization: process.env.MAPI_KEY,
-          'Content-Type': 'application/json'
-        },
-        method: 'post',
-        url,
-        data: {
-          rawTx: tx
-        }
-      })
+    axios({
+      headers: {
+        Authorization: process.env.MAPI_KEY,
+        'Content-Type': 'application/json'
+      },
+      method: 'post',
+      url,
+      data: {
+        rawTx: tx
+      }
+    })
   } catch (error) {
     console.log(error)
   }
@@ -342,7 +342,7 @@ async function broadcastMapi(tx) {
   return txid
 }
 
-async function getTransactionMainNet(txid) {
+async function getTransactionMainNet (txid) {
   const url = `https://api.whatsonchain.com/v1/bsv/main/tx/hash/${txid}`
   let response
   try {
@@ -356,7 +356,7 @@ async function getTransactionMainNet(txid) {
   return response.data
 }
 
-async function getTokenBalanceMainNet(address, symbolIn) {
+async function getTokenBalanceMainNet (address, symbolIn) {
   const url = `https://api.whatsonchain.com/v1/bsv/main/address/${address}/tokens`
   const response = await axios({
     method: 'get',
@@ -366,7 +366,7 @@ async function getTokenBalanceMainNet(address, symbolIn) {
   return result.balance
 }
 
-async function getTokenMainNet(txid) {
+async function getTokenMainNet (txid) {
   const url = `https://api.whatsonchain.com/v1/bsv/main/tx/hash/${txid}`
   const response = await axios({
     method: 'get',
@@ -379,7 +379,7 @@ async function getTokenMainNet(txid) {
   return tokenId
 }
 
-async function getTokenResponseMainNet(tokenId, symbol) {
+async function getTokenResponseMainNet (tokenId, symbol) {
   let response
   try {
     const url = `https://api.whatsonchain.com/v1/bsv/main/token/${tokenId}/${symbol}`
@@ -394,15 +394,14 @@ async function getTokenResponseMainNet(tokenId, symbol) {
   return response.data.token
 }
 
-async function getUtxoMainNet(address, forContract) {
-
+async function getUtxoMainNet (address, forContract) {
   const url = `https://api.whatsonchain.com/v1/bsv/main/address/${address}/unspent`
 
   const response = await axios({
     method: 'get',
     url
   })
-  let array = []
+  const array = []
   if (forContract) {
     for (var key in response.data) {
       if (response.data[key].value == 1505139) {
@@ -420,16 +419,14 @@ async function getUtxoMainNet(address, forContract) {
         break
       }
     }
-
   }
   console.log(array)
   return array
 }
 
-async function setupMainNetTest(address, wait, valueOfSats) {
-
+async function setupMainNetTest (address, wait, valueOfSats) {
   rsp = await getUnspentMainNet(address)
-  let array = []
+  const array = []
   for (var key in rsp.data) {
     if (rsp.data[key].value == valueOfSats) {
       array.push(rsp.data[key].tx_hash)
@@ -438,16 +435,16 @@ async function setupMainNetTest(address, wait, valueOfSats) {
       break
     }
   }
-  const amount3 = (Math.round(array[2] / 2)) - 5000 //5000 removed to cover tx fee
+  const amount3 = (Math.round(array[2] / 2)) - 5000 // 5000 removed to cover tx fee
 
   const inputTxID = array[0] // id of tx to be used as UTXO
-  const destinationAddress = address // address we are sending sats to 
+  const destinationAddress = address // address we are sending sats to
   const changeAddress = address // address that change from tx is returned to
   const satAmount = amount3 // the amount in satoshes we are sending
   const senderPrivateKey = process.env.ISSUERWIF // private key of owner of UTXO to sign transaction
 
   const inputTx = await getTransactionMainNet(inputTxID)
-  const inputVout = array[1]  // which output of UTXO we are consuming
+  const inputVout = array[1] // which output of UTXO we are consuming
 
   const utxo = new bsv.Transaction.UnspentOutput({
     txId: inputTxID,
@@ -470,7 +467,7 @@ async function setupMainNetTest(address, wait, valueOfSats) {
 
   response2 = await getUnspentMainNet(address)
 
-  let responseArray = []
+  const responseArray = []
   for (var key in response2.data) {
     if (response2.data[key].value == Math.round(tx.vout[0].value * SATS_PER_BITCOIN)) {
       responseArray.push(response2.data[key].tx_hash)
@@ -490,8 +487,7 @@ async function setupMainNetTest(address, wait, valueOfSats) {
   return responseArray
 }
 
-
-async function getUnspentMainNet(address) {
+async function getUnspentMainNet (address) {
   const url = `https://api.whatsonchain.com/v1/bsv/main/address/${address}/unspent`
 
   const response = await axios({
@@ -501,17 +497,16 @@ async function getUnspentMainNet(address) {
   return response
 }
 
-function randomSymbol(length) {
-  var result = '';
-  var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  var charactersLength = characters.length;
-  for (var i = 0; i < length; i++) {
+function randomSymbol (length) {
+  let result = ''
+  var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  var charactersLength = characters.length
+  for (let i = 0; i < length; i++) {
     result += characters.charAt(Math.floor(Math.random() *
-      charactersLength));
+      charactersLength))
   }
-  return result;
+  return result
 }
-
 
 module.exports = {
   schema,
