@@ -4,7 +4,7 @@
   "description": "This library will create various types of STAS token transactions that add token functionality to the BSV blockchain.",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --reporter spec --timeout 240000",
+    "test": "jest",
     "test-all": "mocha test/**/*test.js --reporter spec  --timeout 20000",
     "watch": "npm-watch",
     "lint": "standard"
@@ -26,15 +26,28 @@
     "chai": "^4.3.4",
     "chai-as-promised": "^7.1.1",
     "dotenv": "^10.0.0",
+    "jest-html-reporter": "^3.4.2",
     "mocha": "^9.1.3",
     "node-fetch": "^2.6.6",
     "test": "^0.6.0"
   },
   "devDependencies": {
     "eslint-plugin-mocha": "^9.0.0",
+    "jest": "^27.4.7",
     "mocha-tags": "^1.0.1",
     "mochawesome": "^7.0.1",
     "mochawesome-report-generator": "^6.0.1",
     "standard": "^16.0.4"
+  },
+  "jest": {
+    "testRegex": "tests/.*\\.(js|jsx)$",
+    "verbose": true,
+    "testTimeout": 30000,
+    "reporters": [
+      "default",
+      ["./node_modules/jest-html-reporter", {
+        "pageTitle": "Test Report"
+      }]
+    ]
   }
 }
