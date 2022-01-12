@@ -2,14 +2,14 @@
 // const assert = require('chai').assert
 const utils = require('../utils/test_utils')
 const bsv = require('bsv')
-const assert = require('assert')
+// const assert = require('assert')
 const expect = require('chai').expect
 
 require('dotenv').config()
 
 const {
-  createSwapOffer,
-  acceptSwapOffer,
+//   createSwapOffer,
+//   acceptSwapOffer,
   allInOneSwap,
   createUnsignedSwapOffer,
   acceptUnsignedSwapOffer,
@@ -51,7 +51,7 @@ let tokenASplitTxid
 let tokenBSplitTxid
 let tokenASplitHex
 let tokenBSplitHex
-let tokenASplitTx
+// let tokenASplitTx
 let tokenBSplitTx
 let tokenASplitTxObj
 let tokenBSplitTxObj
@@ -99,7 +99,7 @@ describe('atomic swap', function () {
     console.log('swaptxid', swapTxid)
     const tokenId = await utils.getToken(swapTxid)
     console.log(`Token ID:        ${tokenId}`)
-    await new Promise(r => setTimeout(r, 5000))
+    await new Promise(resolve => setTimeout(resolve, 5000))
     const response = await utils.getTokenWithSymbol(tokenId, 'TOKENA')
     expect(response.symbol).to.equal('TOKENA')
     // add second token check
@@ -143,11 +143,10 @@ describe('atomic swap', function () {
       scriptPubKey: tokenBSplitTx.vout[2].scriptPubKey.hex,
       amount: Math.floor(tokenBSplitTx.vout[2].value * 1E8)
     }
-    console.log('funding amount: ', Math.floor(tokenBSplitTx.vout[2].value * 1E8))
     const alicePublicKeyHash = bsv.crypto.Hash.sha256ripemd160(alicePrivateKey.publicKey.toBuffer()).toString('hex')
     const bobPublicKeyHash = bsv.crypto.Hash.sha256ripemd160(bobPrivateKey.publicKey.toBuffer()).toString('hex')
 
-    const takerSignedSwapHex = acceptUnsignedSwapOffer(unsignedSwapOfferHex, makerInputSatoshis, makerOutputSatoshis, tokenBSplitHex, 0,
+    const takerSignedSwapHex = acceptUnsignedSwapOffer(unsignedSwapOfferHex, makerInputSatoshis, tokenBSplitHex, 0,
       bobPrivateKey, tokenASplitHex, 0, takerInputSatoshis, takerOutputSatoshis, alicePublicKeyHash,
       fundingUTXO, fundingPrivateKey)
 
@@ -157,13 +156,13 @@ describe('atomic swap', function () {
     console.log('swaptxid', swapTxid)
     const tokenId = await utils.getToken(swapTxid)
     console.log(`Token ID:        ${tokenId}`)
-    await new Promise(r => setTimeout(r, 5000))
+    await new Promise(resolve => setTimeout(resolve, 5000))
     const response = await utils.getTokenWithSymbol(tokenId, 'TOKENA')
     expect(response.symbol).to.equal('TOKENA')
     // add second token check
   })
 
-  // swap a token for sats
+  // the maker offers a token for sats
   it('Swap - 3 step token-p2pkh swap', async function () {
     const makerStasTx = bsv.Transaction(tokenBSplitHex)
 
@@ -209,7 +208,7 @@ describe('atomic swap', function () {
       amount: Math.floor(tokenBSplitTx.vout[2].value * 1E8)
     }
 
-    const takerSignedSwapHex = acceptUnsignedNativeSwapOffer(unsignedSwapOfferHex, takerInputInfo, makerInputSatoshis, makerOutputSatoshis, tokenBSplitHex, 0,
+    const takerSignedSwapHex = acceptUnsignedNativeSwapOffer(unsignedSwapOfferHex, takerInputInfo, makerInputSatoshis, tokenBSplitHex, 0,
       bobPrivateKey, takerInputTx, bobUtxos[0].vout, takerOutputSatoshis, alicePublicKeyHash,
       fundingUTXO, fundingPrivateKey)
 
@@ -218,7 +217,7 @@ describe('atomic swap', function () {
     console.log('swaptxid', swapTxid)
     const tokenId = await utils.getToken(swapTxid)
     console.log(`Token ID:        ${tokenId}`)
-    await new Promise(r => setTimeout(r, 5000))
+    await new Promise(resolve => setTimeout(resolve, 5000))
     const response = await utils.getTokenWithSymbol(tokenId, 'TOKENA')
     expect(response.symbol).to.equal('TOKENA')
   })
@@ -260,7 +259,7 @@ describe('atomic swap', function () {
       amount: Math.floor(tokenBSplitTx.vout[2].value * 1E8)
     }
 
-    const takerSignedSwapHex = acceptUnsignedSwapOffer(unsignedSwapOfferHex, makerInputSatoshis, makerOutputSatoshis, makerInputTx, aliceUtxos[0].vout,
+    const takerSignedSwapHex = acceptUnsignedSwapOffer(unsignedSwapOfferHex, makerInputSatoshis, makerInputTx, aliceUtxos[0].vout,
       bobPrivateKey, tokenASplitHex, 0, takerInputSatoshis, takerOutputSatoshis, alicePublicKeyHash,
       fundingUTXO, fundingPrivateKey)
 
@@ -268,9 +267,10 @@ describe('atomic swap', function () {
     // console.log(' p2pkh-token fullySignedSwapHex: ', fullySignedSwapHex)
 
     const swapTxid = await broadcast(fullySignedSwapHex)
+    console.log('swaptxid', swapTxid)
     const tokenId = await utils.getToken(swapTxid)
     console.log(`Token ID:        ${tokenId}`)
-    await new Promise(r => setTimeout(r, 5000))
+    await new Promise(resolve => setTimeout(resolve, 5000))
     const response = await utils.getTokenWithSymbol(tokenId, 'TOKENA')
     expect(response.symbol).to.equal('TOKENA')
   })
@@ -292,15 +292,14 @@ async function setup () {
   paymentPublicKeyHash = bsv.crypto.Hash.sha256ripemd160(fundingPrivateKey.publicKey.toBuffer()).toString('hex')
   alicePrivateKey = bsv.PrivateKey()
   bobPrivateKey = bsv.PrivateKey()
-  console.log('tokenAIssuerPrivateKey.toWIF()', tokenAIssuerPrivateKey.toWIF())
-  console.log('tokenBIssuerPrivateKey.toWIF()', tokenBIssuerPrivateKey.toWIF())
-  console.log('fundingPrivateKey.toWIF()', fundingPrivateKey.toWIF())
-  console.log('alicePrivateKey.toWIF()', alicePrivateKey.toWIF())
-  console.log('bobPrivateKey.toWIF()', bobPrivateKey.toWIF())
+  //   console.log('tokenAIssuerPrivateKey.toWIF()', tokenAIssuerPrivateKey.toWIF())
+  //   console.log('tokenBIssuerPrivateKey.toWIF()', tokenBIssuerPrivateKey.toWIF())
+  //   console.log('fundingPrivateKey.toWIF()', fundingPrivateKey.toWIF())
+  //   console.log('alicePrivateKey.toWIF()', alicePrivateKey.toWIF())
+  //   console.log('bobPrivateKey.toWIF()', bobPrivateKey.toWIF())
   bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
   aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
-  console.log('bobAddr', bobAddr)
-  console.log('aliceAddr', aliceAddr)
+
   tokenAContractUtxos = await getFundsFromFaucet(tokenAIssuerPrivateKey.toAddress(process.env.NETWORK).toString())
   tokenBContractUtxos = await getFundsFromFaucet(tokenBIssuerPrivateKey.toAddress(process.env.NETWORK).toString())
   tokenAFundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
@@ -356,8 +355,7 @@ async function setup () {
     fundingPrivateKey
   )
   tokenASplitTxid = await broadcast(tokenASplitHex)
-  //   console.log('tokenASplitTxid', tokenASplitTxid)
-  // console.log('tokenASplitHex', tokenASplitHex)
+  console.log('tokenASplitTxid', tokenASplitTxid)
 
   //   tokenASplitTx = await getTransaction(tokenASplitTxid)
   tokenASplitTxObj = new bsv.Transaction(tokenASplitHex)
