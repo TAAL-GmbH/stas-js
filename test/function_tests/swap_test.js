@@ -146,11 +146,11 @@ describe('atomic swap', function () {
     const alicePublicKeyHash = bsv.crypto.Hash.sha256ripemd160(alicePrivateKey.publicKey.toBuffer()).toString('hex')
     const bobPublicKeyHash = bsv.crypto.Hash.sha256ripemd160(bobPrivateKey.publicKey.toBuffer()).toString('hex')
 
-    const takerSignedSwapHex = acceptUnsignedSwapOffer(unsignedSwapOfferHex, makerInputSatoshis, tokenBSplitHex, 0,
+    const takerSignedSwapHex = acceptUnsignedSwapOffer(unsignedSwapOfferHex, tokenBSplitHex,
       bobPrivateKey, tokenASplitHex, 0, takerInputSatoshis, takerOutputSatoshis, alicePublicKeyHash,
       fundingUTXO, fundingPrivateKey)
 
-    const fullySignedSwapHex = makerSignSwapOffer(takerSignedSwapHex, tokenBSplitHex, tokenASplitHex, 0, alicePrivateKey, bobPublicKeyHash, paymentPublicKeyHash, fundingUTXO)
+    const fullySignedSwapHex = makerSignSwapOffer(takerSignedSwapHex, tokenBSplitHex, tokenASplitHex, alicePrivateKey, bobPublicKeyHash, paymentPublicKeyHash, fundingUTXO)
 
     const swapTxid = await broadcast(fullySignedSwapHex)
     console.log('swaptxid', swapTxid)
@@ -208,11 +208,11 @@ describe('atomic swap', function () {
       amount: Math.floor(tokenBSplitTx.vout[2].value * 1E8)
     }
 
-    const takerSignedSwapHex = acceptUnsignedNativeSwapOffer(unsignedSwapOfferHex, takerInputInfo, makerInputSatoshis, tokenBSplitHex, 0,
+    const takerSignedSwapHex = acceptUnsignedNativeSwapOffer(unsignedSwapOfferHex, takerInputInfo, tokenBSplitHex,
       bobPrivateKey, takerInputTx, bobUtxos[0].vout, takerOutputSatoshis, alicePublicKeyHash,
       fundingUTXO, fundingPrivateKey)
 
-    const fullySignedSwapHex = makerSignSwapOffer(takerSignedSwapHex, tokenBSplitHex, takerInputTx, bobUtxos[0].vout, alicePrivateKey, bobPublicKeyHash, paymentPublicKeyHash, fundingUTXO)
+    const fullySignedSwapHex = makerSignSwapOffer(takerSignedSwapHex, tokenBSplitHex, takerInputTx, alicePrivateKey, bobPublicKeyHash, paymentPublicKeyHash, fundingUTXO)
     const swapTxid = await broadcast(fullySignedSwapHex)
     console.log('swaptxid', swapTxid)
     const tokenId = await utils.getToken(swapTxid)
@@ -222,7 +222,7 @@ describe('atomic swap', function () {
     expect(response.symbol).to.equal('TOKENA')
   })
 
-  // the maker offers sats for a token
+  //   // the maker offers sats for a token
   it('Swap - 3 step p2pkh-token swap', async function () {
     const takerStasTx = bsv.Transaction(tokenASplitHex)
     const takerStasInputScriptHex = takerStasTx.outputs[0].script.toHex()
@@ -259,11 +259,11 @@ describe('atomic swap', function () {
       amount: Math.floor(tokenBSplitTx.vout[2].value * 1E8)
     }
 
-    const takerSignedSwapHex = acceptUnsignedSwapOffer(unsignedSwapOfferHex, makerInputSatoshis, makerInputTx, aliceUtxos[0].vout,
+    const takerSignedSwapHex = acceptUnsignedSwapOffer(unsignedSwapOfferHex, makerInputTx,
       bobPrivateKey, tokenASplitHex, 0, takerInputSatoshis, takerOutputSatoshis, alicePublicKeyHash,
       fundingUTXO, fundingPrivateKey)
 
-    const fullySignedSwapHex = makerSignSwapOffer(takerSignedSwapHex, makerInputTx, tokenASplitHex, 0, alicePrivateKey, bobPublicKeyHash, paymentPublicKeyHash, fundingUTXO)
+    const fullySignedSwapHex = makerSignSwapOffer(takerSignedSwapHex, makerInputTx, tokenASplitHex, alicePrivateKey, bobPublicKeyHash, paymentPublicKeyHash, fundingUTXO)
     // console.log(' p2pkh-token fullySignedSwapHex: ', fullySignedSwapHex)
 
     const swapTxid = await broadcast(fullySignedSwapHex)
