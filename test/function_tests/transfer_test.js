@@ -32,6 +32,8 @@ let issueTxid
 let issueTx
 let issueOutFundingVout
 
+const wait = 5000
+
 const issuerSignatureCallback = (tx, i, script, satoshis) => {
   return bsv.Transaction.sighash.sign(tx, issuerPrivateKey, sighash, i, script, satoshis)
 }
@@ -50,168 +52,151 @@ beforeEach(async () => {
   issueOutFundingVout = issueTx.vout.length - 1
 })
 
+it('Transfer - Successful With Fee 1', async () => {
+  const transferHex = transfer(
+    bobPrivateKey,
+    utils.getUtxo(issueTxid, issueTx, 1),
+    aliceAddr,
+    utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
+    fundingPrivateKey
+  )
+  const transferTxid = await broadcast(transferHex)
+  const tokenId = await utils.getToken(transferTxid)
+  await new Promise(r => setTimeout(r, wait))
+  console.log(tokenId)
+  const response = await utils.getTokenResponse(tokenId)
+  expect(response.symbol).to.equal(symbol)
+  expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
+})
 
-  it('Transfer - Successful With Fee 1', async () => {
-    
-    const transferHex = transfer(
-      bobPrivateKey,
-      utils.getUtxo(issueTxid, issueTx, 1),
-      aliceAddr,
-      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-      fundingPrivateKey
-    )
-    const transferTxid = await broadcast(transferHex)
-    const tokenId = await utils.getToken(transferTxid)
-    const response = await utils.getTokenResponse(tokenId)
-    expect(response.symbol).to.equal(symbol)
-    expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
-    expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
-    expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
-  })
-
-    it('Transfer - Successful With Fee 2', async () => {
-      const transferHex = transfer(
-        alicePrivateKey,
-        utils.getUtxo(issueTxid, issueTx, 0),
-        bobAddr,
-        utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-        fundingPrivateKey
-      )
-      
-      const transferTxid = await broadcast(transferHex)
-      const tokenId = await utils.getToken(transferTxid)
-      const response = await utils.getTokenResponse(tokenId)
-      expect(response.symbol).to.equal(symbol)
-      expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00007)
-      console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
-      console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
-      expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
-      expect(await utils.getTokenBalance(bobAddr)).to.equal(10000)
-    })
-
-  it('Transfer - Successful With Fee 3', async () => {
-    const davePrivateKey = bsv.PrivateKey()
-    const daveAddr = davePrivateKey.toAddress(process.env.NETWORK).toString()
-    const transferHex = transfer(
-      bobPrivateKey,
-      utils.getUtxo(issueTxid, issueTx, 1),
-      daveAddr,
-      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-      fundingPrivateKey
-    )
-    const transferTxid = await broadcast(transferHex)
-    const tokenId = await utils.getToken(transferTxid)
-    const response = await utils.getTokenResponse(tokenId)
-    expect(response.symbol).to.equal(symbol)
-    expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
-    expect(await utils.getTokenBalance(daveAddr)).to.equal(3000)
-    expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
-    expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
-  })
-
-  it('Transfer - Successful With Fee 4', async () => {
-    const transferHex = transfer(
-      bobPrivateKey,
-      utils.getUtxo(issueTxid, issueTx, 1),
-      bobAddr,
-      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-      fundingPrivateKey
-    )
-    const transferTxid = await broadcast(transferHex)
-    const tokenId = await utils.getToken(transferTxid)
-    const response = await utils.getTokenResponse(tokenId)
-    expect(response.symbol).to.equal(symbol)
-    expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
-    expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
-    expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
-  })
-
-  it('Transfer - Successful No Fee', async () => {
-    const transferHex = transfer(
-      bobPrivateKey,
-      utils.getUtxo(issueTxid, issueTx, 1),
-      aliceAddr,
-      null,
-      null
-    )
-    const transferTxid = await broadcast(transferHex)
-    const tokenId = await utils.getToken(transferTxid)
-    const response = await utils.getTokenResponse(tokenId)
-    expect(response.symbol).to.equal(symbol)
-    expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
-    expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
-    expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
-  })
-
-  it('Transfer - Successful Callback With Fee', async () => {
-
-    const transferHex = transferWithCallback(
-      bobPrivateKey.publicKey,
-      utils.getUtxo(issueTxid, issueTx, 1),
-      bobAddr,
-      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-      fundingPrivateKey.publicKey,
-      bobSignatureCallback,
-      paymentSignatureCallback
-    )
-    const transferTxid = await broadcast(transferHex)
-    const tokenId = await utils.getToken(transferTxid)
-    const response = await utils.getTokenResponse(tokenId)
-    expect(response.symbol).to.equal(symbol)
-    expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
-    expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
-    expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
-  })
-
-  
-  it('Transfer - Successful Callback With No Fee', async () => {
-    
-    const transferHex = transferWithCallback(
-      bobPrivateKey.publicKey,
-      utils.getUtxo(issueTxid, issueTx, 1),
-      bobAddr,
-      null,
-      null,
-      bobSignatureCallback,
-      null 
-      )
-    const transferTxid = await broadcast(transferHex)
-    const tokenId = await utils.getToken(transferTxid)
-    const response = await utils.getTokenResponse(tokenId)
-    expect(response.symbol).to.equal(symbol)
-    expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
-    expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
-    expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
-  })
-
-  it(
-    'Transfer -  Transfer To Issuer Address (Splitable) Throws Error',
-    async () => {
-      const issuerAddr = issuerPrivateKey.toAddress(process.env.NETWORK).toString()
-      const transferHex = transfer(
-        issuerPrivateKey,
-        utils.getUtxo(issueTxid, issueTx, 1),
-        issuerAddr,
-        utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-        fundingPrivateKey
-      )
-      try {
-        await broadcast(transferHex)
-        expect(false).toBeTruthy()
-        return
-      } catch (e) {
-        expect(e).to.be.instanceOf(Error)
-        expect(e.response.data).to.contain('mandatory-script-verify-flag-failed')
-      }
-    }
+it('Transfer - Successful With Fee 2', async () => {
+  const transferHex = transfer(
+    alicePrivateKey,
+    utils.getUtxo(issueTxid, issueTx, 0),
+    bobAddr,
+    utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
+    fundingPrivateKey
   )
 
-  it('Transfer - Invalid Issuer Private Key Throws Error', async () => {
-    const incorrectPK = bsv.PrivateKey()
+  const transferTxid = await broadcast(transferHex)
+  const tokenId = await utils.getToken(transferTxid)
+  await new Promise(r => setTimeout(r, wait))
+  const response = await utils.getTokenResponse(tokenId)
+  expect(response.symbol).to.equal(symbol)
+  expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00007)
+  console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
+  console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(10000)
+})
+
+it('Transfer - Successful With Fee 3', async () => {
+  const davePrivateKey = bsv.PrivateKey()
+  const daveAddr = davePrivateKey.toAddress(process.env.NETWORK).toString()
+  const transferHex = transfer(
+    bobPrivateKey,
+    utils.getUtxo(issueTxid, issueTx, 1),
+    daveAddr,
+    utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
+    fundingPrivateKey
+  )
+  const transferTxid = await broadcast(transferHex)
+  const tokenId = await utils.getToken(transferTxid)
+  await new Promise(r => setTimeout(r, wait))
+  const response = await utils.getTokenResponse(tokenId)
+  expect(response.symbol).to.equal(symbol)
+  expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
+  expect(await utils.getTokenBalance(daveAddr)).to.equal(3000)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+})
+
+it('Transfer - Successful With Fee 4', async () => {
+  const transferHex = transfer(
+    bobPrivateKey,
+    utils.getUtxo(issueTxid, issueTx, 1),
+    bobAddr,
+    utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
+    fundingPrivateKey
+  )
+  const transferTxid = await broadcast(transferHex)
+  const tokenId = await utils.getToken(transferTxid)
+  await new Promise(r => setTimeout(r, wait))
+  const response = await utils.getTokenResponse(tokenId)
+  expect(response.symbol).to.equal(symbol)
+  expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+})
+
+it('Transfer - Successful No Fee', async () => {
+  const transferHex = transfer(
+    bobPrivateKey,
+    utils.getUtxo(issueTxid, issueTx, 1),
+    aliceAddr,
+    null,
+    null
+  )
+  const transferTxid = await broadcast(transferHex)
+  const tokenId = await utils.getToken(transferTxid)
+  await new Promise(r => setTimeout(r, wait))
+  const response = await utils.getTokenResponse(tokenId)
+  expect(response.symbol).to.equal(symbol)
+  expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
+})
+
+it('Transfer - Successful Callback With Fee', async () => {
+  const transferHex = transferWithCallback(
+    bobPrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 1),
+    bobAddr,
+    utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
+    fundingPrivateKey.publicKey,
+    bobSignatureCallback,
+    paymentSignatureCallback
+  )
+  const transferTxid = await broadcast(transferHex)
+  const tokenId = await utils.getToken(transferTxid)
+  await new Promise(r => setTimeout(r, wait))
+  const response = await utils.getTokenResponse(tokenId)
+  expect(response.symbol).to.equal(symbol)
+  expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+})
+
+it('Transfer - Successful Callback With No Fee', async () => {
+  const transferHex = transferWithCallback(
+    bobPrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 1),
+    bobAddr,
+    null,
+    null,
+    bobSignatureCallback,
+    null
+  )
+  const transferTxid = await broadcast(transferHex)
+  const tokenId = await utils.getToken(transferTxid)
+  await new Promise(r => setTimeout(r, wait))
+  const response = await utils.getTokenResponse(tokenId)
+  expect(response.symbol).to.equal(symbol)
+  expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+})
+
+it(
+  'Transfer -  Transfer To Issuer Address (Splitable) Throws Error',
+  async () => {
+    const issuerAddr = issuerPrivateKey.toAddress(process.env.NETWORK).toString()
     const transferHex = transfer(
-      incorrectPK,
+      issuerPrivateKey,
       utils.getUtxo(issueTxid, issueTx, 1),
-      aliceAddr,
+      issuerAddr,
       utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
       fundingPrivateKey
     )
@@ -221,31 +206,71 @@ beforeEach(async () => {
       return
     } catch (e) {
       expect(e).to.be.instanceOf(Error)
-      expect(e.response.data).to.contain('mandatory-script-verify-flag-failed (Script failed an OP_EQUALVERIFY operation)')
+      expect(e.response.data).to.contain('mandatory-script-verify-flag-failed')
     }
-  })
+  }
+)
 
-  it('Transfer - Invalid Funding Private Key Throws Error', async () => {
-    const incorrectPK = bsv.PrivateKey()
-    const transferHex = transfer(
+it('Transfer - Invalid Issuer Private Key Throws Error', async () => {
+  const incorrectPK = bsv.PrivateKey()
+  const transferHex = transfer(
+    incorrectPK,
+    utils.getUtxo(issueTxid, issueTx, 1),
+    aliceAddr,
+    utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
+    fundingPrivateKey
+  )
+  try {
+    await broadcast(transferHex)
+    expect(false).toBeTruthy()
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.response.data).to.contain('mandatory-script-verify-flag-failed (Script failed an OP_EQUALVERIFY operation)')
+  }
+})
+
+it('Transfer - Invalid Funding Private Key Throws Error', async () => {
+  const incorrectPK = bsv.PrivateKey()
+  const transferHex = transfer(
+    bobPrivateKey,
+    utils.getUtxo(issueTxid, issueTx, 1),
+    aliceAddr,
+    utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
+    incorrectPK
+  )
+  try {
+    await broadcast(transferHex)
+    expect(false).toBeTruthy()
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.response.data).to.contain('mandatory-script-verify-flag-failed (Script failed an OP_EQUALVERIFY operation)')
+  }
+})
+
+it('Transfer - Address Validation - Too Few Chars', async () => {
+  const invalidAddr = '1MSCReQT9E4GpxuK1K7uyD5q'
+  try {
+    transfer(
       bobPrivateKey,
       utils.getUtxo(issueTxid, issueTx, 1),
-      aliceAddr,
+      invalidAddr,
       utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-      incorrectPK
+      fundingPrivateKey
     )
-    try {
-      await broadcast(transferHex)
-      expect(false).toBeTruthy()
-      return
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error)
-      expect(e.response.data).to.contain('mandatory-script-verify-flag-failed (Script failed an OP_EQUALVERIFY operation)')
-    }
-  })
+    expect(false).toBeTruthy()
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Invalid destination address')
+  }
+})
 
-  it('Transfer - Address Validation - Too Few Chars', async () => {
-    const invalidAddr = '1MSCReQT9E4GpxuK1K7uyD5q'
+it(
+  'Transfer -  Address Validation - Too Many Chars throws error',
+  async () => {
+    const invalidAddr = '1MSCReQT9E4GpxuK1K7uyD5qF1EmznXjkrmoFCgGtkmhyaL2frwff84p2bwTf3FDpkZcCgGtkmhyaL2frwff84p2bwTf3FDpkZcCgGtkmhy'
     try {
       transfer(
         bobPrivateKey,
@@ -260,40 +285,45 @@ beforeEach(async () => {
       expect(e).to.be.instanceOf(Error)
       expect(e.message).to.eql('Invalid destination address')
     }
-  })
+  }
+)
 
-    it(
-      'Transfer -  Address Validation - Too Many Chars throws error',
-      async () => {
-        const invalidAddr = '1MSCReQT9E4GpxuK1K7uyD5qF1EmznXjkrmoFCgGtkmhyaL2frwff84p2bwTf3FDpkZcCgGtkmhyaL2frwff84p2bwTf3FDpkZcCgGtkmhy'
-        try {
-          transfer(
-            bobPrivateKey,
-            utils.getUtxo(issueTxid, issueTx, 1),
-            invalidAddr,
-            utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-            fundingPrivateKey
-          )
-          expect(false).toBeTruthy()
-          return
-        } catch (e) {
-          expect(e).to.be.instanceOf(Error)
-          expect(e.message).to.eql('Invalid destination address')
-        }
-      }
-    )
+it('Transfer - Incorrect STAS UTXO Amount Throws Error', async () => {
+  const transferHex = transfer(
+    bobPrivateKey,
+    {
+      txid: issueTxid,
+      vout: 1,
+      scriptPubKey: issueTx.vout[1].scriptPubKey.hex,
+      amount: 0.0001
+    },
+    aliceAddr,
+    utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
+    fundingPrivateKey
+  )
+  try {
+    await broadcast(transferHex)
+    expect(false).toBeTruthy()
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.response.data).to.contain('bad-txns-in-belowout')
+  }
+})
 
-  it('Transfer - Incorrect STAS UTXO Amount Throws Error', async () => {
+it(
+  'Transfer - Incorrect Payment UTXO Amount Throws Error',
+  async () => {
     const transferHex = transfer(
       bobPrivateKey,
+      utils.getUtxo(issueTxid, issueTx, 1),
+      aliceAddr,
       {
         txid: issueTxid,
-        vout: 1,
-        scriptPubKey: issueTx.vout[1].scriptPubKey.hex,
-        amount: 0.0001
+        vout: issueOutFundingVout,
+        scriptPubKey: issueTx.vout[issueOutFundingVout].scriptPubKey.hex,
+        amount: 0.01
       },
-      aliceAddr,
-      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
       fundingPrivateKey
     )
     try {
@@ -302,106 +332,81 @@ beforeEach(async () => {
       return
     } catch (e) {
       expect(e).to.be.instanceOf(Error)
-      expect(e.response.data).to.contain('bad-txns-in-belowout')
+      expect(e.response.data).to.contain('mandatory-script-verify-flag-failed (Signature must be zero for failed CHECK(MULTI)SIG operation)')
     }
-  })
+  }
+)
 
-  it(
-    'Transfer - Incorrect Payment UTXO Amount Throws Error',
-    async () => {
-      const transferHex = transfer(
-        bobPrivateKey,
+it(
+  'Transfer - Null Token Owner Private Key Throws Error',
+  async () => {
+    try {
+      transfer(
+        null,
         utils.getUtxo(issueTxid, issueTx, 1),
         aliceAddr,
-        {
-          txid: issueTxid,
-          vout: issueOutFundingVout,
-          scriptPubKey: issueTx.vout[issueOutFundingVout].scriptPubKey.hex,
-          amount: 0.01
-        },
+        utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
         fundingPrivateKey
       )
-      try {
-        await broadcast(transferHex)
-        expect(false).toBeTruthy()
-        return
-      } catch (e) {
-        expect(e).to.be.instanceOf(Error)
-        expect(e.response.data).to.contain('mandatory-script-verify-flag-failed (Signature must be zero for failed CHECK(MULTI)SIG operation)')
-      }
+      expect(false).toBeTruthy()
+      return
+    } catch (e) {
+      expect(e).to.be.instanceOf(Error)
+      expect(e.message).to.eql('Token owner private key is null')
     }
-  )
+  }
+)
 
-    it(
-      'Transfer - Null Token Owner Private Key Throws Error',
-      async () => {
-        try {
-          transfer(
-            null,
-            utils.getUtxo(issueTxid, issueTx, 1),
-            aliceAddr,
-            utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-            fundingPrivateKey
-          )
-          expect(false).toBeTruthy()
-          return
-        } catch (e) {
-          expect(e).to.be.instanceOf(Error)
-          expect(e.message).to.eql('Token owner private key is null')
-        }
-      }
+it('Transfer - Null STAS UTXO Throws Error', async () => {
+  try {
+    transfer(
+      bobPrivateKey,
+      null,
+      aliceAddr,
+      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
+      fundingPrivateKey
     )
+    expect(false).toBeTruthy()
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('stasUtxo is null')
+  }
+})
 
-  it('Transfer - Null STAS UTXO Throws Error', async () => {
-    try {
-      transfer(
-        bobPrivateKey,
-        null,
-        aliceAddr,
-        utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-        fundingPrivateKey
-      )
-      expect(false).toBeTruthy()
-      return
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('stasUtxo is null')
-    }
-  })
+it('Transfer - Null Destination Address Throws Error', async () => {
+  try {
+    transfer(
+      bobPrivateKey,
+      utils.getUtxo(issueTxid, issueTx, 1),
+      null,
+      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
+      fundingPrivateKey
+    )
+    expect(false).toBeTruthy()
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.contains('destination address is null')
+  }
+})
 
-  it('Transfer - Null Destination Address Throws Error', async () => {
-    try {
-      transfer(
-        bobPrivateKey,
-        utils.getUtxo(issueTxid, issueTx, 1),
-        null,
-        utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-        fundingPrivateKey
-      )
-      expect(false).toBeTruthy()
-      return
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.contains('destination address is null')
-    }
-  })
-
-  it('Transfer - Null Funding Private Key Throws Error', async () => {
-    try {
-      transfer(
-        bobPrivateKey,
-        utils.getUtxo(issueTxid, issueTx, 1),
-        aliceAddr,
-        utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-        null
-      )
-      expect(false).toBeTruthy()
-      return
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('Payment UTXO provided but payment key is null')
-    }
-  })
+it('Transfer - Null Funding Private Key Throws Error', async () => {
+  try {
+    transfer(
+      bobPrivateKey,
+      utils.getUtxo(issueTxid, issueTx, 1),
+      aliceAddr,
+      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
+      null
+    )
+    expect(false).toBeTruthy()
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Payment UTXO provided but payment key is null')
+  }
+})
 
 async function setup () {
   issuerPrivateKey = bsv.PrivateKey()
