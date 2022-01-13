@@ -28,6 +28,7 @@ let contractUtxos
 let fundingUtxos
 let publicKeyHash
 let contractTxid
+let contractTx
 
 beforeEach(async () => {
   await setup()
@@ -342,7 +343,7 @@ it('Symbol 1 Byte Data Size Large', async () => {
     {
       addr: aliceAddr,
       satoshis: 10000,
-      data: utils.addData(100)
+      data: utils.addData(48)
     }
   ]
   const issueHex = issue(
@@ -381,15 +382,13 @@ it('Symbol 1 Byte Data Size Large', async () => {
 async function setup () {
   issuerPrivateKey = bsv.PrivateKey()
   fundingPrivateKey = bsv.PrivateKey()
-  bobPrivateKey = bsv.PrivateKey()
   alicePrivateKey = bsv.PrivateKey()
   contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
   fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
   publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
   aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
-  bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
-  supply = 10000
-  schema = utils.schema(publicKeyHash, symbol, supply)
+  const supply = 10000
+  const schema = utils.schema(publicKeyHash, symbol, supply)
 
   const contractHex = contract(
     issuerPrivateKey,
