@@ -29,6 +29,7 @@ let contractTxid
 let issueInfo
 let aliceAddr
 let bobAddr
+let fundingAddress
 let symbol
 
 const issuerSignatureCallback = (tx, i, script, satoshis) => {
@@ -207,6 +208,28 @@ it('Issue - Successful Issue Token To Same Address', async () => {
   expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
   expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
+})
+
+it('Issue - Successful Issue Token To Funding Address', async () => {
+  const issueHex = issue(
+    issuerPrivateKey,
+    utils.getIssueInfo(aliceAddr, 7000, fundingAddress, 3000),
+    utils.getUtxo(contractTxid, contractTx, 0),
+    utils.getUtxo(contractTxid, contractTx, 1),
+    fundingPrivateKey,
+    true,
+    symbol
+  )
+  const issueTxid = await broadcast(issueHex)
+  const tokenId = await utils.getToken(issueTxid)
+  const response = await utils.getTokenResponse(tokenId)
+  expect(response.symbol).to.equal(symbol)
+  expect(response.contract_txs).to.contain(contractTxid)
+  expect(response.issuance_txs).to.contain(issueTxid)
+  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
+  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+  expect(await utils.getTokenBalance(fundingAddress)).to.equal(3000)
 })
 
 it('Issue - Successful Issue Token Non Split', async () => {
@@ -819,6 +842,7 @@ async function setup () {
   publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
   aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
   bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
+  fundingAddress = fundingPrivateKey.toAddress(process.env.NETWORK).toString()
   symbol = 'TAALT'
   const supply = 10000
   const schema = utils.schema(publicKeyHash, symbol, supply)
