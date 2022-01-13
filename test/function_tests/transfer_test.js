@@ -27,6 +27,7 @@ let fundingUtxos
 let publicKeyHash
 let aliceAddr
 let bobAddr
+let fundingAddress
 let symbol
 let issueTxid
 let issueTx
@@ -123,6 +124,25 @@ it('Transfer - Successful With Fee 4', async () => {
   expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+})
+
+it('Transfer - Successful to Funding Address', async () => {
+  const transferHex = transfer(
+    bobPrivateKey,
+    utils.getUtxo(issueTxid, issueTx, 1),
+    fundingAddress,
+    utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
+    fundingPrivateKey
+  )
+  const transferTxid = await broadcast(transferHex)
+  const tokenId = await utils.getToken(transferTxid)
+  await new Promise(r => setTimeout(r, wait))
+  const response = await utils.getTokenResponse(tokenId)
+  expect(response.symbol).to.equal(symbol)
+  expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+  expect(await utils.getTokenBalance(fundingAddress)).to.equal(3000)
 })
 
 it('Transfer - Successful No Fee', async () => {
@@ -415,6 +435,7 @@ async function setup () {
   const schema = utils.schema(publicKeyHash, symbol, supply)
   aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
   bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
+  fundingAddress = fundingPrivateKey.toAddress(process.env.NETWORK).toString()
 
   const contractHex = contract(
     issuerPrivateKey,
