@@ -88,6 +88,10 @@ const {
     tx.sign(issuerPrivateKey)
   }
 
+  console.log('------------')
+  console.log(ownerSignCallback.toString())
+  console.log('------------')
+
   const paymentSignCallback = (tx) => {
     tx.sign(fundingPrivateKey)
   }
