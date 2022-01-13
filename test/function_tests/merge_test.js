@@ -37,13 +37,6 @@ let contractTx
 let issueTx
 let issueTxid
 
-
-const issuerSignatureCallback = (tx, i, script, satoshis) => {
-  return bsv.Transaction.sighash.sign(tx, issuerPrivateKey, sighash, i, script, satoshis)
-}
-const aliceSignatureCallback = (tx, i, script, satoshis) => {
-  return bsv.Transaction.sighash.sign(tx, alicePrivateKey, sighash, i, script, satoshis)
-}
 const bobSignatureCallback = (tx, i, script, satoshis) => {
   return bsv.Transaction.sighash.sign(tx, bobPrivateKey, sighash, i, script, satoshis)
 }
@@ -55,27 +48,26 @@ beforeEach(async () => {
   await setup()
 })
 
-  it('Merge - Successful Merge With Fee', async () => {
-    const mergeHex = merge(
-      bobPrivateKey,
-      utils.getMergeUtxo(splitTxObj),
-      aliceAddr,
-      utils.getUtxo(splitTxid, splitTx, 2),
-      fundingPrivateKey
-    )
-    const mergeTxid = await broadcast(mergeHex)
-    const tokenIdMerge = await utils.getToken(mergeTxid)
-    const response = await utils.getTokenResponse(tokenIdMerge)
-    expect(response.symbol).to.equal('TAALT')
-    expect(response.contract_txs).to.contain(contractTxid)
-    expect(response.issuance_txs).to.contain(issueTxid)
-    expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007)
-    console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
-    console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
-    expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
-    expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
-  })
-
+it('Merge - Successful Merge With Fee', async () => {
+  const mergeHex = merge(
+    bobPrivateKey,
+    utils.getMergeUtxo(splitTxObj),
+    aliceAddr,
+    utils.getUtxo(splitTxid, splitTx, 2),
+    fundingPrivateKey
+  )
+  const mergeTxid = await broadcast(mergeHex)
+  const tokenIdMerge = await utils.getToken(mergeTxid)
+  const response = await utils.getTokenResponse(tokenIdMerge)
+  expect(response.symbol).to.equal('TAALT')
+  expect(response.contract_txs).to.contain(contractTxid)
+  expect(response.issuance_txs).to.contain(issueTxid)
+  expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007)
+  console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
+  console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+})
 
 it('Merge - Successful Merge With Fee 2', async () => {
   const mergeHex = merge(
@@ -120,7 +112,6 @@ it('Merge - Merge With No Fee', async () => {
 })
 
 it('Merge - Successful Merge With Callback And Fee', async () => {
-
   const mergeHex = mergeWithCallback(
     bobPrivateKey.publicKey,
     utils.getMergeUtxo(splitTxObj),
@@ -144,7 +135,6 @@ it('Merge - Successful Merge With Callback And Fee', async () => {
 })
 
 it('Merge - Successful Merge With Callback And No Fee', async () => {
-
   const mergeHex = mergeWithCallback(
     bobPrivateKey.publicKey,
     utils.getMergeUtxo(splitTxObj),
@@ -153,7 +143,7 @@ it('Merge - Successful Merge With Callback And No Fee', async () => {
     null,
     bobSignatureCallback,
     null
-    )
+  )
   const mergeTxid = await broadcast(mergeHex)
   const tokenIdMerge = await utils.getToken(mergeTxid)
   const response = await utils.getTokenResponse(tokenIdMerge)
@@ -353,7 +343,7 @@ it('Merge - Null Funding Private Key Throws Error', async () => {
   }
 })
 
-async function setup() {
+async function setup () {
   issuerPrivateKey = bsv.PrivateKey()
   fundingPrivateKey = bsv.PrivateKey()
   bobPrivateKey = bsv.PrivateKey()

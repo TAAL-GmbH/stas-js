@@ -1,4 +1,4 @@
-const expect = require("chai").expect
+const expect = require('chai').expect
 const utils = require('../utils/test_utils')
 const bsv = require('bsv')
 require('dotenv').config()
@@ -17,11 +17,8 @@ const {
   broadcast
 } = require('../../index').utils
 
-
 describe('regression, testnet', () => {
-  
-  it("Full Life Cycle Test NFT 3", async () => {
-
+  it('Full Life Cycle Test NFT 3', async () => {
     const issuerPrivateKey = bsv.PrivateKey()
     const fundingPrivateKey = bsv.PrivateKey()
     const alicePrivateKey = bsv.PrivateKey()
@@ -47,7 +44,7 @@ describe('regression, testnet', () => {
     const contractTxid = await broadcast(contractHex)
     console.log(`Contract TX:     ${contractTxid}`)
     const contractTx = await getTransaction(contractTxid)
-    let amount = await utils.getVoutAmount(contractTxid, 0)
+    const amount = await utils.getVoutAmount(contractTxid, 0)
     expect(amount).to.equal(supply / 100000000)
 
     let issueHex
@@ -70,7 +67,7 @@ describe('regression, testnet', () => {
     console.log(`Issue TX:        ${issueTxid}`)
     const issueTx = await getTransaction(issueTxid)
     const tokenId = await utils.getToken(issueTxid)
-    let response = await utils.getTokenResponse(tokenId)
+    const response = await utils.getTokenResponse(tokenId)
     expect(response.symbol).to.equal(symbol)
     expect(response.contract_txs).to.contain(contractTxid)
     expect(response.issuance_txs).to.contain(issueTxid)
@@ -130,6 +127,5 @@ describe('regression, testnet', () => {
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00003)
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
     expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
-
   })
 })

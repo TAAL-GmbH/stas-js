@@ -27,8 +27,8 @@ const alicePrivateKey = bsv.PrivateKey()
 const symbol = 'TAALT'
 const supply = 10000
 
-aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
-bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
+const aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
+const bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
 
 // We create contract with incorrect public key hash
 beforeEach(async () => {

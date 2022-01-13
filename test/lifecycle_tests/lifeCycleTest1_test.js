@@ -20,9 +20,7 @@ const {
   SATS_PER_BITCOIN
 } = require('../../index').utils
 
-
 describe('regression, testnet', () => {
-
   it('Full Life Cycle Test 1', async () => {
     const issuerPrivateKey = bsv.PrivateKey()
     const fundingPrivateKey = bsv.PrivateKey()
@@ -41,10 +39,7 @@ describe('regression, testnet', () => {
     const symbol = 'TAALT'
     const schema = utils.schema(publicKeyHash, symbol, supply)
 
-    console.log('Alice  ' + aliceAddr)
-    console.log('Bob  ' + bobAddr)
-
-    const wait = 0 //set wait before token balance check
+    const wait = 0 // set wait before token balance check
 
     // change goes back to the fundingPrivateKey
     const contractHex = contract(
@@ -96,7 +91,7 @@ describe('regression, testnet', () => {
     const transferTxid = await broadcast(transferHex)
     console.log(`Transfer TX:     ${transferTxid}`)
     const transferTx = await getTransaction(transferTxid)
-    await new Promise(r => setTimeout(r, wait));
+    await new Promise(r => setTimeout(r, wait))
 
     expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
@@ -123,7 +118,7 @@ describe('regression, testnet', () => {
     const splitTxid = await broadcast(splitHex)
     console.log(`Split TX:        ${splitTxid}`)
     const splitTx = await getTransaction(splitTxid)
-    await new Promise(r => setTimeout(r, wait));
+    await new Promise(r => setTimeout(r, wait))
     expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000015)
     expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000015)
     console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
@@ -145,10 +140,10 @@ describe('regression, testnet', () => {
     const mergeTxid = await broadcast(mergeHex)
     console.log(`Merge TX:        ${mergeTxid}`)
     const mergeTx = await getTransaction(mergeTxid)
-    await new Promise(r => setTimeout(r, wait));
+    await new Promise(r => setTimeout(r, wait))
     expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00003)
     const tokenIdMerge = await utils.getToken(mergeTxid)
-    let responseMerge = await utils.getTokenResponse(tokenIdMerge)
+    const responseMerge = await utils.getTokenResponse(tokenIdMerge)
     expect(responseMerge.symbol).to.equal(symbol)
     expect(responseMerge.contract_txs).to.contain(contractTxid)
     expect(responseMerge.issuance_txs).to.contain(issueTxid)
@@ -174,14 +169,13 @@ describe('regression, testnet', () => {
     const splitTxid2 = await broadcast(splitHex2)
     console.log(`Split TX2:       ${splitTxid2}`)
     const splitTx2 = await getTransaction(splitTxid2)
-    await new Promise(r => setTimeout(r, wait));
+    await new Promise(r => setTimeout(r, wait))
     expect(await utils.getVoutAmount(splitTxid2, 0)).to.equal(0.000015)
     expect(await utils.getVoutAmount(splitTxid2, 1)).to.equal(0.000015)
     console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
     console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
     expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
-
 
     // Now mergeSplit
     const splitTxObj2 = new bsv.Transaction(splitHex2)
@@ -203,7 +197,7 @@ describe('regression, testnet', () => {
     const mergeSplitTxid = await broadcast(mergeSplitHex)
     console.log(`MergeSplit TX:   ${mergeSplitTxid}`)
     const mergeSplitTx = await getTransaction(mergeSplitTxid)
-    await new Promise(r => setTimeout(r, wait));
+    await new Promise(r => setTimeout(r, wait))
     expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075)
     expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
     console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
@@ -221,7 +215,7 @@ describe('regression, testnet', () => {
     )
     const redeemTxid = await broadcast(redeemHex)
     console.log(`Redeem TX:       ${redeemTxid}`)
-    await new Promise(r => setTimeout(r, wait));
+    await new Promise(r => setTimeout(r, wait))
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.0000075)
     console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
     console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))

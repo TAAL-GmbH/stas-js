@@ -48,7 +48,6 @@ console.log('addr4  ' + addr3)
 
 describe('regression, testnet', () => {
   it('Full Life Cycle Test With 10 Issuance Addresses', async () => {
-
     const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
     const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
     const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
@@ -88,7 +87,7 @@ describe('regression, testnet', () => {
     expect(response.contract_txs).to.contain(contractTxid)
     expect(response.issuance_txs).to.contain(issueTxid)
 
-    let addrArray = [addr1, addr2, addr3, addr4, addr5, addr6, addr7, addr8, addr9, addr10]
+    const addrArray = [addr1, addr2, addr3, addr4, addr5, addr6, addr7, addr8, addr9, addr10]
     for (let i = 1; i < 10; i++) {
       expect(await utils.getVoutAmount(issueTxid, i)).to.equal(0.00001)
       expect(await utils.getTokenBalance(addrArray[i])).to.equal(1000)
@@ -150,7 +149,7 @@ describe('regression, testnet', () => {
     const mergeTx = await getTransaction(mergeTxid)
     expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00001)
     const tokenIdMerge = await utils.getToken(issueTxid)
-    let responseMerge = await utils.getTokenResponse(tokenIdMerge)
+    const responseMerge = await utils.getTokenResponse(tokenIdMerge)
     expect(responseMerge.symbol).to.equal(symbol)
     expect(responseMerge.contract_txs).to.contain(contractTxid)
     expect(responseMerge.issuance_txs).to.contain(issueTxid)
@@ -180,6 +179,8 @@ describe('regression, testnet', () => {
     expect(await utils.getVoutAmount(splitTxid2, 1)).to.equal(0.000005)
     console.log('addr3 Balance ' + (await utils.getTokenBalance(addr3)))
     console.log('addr5 Balance ' + (await utils.getTokenBalance(addr5)))
+    expect(await utils.getTokenBalance(addr3)).to.equal(1000)
+    expect(await utils.getTokenBalance(addr5)).to.equal(2000)
 
     // Now mergeSplit
     const splitTxObj2 = new bsv.Transaction(splitHex2)
@@ -206,6 +207,9 @@ describe('regression, testnet', () => {
     console.log('addr5 Balance ' + (await utils.getTokenBalance(addr5)))
     console.log('addr6 Balance ' + (await utils.getTokenBalance(addr6)))
     console.log('addr6 Balance ' + (await utils.getTokenBalance(addr7)))
+    expect(await utils.getTokenBalance(addr5)).to.equal(1000)
+    expect(await utils.getTokenBalance(addr6)).to.equal(1250)
+    expect(await utils.getTokenBalance(addr7)).to.equal(1750)
 
     // Alice wants to redeem the money from bob...
     const redeemHex = redeem(
@@ -220,60 +224,63 @@ describe('regression, testnet', () => {
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.0000025)
     console.log('addr6 Balance ' + (await utils.getTokenBalance(addr6)))
     console.log('addr7 Balance ' + (await utils.getTokenBalance(addr7)))
+    expect(await utils.getTokenBalance(addr6)).to.equal(1000)
+    expect(await utils.getTokenBalance(addr7)).to.equal(1750)
   })
 })
 
-  function get10IssueAddresses() {
-    return issueInfo = [
-      {
-        addr: addr1,
-        satoshis: 1000,
-        data: '1_data'
-      },
-      {
-        addr: addr2,
-        satoshis: 1000,
-        data: '2_data'
-      },
-      {
-        addr: addr3,
-        satoshis: 1000,
-        data: '3_data'
-      },
-      {
-        addr: addr4,
-        satoshis: 1000,
-        data: '4_data'
-      },
-      {
-        addr: addr5,
-        satoshis: 1000,
-        data: '5_data'
-      },
-      {
-        addr: addr6,
-        satoshis: 1000,
-        data: '6_data'
-      },
-      {
-        addr: addr7,
-        satoshis: 1000,
-        data: '7_data'
-      },
-      {
-        addr: addr8,
-        satoshis: 1000,
-        data: '8_data'
-      },
-      {
-        addr: addr9,
-        satoshis: 1000,
-        data: '9_data'
-      },
-      {
-        addr: addr10,
-        satoshis: 1000,
-        data: '10_data'
-      }
-    ]
-  }
+function get10IssueAddresses () {
+  const issueInfo = [
+    {
+      addr: addr1,
+      satoshis: 1000,
+      data: '1_data'
+    },
+    {
+      addr: addr2,
+      satoshis: 1000,
+      data: '2_data'
+    },
+    {
+      addr: addr3,
+      satoshis: 1000,
+      data: '3_data'
+    },
+    {
+      addr: addr4,
+      satoshis: 1000,
+      data: '4_data'
+    },
+    {
+      addr: addr5,
+      satoshis: 1000,
+      data: '5_data'
+    },
+    {
+      addr: addr6,
+      satoshis: 1000,
+      data: '6_data'
+    },
+    {
+      addr: addr7,
+      satoshis: 1000,
+      data: '7_data'
+    },
+    {
+      addr: addr8,
+      satoshis: 1000,
+      data: '8_data'
+    },
+    {
+      addr: addr9,
+      satoshis: 1000,
+      data: '9_data'
+    },
+    {
+      addr: addr10,
+      satoshis: 1000,
+      data: '10_data'
+    }
+  ]
+  return issueInfo
+}

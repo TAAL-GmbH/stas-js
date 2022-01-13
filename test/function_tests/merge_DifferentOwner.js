@@ -1,4 +1,4 @@
-const expect = require("chai").expect
+const expect = require('chai').expect
 const utils = require('../utils/test_utils')
 const chai = require('chai')
 const bsv = require('bsv')
@@ -27,19 +27,16 @@ const bobPrivateKey = bsv.PrivateKey()
 const bobAddr = bobPrivateKey.toAddress().toString()
 const supply = 10000
 const symbol = 'TAALT'
-var splitTxid
-var splitTx
+let splitTxid
+let splitTx
 
-
-it("Attempt To Merge Token with Different Owners Via SDK Throws Error",
+it('Attempt To Merge Token with Different Owners Via SDK Throws Error',
   async () => {
-
-
     const validSplitTxObj = await validToken()
     const invalidSplitTxObj = await invalidToken()
 
     try {
-      const mergeHex = merge(
+      merge(
         bobPrivateKey,
         issuerPrivateKey.publicKey,
         [{
@@ -67,13 +64,10 @@ it("Attempt To Merge Token with Different Owners Via SDK Throws Error",
 )
 
 it(
-  "Attempt To Merge Token with Different Owners Without SDK Validation Throws Error",
+  'Attempt To Merge Token with Different Owners Without SDK Validation Throws Error',
   async () => {
-
-
     const validSplitTxObj = await validToken()
     const invalidSplitTxObj = await invalidToken()
-
 
     const mergeHex = mergeUtil.mergeWithoutValidation(
       bobPrivateKey,
@@ -104,14 +98,12 @@ it(
   }
 )
 
-
-async function validToken() {
-
+async function validToken () {
   const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
   const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
   const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
 
-  schema = utils.schema(publicKeyHash, symbol, supply)
+  const schema = utils.schema(publicKeyHash, symbol, supply)
 
   // change goes back to the fundingPrivateKey
   const contractHex = contract(
@@ -222,13 +214,9 @@ async function validToken() {
   // Now let's merge the last split back together
   const splitTxObj = new bsv.Transaction(splitHex)
   return splitTxObj
-
 }
 
-
-
-async function invalidToken() {
-
+async function invalidToken () {
   const issuerPrivateKey = bsv.PrivateKey()
   const newPk = bsv.PrivateKey()
 
@@ -237,7 +225,7 @@ async function invalidToken() {
 
   const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(newPk.publicKey.toBuffer()).toString('hex')
 
-  schema = utils.schema(publicKeyHash, symbol, supply)
+  const schema = utils.schema(publicKeyHash, symbol, supply)
 
   // change goes back to the fundingPrivateKey
   const contractHex = contract(
@@ -343,7 +331,7 @@ async function invalidToken() {
   )
   const splitTxid = await broadcast(splitHex)
   console.log(`Invalid Split TX:        ${splitTxid}`)
-  const splitTx = await getTransaction(splitTxid)
+  await getTransaction(splitTxid)
 
   // Now let's merge the last split back together
   const splitTxObj = new bsv.Transaction(splitHex)

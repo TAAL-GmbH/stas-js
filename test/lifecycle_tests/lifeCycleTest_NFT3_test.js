@@ -1,4 +1,4 @@
-const expect = require("chai").expect
+const expect = require('chai').expect
 const utils = require('../utils/test_utils')
 const bsv = require('bsv')
 require('dotenv').config()
@@ -17,11 +17,8 @@ const {
   broadcast
 } = require('../../index').utils
 
-
 describe('regression, testnet', () => {
-
-  it("Full Life Cycle Test NFT 3", async () => {
-
+  it('Full Life Cycle Test NFT 3', async () => {
     const issuerPrivateKey = bsv.PrivateKey()
     const fundingPrivateKey = bsv.PrivateKey()
     const alicePrivateKey = bsv.PrivateKey()
@@ -37,7 +34,8 @@ describe('regression, testnet', () => {
     const satsPerSupply = 1000
     const symbol = 'TAALT'
 
-    const schema = schemaSatsPerToken(publicKeyHash, symbol, supply, satsPerSupply)
+    const schema = utils.schema(publicKeyHash, symbol, supply)
+    schema.satsPerSupply = satsPerSupply
 
     const contractHex = contract(
       issuerPrivateKey,
@@ -50,7 +48,7 @@ describe('regression, testnet', () => {
     const contractTxid = await broadcast(contractHex)
     console.log(`Contract TX:     ${contractTxid}`)
     const contractTx = await getTransaction(contractTxid)
-    let amount = await utils.getVoutAmount(contractTxid, 0)
+    const amount = await utils.getVoutAmount(contractTxid, 0)
     expect(amount).to.equal(supply / 100000000)
 
     const issueInfo = [
@@ -91,7 +89,7 @@ describe('regression, testnet', () => {
     console.log(`Issue TX:        ${issueTxid}`)
     const issueTx = await getTransaction(issueTxid)
     const tokenId = await utils.getToken(issueTxid)
-    let response = await utils.getTokenResponse(tokenId)
+    const response = await utils.getTokenResponse(tokenId)
     expect(response.symbol).to.equal(symbol)
     expect(response.contract_txs).to.contain(contractTxid)
     expect(response.issuance_txs).to.contain(issueTxid)
@@ -159,43 +157,3 @@ describe('regression, testnet', () => {
     expect(await utils.getTokenBalance(daveAddr)).to.equal(2000)
   })
 })
-
-function schemaSatsPerToken(publicKeyHash, symbol, supply, satsPerToken) {
-
-  return schema = {
-    name: 'Taal Token',
-    tokenId: `${publicKeyHash}`,
-    protocolId: 'To be decided',
-    symbol: symbol,
-    description: 'Example token on private Taalnet',
-    image: 'https://www.taal.com/wp-content/themes/taal_v2/img/favicon/favicon-96x96.png',
-    totalSupply: supply,
-    decimals: 0,
-    satsPerToken: satsPerToken,
-    properties: {
-      legal: {
-        terms: '© 2020 TAAL TECHNOLOGIES SEZC\nALL RIGHTS RESERVED. ANY USE OF THIS SOFTWARE IS SUBJECT TO TERMS AND CONDITIONS OF LICENSE. USE OF THIS SOFTWARE WITHOUT LICENSE CONSTITUTES INFRINGEMENT OF INTELLECTUAL PROPERTY. FOR LICENSE DETAILS OF THE SOFTWARE, PLEASE REFER TO: www.taal.com/stas-token-license-agreement',
-        licenceId: '1234'
-      },
-      issuer: {
-        organisation: 'Taal Technologies SEZC',
-        legalForm: 'Limited Liability Public Company',
-        governingLaw: 'CA',
-        mailingAddress: '1 Volcano Stret, Canada',
-        issuerCountry: 'CYM',
-        jurisdiction: '',
-        email: 'info@taal.com'
-      },
-      meta: {
-        schemaId: 'token1',
-        website: 'https://taal.com',
-        legal: {
-          terms: 'blah blah'
-        },
-        media: {
-          type: 'mp4'
-        }
-      }
-    }
-  }
-}

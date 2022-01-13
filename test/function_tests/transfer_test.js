@@ -34,12 +34,6 @@ let issueOutFundingVout
 
 const wait = 5000
 
-const issuerSignatureCallback = (tx, i, script, satoshis) => {
-  return bsv.Transaction.sighash.sign(tx, issuerPrivateKey, sighash, i, script, satoshis)
-}
-const aliceSignatureCallback = (tx, i, script, satoshis) => {
-  return bsv.Transaction.sighash.sign(tx, alicePrivateKey, sighash, i, script, satoshis)
-}
 const bobSignatureCallback = (tx, i, script, satoshis) => {
   return bsv.Transaction.sighash.sign(tx, bobPrivateKey, sighash, i, script, satoshis)
 }

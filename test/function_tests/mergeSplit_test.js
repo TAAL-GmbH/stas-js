@@ -262,35 +262,6 @@ it('MergeSplit - Incorrect Payments Private Key Throws Error',
   }
 )
 
-it('MergeSplit - Incorrect Contract Public Key Throws Error',
-  async () => {
-    await setup() // contract, issue, transfer then split
-
-    const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
-    const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
-    const incorrectPrivateKey = bsv.PrivateKey()
-
-    const mergeSplitHex = mergeSplit(
-      issuerPrivateKey,
-      utils.getMergeSplitUtxo(splitTxObj, splitTx),
-      aliceAddr,
-      aliceAmountSatoshis,
-      bobAddr,
-      bobAmountSatoshis,
-      utils.getUtxo(splitTxid, splitTx, 2),
-      fundingPrivateKey
-    )
-    try {
-      await broadcast(mergeSplitHex)
-      expect(false).toBeTruthy()
-      return
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error)
-      expect(e.response.data).to.contain('mandatory-script-verify-flag-failed (Script failed an OP_EQUALVERIFY operation)')
-    }
-  }
-)
-
 it('MergeSplit - Attempt to MergeSplit More Than Two Tokens Throws Error',
   async () => {
     await setup() // contract, issue, transfer then split

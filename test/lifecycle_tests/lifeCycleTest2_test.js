@@ -1,4 +1,4 @@
-const expect = require("chai").expect
+const expect = require('chai').expect
 const utils = require('../utils/test_utils')
 const bsv = require('bsv')
 require('dotenv').config()
@@ -21,10 +21,8 @@ const {
 } = require('../../index').utils
 
 describe('regression, testnet', () => {
-
-  //Life Cycle Test with different supply
-  it("Full Life Cycle Test With More Supply", async () => {
-
+  // Life Cycle Test with different supply
+  it('Full Life Cycle Test With More Supply', async () => {
     const issuerPrivateKey = bsv.PrivateKey()
     const fundingPrivateKey = bsv.PrivateKey()
     const alicePrivateKey = bsv.PrivateKey()
@@ -51,7 +49,7 @@ describe('regression, testnet', () => {
     const contractTxid = await broadcast(contractHex)
     console.log(`Contract TX:     ${contractTxid}`)
     const contractTx = await getTransaction(contractTxid)
-    let amount = await utils.getVoutAmount(contractTxid, 0)
+    const amount = await utils.getVoutAmount(contractTxid, 0)
     expect(amount).to.equal(supply / 100000000)
 
     let issueHex
@@ -74,15 +72,14 @@ describe('regression, testnet', () => {
     console.log(`Issue TX:        ${issueTxid}`)
     const issueTx = await getTransaction(issueTxid)
     const tokenId = await utils.getToken(issueTxid)
-    let response = await utils.getTokenResponse(tokenId)
-    expect(response.symbol).to.equal(symbol)  //token issuance failing
+    const response = await utils.getTokenResponse(tokenId)
+    expect(response.symbol).to.equal(symbol) // token issuance failing
     expect(response.contract_txs).to.contain(contractTxid)
     expect(response.issuance_txs).to.contain(issueTxid)
     expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.004)
     expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.001)
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(400000)
     expect(await utils.getTokenBalance(bobAddr)).to.equal(100000)
-
 
     const issueOutFundingVout = issueTx.vout.length - 1
 
@@ -99,7 +96,6 @@ describe('regression, testnet', () => {
     expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.001)
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(500000)
     expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
-
 
     // Split tokens into 2 - both payable to Bob...
     const bobAmount1 = transferTx.vout[0].value / 2
@@ -118,7 +114,7 @@ describe('regression, testnet', () => {
     const splitTxid = await broadcast(splitHex)
     console.log(`Split TX:        ${splitTxid}`)
     const splitTx = await getTransaction(splitTxid)
-    await new Promise(r => setTimeout(r, 5000));
+    await new Promise(r => setTimeout(r, 5000))
     expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.0005)
     expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.0005)
     console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
@@ -142,7 +138,7 @@ describe('regression, testnet', () => {
     const mergeTx = await getTransaction(mergeTxid)
     expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.001)
     const tokenIdMerge = await utils.getToken(issueTxid)
-    let responseMerge = await utils.getTokenResponse(tokenIdMerge)
+    const responseMerge = await utils.getTokenResponse(tokenIdMerge)
     expect(responseMerge.symbol).to.equal(symbol)
     expect(responseMerge.contract_txs).to.contain(contractTxid)
     expect(responseMerge.issuance_txs).to.contain(issueTxid)
@@ -200,7 +196,6 @@ describe('regression, testnet', () => {
     console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(425000)
     expect(await utils.getTokenBalance(bobAddr)).to.equal(75000)
-
 
     // Alice wants to redeem the money from bob...
     const redeemHex = redeem(

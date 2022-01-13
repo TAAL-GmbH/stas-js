@@ -51,7 +51,7 @@ beforeEach(async function () {
   await setup()
 })
 
-describe('atomic swap', function () {
+describe('atomic swap failing - when token B sats are set to > 2k the broadcast fails with (Signature must be zero for failed CHECK(MULTI)SIG operation)', function () {
   // swap two STAS tokens
   it('Swap - 3 step token-token swap', async function () {
     const takerStasInputScriptHex = tokenAObj.outputs[0].script.toHex()
