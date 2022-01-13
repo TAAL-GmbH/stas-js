@@ -446,6 +446,24 @@ it(
   }
 )
 
+it.only('Contract - Payment Utxo With Null Payment Private Key Throws Error', async () => {
+  try {
+    contract(
+      issuerPrivateKey,
+      contractUtxos,
+      fundingUtxos,
+      null,
+      schema,
+      supply
+    )
+    expect(false).toBeTruthy()
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Payment UTXOs provided but payment public key or paymentSignCallback is null')
+  }
+})
+
 it('Contract - Null Symbol In Schema Throws Error', async () => {
   try {
     schema.symbol = null

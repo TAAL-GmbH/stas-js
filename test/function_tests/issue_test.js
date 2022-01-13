@@ -238,7 +238,7 @@ it('Issue - Issue to Issuer Address', async () => {
     utils.getIssueInfo(issuerAddr, 7000, bobAddr, 3000),
     utils.getUtxo(contractTxid, contractTx, 0),
     utils.getUtxo(contractTxid, contractTx, 1),
-    fundingPrivateKey,
+    null,
     false,
     symbol
   )
