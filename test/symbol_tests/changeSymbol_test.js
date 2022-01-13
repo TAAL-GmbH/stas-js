@@ -12,13 +12,11 @@ const {
 const {
   getTransaction,
   getFundsFromFaucet,
-  broadcast,
+  broadcast
 } = require('../../index').utils
 
 describe('regression, testnet', () => {
-
   it('Changed Symbol in issue functions', async () => {
-
     const issuerPrivateKey = bsv.PrivateKey()
     const fundingPrivateKey = bsv.PrivateKey()
 
@@ -55,7 +53,7 @@ describe('regression, testnet', () => {
         utils.getUtxo(contractTxid, contractTx, 1),
         fundingPrivateKey,
         true,
-        'wrong_symbol',  // symbol changed
+        'wrong_symbol', // symbol changed
         2
       )
       assert(false)

@@ -16,7 +16,6 @@ const {
 } = require('../../index').utils
 
 describe('regression, testnet', () => {
-
   it('Symbol Special Char Test 1', async () => {
     const issuerPrivateKey = bsv.PrivateKey()
     const fundingPrivateKey = bsv.PrivateKey()
@@ -73,9 +72,7 @@ describe('regression, testnet', () => {
     expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
   })
 
-
   it('Symbol Special Char Test 2', async () => {
-
     const issuerPrivateKey = bsv.PrivateKey()
     const fundingPrivateKey = bsv.PrivateKey()
 
@@ -119,7 +116,7 @@ describe('regression, testnet', () => {
     const issueTx = await getTransaction(issueTxid)
     const tokenId = await utils.getToken(issueTxid)
     console.log(`Token ID:        ${tokenId}`)
-    const response = await utils.getTokenResponse(tokenId) 
+    const response = await utils.getTokenResponse(tokenId)
     expect(response.symbol).to.equal(symbol)
     expect(response.contract_txs).to.contain(contractTxid)
     expect(response.issuance_txs).to.contain(issueTxid)
