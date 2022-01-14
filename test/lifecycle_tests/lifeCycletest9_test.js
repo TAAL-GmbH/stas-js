@@ -20,15 +20,13 @@ const {
   SATS_PER_BITCOIN
 } = require('../../index').utils
 
-
 describe('regression, testnet', () => {
-//ongoing - need to merge funding utxos 
+// ongoing - need to merge funding utxos
   it(
     'Full Life Cycle Test 10 - Issuance with 10mb of data',
     async () => {
-
       const wait = 5000 // slight delay on token issuance due to size of tx
-      
+
       const issuerPrivateKey = bsv.PrivateKey()
       const fundingPrivateKey = bsv.PrivateKey()
 
@@ -72,7 +70,7 @@ describe('regression, testnet', () => {
         {
           addr: bobAddr,
           satoshis: 3000,
-          data: "two"
+          data: 'two'
         }
       ]
 
@@ -162,17 +160,17 @@ describe('regression, testnet', () => {
           txid: fundingUtxos2[0].txid,
           vout: 1,
           scriptPubKey: fundingUtxos2[0].scriptPubKey,
-          amount:fundingUtxos2[0].amount
+          amount: fundingUtxos2[0].amount
         },
         fundingPrivateKey
       )
-  console.log(mergeHex)
+      console.log(mergeHex)
       const mergeTxid = await broadcast(mergeHex)
       console.log(`Merge TX:        ${mergeTxid}`)
       const mergeTx = await getTransaction(mergeTxid)
       expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00003)
       const tokenIdMerge = await utils.getToken(mergeTxid)
-      let responseMerge = await utils.getTokenResponse(tokenIdMerge)
+      const responseMerge = await utils.getTokenResponse(tokenIdMerge)
       expect(responseMerge.symbol).to.equal(symbol)
       expect(responseMerge.contract_txs).to.contain(contractTxid)
       expect(responseMerge.issuance_txs).to.contain(issueTxid)
@@ -204,7 +202,6 @@ describe('regression, testnet', () => {
       console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
       expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
       expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
-
 
       // Now mergeSplit
       const splitTxObj2 = new bsv.Transaction(splitHex2)
