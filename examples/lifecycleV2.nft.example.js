@@ -6,13 +6,13 @@ const {
   issue,
   transfer,
   split
-} = require('./index')
+} = require('../index')
 
 const {
   getTransaction,
   getFundsFromFaucet,
   broadcast
-} = require('./index').utils
+} = require('../index').utils
 
 ;(async () => {
   const issuerPrivateKey = bsv.PrivateKey()

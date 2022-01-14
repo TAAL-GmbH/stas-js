@@ -10,14 +10,14 @@ const {
   mergeSplit,
   redeem,
   redeemSplit
-} = require('./index')
+} = require('../index')
 
 const {
   getTransaction,
   getFundsFromFaucet,
   broadcast,
   SATS_PER_BITCOIN
-} = require('./index').utils
+} = require('../index').utils
 
 ;(async () => {
   const issuerPrivateKey = bsv.PrivateKey()

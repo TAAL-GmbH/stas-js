@@ -9,16 +9,16 @@ const {
   mergeWithCallback,
   mergeSplitWithCallback,
   redeemWithCallback
-} = require('./index')
+} = require('../index')
 
-const { sighash } = require('./lib/stas')
+const { sighash } = require('../lib/stas')
 
 const {
   getTransaction,
   getFundsFromFaucet,
   broadcast,
   SATS_PER_BITCOIN
-} = require('./index').utils
+} = require('../index').utils
 
 ;(async () => {
   const issuerPrivateKey = bsv.PrivateKey()

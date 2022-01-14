@@ -8,14 +8,14 @@ const {
   // merge,
   // mergeSplit,
   // redeem
-} = require('./index')
+} = require('../index')
 
 const {
   getTransaction,
   getFundsFromFaucet,
   broadcast
   // SATS_PER_BITCOIN
-} = require('./index').utils
+} = require('../index').utils
 
 ;(async () => {
   // use an explicit private key
