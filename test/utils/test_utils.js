@@ -403,16 +403,16 @@ async function getUtxoMainNet (address, forContract) {
   })
   const array = []
   if (forContract) {
-    for (var key in response.data) {
-      if (response.data[key].value == 1505139) {
+    for (const key in response.data) {
+      if (response.data[key].value === 1505139) {
         array.push(response.data[key].tx_hash)
         array.push(response.data[key].tx_pos)
         break
       }
     }
   } else {
-    for (var key in response.data) {
-      if (response.data[key].value == 1495253) {
+    for (const key in response.data) {
+      if (response.data[key].value === 1495253) {
         //  if ((response.data[key].value > 900000) && (response.data[key].value < 1300000)) {
         array.push(response.data[key].tx_hash)
         array.push(response.data[key].tx_pos)
@@ -425,10 +425,10 @@ async function getUtxoMainNet (address, forContract) {
 }
 
 async function setupMainNetTest (address, wait, valueOfSats) {
-  rsp = await getUnspentMainNet(address)
+  const rsp = await getUnspentMainNet(address)
   const array = []
-  for (var key in rsp.data) {
-    if (rsp.data[key].value == valueOfSats) {
+  for (const key in rsp.data) {
+    if (rsp.data[key].value === valueOfSats) {
       array.push(rsp.data[key].tx_hash)
       array.push(rsp.data[key].tx_pos)
       array.push(rsp.data[key].value)
@@ -461,23 +461,23 @@ async function setupMainNetTest (address, wait, valueOfSats) {
   console.log(transaction.toString()) // if broadcast fails goto 'https://whatsonchain.com/broadcast' and put in tx hex to check error
 
   const txid = await broadcastMapi(transaction.toString())
-  await new Promise(r => setTimeout(r, wait))
+  await new Promise(resolve => setTimeout(resolve, wait))
   const tx = await getTransactionMainNet(txid)
   console.log(Math.round(tx.vout[0].value * SATS_PER_BITCOIN))
 
-  response2 = await getUnspentMainNet(address)
+  const response2 = await getUnspentMainNet(address)
 
   const responseArray = []
-  for (var key in response2.data) {
-    if (response2.data[key].value == Math.round(tx.vout[0].value * SATS_PER_BITCOIN)) {
+  for (const key in response2.data) {
+    if (response2.data[key].value === Math.round(tx.vout[0].value * SATS_PER_BITCOIN)) {
       responseArray.push(response2.data[key].tx_hash)
       responseArray.push(response2.data[key].tx_pos)
       break
     }
   }
 
-  response3 = await getUnspentMainNet(address)
-  for (var key in response3.data) {
+  const response3 = await getUnspentMainNet(address)
+  for (const key in response3.data) {
     if (response3.data[key].value > Math.round(tx.vout[1].value * SATS_PER_BITCOIN)) {
       responseArray.push(response3.data[key].tx_hash)
       responseArray.push(response3.data[key].tx_pos)
@@ -499,8 +499,8 @@ async function getUnspentMainNet (address) {
 
 function randomSymbol (length) {
   let result = ''
-  var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-  var charactersLength = characters.length
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  const charactersLength = characters.length
   for (let i = 0; i < length; i++) {
     result += characters.charAt(Math.floor(Math.random() *
       charactersLength))
