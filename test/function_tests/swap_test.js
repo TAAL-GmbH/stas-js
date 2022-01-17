@@ -189,7 +189,6 @@ describe('atomic swap', function () {
       fundingUTXO, fundingPrivateKey)
 
     const fullySignedSwapHex = makerSignSwapOffer(takerSignedSwapHex, tokenBIssueHex, tokenAIssueHex, alicePrivateKey, bobPublicKeyHash, paymentPublicKeyHash, fundingUTXO)
-    console.log(fullySignedSwapHex)
     const swapTxid = await broadcast(fullySignedSwapHex)
     expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.00006)
     expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.00003)
