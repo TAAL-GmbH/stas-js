@@ -1,8 +1,5 @@
-// const expect = require('chai').expect
-// const assert = require('chai').assert
 const utils = require('../utils/test_utils')
 const bsv = require('bsv')
-// const assert = require('assert')
 const expect = require('chai').expect
 
 require('dotenv').config()
@@ -30,8 +27,6 @@ const {
   issue
 } = require('../../index')
 
-// const { sighash } = require('../../lib/stas')
-
 let fundingPrivateKey
 let bobPrivateKey
 let alicePrivateKey
@@ -43,6 +38,7 @@ let tokenBIssueHex
 let tokenAObj
 let tokenBObj
 let tokenBIssueTx
+let tokenAIssueTxid
 let tokenBIssueTxid
 let fundingUTXO
 let alicePublicKeyHash
@@ -75,26 +71,21 @@ describe('atomic swap', function () {
     console.log('swaptxid', swapTxid)
     expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.00006)
     expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.00003)
-    // expect(await utils.getTokenBalance(aliceAddr)).to.equal(3000)
-    // expect(await utils.getTokenBalance(bobAddr)).to.equal(6000)
   })
 
-  //   // the maker offers a token for sats
+  // the maker offers a token for sats
   it('Swap - 2 step token-p2pkh swap', async function () {
     const makerVout = 0
     const takerVout = 0
     const makerStasTx = bsv.Transaction(tokenBIssueHex)
-    // const takerStasTx = bsv.Transaction(tokenASplitHex)
-    // const takerStasInputScriptHex = takerStasTx.outputs[takerVout].script.toHex()
     const makerStasInputScript = makerStasTx.outputs[makerVout].script
 
     // taker gets some funds
     const bobUtxos = await getFundsFromFaucet(bobPrivateKey.toAddress(process.env.NETWORK).toString())
-    //     // get input transaction
+    // get input transaction
     const takerInputTxHex = await getRawTransaction(bobUtxos[0].txid)
 
     const alicePublicKeyHash = bsv.crypto.Hash.sha256ripemd160(alicePrivateKey.publicKey.toBuffer()).toString('hex')
-    //     const bobPublicKeyHash = bsv.crypto.Hash.sha256ripemd160(bobPrivateKey.publicKey.toBuffer()).toString('hex')
 
     const makerInputSatoshis = tokenBObj.outputs[makerVout].satoshis
     const takerOutputSatoshis = makerInputSatoshis
@@ -108,27 +99,13 @@ describe('atomic swap', function () {
       satoshis: makerInputSatoshis
     }
 
-    console.log('t makerInputSatoshis: ', makerInputSatoshis)
-    console.log('t takerOutputSatoshis: ', takerOutputSatoshis)
-    console.log('t makerOutputSatoshis: ', makerOutputSatoshis)
-    console.log('t takerInputSatoshis: ', takerInputSatoshis)
-
     const wantedInfo = { type: 'native', satoshis: makerOutputSatoshis }
-    // const takerInputInfo = { type: 'native', utxo: bobUtxos[0], satoshis: takerInputSatoshis }
-
-    //     const unsignedSwapOfferHex = createUnsignedSwapOffer(
-    //       alicePrivateKey,
-    //       makerInputUtxo,
-    //       wantedInfo
-    //     )
-    // const wantedInfo = { scriptHex: takerStasInputScriptHex, satoshis: makerOutputSatoshis }
 
     const swapOfferHex = createSwapOffer(
       alicePrivateKey,
       makerInputUtxo,
       wantedInfo
     )
-    // console.log('swapOfferHex:', swapOfferHex)
     // now bob takes the offer
     const fundingUTXO = {
       txid: tokenBIssueTxid,
@@ -140,23 +117,68 @@ describe('atomic swap', function () {
     const takerInputUTXO = {
       txId: bobUtxos[0].txid,
       outputIndex: bobUtxos[0].vout,
-      script: bsv.Script.fromHex(bobUtxos[0].scriptPubKey), // makerStasInputScript,
+      script: bsv.Script.fromHex(bobUtxos[0].scriptPubKey),
       satoshis: takerInputSatoshis
     }
 
     const fullySignedSwapHex = acceptSwapOffer(swapOfferHex, tokenBIssueHex,
       bobPrivateKey, takerInputTxHex, takerInputUTXO, takerOutputSatoshis, alicePublicKeyHash,
-      fundingUTXO, fundingPrivateKey, alicePrivateKey)
+      fundingUTXO, fundingPrivateKey)
 
-    // console.log('fullySignedSwapHex: ', fullySignedSwapHex)
     const swapTxid = await broadcast(fullySignedSwapHex)
     console.log('swaptxid', swapTxid)
-    // const tokenId = await utils.getToken(swapTxid)
-    // console.log(`Token ID:        ${tokenId}`)
+
     expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.01)
     expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.00003)
+  })
 
-    // add second token check
+  // the maker offers sats for a token
+  it('Swap - 2 step p2pkh-token swap', async function () {
+    const takerStasInputScriptHex = tokenAObj.outputs[0].script.toHex()
+    // first get some funds
+    const aliceUtxos = await getFundsFromFaucet(alicePrivateKey.toAddress(process.env.NETWORK).toString())
+    // get input transaction
+    const makerInputHex = await getRawTransaction(aliceUtxos[0].txid)
+
+    const makerInputSatoshis = Math.floor(aliceUtxos[0].amount * 1E8)
+    const takerOutputSatoshis = makerInputSatoshis
+    const makerOutputSatoshis = tokenAObj.outputs[0].satoshis
+    const takerInputSatoshis = makerOutputSatoshis
+
+    const wantedInfo = { scriptHex: takerStasInputScriptHex, satoshis: makerOutputSatoshis }
+
+    const makerUtxo = {
+      txId: aliceUtxos[0].txid,
+      outputIndex: aliceUtxos[0].vout,
+      script: bsv.Script.fromHex(aliceUtxos[0].scriptPubKey), // makerStasInputScript,
+      satoshis: makerInputSatoshis
+    }
+    const swapOfferHex = createSwapOffer(
+      alicePrivateKey,
+      makerUtxo,
+      wantedInfo
+    )
+
+    // console.log('swapOfferHex', swapOfferHex)
+
+    const takerInputUTXO = {
+      txId: tokenAIssueTxid,
+      outputIndex: 0,
+      script: tokenAObj.outputs[0].script, // makerStasInputScript,
+      satoshis: takerInputSatoshis
+    }
+
+    // now bob takes the offer
+    const fullySignedSwapHex = acceptSwapOffer(swapOfferHex, makerInputHex,
+      bobPrivateKey, tokenAIssueHex, takerInputUTXO, takerOutputSatoshis, alicePublicKeyHash,
+      fundingUTXO, fundingPrivateKey)
+
+    // console.log('fullySignedSwapHex', fullySignedSwapHex)
+
+    const swapTxid = await broadcast(fullySignedSwapHex)
+    console.log('swaptxid ', swapTxid)
+    expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.00006)
+    expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.01)
   })
 
   // swap two STAS tokens
@@ -190,10 +212,10 @@ describe('atomic swap', function () {
 
     const fullySignedSwapHex = makerSignSwapOffer(takerSignedSwapHex, tokenBIssueHex, tokenAIssueHex, alicePrivateKey, bobPublicKeyHash, paymentPublicKeyHash, fundingUTXO)
     const swapTxid = await broadcast(fullySignedSwapHex)
+    console.log('swaptxid ', swapTxid)
+
     expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.00006)
     expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.00003)
-    // expect(await utils.getTokenBalance(aliceAddr)).to.equal(3000)
-    // expect(await utils.getTokenBalance(bobAddr)).to.equal(6000)
   })
 
   // the maker offers a token for sats
@@ -233,8 +255,6 @@ describe('atomic swap', function () {
     console.log('swaptxid', swapTxid)
     expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.01)
     expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.00003)
-    // expect(await utils.getTokenBalance(aliceAddr)).to.equal(3000)
-    // expect(await utils.getTokenBalance(bobAddr)).to.equal(6000)
   })
 
   // the maker offers sats for a token
@@ -269,8 +289,6 @@ describe('atomic swap', function () {
     console.log('swaptxid ', swapTxid)
     expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.00006)
     expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.01)
-    // expect(await utils.getTokenBalance(aliceAddr)).to.equal(3000)
-    // expect(await utils.getTokenBalance(bobAddr)).to.equal(6000)
   })
 })
 
@@ -323,7 +341,7 @@ async function setup () {
     tokenASymbol,
     2
   )
-  await broadcast(tokenAIssueHex)
+  tokenAIssueTxid = await broadcast(tokenAIssueHex)
   tokenAObj = new bsv.Transaction(tokenAIssueHex)
 
   // Token B
