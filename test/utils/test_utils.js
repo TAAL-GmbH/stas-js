@@ -13,7 +13,7 @@ function schema (publicKeyHash, symbol, supply) {
     symbol: `${symbol}`,
     description: 'Example token on private Taalnet',
     image: 'https://www.taal.com/wp-content/themes/taal_v2/img/favicon/favicon-96x96.png',
-    totalSupply: `${supply}`,
+    totalSupply: supply,
     decimals: 0,
     satsPerToken: 1,
     properties: {
