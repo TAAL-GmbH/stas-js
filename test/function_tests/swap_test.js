@@ -43,6 +43,8 @@ let tokenBIssueTxid
 let fundingUTXO
 let alicePublicKeyHash
 let bobPublicKeyHash
+let tokenASymbol
+let tokenBSymbol
 
 beforeEach(async function () {
   await setup()
@@ -128,6 +130,9 @@ describe('atomic swap', function () {
     const swapTxid = await broadcast(fullySignedSwapHex)
     console.log('swaptxid', swapTxid)
 
+    const tokenId = await utils.getToken(swapTxid, 1)
+    const response = await utils.getTokenResponse(tokenId)
+    expect(response.symbol).to.equal(tokenBSymbol)
     expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.01)
     expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.00003)
   })
@@ -177,6 +182,10 @@ describe('atomic swap', function () {
 
     const swapTxid = await broadcast(fullySignedSwapHex)
     console.log('swaptxid ', swapTxid)
+    console.log('tokenA', tokenASymbol)
+    const tokenId = await utils.getToken(swapTxid, 0)
+    const response = await utils.getTokenResponse(tokenId, tokenASymbol)
+    expect(response.symbol).to.equal(tokenASymbol)
     expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.00006)
     expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.01)
   })
@@ -214,6 +223,12 @@ describe('atomic swap', function () {
     const swapTxid = await broadcast(fullySignedSwapHex)
     console.log('swaptxid ', swapTxid)
 
+    const tokenId = await utils.getToken(swapTxid, 0)
+    const response = await utils.getTokenResponse(tokenId, tokenASymbol)
+    expect(response.symbol).to.equal(tokenASymbol)
+    const tokenId2 = await utils.getToken(swapTxid, 1)
+    const response2 = await utils.getTokenResponse(tokenId2, tokenBSymbol)
+    expect(response2.symbol).to.equal(tokenBSymbol)
     expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.00006)
     expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.00003)
   })
@@ -253,6 +268,9 @@ describe('atomic swap', function () {
     const fullySignedSwapHex = makerSignSwapOffer(takerSignedSwapHex, tokenBIssueHex, takerInputTx, alicePrivateKey, bobPublicKeyHash, paymentPublicKeyHash, fundingUTXO)
     const swapTxid = await broadcast(fullySignedSwapHex)
     console.log('swaptxid', swapTxid)
+    const tokenId = await utils.getToken(swapTxid, 1)
+    const response = await utils.getTokenResponse(tokenId, tokenBSymbol)
+    expect(response.symbol).to.equal(tokenBSymbol)
     expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.01)
     expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.00003)
   })
@@ -287,6 +305,9 @@ describe('atomic swap', function () {
 
     const swapTxid = await broadcast(fullySignedSwapHex)
     console.log('swaptxid ', swapTxid)
+    const tokenId = await utils.getToken(swapTxid, 0)
+    const response = await utils.getTokenResponse(tokenId, tokenASymbol)
+    expect(response.symbol).to.equal(tokenASymbol)
     expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.00006)
     expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.01)
   })
@@ -313,7 +334,7 @@ async function setup () {
   bobPublicKeyHash = bsv.crypto.Hash.sha256ripemd160(bobPrivateKey.publicKey.toBuffer()).toString('hex')
 
   // Token A
-  const tokenASymbol = 'TOKENA'
+  tokenASymbol = 'TOKENA'
   const tokenASupply = 6000
   const tokenASchema = utils.schema(tokenAIssuerPublicKeyHash, tokenASymbol, tokenASupply)
   const tokenAContractHex = contract(
@@ -345,7 +366,7 @@ async function setup () {
   tokenAObj = new bsv.Transaction(tokenAIssueHex)
 
   // Token B
-  const tokenBSymbol = 'TOKENB'
+  tokenBSymbol = 'TOKENB'
   const tokenBSupply = 3000
   const tokenBSchema = utils.schema(tokenBIssuerPublicKeyHash, tokenBSymbol, tokenBSupply)
   const tokenBContractHex = contract(
