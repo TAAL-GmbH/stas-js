@@ -446,7 +446,7 @@ it(
   }
 )
 
-it.only('Contract - Payment Utxo With Null Payment Private Key Throws Error', async () => {
+it('Contract - Payment Utxo With Null Payment Private Key Throws Error', async () => {
   try {
     contract(
       issuerPrivateKey,
