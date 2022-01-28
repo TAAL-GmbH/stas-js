@@ -161,7 +161,7 @@ async function getVoutAmount (txid, vout) {
   return response.data.vout[vout].value
 }
 
-async function getToken (txid) {
+async function getToken (txid, vout) {
   const url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/tx/hash/${txid}`
   const response = await axios({
     method: 'get',
@@ -172,16 +172,17 @@ async function getToken (txid) {
     }
   })
 
-  const temp = response.data.vout[0].scriptPubKey.asm
+  const temp = response.data.vout[vout].scriptPubKey.asm
   const split = temp.split('OP_RETURN')[1]
   const tokenId = split.split(' ')[1]
   return tokenId
 }
 
-async function getTokenResponse (tokenId) {
+async function getTokenResponse (tokenId, symbol) {
   let response
+  let url
   try {
-    const url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/token/${tokenId}/TAALT`
+    url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/token/${tokenId}/${symbol}`
     response = await axios({
       method: 'get',
       url,
@@ -191,14 +192,14 @@ async function getTokenResponse (tokenId) {
       }
     })
   } catch (e) {
-    console.log('Token Not Found: ' + e)
+    console.log('Token Not Found: ' + e, ' ', url)
     return 'Token Not Found'
   }
   return response.data.token
 }
 
-async function getTokenWithSymbol (tokenId, symbol) {
-  const url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/token/${tokenId}/${symbol}`
+async function getTokenWithSymbol (txid, symbol, vout) {
+  const url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/token/${txid}/${symbol}`
   console.log(url)
   let response
   try {
@@ -214,7 +215,11 @@ async function getTokenWithSymbol (tokenId, symbol) {
     console.log('Token Not Found: ' + e)
     return
   }
-  return response.data.token
+  console.log('response', response)
+  const temp = response.data.vout[vout].scriptPubKey.asm
+  const split = temp.split('OP_RETURN')[1]
+  const tokenId = split.split(' ')[1]
+  return tokenId
 }
 
 async function getTokenBalance (address) {
