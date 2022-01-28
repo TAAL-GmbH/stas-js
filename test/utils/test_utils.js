@@ -162,6 +162,9 @@ async function getVoutAmount (txid, vout) {
 }
 
 async function getToken (txid, vout) {
+  if (vout === undefined) {
+    vout = 0
+  }
   const url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/tx/hash/${txid}`
   const response = await axios({
     method: 'get',
@@ -179,6 +182,9 @@ async function getToken (txid, vout) {
 }
 
 async function getTokenResponse (tokenId, symbol) {
+  if (symbol === undefined) {
+    symbol = 'TAALT'
+  }
   let response
   let url
   try {
