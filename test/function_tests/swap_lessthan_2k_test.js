@@ -85,9 +85,9 @@ describe('atomic swap failing - when token B sats are set to > 2k the broadcast 
     console.log(fullySignedSwapHex)
     const swapTxid = await broadcast(fullySignedSwapHex)
     expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.00006)
-    expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.00003)
-    // expect(await utils.getTokenBalance(aliceAddr)).to.equal(3000)
-    // expect(await utils.getTokenBalance(bobAddr)).to.equal(6000)
+    expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.00002)
+    expect(await utils.getTokenBalance(aliceAddr)).to.equal(6000)
+    expect(await utils.getTokenBalance(bobAddr)).to.equal(2000)
   })
 })
 
