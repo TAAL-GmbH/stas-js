@@ -9,6 +9,7 @@ const {
 } = require('../index')
 
 const {
+  bitcoinToSatoshis,
   getTransaction,
   getFundsFromFaucet,
   broadcast
@@ -26,8 +27,6 @@ const {
 
   const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
   const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
-  console.log(contractUtxos)
-  console.log(fundingUtxos)
 
   const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
   const supply = 10000
@@ -146,8 +145,8 @@ const {
   const bobAmount1 = transferTx.vout[0].value / 2
   const bobAmount2 = transferTx.vout[0].value - bobAmount1
   const splitDestinations = []
-  splitDestinations[0] = { address: bobAddr, amount: bobAmount1 }
-  splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
+  splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount1) }
+  splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
 
   const splitHex = split(
     alicePrivateKey,

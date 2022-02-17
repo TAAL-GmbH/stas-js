@@ -12,10 +12,10 @@ const {
 } = require('../index')
 
 const {
+  bitcoinToSatoshis,
   getTransaction,
   getFundsFromFaucet,
-  broadcast,
-  SATS_PER_BITCOIN
+  broadcast
 } = require('../index').utils
 
 ;(async () => {
@@ -153,14 +153,16 @@ const {
   const transferTx = await getTransaction(transferTxid)
 
   // Split tokens into 4 - both payable to Bob...
-  const bobAmount1 = transferTx.vout[0].value / 4
-  const bobAmount2 = transferTx.vout[0].value / 4
-  const bobAmount3 = transferTx.vout[0].value / 4
-  const bobAmount4 = transferTx.vout[0].value - (bobAmount1 + bobAmount2 + bobAmount3)
+  const txOutSats = bitcoinToSatoshis(transferTx.vout[0].value)
+  const bobAmount1 = txOutSats / 4
+  const bobAmount2 = txOutSats / 4
+  const bobAmount3 = txOutSats / 4
+  const bobAmount4 = txOutSats - (bobAmount1 + bobAmount2 + bobAmount3)
+
   const splitDestinations = []
   splitDestinations[0] = { address: bobAddr, amount: bobAmount1 }
   splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
-  splitDestinations[2] = { address: bobAddr, amount: bobAmount4 }
+  splitDestinations[2] = { address: bobAddr, amount: bobAmount3 }
   splitDestinations[3] = { address: bobAddr, amount: bobAmount4 }
 
   const splitHex = split(
@@ -242,8 +244,8 @@ const {
   const aliceAmount2 = mergeTx.vout[0].value - aliceAmount1
 
   const split2Destinations = []
-  split2Destinations[0] = { address: aliceAddr, amount: aliceAmount1 }
-  split2Destinations[1] = { address: aliceAddr, amount: aliceAmount2 }
+  split2Destinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(aliceAmount1) }
+  split2Destinations[1] = { address: aliceAddr, amount: bitcoinToSatoshis(aliceAmount2) }
 
   const splitHex2 = split(
     alicePrivateKey,
@@ -269,8 +271,8 @@ const {
   // Now mergeSplit
   const splitTxObj2 = new bsv.Transaction(splitHex2)
 
-  const aliceAmountSatoshis = Math.floor(splitTx2.vout[0].value * SATS_PER_BITCOIN) / 2
-  const bobAmountSatoshis = Math.floor(splitTx2.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx2.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
+  const aliceAmountSatoshis = bitcoinToSatoshis(splitTx2.vout[0].value) / 2
+  const bobAmountSatoshis = bitcoinToSatoshis(splitTx2.vout[0].value) + bitcoinToSatoshis(splitTx2.vout[1].value) - aliceAmountSatoshis
 
   const mergeSplitHex = mergeSplit(
     alicePrivateKey,

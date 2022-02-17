@@ -14,10 +14,10 @@ const {
 } = require('../../index')
 
 const {
+    bitcoinToSatoshis,
     getTransaction,
     getFundsFromFaucet,
-    broadcast,
-    SATS_PER_BITCOIN
+    broadcast
 } = require('../../index').utils
 
 
@@ -52,13 +52,13 @@ it('Redeem STAS Utxo on MainNet', async () => {
             txid: inputTxID,
             vout: 1,
             scriptPubKey: inputUtxo.vout[1].scriptPubKey.hex,
-            amount: inputUtxo.vout[1].value
+            amount: bitcoinToSatoshis(inputUtxo.vout[1].value)
         },
         {
             txid: inputTxID,
             vout: 2,
             scriptPubKey: inputUtxo.vout[2].scriptPubKey.hex,
-            amount: inputUtxo.vout[2].value
+            amount: bitcoinToSatoshis(inputUtxo.vout[2].value)
         },
         leonardPrivateKey
     )

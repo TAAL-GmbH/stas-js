@@ -2,18 +2,17 @@
 
 This library will create various types of STAS token transactions that add token functionality to the BSV blockchain.
 
-## The 6 STAS building functions are:
+## The 8 STAS building functions are:
 
 1. Contract: This will create an OP_RETURN UTXO which contains a JSON schema that provides details about a particular token.
-2. Issue: This will spend the contract transaction and create a new P2STAS UTXO.
-3. Transfer: This spends a P2STAS UTXO and allocates it to a new destination P2STAS UTXO.
-4. Split: This spends a P2STAS UTXO and allocates it to 2 different P2STAS UTXOs.
-5. Merge: This merges 2 P2STAS inputs. Only available in Version 2. Can only merge if the in transactions have less than 3 outputs. (including the change)
-6. RedeemSplit: This spends a P2STAS UTXO and allocates some of the tokens to a standard P2PKH UTXO and the remainder to a destination P2STAS UTXO. The P2PKH destination must be the redemption public key hash.
-7. Redeem: This spends a P2STAS UTXO and creates a standard P2PKH of the full amount. The P2PKH destination must be the redemption public key hash.
+2. Issue: This will spend the contract transaction and create a new STAS UTXO.
+3. Transfer: This spends a STAS UTXO and allocates it to a new destination STAS UTXO.
+4. Split: This spends a STAS UTXO and allocates it to 2 different STAS UTXOs.
+5. Merge: This merges 2 STAS inputs. Only available in Version 2. Can only merge if the in transactions have less than 3 outputs. (including the change)
+6. Swap: Swap token for token, P2PKH for token or token for P2PKH
+7. RedeemSplit: This spends a STAS UTXO and allocates some of the tokens to a standard P2PKH UTXO and the remainder to a destination STAS UTXO. The P2PKH destination must be the redemption public key hash.
+8. Redeem: This spends a STAS UTXO and creates a standard P2PKH of the full amount. The P2PKH destination must be the redemption public key hash.
 
-
-*Please note that the ```utils.js``` file is not needed to build STAS tokens: it contains tools to help interaction with Taal's private testing network, Taalnet.*
 
 ## Fees
 
@@ -32,7 +31,7 @@ There is a file called ```lifecycle.test.js``` that exercises a full lifecycle o
 
 ```sh
 npm install
-node lifecycleV2.js
+node examples/lifecycleV2.example.js
 ```
 
 which will produce a series of transactions:
@@ -101,6 +100,7 @@ const {
 
 function App () {
   const privateKey = bsv.PrivateKey() // This will be a random privateKey each time the app is reloaded.
+  const fundingPrivateKey = bsv.PrivateKey() // This will be a random privateKey each time the app is reloaded.
   const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(privateKey.publicKey.toBuffer()).toString('hex')
 
   const [schema, setSchema] = useState(JSON.stringify({
@@ -125,11 +125,14 @@ function App () {
 
   async function send () {
     try {
-      const utxos = await getFundsFromFaucet(privateKey.toAddress('testnet').toString())
+      const contractUtxos = await getFundsFromFaucet(privateKey.toAddress('testnet').toString())
+      const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress('testnet').toString())
 
       const contractHex = contract(
         privateKey,
-        utxos,
+        contractUtxos,
+        fundingUtxos,
+        fundingPrivateKey,
         JSON.parse(schema),
         10000
       )

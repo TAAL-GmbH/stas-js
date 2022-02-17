@@ -240,7 +240,7 @@ it(
       return
     } catch (e) {
       expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('Payment UTXOs provided but payment public key  or paymentSignCallback is null')
+      expect(e.message).to.eql('Payment UTXOs provided but payment public key or paymentSignCallback is null')
     }
   }
 )
@@ -404,7 +404,7 @@ it('Contract - Invalid Char Symbol Throws Error 1 ', async () => {
 })
 
 it('Contract - Invalid Char Symbol Throws Error 2', async () => {
-  const invalidCharsSymbol = '&@invalid\"\'+='
+  const invalidCharsSymbol = '&@invalid"\'+='
   const invalidSchema = utils.schema(publicKeyHash, invalidCharsSymbol, supply)
   try {
     contract(
@@ -544,28 +544,26 @@ it(
       expect(e).to.be.instanceOf(Error)
       expect(e.message).to.eql('Token amount 1000 must be divisible by satsPerToken 66')
     }
+  })
+it('Contract - satsPerToken > Supply Throws Error', async () => {
+  try {
+    schema.satsPerToken = 2000
 
-    it('Contract - satsPerToken > Supply Throws Error', async () => {
-      try {
-        schema.satsPerToken = 2000
-
-        contract(
-          issuerPrivateKey,
-          contractUtxos,
-          fundingUtxos,
-          fundingPrivateKey,
-          schema,
-          1000
-        )
-        expect(false).toBeTruthy()
-        return
-      } catch (e) {
-        expect(e).to.be.instanceOf(Error)
-        expect(e.message).to.eql('Token amount 1000 is less than satsPerToken 2000')
-      }
-    })
+    contract(
+      issuerPrivateKey,
+      contractUtxos,
+      fundingUtxos,
+      fundingPrivateKey,
+      schema,
+      1000
+    )
+    expect(false).toBeTruthy()
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Token amount 1000 is less than satsPerToken 2000')
   }
-)
+})
 
 async function setup () {
   issuerPrivateKey = bsv.PrivateKey()

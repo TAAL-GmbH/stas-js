@@ -5,19 +5,13 @@ require('dotenv').config()
 
 const {
   contract,
-  issue,
-  transfer,
-  split,
-  merge,
-  mergeSplit,
-  redeem
+  issue
 } = require('../../index')
 
 const {
   getTransaction,
   getFundsFromFaucet,
-  broadcast,
-  SATS_PER_BITCOIN
+  broadcast
 } = require('../../index').utils
 
 describe('regression, testnet', () => {

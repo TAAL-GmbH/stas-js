@@ -19,8 +19,7 @@ const issuerPrivateKey = bsv.PrivateKey()
 const fundingPrivateKey = bsv.PrivateKey()
 let contractTx
 let contractTxid
-let aliceAddr
-let bobAddr
+
 const incorrectPrivateKey = bsv.PrivateKey()
 const bobPrivateKey = bsv.PrivateKey()
 const alicePrivateKey = bsv.PrivateKey()
@@ -49,36 +48,36 @@ beforeEach(async () => {
   contractTx = await getTransaction(contractTxid)
 })
 
-  it('Attempt to issue invalid token', async () => {
-    const issueHex = issue(
-      issuerPrivateKey,
-      issueInfo(),
-      contractUtxo(),
-      paymentUtxo(),
-      fundingPrivateKey,
-      true,
-      symbol,
-      2
-    )
-    const issueTxid = await broadcast(issueHex)
-    const tokenId = await getToken(issueTxid)
-    const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/token/' + tokenId + '/TAALT'
-    try {
-      await axios({
-        method: 'get',
-        url,
-        auth: {
-          username: process.env.API_USERNAME,
-          password: process.env.API_PASSWORD
-        }
-      })
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('Request failed with status code 404')
-    }
-  })
+it('Attempt to issue invalid token', async () => {
+  const issueHex = issue(
+    issuerPrivateKey,
+    issueInfo(),
+    contractUtxo(),
+    paymentUtxo(),
+    fundingPrivateKey,
+    true,
+    symbol,
+    2
+  )
+  const issueTxid = await broadcast(issueHex)
+  const tokenId = await getToken(issueTxid)
+  const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/token/' + tokenId + '/TAALT'
+  try {
+    await axios({
+      method: 'get',
+      url,
+      auth: {
+        username: process.env.API_USERNAME,
+        password: process.env.API_PASSWORD
+      }
+    })
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Request failed with status code 404')
+  }
+})
 
-async function getToken(txid) {
+async function getToken (txid) {
   const url = 'https://taalnet.whatsonchain.com/v1/bsv/taalnet/tx/hash/' + txid
   const response = await axios({
     method: 'get',
@@ -96,7 +95,7 @@ async function getToken(txid) {
   return tokenId
 }
 
-function contractUtxo() {
+function contractUtxo () {
   return {
     txid: contractTxid,
     vout: 0,
@@ -105,7 +104,7 @@ function contractUtxo() {
   }
 }
 
-function paymentUtxo() {
+function paymentUtxo () {
   return {
     txid: contractTxid,
     vout: 1,
@@ -114,7 +113,7 @@ function paymentUtxo() {
   }
 }
 
-function issueInfo() {
+function issueInfo () {
   return [
     {
       addr: aliceAddr,

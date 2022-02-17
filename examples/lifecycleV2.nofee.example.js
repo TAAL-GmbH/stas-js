@@ -13,10 +13,10 @@ const {
 } = require('../index')
 
 const {
+  bitcoinToSatoshis,
   getTransaction,
   getFundsFromFaucet,
-  broadcast,
-  SATS_PER_BITCOIN
+  broadcast
 } = require('../index').utils
 
 ;(async () => {
@@ -152,8 +152,8 @@ const {
   const bobAmount1 = transferTx.vout[0].value / 2
   const bobAmount2 = transferTx.vout[0].value - bobAmount1
   const splitDestinations = []
-  splitDestinations[0] = { address: bobAddr, amount: bobAmount1 }
-  splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
+  splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount1) }
+  splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
 
   const splitHex = split(
     alicePrivateKey,
@@ -193,8 +193,9 @@ const {
   const mergeTx = await getTransaction(mergeTxid)
 
   // Split again - both payable to Alice...
-  const aliceAmount1 = mergeTx.vout[0].value / 2
-  const aliceAmount2 = mergeTx.vout[0].value - aliceAmount1
+  const mergeTxSats = bitcoinToSatoshis(mergeTx.vout[0].value)
+  const aliceAmount1 = mergeTxSats / 2
+  const aliceAmount2 = mergeTxSats - aliceAmount1
 
   const split2Destinations = []
   split2Destinations[0] = { address: aliceAddr, amount: aliceAmount1 }
@@ -219,8 +220,9 @@ const {
   // Now mergeSplit
   const splitTxObj2 = new bsv.Transaction(splitHex2)
 
-  const aliceAmountSatoshis = Math.floor(splitTx2.vout[0].value * SATS_PER_BITCOIN) / 2
-  const bobAmountSatoshis = Math.floor(splitTx2.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx2.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
+  const splitTx2Sats = bitcoinToSatoshis(splitTx2.vout[0].value)
+  const aliceAmountSatoshis = splitTx2Sats / 2
+  const bobAmountSatoshis = splitTx2Sats + bitcoinToSatoshis(splitTx2.vout[1].value) - aliceAmountSatoshis
 
   const mergeSplitHex = mergeSplit(
     alicePrivateKey,
@@ -269,8 +271,8 @@ const {
   const rsBobAmount = mergeSplitTx.vout[1].value / 3
   const rsAliceAmount1 = mergeSplitTx.vout[1].value / 3
   const rSplitDestinations = []
-  rSplitDestinations[0] = { address: bobAddr, amount: rsBobAmount }
-  rSplitDestinations[1] = { address: aliceAddr, amount: rsAliceAmount1 }
+  rSplitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(rsBobAmount) }
+  rSplitDestinations[1] = { address: aliceAddr, amount: bitcoinToSatoshis(rsAliceAmount1) }
 
   const redeemSplitHex = redeemSplit(
     bobPrivateKey,

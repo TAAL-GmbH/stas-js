@@ -14,10 +14,10 @@ const {
 } = require('../../index')
 
 const {
+  bitcoinToSatoshis,
   getTransaction,
   getFundsFromFaucet,
-  broadcast,
-  SATS_PER_BITCOIN
+  broadcast
 } = require('../../index').utils
 
 const issuerPrivateKey = bsv.PrivateKey()
@@ -249,8 +249,8 @@ describe('regression, testnet', () => {
       //   // Now mergeSplit
       //   const splitTxObj2 = new bsv.Transaction(splitHex2)
 
-      //   const aliceAmountSatoshis = Math.floor(splitTx2.vout[0].value * SATS_PER_BITCOIN) / 2
-      //   const bobAmountSatoshis = Math.floor(splitTx2.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx2.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
+      //   const aliceAmountSatoshis = bitcoinToSatoshis(splitTx2.vout[0].value) / 2
+      //   const bobAmountSatoshis = bitcoinToSatoshis(splitTx2.vout[0].value) + bitcoinToSatoshis(splitTx2.vout[1].value) - aliceAmountSatoshis
 
       //   const mergeSplitHex = mergeSplit(
       //     alicePrivateKey,

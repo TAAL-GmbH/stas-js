@@ -14,10 +14,10 @@ const {
 } = require('../../index')
 
 const {
+  bitcoinToSatoshis,
   getTransaction,
   getFundsFromFaucet,
-  broadcast,
-  SATS_PER_BITCOIN
+  broadcast
 } = require('../../index').utils
 
 describe('regression, testnet', () => {
@@ -123,8 +123,8 @@ describe('regression, testnet', () => {
     const bobAmount1 = transferTx.vout[0].value / 2
     const bobAmount2 = transferTx.vout[0].value - bobAmount1
     const splitDestinations = []
-    splitDestinations[0] = { address: bobAddr, amount: bobAmount1 }
-    splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
+    splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount1) }
+    splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
 
     const splitHex = split(
       alicePrivateKey,
@@ -173,7 +173,7 @@ describe('regression, testnet', () => {
     expect(await utils.getTokenBalance(daveAddr)).to.equal(2000)
 
     // Split again - both payable to Alice...
-    const amount = mergeTx.vout[0].value / 2
+    const amount = bitcoinToSatoshis(mergeTx.vout[0].value / 2)
 
     const split2Destinations = []
     split2Destinations[0] = { address: bobAddr, amount: amount }
@@ -201,8 +201,8 @@ describe('regression, testnet', () => {
     // Now mergeSplit
     const splitTxObj2 = new bsv.Transaction(splitHex2)
 
-    const aliceAmountSatoshis = Math.floor(splitTx2.vout[0].value * SATS_PER_BITCOIN) / 2
-    const bobAmountSatoshis = Math.floor(splitTx2.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx2.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
+    const aliceAmountSatoshis = bitcoinToSatoshis(splitTx2.vout[0].value) / 2
+    const bobAmountSatoshis = bitcoinToSatoshis(splitTx2.vout[0].value) + bitcoinToSatoshis(splitTx2.vout[1].value) - aliceAmountSatoshis
 
     const mergeSplitHex = mergeSplit(
       bobPrivateKey,

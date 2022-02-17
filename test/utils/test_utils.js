@@ -1,9 +1,7 @@
 const axios = require('axios')
 const bsv = require('bsv')
 require('dotenv').config()
-const {
-  SATS_PER_BITCOIN
-} = require('../../index').utils
+const { bitcoinToSatoshis } = require('../../index').utils
 
 function schema (publicKeyHash, symbol, supply) {
   const schema = {
@@ -295,7 +293,7 @@ async function broadcastToMainNet (tx) {
   if (Buffer.isBuffer(tx)) {
     tx = tx.toString('hex')
   }
-  const url = 'https://api.whatsonchain.com/v1/bsv/main/tx/raw?dontcheckfee=true'
+  const url = 'https://api.whatsonchain.com/v1/bsv/main/tx/raw'
 
   const response = await axios({
     method: 'post',
@@ -474,13 +472,13 @@ async function setupMainNetTest (address, wait, valueOfSats) {
   const txid = await broadcastMapi(transaction.toString())
   await new Promise(resolve => setTimeout(resolve, wait))
   const tx = await getTransactionMainNet(txid)
-  console.log(Math.round(tx.vout[0].value * SATS_PER_BITCOIN))
+  console.log(bitcoinToSatoshis(tx.vout[0].value))
 
   const response2 = await getUnspentMainNet(address)
 
   const responseArray = []
   for (const key in response2.data) {
-    if (response2.data[key].value === Math.round(tx.vout[0].value * SATS_PER_BITCOIN)) {
+    if (response2.data[key].value === bitcoinToSatoshis(tx.vout[0].value)) {
       responseArray.push(response2.data[key].tx_hash)
       responseArray.push(response2.data[key].tx_pos)
       break
@@ -489,7 +487,7 @@ async function setupMainNetTest (address, wait, valueOfSats) {
 
   const response3 = await getUnspentMainNet(address)
   for (const key in response3.data) {
-    if (response3.data[key].value > Math.round(tx.vout[1].value * SATS_PER_BITCOIN)) {
+    if (response3.data[key].value > bitcoinToSatoshis(tx.vout[1].value)) {
       responseArray.push(response3.data[key].tx_hash)
       responseArray.push(response3.data[key].tx_pos)
       break

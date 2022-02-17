@@ -13,10 +13,10 @@ const {
 } = require('../../index')
 
 const {
+  bitcoinToSatoshis,
   getTransaction,
   getFundsFromFaucet,
-  broadcast,
-  SATS_PER_BITCOIN
+  broadcast
 } = require('../../index').utils
 
 const { sighash } = require('../../lib/stas')
@@ -46,8 +46,8 @@ it('MergeSplit - Successful MergeSplit With Fees', async () => {
 
   const issueOutFundingVout = splitTx.vout.length - 1
 
-  const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
-  const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
+  const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
+  const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
 
   const mergeSplitHex = mergeSplit(
     bobPrivateKey,
@@ -71,8 +71,8 @@ it('MergeSplit - Successful MergeSplit With Fees', async () => {
 it('MergeSplit - Successful MergeSplit No Fees', async () => {
   await setup() // contract, issue, transfer then split
 
-  const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
-  const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
+  const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
+  const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
 
   const mergeSplitHex = mergeSplit(
     bobPrivateKey,
@@ -100,8 +100,8 @@ it(
 
     const issueOutFundingVout = splitTx.vout.length - 1
 
-    const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
-    const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
+    const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
+    const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
 
     const mergeSplitHex = mergeSplitWithCallback(
       bobPrivateKey.publicKey,
@@ -129,8 +129,8 @@ it('MergeSplit - Successful MergeSplit With Callback No Fees',
   async () => {
     await setup() // contract, issue, transfer then split
 
-    const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
-    const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
+    const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
+    const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
 
     const mergeSplitHex = mergeSplitWithCallback(
       bobPrivateKey.publicKey,
@@ -157,8 +157,8 @@ it('MergeSplit - Successful MergeSplit With Callback No Fees',
 it('MergeSplit - Incorrect Destination 1 Satoshi Amount', async () => {
   await setup() // contract, issue, transfer then split
 
-  const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
-  const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
+  const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
+  const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
 
   const mergeSplitHex = mergeSplit(
     alicePrivateKey,
@@ -183,7 +183,7 @@ it('MergeSplit - Incorrect Destination 1 Satoshi Amount', async () => {
 it('MergeSplit - Incorrect Destination 2 Satoshi Amount', async () => {
   await setup() // contract, issue, transfer then split
 
-  const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
+  const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
 
   const mergeSplitHex = mergeSplit(
     alicePrivateKey,
@@ -208,8 +208,8 @@ it('MergeSplit - Incorrect Owner Private Key Throws Error',
   async () => {
     await setup() // contract, issue, transfer then split
 
-    const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
-    const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
+    const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
+    const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
     const incorrectPrivateKey = bsv.PrivateKey()
 
     const mergeSplitHex = mergeSplit(
@@ -237,8 +237,8 @@ it('MergeSplit - Incorrect Payments Private Key Throws Error',
   async () => {
     await setup() // contract, issue, transfer then split
 
-    const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
-    const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
+    const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
+    const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
     const incorrectPrivateKey = bsv.PrivateKey()
 
     const mergeSplitHex = mergeSplit(
@@ -266,8 +266,8 @@ it('MergeSplit - Attempt to MergeSplit More Than Two Tokens Throws Error',
   async () => {
     await setup() // contract, issue, transfer then split
 
-    const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
-    const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
+    const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
+    const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
     const incorrectPrivateKey = bsv.PrivateKey()
     try {
       mergeSplitHex = mergeSplit(
@@ -312,8 +312,8 @@ it('MergeSplit - Attempt to MergeSplit Less Than Two Tokens Throws Error',
   async () => {
     await setup() // contract, issue, transfer then split
 
-    const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
-    const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
+    const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
+    const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
     const incorrectPrivateKey = bsv.PrivateKey()
     try {
       mergeSplit(
@@ -344,8 +344,8 @@ it('MergeSplit - Invalid Address Destination Address 1 Throws Error',
   async () => {
     await setup() // contract, issue, transfer then split
 
-    const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
-    const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
+    const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
+    const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
     const invalidAddr = '1MSCReQT9E4GpxuK1K'
 
     try {
@@ -372,8 +372,8 @@ it('MergeSplit - Invalid Address Destination Address 2 Throws Error',
   async () => {
     await setup() // contract, issue, transfer then split
 
-    const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
-    const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
+    const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
+    const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
     const invalidAddr = '1MSCReQT9E4GpxuK1K'
 
     try {
@@ -399,8 +399,8 @@ it('MergeSplit - Invalid Address Destination Address 2 Throws Error',
 it('MergeSplit - Null Issuer Private Key Throws Error', async () => {
   await setup() // contract, issue, transfer then split
 
-  const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
-  const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
+  const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
+  const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
   try {
     mergeSplit(
       null,
@@ -423,8 +423,8 @@ it('MergeSplit - Null Issuer Private Key Throws Error', async () => {
 it('MergeSplit - Null STAS Merge UTXO Throws Error', async () => {
   await setup() // contract, issue, transfer then split
 
-  const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
-  const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
+  const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
+  const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
 
   try {
     mergeSplit(
@@ -450,8 +450,8 @@ it(
   async () => {
     await setup() // contract, issue, transfer then split
 
-    const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
-    const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
+    const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
+    const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
 
     try {
       mergeSplit(
@@ -476,8 +476,8 @@ it(
 it('MergeSplit - Null Satoshi Amount 1 Throws Error', async () => {
   await setup() // contract, issue, transfer then split
 
-  const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
-  const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
+  const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
+  const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
 
   try {
     mergeSplit(
@@ -503,8 +503,8 @@ it(
   async () => {
     await setup() // contract, issue, transfer then split
 
-    const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
-    const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
+    const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
+    const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
 
     try {
       mergeSplit(
@@ -529,7 +529,7 @@ it(
 it('MergeSplit - Null Satoshi Amount 2 Throws Error', async () => {
   await setup() // contract, issue, transfer then split
 
-  const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
+  const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
   try {
     mergeSplit(
       issuerPrivateKey,
@@ -552,8 +552,8 @@ it('MergeSplit - Null Satoshi Amount 2 Throws Error', async () => {
 it('MergeSplit - Null Funding Private Key Throws Error', async () => {
   await setup() // contract, issue, transfer then split
 
-  const aliceAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) / 2
-  const bobAmountSatoshis = Math.floor(splitTx.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
+  const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
+  const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
 
   try {
     mergeSplit(

@@ -16,8 +16,7 @@ const {
 const {
   getTransaction,
   getFundsFromFaucet,
-  broadcast,
-  SATS_PER_BITCOIN
+  broadcast
 } = require('../../index').utils
 
 describe('regression, testnet', () => {

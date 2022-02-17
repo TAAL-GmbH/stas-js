@@ -21,7 +21,6 @@ const symbol = 'CallmeIshmaelSomeyearsagosdnevermindhowlongpreciselyhavinglittle
 const wait = 5000
 let issuerPrivateKey
 let fundingPrivateKey
-let bobPrivateKey
 let alicePrivateKey
 let aliceAddr
 let contractUtxos
@@ -58,7 +57,7 @@ it('Symbol 128 Data Size Zero Bytes', async () => {
   const tokenId = await utils.getToken(issueTxid)
   console.log(`issueTxid:        ${issueTxid}`)
   console.log(`Token ID:        ${tokenId}`)
-  await new Promise(r => setTimeout(r, wait))
+  await new Promise(resolve => setTimeout(resolve, wait))
   const response = await utils.getTokenWithSymbol(tokenId, symbol)
   expect(response.symbol).to.equal(symbol)
   const issueTx = await getTransaction(issueTxid)
@@ -101,7 +100,7 @@ it('Symbol 128 Data Size 1 Byte', async () => {
   const tokenId = await utils.getToken(issueTxid)
   console.log(`issueTxid:        ${issueTxid}`)
   console.log(`Token ID:        ${tokenId}`)
-  await new Promise(r => setTimeout(r, wait))
+  await new Promise(resolve => setTimeout(resolve, wait))
   const response = await utils.getTokenWithSymbol(tokenId, symbol)
   expect(response.symbol).to.equal(symbol)
   const issueTx = await getTransaction(issueTxid)
@@ -144,7 +143,7 @@ it('Symbol 128 Data Size < 75 Bytes', async () => {
   const tokenId = await utils.getToken(issueTxid)
   console.log(`issueTxid:        ${issueTxid}`)
   console.log(`Token ID:        ${tokenId}`)
-  await new Promise(r => setTimeout(r, wait))
+  await new Promise(resolve => setTimeout(resolve, wait))
   const response = await utils.getTokenWithSymbol(tokenId, symbol)
   expect(response.symbol).to.equal(symbol)
   const issueTx = await getTransaction(issueTxid)
@@ -187,7 +186,7 @@ it('Symbol 128 Data Size < 128 Bytes', async () => {
   const tokenId = await utils.getToken(issueTxid)
   console.log(`issueTxid:        ${issueTxid}`)
   console.log(`Token ID:        ${tokenId}`)
-  await new Promise(r => setTimeout(r, wait))
+  await new Promise(resolve => setTimeout(resolve, wait))
   const response = await utils.getTokenWithSymbol(tokenId, symbol)
   expect(response.symbol).to.equal(symbol)
   const issueTx = await getTransaction(issueTxid)
@@ -230,7 +229,7 @@ it('Symbol 128 Data Size > 128 Bytes', async () => {
   const tokenId = await utils.getToken(issueTxid)
   console.log(`issueTxid:        ${issueTxid}`)
   console.log(`Token ID:        ${tokenId}`)
-  await new Promise(r => setTimeout(r, wait))
+  await new Promise(resolve => setTimeout(resolve, wait))
   const response = await utils.getTokenWithSymbol(tokenId, symbol)
   expect(response.symbol).to.equal(symbol)
   const issueTx = await getTransaction(issueTxid)
@@ -272,7 +271,7 @@ it('Symbol 128 Data Size > 32768 Bytes', async () => {
   const tokenId = await utils.getToken(issueTxid)
   console.log(`issueTxid:        ${issueTxid}`)
   console.log(`Token ID:        ${tokenId}`)
-  await new Promise(r => setTimeout(r, wait))
+  await new Promise(resolve => setTimeout(resolve, wait))
   const response = await utils.getTokenWithSymbol(tokenId, symbol)
   expect(response.symbol).to.equal(symbol)
   const issueTx = await getTransaction(issueTxid)
@@ -315,7 +314,7 @@ it('Symbol 128 Data Size < 32768 Bytes', async () => {
   const tokenId = await utils.getToken(issueTxid)
   console.log(`issueTxid:        ${issueTxid}`)
   console.log(`Token ID:        ${tokenId}`)
-  await new Promise(r => setTimeout(r, wait))
+  await new Promise(resolve => setTimeout(resolve, wait))
   const response = await utils.getTokenWithSymbol(tokenId, symbol)
   expect(response.symbol).to.equal(symbol)
   const issueTx = await getTransaction(issueTxid)
@@ -358,7 +357,7 @@ it('Symbol 128 Data Size Large', async () => {
   const tokenId = await utils.getToken(issueTxid)
   console.log(`issueTxid:        ${issueTxid}`)
   console.log(`Token ID:        ${tokenId}`)
-  await new Promise(r => setTimeout(r, wait))
+  await new Promise(resolve => setTimeout(resolve, wait))
   const response = await utils.getTokenWithSymbol(tokenId, symbol)
   expect(response.symbol).to.equal(symbol)
   const issueTx = await getTransaction(issueTxid)

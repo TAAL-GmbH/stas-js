@@ -14,13 +14,10 @@ const {
   redeem
 } = require('../../../index')
 
-const {
-  SATS_PER_BITCOIN
-} = require('../../../index').utils
+const { bitcoinToSatoshis } = require('../../../index').utils
 
 // eslint-disable-next-line no-undef
 it('Mainnet LifeCycle Test 1 broadcast via WOC', async () => {
-
   // per-run modifiable values
   const contractUtxo = await getUtxoMainNet('', true)
   const feeUtxo = await getUtxoMainNet('', false)
@@ -81,7 +78,7 @@ it('Mainnet LifeCycle Test 1 broadcast via WOC', async () => {
   const contractTx = await utils.getTransactionMainNet(contractTxid)
 
   // eslint-disable-next-line promise/param-names
-  await new Promise(r => setTimeout(r, wait))
+  await new Promise(resolve => setTimeout(resolve, wait))
 
   const issueHex = issue(
     issuerPrivateKey,
@@ -100,9 +97,9 @@ it('Mainnet LifeCycle Test 1 broadcast via WOC', async () => {
   console.log(`Token ID:        ${tokenId}`)
   const response = await utils.getTokenResponseMainNet(tokenId, symbol)
   expect(response.symbol).to.equal(symbol)
-  console.log("token issued")
+  console.log('token issued')
   // eslint-disable-next-line promise/param-names
-  await new Promise(r => setTimeout(r, wait))
+  await new Promise(resolve => setTimeout(resolve, wait))
 
   expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(6000)
   expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(4000)
@@ -122,7 +119,7 @@ it('Mainnet LifeCycle Test 1 broadcast via WOC', async () => {
   console.log(`Transfer TX:     ${transferTxid}`)
   const transferTx = await utils.getTransactionMainNet(transferTxid)
 
-  await new Promise(r => setTimeout(r, wait))
+  await new Promise(resolve => setTimeout(resolve, wait))
   expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(0)
   expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(10000)
   console.log('Bob Balance  ' + (await utils.getTokenBalanceMainNet(bobAddr, symbol)))
@@ -145,7 +142,7 @@ it('Mainnet LifeCycle Test 1 broadcast via WOC', async () => {
   const splitTxid = await utils.broadcastToMainNet(splitHex)
   console.log(`Split TX:        ${splitTxid}`)
   const splitTx = await utils.getTransactionMainNet(splitTxid)
-  await new Promise(r => setTimeout(r, wait))
+  await new Promise(resolve => setTimeout(resolve, wait))
 
   expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(6000)
   expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(4000)
@@ -166,14 +163,14 @@ it('Mainnet LifeCycle Test 1 broadcast via WOC', async () => {
   console.log(`Merge TX:        ${mergeTxid}`)
   const mergeTx = await utils.getTransactionMainNet(mergeTxid)
 
-  await new Promise(r => setTimeout(r, wait))
+  await new Promise(resolve => setTimeout(resolve, wait))
   expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(0)
   expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(10000)
   console.log('Bob Balance  ' + (await utils.getTokenBalanceMainNet(bobAddr, symbol)))
   console.log('Alice Balance  ' + (await utils.getTokenBalanceMainNet(aliceAddr, symbol)))
 
   // Split again - both payable to Bob...
-  const amount = mergeTx.vout[0].value / 2
+  const amount = bitcoinToSatoshis(mergeTx.vout[0].value / 2)
 
   const split2Destinations = []
   split2Destinations[0] = { address: bobAddr, amount: amount }
@@ -190,7 +187,7 @@ it('Mainnet LifeCycle Test 1 broadcast via WOC', async () => {
   console.log(`Split TX2:       ${splitTxid2}`)
   const splitTx2 = await utils.getTransactionMainNet(splitTxid2)
 
-  await new Promise(r => setTimeout(r, wait))
+  await new Promise(resolve => setTimeout(resolve, wait))
   expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(6000)
   expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(4000)
   console.log('Bob Balance  ' + (await utils.getTokenBalanceMainNet(bobAddr, symbol)))
@@ -199,8 +196,8 @@ it('Mainnet LifeCycle Test 1 broadcast via WOC', async () => {
   // Now mergeSplit
   const splitTxObj2 = new bsv.Transaction(splitHex2)
 
-  const aliceAmountSatoshis = Math.floor(splitTx2.vout[0].value * SATS_PER_BITCOIN) / 2
-  const bobAmountSatoshis = Math.floor(splitTx2.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx2.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
+  const aliceAmountSatoshis = bitcoinToSatoshis(splitTx2.vout[0].value) / 2
+  const bobAmountSatoshis = bitcoinToSatoshis(splitTx2.vout[0].value) + bitcoinToSatoshis(splitTx2.vout[1].value) - aliceAmountSatoshis
 
   const mergeSplitHex = mergeSplit(
     bobsPrivateKey,
@@ -217,7 +214,7 @@ it('Mainnet LifeCycle Test 1 broadcast via WOC', async () => {
   console.log(`MergeSplit TX:   ${mergeSplitTxid}`)
   const mergeSplitTx = await utils.getTransactionMainNet(mergeSplitTxid)
 
-  await new Promise(r => setTimeout(r, wait))
+  await new Promise(resolve => setTimeout(resolve, wait))
   expect(await utils.getTokenBalanceMainNet(bobAddr, symbol)).to.equal(4500)
   expect(await utils.getTokenBalanceMainNet(aliceAddr, symbol)).to.equal(5500)
   console.log('Bob Balance  ' + (await utils.getTokenBalanceMainNet(bobAddr, symbol)))
@@ -238,18 +235,13 @@ it('Mainnet LifeCycle Test 1 broadcast via WOC', async () => {
   console.log('Alice Balance  ' + (await utils.getTokenBalanceMainNet(aliceAddr, symbol)))
 })
 
-function randomSymbol(length) {
-  var result = '';
-  var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  var charactersLength = characters.length;
-  for (var i = 0; i < length; i++) {
+function randomSymbol (length) {
+  let result = ''
+  var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  var charactersLength = characters.length
+  for (let i = 0; i < length; i++) {
     result += characters.charAt(Math.floor(Math.random() *
-      charactersLength));
+      charactersLength))
   }
-  return result;
+  return result
 }
-
-
-  
-
-

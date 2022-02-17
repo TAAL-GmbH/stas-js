@@ -16,6 +16,7 @@ const {
 } = require('../../index').swap
 
 const {
+  bitcoinToSatoshis,
   getTransaction,
   getRawTransaction,
   getFundsFromFaucet,
@@ -91,7 +92,7 @@ describe('atomic swap', function () {
 
     const makerInputSatoshis = tokenBObj.outputs[makerVout].satoshis
     const takerOutputSatoshis = makerInputSatoshis
-    const makerOutputSatoshis = Math.floor(bobUtxos[0].amount * 1E8)
+    const makerOutputSatoshis = bobUtxos[0].amount 
     const takerInputSatoshis = makerOutputSatoshis
 
     const makerInputUtxo = {
@@ -113,7 +114,7 @@ describe('atomic swap', function () {
       txid: tokenBIssueTxid,
       vout: 1,
       scriptPubKey: tokenBIssueTx.vout[1].scriptPubKey.hex,
-      amount: Math.floor(tokenBIssueTx.vout[1].value * 1E8)
+      amount: bitcoinToSatoshis(tokenBIssueTx.vout[1].value)
     }
 
     const takerInputUTXO = {
@@ -145,7 +146,7 @@ describe('atomic swap', function () {
     // get input transaction
     const makerInputHex = await getRawTransaction(aliceUtxos[0].txid)
 
-    const makerInputSatoshis = Math.floor(aliceUtxos[0].amount * 1E8)
+    const makerInputSatoshis = aliceUtxos[0].amount
     const takerOutputSatoshis = makerInputSatoshis
     const makerOutputSatoshis = tokenAObj.outputs[0].satoshis
     const takerInputSatoshis = makerOutputSatoshis
@@ -242,7 +243,7 @@ describe('atomic swap', function () {
 
     const makerInputSatoshis = tokenBObj.outputs[0].satoshis
     const takerOutputSatoshis = makerInputSatoshis
-    const makerOutputSatoshis = Math.floor(bobUtxos[0].amount * 1E8)
+    const makerOutputSatoshis = bobUtxos[0].amount
     const takerInputSatoshis = makerOutputSatoshis
 
     const makerInputUtxo = {
@@ -283,7 +284,7 @@ describe('atomic swap', function () {
     // get input transaction
     const makerInputTx = await getRawTransaction(aliceUtxos[0].txid)
 
-    const makerInputSatoshis = Math.floor(aliceUtxos[0].amount * 1E8)
+    const makerInputSatoshis = aliceUtxos[0].amount
     const takerOutputSatoshis = makerInputSatoshis
     const makerOutputSatoshis = tokenAObj.outputs[0].satoshis
     const takerInputSatoshis = makerOutputSatoshis
@@ -401,6 +402,6 @@ async function setup () {
     txid: tokenBIssueTxid,
     vout: 1,
     scriptPubKey: tokenBIssueTx.vout[1].scriptPubKey.hex,
-    amount: Math.floor(tokenBIssueTx.vout[1].value * 1E8)
+    amount: bitcoinToSatoshis(tokenBIssueTx.vout[1].value)
   }
 }

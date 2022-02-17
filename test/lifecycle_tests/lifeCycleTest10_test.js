@@ -14,10 +14,10 @@ const {
 } = require('../../index')
 
 const {
+  bitcoinToSatoshis,
   getTransaction,
   getFundsFromFaucet,
-  broadcast,
-  SATS_PER_BITCOIN
+  broadcast
 } = require('../../index').utils
 
 describe('regression, testnet', () => {
@@ -91,7 +91,7 @@ describe('regression, testnet', () => {
     const transferTxid = await broadcast(transferHex)
     console.log(`Transfer TX:     ${transferTxid}`)
     const transferTx = await getTransaction(transferTxid)
-    await new Promise(r => setTimeout(r, wait))
+    await new Promise(resolve => setTimeout(resolve, wait))
 
     expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
@@ -101,9 +101,8 @@ describe('regression, testnet', () => {
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
     expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
 
-    // Split tokens into 2 - both payable to Bob...
-    const bobAmount = transferTx.vout[0].value / 4
-    // const bobAmount2 = transferTx.vout[0].value - bobAmount1
+    // Split tokens into 4 - all payable to Bob...
+    const bobAmount = bitcoinToSatoshis(transferTx.vout[0].value / 4)
     const splitDestinations = []
     splitDestinations[0] = { address: bobAddr, amount: bobAmount }
     splitDestinations[1] = { address: bobAddr, amount: bobAmount }
@@ -121,7 +120,7 @@ describe('regression, testnet', () => {
     const splitTxid = await broadcast(splitHex)
     console.log(`Split TX:        ${splitTxid}`)
     const splitTx = await getTransaction(splitTxid)
-    await new Promise(r => setTimeout(r, wait))
+    await new Promise(resolve => setTimeout(resolve, wait))
     expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.0000075)
     expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.0000075)
     expect(await utils.getVoutAmount(splitTxid, 2)).to.equal(0.0000075)
@@ -152,7 +151,7 @@ describe('regression, testnet', () => {
     const mergeTxid = await broadcast(mergeHex)
     console.log(`Merge TX:        ${mergeTxid}`)
     const mergeTx = await getTransaction(mergeTxid)
-    await new Promise(r => setTimeout(r, wait))
+    await new Promise(resolve => setTimeout(resolve, wait))
     expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.000015)
     const tokenIdMerge = await utils.getToken(mergeTxid)
     const responseMerge = await utils.getTokenResponse(tokenIdMerge)
@@ -182,7 +181,7 @@ describe('regression, testnet', () => {
     const mergeTxid2 = await broadcast(mergeHex2)
     console.log(`Merge TX2:        ${mergeTxid2}`)
     const mergeTx2 = await getTransaction(mergeTxid2)
-    await new Promise(r => setTimeout(r, wait))
+    await new Promise(resolve => setTimeout(resolve, wait))
     expect(await utils.getVoutAmount(mergeTxid2, 0)).to.equal(0.000015)
     const tokenIdMerge2 = await utils.getToken(mergeTxid2)
     const responseMerge2 = await utils.getTokenResponse(tokenIdMerge2)
@@ -204,7 +203,7 @@ describe('regression, testnet', () => {
     )
     const redeemTxid = await broadcast(redeemHex)
     console.log(`Redeem TX:       ${redeemTxid}`)
-    await new Promise(r => setTimeout(r, wait))
+    await new Promise(resolve => setTimeout(resolve, wait))
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000015)
     console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
     console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))

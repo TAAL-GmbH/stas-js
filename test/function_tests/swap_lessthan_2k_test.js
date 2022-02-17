@@ -18,6 +18,7 @@ const {
 } = require('../../index').swap
 
 const {
+  bitcoinToSatoshis,
   getTransaction,
   getRawTransaction,
   getFundsFromFaucet,
@@ -179,6 +180,6 @@ async function setup () {
     txid: tokenBIssueTxid,
     vout: 1,
     scriptPubKey: tokenBIssueTx.vout[1].scriptPubKey.hex,
-    amount: Math.floor(tokenBIssueTx.vout[1].value * 1E8)
+    amount: bitcoinToSatoshis(tokenBIssueTx.vout[1].value)
   }
 }

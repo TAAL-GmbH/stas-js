@@ -5,7 +5,7 @@ const {
   getStasScript,
   sighash
 } = require('../../lib/stas')
-const { addressToPubkeyhash, SATS_PER_BITCOIN } = require('../../lib/utils')
+const { bitcoinToSatoshis, addressToPubkeyhash } = require('../../lib/utils')
 
 // the minimum length of a bitcoin address
 const ADDRESS_MIN_LENGTH = 26
@@ -43,7 +43,7 @@ function issueWithoutValiation (privateKey, issueInfo, contractUtxo, paymentUtxo
   if (!isZeroFee) {
     // add the payment utxos to the transaction
     tx.from(paymentUtxo)
-    satoshis += Math.round(paymentUtxo.amount * SATS_PER_BITCOIN)
+    satoshis += bitcoinToSatoshis(paymentUtxo.amount)
   }
 
   issueInfo.forEach(is => {

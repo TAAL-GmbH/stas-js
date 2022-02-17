@@ -14,10 +14,10 @@ const {
 const { sighash } = require('../lib/stas')
 
 const {
+  bitcoinToSatoshis,
   getTransaction,
   getFundsFromFaucet,
-  broadcast,
-  SATS_PER_BITCOIN
+  broadcast
 } = require('../index').utils
 
 ;(async () => {
@@ -88,9 +88,9 @@ const {
     tx.sign(issuerPrivateKey)
   }
 
-  console.log('------------')
-  console.log(ownerSignCallback.toString())
-  console.log('------------')
+  // console.log('------------')
+  // console.log(ownerSignCallback.toString())
+  // console.log('------------')
 
   const paymentSignCallback = (tx) => {
     tx.sign(fundingPrivateKey)
@@ -197,8 +197,9 @@ const {
   const transferTx = await getTransaction(transferTxid)
 
   // Split tokens into 2 - both payable to Bob...
-  const bobAmount1 = transferTx.vout[0].value / 2
-  const bobAmount2 = transferTx.vout[0].value - bobAmount1
+  const transferTxSats = bitcoinToSatoshis(transferTx.vout[0].value)
+  const bobAmount1 = transferTxSats / 2
+  const bobAmount2 = transferTxSats - bobAmount1
   const splitDestinations = []
   splitDestinations[0] = { address: bobAddr, amount: bobAmount1 }
   splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
@@ -256,8 +257,9 @@ const {
   const mergeTx = await getTransaction(mergeTxid)
 
   // Split again - both payable to Alice...
-  const aliceAmount1 = mergeTx.vout[0].value / 2
-  const aliceAmount2 = mergeTx.vout[0].value - aliceAmount1
+  const mergeTxSats = bitcoinToSatoshis(mergeTx.vout[0].value)
+  const aliceAmount1 = mergeTxSats / 2
+  const aliceAmount2 = mergeTxSats - aliceAmount1
 
   const split2Destinations = []
   split2Destinations[0] = { address: aliceAddr, amount: aliceAmount1 }
@@ -290,8 +292,8 @@ const {
   // Now mergeSplit
   const splitTxObj2 = new bsv.Transaction(splitHex2)
 
-  const aliceAmountSatoshis = Math.floor(splitTx2.vout[0].value * SATS_PER_BITCOIN) / 2
-  const bobAmountSatoshis = Math.floor(splitTx2.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx2.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
+  const aliceAmountSatoshis = bitcoinToSatoshis(splitTx2.vout[0].value) / 2
+  const bobAmountSatoshis = bitcoinToSatoshis(splitTx2.vout[0].value) + bitcoinToSatoshis(splitTx2.vout[1].value) - aliceAmountSatoshis
 
   const mergeSplitHex = mergeSplitWithCallback(
     alicePublicKey,

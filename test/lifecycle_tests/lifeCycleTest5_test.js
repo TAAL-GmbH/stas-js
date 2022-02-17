@@ -14,10 +14,10 @@ const {
 } = require('../../index')
 
 const {
+  bitcoinToSatoshis,
   getTransaction,
   getFundsFromFaucet,
-  broadcast,
-  SATS_PER_BITCOIN
+  broadcast
 } = require('../../index').utils
 
 const issuerPrivateKey = bsv.PrivateKey()
@@ -112,7 +112,7 @@ describe('regression, testnet', () => {
     console.log('addr2 Balance ' + (await utils.getTokenBalance(addr2)))
     console.log('addr3 Balance ' + (await utils.getTokenBalance(addr3)))
 
-    const amount = transferTx.vout[0].value / 2
+    const amount = bitcoinToSatoshis(transferTx.vout[0].value / 2)
     const splitDestinations = []
     splitDestinations[0] = { address: addr4, amount: amount }
     splitDestinations[1] = { address: addr4, amount: amount }
@@ -185,8 +185,8 @@ describe('regression, testnet', () => {
     // Now mergeSplit
     const splitTxObj2 = new bsv.Transaction(splitHex2)
 
-    const amount1 = Math.floor(splitTx2.vout[0].value * SATS_PER_BITCOIN) / 2
-    const amount2 = Math.floor(splitTx2.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx2.vout[1].value * SATS_PER_BITCOIN) - amount1
+    const amount1 = bitcoinToSatoshis(splitTx2.vout[0].value) / 2
+    const amount2 = bitcoinToSatoshis(splitTx2.vout[0].value) + bitcoinToSatoshis(splitTx2.vout[1].value) - amount1
 
     const mergeSplitHex = mergeSplit(
       pk5,

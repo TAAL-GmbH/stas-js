@@ -11,10 +11,10 @@ const {
 } = require('../index')
 
 const {
+  bitcoinToSatoshis,
   getTransaction,
   getFundsFromFaucet,
   broadcast
-  // SATS_PER_BITCOIN
 } = require('../index').utils
 
 ;(async () => {
@@ -119,7 +119,7 @@ const {
     },
     fundingPrivateKey,
     true, // isSplittable
-    2 // STAS version
+    symbol
   )
   const issueTxid = await broadcast(issueHex)
   console.log(`Issue TX:        ${issueTxid}`)
@@ -131,7 +131,6 @@ const {
   // transfer moves tokens to another address
   const transferHex = transfer(
     bobPrivateKey,
-    issuerPrivateKey.publicKey,
     {
       txid: issueTxid,
       vout: 1,
@@ -153,15 +152,15 @@ const {
   // alice 10000
   // bob  0
   // Split tokens into 2 - both payable to Bob...
-  const bobAmount1 = transferTx.vout[0].value / 2
-  const bobAmount2 = transferTx.vout[0].value - bobAmount1
+  const transferTxSats = bitcoinToSatoshis(transferTx.vout[0].value)
+  const bobAmount1 = transferTxSats / 2
+  const bobAmount2 = transferTxSats - bobAmount1
   const splitDestinations = []
   splitDestinations[0] = { address: bobAddr, amount: bobAmount1 }
   splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
 
   const splitHex = split(
     alicePrivateKey,
-    issuerPrivateKey.publicKey,
     {
       txid: transferTxid,
       vout: 0,
@@ -244,8 +243,8 @@ const {
   // // Now mergeSplit
   // const splitTxObj2 = new bsv.Transaction(splitHex2)
 
-  // const aliceAmountSatoshis = Math.floor(splitTx2.vout[0].value * SATS_PER_BITCOIN) / 2
-  // const bobAmountSatoshis = Math.floor(splitTx2.vout[0].value * SATS_PER_BITCOIN) + Math.floor(splitTx2.vout[1].value * SATS_PER_BITCOIN) - aliceAmountSatoshis
+  // const aliceAmountSatoshis = bitcoinToSatoshis(splitTx2.vout[0].value) / 2
+  // const bobAmountSatoshis = bitcoinToSatoshis(splitTx2.vout[0].value) + bitcoinToSatoshis(splitTx2.vout[1].value) - aliceAmountSatoshis
 
   // const mergeSplitHex = mergeSplit(
   //   alicePrivateKey,
