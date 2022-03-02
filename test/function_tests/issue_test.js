@@ -261,46 +261,47 @@ it('Issue - Issue to Issuer Address', async () => {
   expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
 })
 
-it('Issue - Successful Issue Token With Split No Fee', async () => {
-  const issueHex = issue(
-    issuerPrivateKey,
-    utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
-    utils.getUtxo(contractTxid, contractTx, 0),
-    null,
-    null,
-    true,
-    symbol
-  )
-  console.log(issueHex)
-  const issueTxid = await broadcast(issueHex)
-  const tokenId = await utils.getToken(issueTxid)
-  const response = await utils.getTokenResponse(tokenId)
-  expect(response.symbol).to.equal(symbol)
-  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
-  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
-})
+// No Fees disabled currently
+// it('Issue - Successful Issue Token With Split No Fee', async () => {
+//   const issueHex = issue(
+//     issuerPrivateKey,
+//     utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+//     utils.getUtxo(contractTxid, contractTx, 0),
+//     null,
+//     null,
+//     true,
+//     symbol
+//   )
+//   console.log(issueHex)
+//   const issueTxid = await broadcast(issueHex)
+//   const tokenId = await utils.getToken(issueTxid)
+//   const response = await utils.getTokenResponse(tokenId)
+//   expect(response.symbol).to.equal(symbol)
+//   expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
+//   expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
+//   expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+//   expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+// })
 
-it('Issue - Succesful Empty Funding UTXO', async () => {
-  const issueHex = issue(
-    issuerPrivateKey,
-    utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
-    utils.getUtxo(contractTxid, contractTx, 0),
-    null,
-    null,
-    true,
-    symbol
-  )
-  const issueTxid = await broadcast(issueHex)
-  const tokenId = await utils.getToken(issueTxid)
-  const response = await utils.getTokenResponse(tokenId)
-  expect(response.symbol).to.equal(symbol)
-  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
-  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
-})
+// it('Issue - Succesful Empty Funding UTXO', async () => {
+//   const issueHex = issue(
+//     issuerPrivateKey,
+//     utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+//     utils.getUtxo(contractTxid, contractTx, 0),
+//     null,
+//     null,
+//     true,
+//     symbol
+//   )
+//   const issueTxid = await broadcast(issueHex)
+//   const tokenId = await utils.getToken(issueTxid)
+//   const response = await utils.getTokenResponse(tokenId)
+//   expect(response.symbol).to.equal(symbol)
+//   expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
+//   expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
+//   expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+//   expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+// })
 
 it('Issue - Successful Callback with Fee', async () => {
   const issueHex = issueWithCallback(
@@ -324,33 +325,33 @@ it('Issue - Successful Callback with Fee', async () => {
   expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
 })
 
-it.only('Issue - Successful No Fee with callback', async () => {
-  const issueHex = issueWithCallback(
-    issuerPrivateKey.publicKey,
-    utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
-    utils.getUtxo(contractTxid, contractTx, 0),
-    null,
-    null,
-    true,
-    symbol,
-    issuerSignatureCallback,
-    null
-  )
-  console.log(issueHex)
-  let issueTxid
-  try {
-    issueTxid = await broadcast(issueHex)
-  } catch (e) {
-    console.log(e)
-  }
-  const tokenId = await utils.getToken(issueTxid)
-  const response = await utils.getTokenResponse(tokenId)
-  expect(response.symbol).to.equal(symbol)
-  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
-  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
-})
+// it('Issue - Successful No Fee with callback', async () => {
+//   const issueHex = issueWithCallback(
+//     issuerPrivateKey.publicKey,
+//     utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+//     utils.getUtxo(contractTxid, contractTx, 0),
+//     null,
+//     null,
+//     true,
+//     symbol,
+//     issuerSignatureCallback,
+//     null
+//   )
+//   console.log(issueHex)
+//   let issueTxid
+//   try {
+//     issueTxid = await broadcast(issueHex)
+//   } catch (e) {
+//     console.log(e)
+//   }
+//   const tokenId = await utils.getToken(issueTxid)
+//   const response = await utils.getTokenResponse(tokenId)
+//   expect(response.symbol).to.equal(symbol)
+//   expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
+//   expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
+//   expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+//   expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+// })
 
 it('Issue - Successful Issue Token 10 Addresses', async () => {
   const pk1 = bsv.PrivateKey()
