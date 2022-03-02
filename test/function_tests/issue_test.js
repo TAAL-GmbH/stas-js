@@ -261,7 +261,7 @@ it('Issue - Issue to Issuer Address', async () => {
   expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
 })
 
-// No Fees disabled currently
+// No Fees disabled currently for tests
 // it('Issue - Successful Issue Token With Split No Fee', async () => {
 //   const issueHex = issue(
 //     issuerPrivateKey,
