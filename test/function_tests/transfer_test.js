@@ -66,7 +66,7 @@ it('Transfer - Successful With Fee 1', async () => {
   expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
 })
 
-it.only('Transfer - Successful With Fee 2', async () => {
+it('Transfer - Successful With Fee 2', async () => {
   const transferHex = transfer(
     alicePrivateKey,
     utils.getUtxo(issueTxid, issueTx, 0),
