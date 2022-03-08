@@ -37,6 +37,7 @@ let contractTxid
 let contractTx
 let issueTx
 let issueTxid
+const wait = 2000
 
 const bobSignatureCallback = (tx, i, script, satoshis) => {
   return bsv.Transaction.sighash.sign(tx, bobPrivateKey, sighash, i, script, satoshis)
@@ -58,6 +59,7 @@ it('Merge - Successful Merge With Fee', async () => {
     fundingPrivateKey
   )
   const mergeTxid = await broadcast(mergeHex)
+  await new Promise(resolve => setTimeout(resolve, wait))
   const tokenIdMerge = await utils.getToken(mergeTxid)
   const response = await utils.getTokenResponse(tokenIdMerge)
   expect(response.symbol).to.equal('TAALT')
@@ -79,6 +81,7 @@ it('Merge - Successful Merge With Fee 2', async () => {
     fundingPrivateKey
   )
   const mergeTxid = await broadcast(mergeHex)
+  await new Promise(resolve => setTimeout(resolve, wait))
   const tokenIdMerge = await utils.getToken(mergeTxid)
   const response = await utils.getTokenResponse(tokenIdMerge)
   expect(response.symbol).to.equal('TAALT')
@@ -124,6 +127,7 @@ it('Merge - Successful Merge With Callback And Fee', async () => {
     paymentSignatureCallback
   )
   const mergeTxid = await broadcast(mergeHex)
+  await new Promise(resolve => setTimeout(resolve, wait))
   const tokenIdMerge = await utils.getToken(mergeTxid)
   const response = await utils.getTokenResponse(tokenIdMerge)
   expect(response.symbol).to.equal('TAALT')
@@ -132,8 +136,8 @@ it('Merge - Successful Merge With Callback And Fee', async () => {
   expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007)
   console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
   console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(10000)
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
 })
 
 // no fee disabled in tests
@@ -225,38 +229,6 @@ it('Merge - Attempt to Merge More Than 2 Tokens', async () => {
     expect(e.message).to.eql('This function can only merge exactly 2 STAS tokens')
   }
 })
-
-it(
-  'Merge - Attempt to Merge More Than 2 Tokens Without SDK Validation',
-  async () => {
-    const mergeHex = mergeUtil.mergeWithoutValidation(
-      bobPrivateKey,
-      [{
-        tx: splitTxObj,
-        vout: 0
-      },
-      {
-        tx: splitTxObj,
-        vout: 1
-      },
-      {
-        tx: splitTxObj,
-        vout: 2
-      }],
-      aliceAddr,
-      utils.getUtxo(splitTxid, splitTx, 2),
-      fundingPrivateKey
-    )
-    try {
-      await broadcast(mergeHex)
-      expect(false).toBeTruthy()
-      return
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('Request failed with status code 400')
-    }
-  }
-)
 
 it('Merge - Attempt to Merge Less Than Two Tokens', async () => {
   try {
