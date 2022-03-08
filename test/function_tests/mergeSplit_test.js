@@ -33,6 +33,7 @@ let aliceAddr
 let splitTxid
 let splitTx
 let splitTxObj
+const wait = 3000
 
 const bobSignatureCallback = (tx, i, script, satoshis) => {
   return bsv.Transaction.sighash.sign(tx, bobPrivateKey, sighash, i, script, satoshis)
@@ -60,6 +61,7 @@ it('MergeSplit - Successful MergeSplit With Fees', async () => {
     fundingPrivateKey
   )
   const mergeSplitTxid = await broadcast(mergeSplitHex)
+  await new Promise(resolve => setTimeout(resolve, wait))
   expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075)
   expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(7750)
@@ -68,30 +70,32 @@ it('MergeSplit - Successful MergeSplit With Fees', async () => {
   console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
 })
 
-it('MergeSplit - Successful MergeSplit No Fees', async () => {
-  await setup() // contract, issue, transfer then split
+// no fees disabled for tests
+// it('MergeSplit - Successful MergeSplit No Fees', async () => {
+//   await setup() // contract, issue, transfer then split
 
-  const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
-  const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
+//   const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
+//   const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
 
-  const mergeSplitHex = mergeSplit(
-    bobPrivateKey,
-    utils.getMergeSplitUtxo(splitTxObj, splitTx),
-    aliceAddr,
-    aliceAmountSatoshis,
-    bobAddr,
-    bobAmountSatoshis,
-    null,
-    null
-  )
-  const mergeSplitTxid = await broadcast(mergeSplitHex)
-  expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075)
-  expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7750)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(2250)
-  console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
-  console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
-})
+//   const mergeSplitHex = mergeSplit(
+//     bobPrivateKey,
+//     utils.getMergeSplitUtxo(splitTxObj, splitTx),
+//     aliceAddr,
+//     aliceAmountSatoshis,
+//     bobAddr,
+//     bobAmountSatoshis,
+//     null,
+//     null
+//   )
+//   const mergeSplitTxid = await broadcast(mergeSplitHex)
+//   await new Promise(resolve => setTimeout(resolve, wait))
+//   expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075)
+//   expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
+//   expect(await utils.getTokenBalance(aliceAddr)).to.equal(7750)
+//   expect(await utils.getTokenBalance(bobAddr)).to.equal(2250)
+//   console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
+//   console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
+// })
 
 it(
   'MergeSplit - Successful MergeSplit With Callback And Fees',
@@ -116,6 +120,7 @@ it(
       paymentSignatureCallback
     )
     const mergeSplitTxid = await broadcast(mergeSplitHex)
+    await new Promise(resolve => setTimeout(resolve, wait))
     expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075)
     expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(7750)
@@ -125,34 +130,36 @@ it(
   }
 )
 
-it('MergeSplit - Successful MergeSplit With Callback No Fees',
-  async () => {
-    await setup() // contract, issue, transfer then split
+// no fees currently disabled for tests
+// it('MergeSplit - Successful MergeSplit With Callback No Fees',
+//   async () => {
+//     await setup() // contract, issue, transfer then split
 
-    const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
-    const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
+//     const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
+//     const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
 
-    const mergeSplitHex = mergeSplitWithCallback(
-      bobPrivateKey.publicKey,
-      utils.getMergeSplitUtxo(splitTxObj, splitTx),
-      aliceAddr,
-      aliceAmountSatoshis,
-      bobAddr,
-      bobAmountSatoshis,
-      null,
-      null,
-      bobSignatureCallback,
-      null
-    )
-    const mergeSplitTxid = await broadcast(mergeSplitHex)
-    expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075)
-    expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
-    expect(await utils.getTokenBalance(aliceAddr)).to.equal(7750)
-    expect(await utils.getTokenBalance(bobAddr)).to.equal(2250)
-    console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
-    console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
-  }
-)
+//     const mergeSplitHex = mergeSplitWithCallback(
+//       bobPrivateKey.publicKey,
+//       utils.getMergeSplitUtxo(splitTxObj, splitTx),
+//       aliceAddr,
+//       aliceAmountSatoshis,
+//       bobAddr,
+//       bobAmountSatoshis,
+//       null,
+//       null,
+//       bobSignatureCallback,
+//       null
+//     )
+//     const mergeSplitTxid = await broadcast(mergeSplitHex)
+//     await new Promise(resolve => setTimeout(resolve, wait))
+//     expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075)
+//     expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
+//     expect(await utils.getTokenBalance(aliceAddr)).to.equal(7750)
+//     expect(await utils.getTokenBalance(bobAddr)).to.equal(2250)
+//     console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
+//     console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
+//   }
+// )
 
 it('MergeSplit - Incorrect Destination 1 Satoshi Amount', async () => {
   await setup() // contract, issue, transfer then split
@@ -626,8 +633,8 @@ async function setup () {
   const bobAmount1 = transferTx.vout[0].value / 2
   const bobAmount2 = transferTx.vout[0].value - bobAmount1
   const splitDestinations = []
-  splitDestinations[0] = { address: bobAddr, amount: bobAmount1 }
-  splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
+  splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount1) }
+  splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
 
   const splitHex = split(
     alicePrivateKey,
