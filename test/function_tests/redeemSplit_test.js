@@ -11,6 +11,7 @@ const {
 } = require('../../index')
 
 const {
+  bitcoinToSatoshis,
   getTransaction,
   getFundsFromFaucet,
   broadcast
@@ -27,6 +28,7 @@ let fundingUtxos
 let publicKeyHash
 let issueTxid
 let issueTx
+const wait = 3000
 
 beforeEach(async () => {
   await setup()
@@ -46,6 +48,7 @@ it('Successful RedeemSplit With 1 Split', async () => {
     fundingPrivateKey
   )
   const redeemTxid = await broadcast(redeemSplitHex)
+  await new Promise(resolve => setTimeout(resolve, wait))
   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000035) // first utxo goes to redemption address
   expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000035)
   console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
@@ -67,6 +70,7 @@ it('Successful RedeemSplit With 2 Split', async () => {
     fundingPrivateKey
   )
   const redeemTxid = await broadcast(redeemSplitHex)
+  await new Promise(resolve => setTimeout(resolve, wait))
   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000042) // first utxo goes to redemption address
   expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000014)
   expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.000014)
@@ -94,6 +98,7 @@ it('Successful RedeemSplit With 3 Split', async () => {
     fundingPrivateKey
   )
   const redeemTxid = await broadcast(redeemSplitHex)
+  await new Promise(resolve => setTimeout(resolve, wait))
   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000049)
   expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000007)
   expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.000007)
@@ -106,30 +111,32 @@ it('Successful RedeemSplit With 3 Split', async () => {
   expect(await utils.getTokenBalance(daveAddr)).to.equal(700)
 })
 
-it('Successful RedeemSplit With No Fees', async () => {
-  const rsBobAmount = issueTx.vout[0].value / 3
-  const rsAliceAmount1 = issueTx.vout[0].value / 3
-  const rSplitDestinations = []
-  rSplitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(rsBobAmount) }
-  rSplitDestinations[1] = { address: aliceAddr, amount: bitcoinToSatoshis(rsAliceAmount1) }
+// no fees disabled in tests
+// it('Successful RedeemSplit With No Fees', async () => {
+//   const rsBobAmount = issueTx.vout[0].value / 3
+//   const rsAliceAmount1 = issueTx.vout[0].value / 3
+//   const rSplitDestinations = []
+//   rSplitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(rsBobAmount) }
+//   rSplitDestinations[1] = { address: aliceAddr, amount: bitcoinToSatoshis(rsAliceAmount1) }
 
-  const redeemSplitHex = redeemSplit(
-    alicePrivateKey,
-    issuerPrivateKey.publicKey,
-    utils.getUtxo(issueTxid, issueTx, 0),
-    rSplitDestinations,
-    null,
-    null
-  )
-  const redeemTxid = await broadcast(redeemSplitHex)
-  expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00002334)
-  expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.00002333)
-  expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.00002333)
-  console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
-  console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(2333)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(5333)
-})
+//   const redeemSplitHex = redeemSplit(
+//     alicePrivateKey,
+//     issuerPrivateKey.publicKey,
+//     utils.getUtxo(issueTxid, issueTx, 0),
+//     rSplitDestinations,
+//     null,
+//     null
+//   )
+//   const redeemTxid = await broadcast(redeemSplitHex)
+//   await new Promise(resolve => setTimeout(resolve, wait))
+//   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00002334)
+//   expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.00002333)
+//   expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.00002333)
+//   console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
+//   console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
+//   expect(await utils.getTokenBalance(aliceAddr)).to.equal(2333)
+//   expect(await utils.getTokenBalance(bobAddr)).to.equal(5333)
+// })
 
 it('RedeemSplit - No Split Completes Successfully', async () => {
   const rsBobAmount = issueTx.vout[0].value / 2
@@ -145,6 +152,7 @@ it('RedeemSplit - No Split Completes Successfully', async () => {
     fundingPrivateKey
   )
   const redeemTxid = await broadcast(redeemSplitHex)
+  await new Promise(resolve => setTimeout(resolve, wait))
   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000035)
   console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
   console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
@@ -198,10 +206,9 @@ it('RedeemSplit - Add Too Much To Split Throws Error', async () => {
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Not enough input Satoshis to cover output')
+    expect(e.message).to.eql('Not enough input Satoshis to cover output. Trying to redeem -7000 sats')
   }
 })
-
 
 it('RedeemSplit - Address Too Short Throws Error', async () => {
   const bobAmount1 = issueTx.vout[0].value / 2
@@ -477,7 +484,7 @@ it('RedeemSplit - Null Funding Private Key Throws Error', async () => {
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Payment UTXO provided but payment private key is null')
+    expect(e.message).to.eql('Payment UTXO provided but payment public key is null')
   }
 })
 
