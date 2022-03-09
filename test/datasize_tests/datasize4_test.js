@@ -18,7 +18,7 @@ const {
 
 // Symbol size of 1 byte
 const symbol = 'A'
-const wait = 5000 // wait may be required due to delay in issuance of token
+const wait = 2000 // wait may be required due to delay in issuance of token
 let issuerPrivateKey
 let fundingPrivateKey
 let bobPrivateKey
@@ -61,7 +61,7 @@ it('Symbol 1 Byte Data Size Zero Bytes', async () => {
   await new Promise(resolve => setTimeout(resolve, wait))
   console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
-  const response = await utils.getTokenWithSymbol(tokenId, symbol)
+  const response = await utils.getTokenResponse(tokenId, symbol)
   expect(response.symbol).to.equal(symbol)
   const issueTx = await getTransaction(issueTxid)
 
@@ -104,7 +104,7 @@ it('Symbol 1 Byte Data Size 1 Byte', async () => {
   console.log(`issueTxid:        ${issueTxid}`)
   console.log(`Token ID:        ${tokenId}`)
   await new Promise(resolve => setTimeout(resolve, wait))
-  const response = await utils.getTokenWithSymbol(tokenId, symbol)
+  const response = await utils.getTokenResponse(tokenId, symbol)
   expect(response.symbol).to.equal(symbol)
   const issueTx = await getTransaction(issueTxid)
 
@@ -147,7 +147,7 @@ it('Symbol 1 Byte Data Size < 75 Bytes', async () => {
   console.log(`issueTxid:        ${issueTxid}`)
   console.log(`Token ID:        ${tokenId}`)
   await new Promise(resolve => setTimeout(resolve, wait))
-  const response = await utils.getTokenWithSymbol(tokenId, symbol)
+  const response = await utils.getTokenResponse(tokenId, symbol)
   expect(response.symbol).to.equal(symbol)
   const issueTx = await getTransaction(issueTxid)
 
@@ -190,7 +190,7 @@ it('Symbol 1 Byte Data Size < 128 Bytes', async () => {
   console.log(`issueTxid:        ${issueTxid}`)
   console.log(`Token ID:        ${tokenId}`)
   await new Promise(resolve => setTimeout(resolve, wait))
-  const response = await utils.getTokenWithSymbol(tokenId, symbol)
+  const response = await utils.getTokenResponse(tokenId, symbol)
   expect(response.symbol).to.equal(symbol)
   const issueTx = await getTransaction(issueTxid)
 
@@ -233,7 +233,7 @@ it('Symbol 1 Byte Data Size > 128 Bytes', async () => {
   console.log(`issueTxid:        ${issueTxid}`)
   console.log(`Token ID:        ${tokenId}`)
   await new Promise(resolve => setTimeout(resolve, wait))
-  const response = await utils.getTokenWithSymbol(tokenId, symbol)
+  const response = await utils.getTokenResponse(tokenId, symbol)
   expect(response.symbol).to.equal(symbol)
   const issueTx = await getTransaction(issueTxid)
 
@@ -275,7 +275,7 @@ it('Symbol 1 Byte Data Size > 32768 Bytes', async () => {
   console.log(`issueTxid:        ${issueTxid}`)
   console.log(`Token ID:        ${tokenId}`)
   await new Promise(resolve => setTimeout(resolve, wait))
-  const response = await utils.getTokenWithSymbol(tokenId, symbol)
+  const response = await utils.getTokenResponse(tokenId, symbol)
   expect(response.symbol).to.equal(symbol)
   const issueTx = await getTransaction(issueTxid)
 
@@ -318,7 +318,7 @@ it('Symbol 1 Byte Data Size < 32768 Bytes', async () => {
   console.log(`issueTxid:        ${issueTxid}`)
   console.log(`Token ID:        ${tokenId}`)
   await new Promise(resolve => setTimeout(resolve, wait))
-  const response = await utils.getTokenWithSymbol(tokenId, symbol)
+  const response = await utils.getTokenResponse(tokenId, symbol)
   expect(response.symbol).to.equal(symbol)
   const issueTx = await getTransaction(issueTxid)
 
@@ -361,7 +361,7 @@ it('Symbol 1 Byte Data Size Large', async () => {
   console.log(`issueTxid:        ${issueTxid}`)
   console.log(`Token ID:        ${tokenId}`)
   await new Promise(resolve => setTimeout(resolve, wait))
-  const response = await utils.getTokenWithSymbol(tokenId, symbol)
+  const response = await utils.getTokenResponse(tokenId, symbol)
   expect(response.symbol).to.equal(symbol)
   const issueTx = await getTransaction(issueTxid)
 
