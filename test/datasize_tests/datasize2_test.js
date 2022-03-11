@@ -18,7 +18,7 @@ const {
 
 // Symbol size of 128 bytes
 const symbol = 'CallmeIshmaelSomeyearsagosdnevermindhowlongpreciselyhavinglittleornomoneyinmypurseandnothingparticulartointerestmeotoadasdfasfgg'
-const wait = 2000
+const wait = 5000
 let issuerPrivateKey
 let fundingPrivateKey
 let alicePrivateKey
@@ -70,6 +70,7 @@ it('Symbol 128 Data Size Zero Bytes', async () => {
     fundingPrivateKey
   )
   const redeemTxid = await broadcast(redeemHex)
+  await new Promise(resolve => setTimeout(resolve, wait))
   console.log(`Redeem TX:       ${redeemTxid}`)
   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00010000)
   console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
@@ -113,6 +114,7 @@ it('Symbol 128 Data Size 1 Byte', async () => {
     fundingPrivateKey
   )
   const redeemTxid = await broadcast(redeemHex)
+  await new Promise(resolve => setTimeout(resolve, wait))
   console.log(`Redeem TX:       ${redeemTxid}`)
   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00010000)
   console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
@@ -156,6 +158,7 @@ it('Symbol 128 Data Size < 75 Bytes', async () => {
     fundingPrivateKey
   )
   const redeemTxid = await broadcast(redeemHex)
+  await new Promise(resolve => setTimeout(resolve, wait))
   console.log(`Redeem TX:       ${redeemTxid}`)
   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00010000)
   console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
@@ -199,6 +202,7 @@ it('Symbol 128 Data Size < 128 Bytes', async () => {
     fundingPrivateKey
   )
   const redeemTxid = await broadcast(redeemHex)
+  await new Promise(resolve => setTimeout(resolve, wait))
   console.log(`Redeem TX:       ${redeemTxid}`)
   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00010000)
   console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
@@ -242,6 +246,7 @@ it('Symbol 128 Data Size > 128 Bytes', async () => {
     fundingPrivateKey
   )
   const redeemTxid = await broadcast(redeemHex)
+  await new Promise(resolve => setTimeout(resolve, wait))
   console.log(`Redeem TX:       ${redeemTxid}`)
   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00010000)
   console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
@@ -284,6 +289,7 @@ it('Symbol 128 Data Size > 32768 Bytes', async () => {
     fundingPrivateKey
   )
   const redeemTxid = await broadcast(redeemHex)
+  await new Promise(resolve => setTimeout(resolve, wait))
   console.log(`Redeem TX:       ${redeemTxid}`)
   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00010000)
   console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
@@ -327,6 +333,7 @@ it('Symbol 128 Data Size < 32768 Bytes', async () => {
     fundingPrivateKey
   )
   const redeemTxid = await broadcast(redeemHex)
+  await new Promise(resolve => setTimeout(resolve, wait))
   console.log(`Redeem TX:       ${redeemTxid}`)
   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00010000)
   console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
@@ -370,6 +377,7 @@ it('Symbol 128 Data Size Large', async () => {
     fundingPrivateKey
   )
   const redeemTxid = await broadcast(redeemHex)
+  await new Promise(resolve => setTimeout(resolve, wait))
   console.log(`Redeem TX:       ${redeemTxid}`)
   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00010000)
   console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))

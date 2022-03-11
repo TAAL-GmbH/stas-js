@@ -1,4 +1,5 @@
 const axios = require('axios')
+const axiosRetry = require('axios-retry')
 const bsv = require('bsv')
 require('dotenv').config()
 const { bitcoinToSatoshis } = require('../../index').utils
@@ -179,10 +180,70 @@ async function getToken (txid, vout) {
   return tokenId
 }
 
+// async function getTokenResponse (tokenId, symbol) {
+//   if (symbol === undefined) {
+//     symbol = 'TAALT'
+//   }
+//   const url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/token/${tokenId}/${symbol}`
+//   let response
+//   let i = 0
+//   console.log('url ' + url)
+//   while (i < 30) {
+//     response = await axios({
+//       method: 'get',
+//       url,
+//       auth: {
+//         username: process.env.API_USERNAME,
+//         password: process.env.API_PASSWORD
+//       }
+//     })
+//     // console.log('response here ' + response)
+//     if (response.data.token != null) {
+//       console.log('breaking')
+//       break
+//     }
+//     await new Promise(resolve => setTimeout(resolve, 2000))
+//     i++
+//   }
+//   return response.data.token
+// }
+
+// async function getToken (txid, vout) {
+//   if (vout === undefined) {
+//     vout = 0
+//   }
+//   const url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/tx/hash/${txid}`
+//   const response = await axios({
+//     method: 'get',
+//     url,
+//     auth: {
+//       username: process.env.API_USERNAME,
+//       password: process.env.API_PASSWORD
+//     }
+//   })
+
+//   const temp = response.data.vout[vout].scriptPubKey.asm
+//   const split = temp.split('OP_RETURN')[1]
+//   const tokenId = split.split(' ')[1]
+//   return tokenId
+// }
+
 async function getTokenResponse (tokenId, symbol) {
   if (symbol === undefined) {
     symbol = 'TAALT'
   }
+
+  axiosRetry(axios, {
+    retries: 5, // number of retries
+    retryDelay: (retryCount) => {
+      console.log(`retry attempt: ${retryCount}`)
+      return retryCount * 2000 // time interval between retries
+    },
+    retryCondition: (error) => {
+      // if retry condition is not specified, by default idempotent requests are retried
+      return error.response.status === 404
+    }
+  })
   let response
   let url
   try {
