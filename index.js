@@ -1,6 +1,6 @@
 'use strict'
 
-const stas = module.exports
+const stas = {}
 
 stas.contract = require('./lib/contract')
 stas.contractWithCallback = require('./lib/contractWithCallback')
@@ -21,3 +21,5 @@ stas.mergeSplitWithCallback = require('./lib/mergeSplitWithCallback')
 stas.swap = require('./lib/swap')
 
 stas.utils = require('./lib/utils')
+
+module.exports = stas
