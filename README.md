@@ -18,9 +18,13 @@ This library will create various types of STAS token transactions that add token
 
 The mining fee is set in the config.js file. The default is currently 500 sats per 1000 bytes which is 0.5 sats per byte. Change the sats to whatever you expect to pay.
 
+## Example Code
+
+We include examples that run on the private Taalnet. They contain no real error handling and are not meant to be used in production.
+
 ## Env Vars
 
-The following environment variables must be set inside the .env file
+To use the examples the following environment variables must be set inside the .env file
 API_USERNAME=  The API username
 API_PASSWORD=  The API password
 NETWORK= The netork that the tests will run on. 'livenet' is the main network
