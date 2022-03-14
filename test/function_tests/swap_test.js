@@ -92,7 +92,7 @@ describe('atomic swap', function () {
 
     const makerInputSatoshis = tokenBObj.outputs[makerVout].satoshis
     const takerOutputSatoshis = makerInputSatoshis
-    const makerOutputSatoshis = bobUtxos[0].amount 
+    const makerOutputSatoshis = bobUtxos[0].amount
     const takerInputSatoshis = makerOutputSatoshis
 
     const makerInputUtxo = {
@@ -127,6 +127,75 @@ describe('atomic swap', function () {
     const fullySignedSwapHex = acceptSwapOffer(swapOfferHex, tokenBIssueHex,
       bobPrivateKey, takerInputTxHex, takerInputUTXO, takerOutputSatoshis, alicePublicKeyHash,
       fundingUTXO, fundingPrivateKey)
+
+    const swapTxid = await broadcast(fullySignedSwapHex)
+    console.log('swaptxid', swapTxid)
+
+    const tokenId = await utils.getToken(swapTxid, 1)
+    const response = await utils.getTokenResponse(tokenId, tokenBSymbol)
+    expect(response.symbol).to.equal(tokenBSymbol)
+    expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.01)
+    expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.00003)
+  })
+
+  // the maker offers a token for sats with commission
+  it('Swap - 2 step token-p2pkh swap with commission', async function () {
+    const makerVout = 0
+    const takerVout = 0
+    const makerStasTx = bsv.Transaction(tokenBIssueHex)
+    const makerStasInputScript = makerStasTx.outputs[makerVout].script
+
+    const commissionPrivateKey = bsv.PrivateKey
+    const commissionAddress = commissionPrivateKey.toAddress(process.env.NETWORK).toString()
+    const commissionUtxo = await getFundsFromFaucet(bobPrivateKey.toAddress(process.env.NETWORK).toString())
+
+    // taker gets some funds
+    const bobUtxos = await getFundsFromFaucet(bobPrivateKey.toAddress(process.env.NETWORK).toString())
+    // get input transaction
+    const takerInputTxHex = await getRawTransaction(bobUtxos[0].txid)
+
+    const alicePublicKeyHash = bsv.crypto.Hash.sha256ripemd160(alicePrivateKey.publicKey.toBuffer()).toString('hex')
+
+    const makerInputSatoshis = tokenBObj.outputs[makerVout].satoshis
+    const takerOutputSatoshis = makerInputSatoshis
+    const makerOutputSatoshis = bobUtxos[0].amount
+    const takerInputSatoshis = makerOutputSatoshis
+
+    const makerInputUtxo = {
+      txId: tokenBIssueTxid,
+      outputIndex: takerVout,
+      script: makerStasInputScript,
+      satoshis: makerInputSatoshis
+    }
+
+    const wantedInfo = { type: 'native', satoshis: makerOutputSatoshis }
+
+    const commission = { address: commissionAddress, satoshis: 10000 }
+
+    const swapOfferHex = createSwapOffer(
+      alicePrivateKey,
+      makerInputUtxo,
+      wantedInfo,
+      commission
+    )
+    // now bob takes the offer
+    const fundingUTXO = {
+      txid: tokenBIssueTxid,
+      vout: 1,
+      scriptPubKey: tokenBIssueTx.vout[1].scriptPubKey.hex,
+      amount: bitcoinToSatoshis(tokenBIssueTx.vout[1].value)
+    }
+
+    const takerInputUTXO = {
+      txId: bobUtxos[0].txid,
+      outputIndex: bobUtxos[0].vout,
+      script: bsv.Script.fromHex(bobUtxos[0].scriptPubKey),
+      satoshis: takerInputSatoshis
+    }
+
+    const fullySignedSwapHex = acceptSwapOffer(swapOfferHex, tokenBIssueHex,
+      bobPrivateKey, takerInputTxHex, takerInputUTXO, takerOutputSatoshis, alicePublicKeyHash,
+      fundingUTXO, fundingPrivateKey, commissionUtxo)
 
     const swapTxid = await broadcast(fullySignedSwapHex)
     console.log('swaptxid', swapTxid)
