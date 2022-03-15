@@ -30,7 +30,7 @@ let bobAddr
 let aliceAddr
 let issueTxid
 let issueTx
-const wait = 2000
+const wait = 10000
 
 const aliceSignatureCallback = (tx, i, script, satoshis) => {
   return bsv.Transaction.sighash.sign(tx, alicePrivateKey, sighash, i, script, satoshis)

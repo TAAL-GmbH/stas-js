@@ -515,7 +515,7 @@ it(
       return
     } catch (e) {
       expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('total out amount 9000 must equal total in amount 10000')
+      expect(e.message).to.contain('total out amount 9000 must equal total in amount 10000')
     }
   }
 )
