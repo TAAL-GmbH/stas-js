@@ -61,10 +61,13 @@ describe('regression, testnet', () => {
       symbol,
       2
     )
+    console.log('alice address ' + aliceAddr)
+    console.log('bob address ' + bobAddr)
     const issueTxid = await broadcast(issueHex)
+    console.log(`Issue TX:     ${issueTxid}`)
     const tokenId = await utils.getToken(issueTxid)
     console.log(`Token ID:        ${tokenId}`)
-    response = await utils.getTokenResponse(tokenId)
+    const response = await utils.getTokenResponse(tokenId)
     expect(response).to.equal('Token Not Found')
   })
 })
