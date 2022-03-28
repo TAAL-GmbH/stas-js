@@ -24,6 +24,7 @@
   "homepage": "https://github.com/ordishs/go-stas#readme",
   "dependencies": {
     "axios": "^0.21.4",
+    "axios-retry": "^3.2.4",
     "chai": "^4.3.4",
     "chai-as-promised": "^7.1.1",
     "dotenv": "^10.0.0",
