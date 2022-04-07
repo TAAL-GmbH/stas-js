@@ -2,6 +2,8 @@
 
 This library will create various types of STAS token transactions that add token functionality to the BSV blockchain.
 
+To use the STAS protocol to issue tokens for commercial purposes, please contact sales@taal.com
+
 ## The 8 STAS building functions are:
 
 1. Contract: This will create an OP_RETURN UTXO which contains a JSON schema that provides details about a particular token.
