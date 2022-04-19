@@ -31,6 +31,7 @@ let aliceAddr
 let bobAddr
 let fundingAddress
 let symbol
+const wait = 5000 // due to delay in token issuance
 
 const issuerSignatureCallback = (tx, i, script, satoshis) => {
   return bsv.Transaction.sighash.sign(tx, issuerPrivateKey, sighash, i, script, satoshis)
@@ -55,6 +56,7 @@ it('Issue - Successful Issue Token With Split And Fee 1', async () => {
   )
   const issueTxid = await broadcast(issueHex)
   const tokenId = await utils.getToken(issueTxid)
+  await new Promise(resolve => setTimeout(resolve, wait))
   const response = await utils.getTokenResponse(tokenId)
   expect(response.symbol).to.equal(symbol)
   expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
@@ -82,6 +84,7 @@ it('Issue - Successful Issue Token With Split And Fee 2', async () => {
   )
   const issueTxid = await broadcast(issueHex)
   const tokenId = await utils.getToken(issueTxid)
+  await new Promise(resolve => setTimeout(resolve, wait))
   const response = await utils.getTokenResponse(tokenId)
   expect(response.symbol).to.equal(symbol)
   expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.0001)
@@ -121,6 +124,7 @@ it('Issue - Successful Issue Token With Split And Fee 3', async () => {
   const issueTxid = await broadcast(issueHex)
   const tokenId = await utils.getToken(issueTxid)
   console.log('token  ' + tokenId)
+  await new Promise(resolve => setTimeout(resolve, wait))
   const response = await utils.getTokenResponse(tokenId)
   expect(response.symbol).to.equal(symbol)
   expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00006)
@@ -169,6 +173,7 @@ it('Issue - Successful Issue Token With Split And Fee 4', async () => {
   )
   const issueTxid = await broadcast(issueHex)
   const tokenId = await utils.getToken(issueTxid)
+  await new Promise(resolve => setTimeout(resolve, wait))
   const response = await utils.getTokenResponse(tokenId)
   expect(response.symbol).to.equal(symbol)
   expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00004)
@@ -193,6 +198,7 @@ it('Issue - Successful Issue Token To Same Address', async () => {
   )
   const issueTxid = await broadcast(issueHex)
   const tokenId = await utils.getToken(issueTxid)
+  await new Promise(resolve => setTimeout(resolve, wait))
   const response = await utils.getTokenResponse(tokenId)
   expect(response.symbol).to.equal(symbol)
   expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
@@ -213,6 +219,7 @@ it('Issue - Successful Issue Token To Funding Address', async () => {
   const issueTxid = await broadcast(issueHex)
   const tokenId = await utils.getToken(issueTxid)
   const response = await utils.getTokenResponse(tokenId)
+  await new Promise(resolve => setTimeout(resolve, wait))
   expect(response.symbol).to.equal(symbol)
   expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
   expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
@@ -253,6 +260,7 @@ it('Issue - Issue to Issuer Address', async () => {
   )
   const issueTxid = await broadcast(issueHex)
   const tokenId = await utils.getToken(issueTxid)
+  await new Promise(resolve => setTimeout(resolve, wait))
   const response = await utils.getTokenResponse(tokenId)
   expect(response.symbol).to.equal(symbol)
   expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
@@ -317,6 +325,7 @@ it('Issue - Successful Callback with Fee', async () => {
   )
   const issueTxid = await broadcast(issueHex)
   const tokenId = await utils.getToken(issueTxid)
+  await new Promise(resolve => setTimeout(resolve, wait))
   const response = await utils.getTokenResponse(tokenId)
   expect(response.symbol).to.equal(symbol)
   expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
@@ -382,6 +391,7 @@ it('Issue - Successful Issue Token 10 Addresses', async () => {
   )
   const issueTxid = await broadcast(issueHex)
   const tokenId = await utils.getToken(issueTxid)
+  await new Promise(resolve => setTimeout(resolve, wait))
   const response = await utils.getTokenResponse(tokenId)
   expect(response.symbol).to.equal(symbol)
 
