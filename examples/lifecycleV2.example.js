@@ -31,9 +31,11 @@ const {
   const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
   const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
 
-  const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
+  const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(bobPrivateKey.publicKey.toBuffer()).toString('hex')
   const supply = 10000
   const symbol = 'TAALT'
+  console.log('alice address ' + aliceAddr)
+  console.log('bob address ' + bobAddr)
 
   // schemaId is required for the api to parse the tokens
   const schema = {
@@ -45,7 +47,7 @@ const {
     image: 'https://www.taal.com/wp-content/themes/taal_v2/img/favicon/favicon-96x96.png',
     totalSupply: supply,
     decimals: 0,
-    satsPerToken: 1,
+    satsPerToken: 2,
     properties: {
       issuer: {
         organisation: 'Taal Technologies SEZC',
@@ -123,6 +125,11 @@ const {
     console.log('error issuing token', e)
     return
   }
+  console.log('here ' + contractTx.vout[1].value)
+  console.log('---------')
+  console.log(contractTx.vout[0].value)
+
+  console.log('---------')
   const issueTxid = await broadcast(issueHex)
   console.log(`Issue TX:        ${issueTxid}`)
   const issueTx = await getTransaction(issueTxid)

@@ -18,7 +18,7 @@ const {
 
 // Symbol size of 1 byte
 const symbol = 'A'
-const wait = 5000 // wait may be required due to delay in issuance of token
+const wait = 30000 // wait may be required due to delay in issuance of token
 let issuerPrivateKey
 let fundingPrivateKey
 let bobPrivateKey

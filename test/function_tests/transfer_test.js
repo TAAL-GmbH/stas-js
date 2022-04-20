@@ -33,7 +33,7 @@ let issueTxid
 let issueTx
 let issueOutFundingVout
 
-const wait = 5000
+const wait = 30000
 
 const bobSignatureCallback = (tx, i, script, satoshis) => {
   return bsv.Transaction.sighash.sign(tx, bobPrivateKey, sighash, i, script, satoshis)

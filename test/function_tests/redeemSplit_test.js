@@ -28,7 +28,7 @@ let fundingUtxos
 let publicKeyHash
 let issueTxid
 let issueTx
-const wait = 3000
+const wait = 5000
 
 beforeEach(async () => {
   await setup()

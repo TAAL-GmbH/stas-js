@@ -64,11 +64,12 @@ it('Full Life Cycle Test 1', async () => {
     2
   )
   const issueTxid = await broadcast(issueHex)
-  await new Promise(resolve => setTimeout(resolve, wait))
+  console.log(`Issue TX:     ${issueTxid}`)
   const issueTx = await getTransaction(issueTxid)
   const tokenId = await utils.getToken(issueTxid)
   console.log(`Token ID:        ${tokenId}`)
   const response = await utils.getTokenResponse(tokenId)
+  await new Promise(resolve => setTimeout(resolve, wait))
   expect(response.symbol).to.equal(symbol)
   expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
   expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)

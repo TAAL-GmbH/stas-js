@@ -37,7 +37,7 @@ let contractTxid
 let contractTx
 let issueTx
 let issueTxid
-const wait = 2000
+const wait = 3000
 
 const bobSignatureCallback = (tx, i, script, satoshis) => {
   return bsv.Transaction.sighash.sign(tx, bobPrivateKey, sighash, i, script, satoshis)
@@ -116,7 +116,7 @@ it('Merge - Successful Merge With Fee 2', async () => {
 //   expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
 // })
 
-it('Merge - Successful Merge With Callback And Fee', async () => {
+it.only('Merge - Successful Merge With Callback And Fee', async () => {
   const mergeHex = mergeWithCallback(
     bobPrivateKey.publicKey,
     utils.getMergeUtxo(splitTxObj),

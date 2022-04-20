@@ -391,7 +391,7 @@ it('Issue - Successful Issue Token 10 Addresses', async () => {
   )
   const issueTxid = await broadcast(issueHex)
   const tokenId = await utils.getToken(issueTxid)
-  await new Promise(resolve => setTimeout(resolve, wait))
+  await new Promise(resolve => setTimeout(resolve, 10000))
   const response = await utils.getTokenResponse(tokenId)
   expect(response.symbol).to.equal(symbol)
 

@@ -32,6 +32,7 @@ describe('regression, testnet', () => {
     const supply = 10000
     const satsPerSupply = 10000 // 1 token worth 10k sats
     const symbol = 'TAALT'
+    const wait = 5000 // set wait before token balance check
 
     const schema = utils.schema(publicKeyHash, symbol, supply, satsPerSupply)
     schema.satsPerToken = satsPerSupply
@@ -78,11 +79,10 @@ describe('regression, testnet', () => {
     const issueTxid = await broadcast(issueHex)
     console.log(`Issue TX:        ${issueTxid}`)
     const issueTx = await getTransaction(issueTxid)
+    await new Promise(resolve => setTimeout(resolve, wait))
     const tokenId = await utils.getToken(issueTxid)
     const response = await utils.getTokenResponse(tokenId)
     expect(response.symbol).to.equal(symbol)
-    expect(response.contract_txs).to.contain(contractTxid)
-    expect(response.issuance_txs).to.contain(issueTxid)
     expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00010)
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
 
@@ -133,6 +133,7 @@ describe('regression, testnet', () => {
     )
     const redeemTxid = await broadcast(redeemHex)
     console.log(`Redeem TX:       ${redeemTxid}`)
+    await new Promise(resolve => setTimeout(resolve, wait))
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.0001)
     expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
