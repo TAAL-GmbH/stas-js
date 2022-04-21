@@ -33,7 +33,7 @@ let aliceAddr
 let splitTxid
 let splitTx
 let splitTxObj
-const wait = 3000
+const wait = 5000
 
 const bobSignatureCallback = (tx, i, script, satoshis) => {
   return bsv.Transaction.sighash.sign(tx, bobPrivateKey, sighash, i, script, satoshis)
@@ -60,14 +60,16 @@ it('MergeSplit - Successful MergeSplit With Fees', async () => {
     utils.getUtxo(splitTxid, splitTx, issueOutFundingVout),
     fundingPrivateKey
   )
+  console.log(aliceAddr)
+  console.log(bobAddr)
   const mergeSplitTxid = await broadcast(mergeSplitHex)
   await new Promise(resolve => setTimeout(resolve, wait))
   expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075)
   expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7750)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(2250)
   console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
   console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7750)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(2250)
 })
 
 // no fees disabled for tests

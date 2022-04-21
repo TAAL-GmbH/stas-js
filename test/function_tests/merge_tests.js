@@ -116,7 +116,7 @@ it('Merge - Successful Merge With Fee 2', async () => {
 //   expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
 // })
 
-it.only('Merge - Successful Merge With Callback And Fee', async () => {
+it('Merge - Successful Merge With Callback And Fee', async () => {
   const mergeHex = mergeWithCallback(
     bobPrivateKey.publicKey,
     utils.getMergeUtxo(splitTxObj),

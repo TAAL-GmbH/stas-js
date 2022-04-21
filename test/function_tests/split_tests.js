@@ -481,33 +481,6 @@ it('Split - Incorrect Owner Private Key Throws Error', async () => {
   }
 })
 
-it('Split - Incorrect Owner Private Key Throws Error', async () => {
-  const bobAmount1 = issueTx.vout[0].value / 2
-  const bobAmount2 = issueTx.vout[0].value - bobAmount1
-  const splitDestinations = []
-  splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount1) }
-  splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
-  const incorrectPrivateKey = bsv.PrivateKey()
-  console.log(bobAmount1)
-  console.log(bitcoinToSatoshis(bobAmount2))
-
-  const splitHex = split(
-    incorrectPrivateKey,
-    utils.getUtxo(issueTxid, issueTx, 0),
-    splitDestinations,
-    utils.getUtxo(issueTxid, issueTx, 2),
-    fundingPrivateKey
-  )
-  try {
-    await broadcast(splitHex)
-    expect(false).toBeTruthy()
-    return
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Request failed with status code 400')
-  }
-})
-
 it('Split - Incorrect Payments Private Key Throws Error', async () => {
   const bobAmount1 = issueTx.vout[0].value / 2
   const bobAmount2 = issueTx.vout[0].value - bobAmount1
