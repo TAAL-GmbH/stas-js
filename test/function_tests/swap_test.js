@@ -145,9 +145,8 @@ describe('atomic swap', function () {
     const makerStasTx = bsv.Transaction(tokenBIssueHex)
     const makerStasInputScript = makerStasTx.outputs[makerVout].script
 
-    const commissionPrivateKey = bsv.PrivateKey
+    const commissionPrivateKey = bsv.PrivateKey()
     const commissionAddress = commissionPrivateKey.toAddress(process.env.NETWORK).toString()
-    const commissionUtxo = await getFundsFromFaucet(bobPrivateKey.toAddress(process.env.NETWORK).toString())
 
     // taker gets some funds
     const bobUtxos = await getFundsFromFaucet(bobPrivateKey.toAddress(process.env.NETWORK).toString())
@@ -156,10 +155,13 @@ describe('atomic swap', function () {
 
     const alicePublicKeyHash = bsv.crypto.Hash.sha256ripemd160(alicePrivateKey.publicKey.toBuffer()).toString('hex')
 
+    const commissionInfo = { address: commissionAddress, satoshis: 10000 }
+
     const makerInputSatoshis = tokenBObj.outputs[makerVout].satoshis
     const takerOutputSatoshis = makerInputSatoshis
-    const makerOutputSatoshis = bobUtxos[0].amount
-    const takerInputSatoshis = makerOutputSatoshis
+    // remove the commission from the input value and use it as wanted the output
+    const makerOutputSatoshis = bobUtxos[0].amount - (commissionInfo ? commissionInfo.satoshis : 0)
+    const takerInputSatoshis = bobUtxos[0].amount
 
     const makerInputUtxo = {
       txId: tokenBIssueTxid,
@@ -170,13 +172,10 @@ describe('atomic swap', function () {
 
     const wantedInfo = { type: 'native', satoshis: makerOutputSatoshis }
 
-    const commission = { address: commissionAddress, satoshis: 10000 }
-
     const swapOfferHex = createSwapOffer(
       alicePrivateKey,
       makerInputUtxo,
-      wantedInfo,
-      commission
+      wantedInfo
     )
     // now bob takes the offer
     const fundingUTXO = {
@@ -195,10 +194,15 @@ describe('atomic swap', function () {
 
     const fullySignedSwapHex = acceptSwapOffer(swapOfferHex, tokenBIssueHex,
       bobPrivateKey, takerInputTxHex, takerInputUTXO, takerOutputSatoshis, alicePublicKeyHash,
-      fundingUTXO, fundingPrivateKey, commissionUtxo)
+      fundingUTXO, fundingPrivateKey, commissionInfo)
 
-    const swapTxid = await broadcast(fullySignedSwapHex)
-    console.log('swaptxid', swapTxid)
+    let swapTxid
+    try {
+      swapTxid = await broadcast(fullySignedSwapHex)
+      console.log('swaptxid', swapTxid)
+    } catch (e) {
+      console.log('error broadcasting tx: ' + e)
+    }
 
     const tokenId = await utils.getToken(swapTxid, 1)
     const response = await utils.getTokenResponse(tokenId, tokenBSymbol)

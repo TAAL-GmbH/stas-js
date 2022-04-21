@@ -51,7 +51,8 @@
     "rollup-plugin-peer-deps-external": "^2.2.4",
     "rollup-plugin-polyfill-node": "^0.8.0",
     "rollup-plugin-terser": "^7.0.2",
-    "standard": "^16.0.4"
+    "standard": "^16.0.4",
+    "axios-retry": "^3.2.4"
   },
   "jest": {
     "testRegex": "tests/.*\\.(js|jsx)$",
