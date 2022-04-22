@@ -42,7 +42,7 @@ const paymentSignatureCallback = (tx, i, script, satoshis) => {
   return bsv.Transaction.sighash.sign(tx, fundingPrivateKey, sighash, i, script, satoshis)
 }
 
-it('MergeSplit - Successful MergeSplit With Fees', async () => {
+it('MergeSplit - Successful MergeSplit With Fees 1', async () => {
   await setup() // contract, issue, transfer then split
 
   const issueOutFundingVout = splitTx.vout.length - 1
@@ -60,8 +60,6 @@ it('MergeSplit - Successful MergeSplit With Fees', async () => {
     utils.getUtxo(splitTxid, splitTx, issueOutFundingVout),
     fundingPrivateKey
   )
-  console.log(aliceAddr)
-  console.log(bobAddr)
   const mergeSplitTxid = await broadcast(mergeSplitHex)
   await new Promise(resolve => setTimeout(resolve, wait))
   expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075)
@@ -70,6 +68,34 @@ it('MergeSplit - Successful MergeSplit With Fees', async () => {
   console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(7750)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(2250)
+})
+
+it('MergeSplit - Successful MergeSplit With Fees 2', async () => {
+  await setup() // contract, issue, transfer then split
+
+  const issueOutFundingVout = splitTx.vout.length - 1
+
+  const amount1 = bitcoinToSatoshis(splitTx.vout[0].value) / 2
+  const amount2 = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - amount1
+
+  const mergeSplitHex = mergeSplit(
+    bobPrivateKey,
+    utils.getMergeSplitUtxo(splitTxObj, splitTx),
+    bobAddr,
+    amount1,
+    bobAddr,
+    amount2,
+    utils.getUtxo(splitTxid, splitTx, issueOutFundingVout),
+    fundingPrivateKey
+  )
+  const mergeSplitTxid = await broadcast(mergeSplitHex)
+  await new Promise(resolve => setTimeout(resolve, wait))
+  expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075)
+  expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
+  console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
+  console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
 })
 
 // no fees disabled for tests
@@ -279,7 +305,7 @@ it('MergeSplit - Attempt to MergeSplit More Than Two Tokens Throws Error',
     const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
     const incorrectPrivateKey = bsv.PrivateKey()
     try {
-      mergeSplitHex = mergeSplit(
+      mergeSplit(
         incorrectPrivateKey,
         [{
           tx: splitTxObj,
