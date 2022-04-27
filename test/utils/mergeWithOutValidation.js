@@ -6,7 +6,7 @@ const { sighash } = require('../../lib/stas')
 
 // merge will take 2 existing STAS UTXOs and combine them and assign the single UTXO to another address.
 // The tokenOwnerPrivateKey must own the existing STAS UTXOs, the payment UTXOs and will be the owner of the change, if any.
-function mergeWithoutValidation (tokenOwnerPrivateKey, mergeUtxos, destinationAddr, paymentUtxo, paymentPrivateKey) {
+function mergeWithOutValidation (tokenOwnerPrivateKey, mergeUtxos, destinationAddr, paymentUtxo, paymentPrivateKey) {
   if (tokenOwnerPrivateKey === null) {
     throw new Error('Token owner private key is null')
   }
@@ -20,4 +20,4 @@ function mergeWithoutValidation (tokenOwnerPrivateKey, mergeUtxos, destinationAd
   return mergeWithCallbackWithoutValidation(tokenOwnerPrivateKey.publicKey, mergeUtxos, destinationAddr, paymentUtxo, paymentPrivateKey ? paymentPrivateKey.publicKey : null, ownerSignatureCallback, paymentSignatureCallback)
 }
 
-module.exports = { mergeWithoutValidation }
+module.exports = { mergeWithOutValidation }
