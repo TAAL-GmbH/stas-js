@@ -1,6 +1,5 @@
 const expect = require('chai').expect
 const utils = require('../utils/test_utils')
-const chai = require('chai')
 const bsv = require('bsv')
 const mergeUtil = require('../utils/mergeWithoutValidation')
 require('dotenv').config()
@@ -39,7 +38,6 @@ it('Attempt To Merge Token with Different Owners Via SDK Throws Error',
     try {
       merge(
         bobPrivateKey,
-        issuerPrivateKey.publicKey,
         [{
           tx: validSplitTxObj,
           vout: 0
@@ -72,7 +70,6 @@ it(
 
     const mergeHex = mergeUtil.mergeWithoutValidation(
       bobPrivateKey,
-      issuerPrivateKey.publicKey,
       [{
         tx: validSplitTxObj,
         vout: 0

@@ -19,7 +19,7 @@ const {
 } = require('../../index').utils
 
 describe('regression, testnet', () => {
-  it('Full Life Cycle Test NFT 3', async () => {
+  it('Full Life Cycle Test NFT 1', async () => {
     const issuerPrivateKey = bsv.PrivateKey()
     const fundingPrivateKey = bsv.PrivateKey()
     const alicePrivateKey = bsv.PrivateKey()
@@ -31,6 +31,7 @@ describe('regression, testnet', () => {
     const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
     const supply = 10000
     const symbol = 'TAALT'
+    const wait = 5000
 
     const schema = utils.schema(publicKeyHash, symbol, supply)
 
@@ -126,6 +127,7 @@ describe('regression, testnet', () => {
     const redeemTxid = await broadcast(redeemHex)
     console.log(`Redeem TX:       ${redeemTxid}`)
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00003)
+    await new Promise(resolve => setTimeout(resolve, wait))
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
     expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
   })
