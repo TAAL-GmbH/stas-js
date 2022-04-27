@@ -1,7 +1,6 @@
 const expect = require('chai').expect
 const utils = require('../utils/test_utils')
 const bsv = require('bsv')
-const mergeUtil = require('../utils/mergeWithoutValidation')
 require('dotenv').config()
 
 const {

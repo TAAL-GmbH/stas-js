@@ -33,7 +33,7 @@ let aliceAddr
 let splitTxid
 let splitTx
 let splitTxObj
-const wait = 5000
+const wait = 7000
 
 const bobSignatureCallback = (tx, i, script, satoshis) => {
   return bsv.Transaction.sighash.sign(tx, bobPrivateKey, sighash, i, script, satoshis)

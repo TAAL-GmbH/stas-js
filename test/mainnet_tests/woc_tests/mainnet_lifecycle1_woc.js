@@ -19,8 +19,8 @@ const { bitcoinToSatoshis } = require('../../../index').utils
 // eslint-disable-next-line no-undef
 it('Mainnet LifeCycle Test 1 broadcast via WOC', async () => {
   // per-run modifiable values
-  const contractUtxo = await getUtxoMainNet('', true)
-  const feeUtxo = await getUtxoMainNet('', false)
+  const contractUtxo = await utils.getUtxoMainNet('17WYiaND4U88fKkt1tSa142gFSquRsXkpP', true)
+  const feeUtxo = await utils.getUtxoMainNet('17WYiaND4U88fKkt1tSa142gFSquRsXkpP', false)
 
   const inputUtxoid = contractUtxo[0] // the input utxo
   const inputUtxoIdVoutIndex = contractUtxo[1]
@@ -51,6 +51,7 @@ it('Mainnet LifeCycle Test 1 broadcast via WOC', async () => {
 
   const inputUtxo = await utils.getTransactionMainNet(inputUtxoid)
   const inputUtxoFee = await utils.getTransactionMainNet(inputUtxoidFee)
+  console.log(inputUtxo)
 
   const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
   const schema = utils.schema(publicKeyHash, symbol, supply)
@@ -237,8 +238,8 @@ it('Mainnet LifeCycle Test 1 broadcast via WOC', async () => {
 
 function randomSymbol (length) {
   let result = ''
-  var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-  var charactersLength = characters.length
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  const charactersLength = characters.length
   for (let i = 0; i < length; i++) {
     result += characters.charAt(Math.floor(Math.random() *
       charactersLength))
