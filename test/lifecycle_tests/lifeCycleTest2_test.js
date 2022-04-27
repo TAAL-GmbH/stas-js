@@ -34,7 +34,7 @@ describe('regression, testnet', () => {
     const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
     const supply = 500000
     const symbol = 'TAALT'
-    const wait = 10000
+    const wait = 5000
 
     const schema = utils.schema(publicKeyHash, symbol, supply)
 
@@ -116,7 +116,7 @@ describe('regression, testnet', () => {
     await new Promise(resolve => setTimeout(resolve, wait))
     console.log(`Split TX:        ${splitTxid}`)
     const splitTx = await getTransaction(splitTxid)
-    await new Promise(r => setTimeout(r, 5000))
+    await new Promise(r => setTimeout(r, wait))
     expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.0005)
     expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.0005)
     console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))

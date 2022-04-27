@@ -91,8 +91,6 @@ it(
     await new Promise(resolve => setTimeout(resolve, wait))
     const response = await utils.getTokenResponse(tokenId)
     expect(response.symbol).to.equal(symbol)
-    expect(response.contract_txs).to.contain(contractTxid)
-    expect(response.issuance_txs).to.contain(issueTxid)
     expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
     expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
     console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
