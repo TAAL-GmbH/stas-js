@@ -4,21 +4,12 @@ const bsv = require('bsv')
 require('dotenv').config()
 
 const {
-  contract, contractWithCallback
+  contract
 } = require('../../index')
 
 const {
-  getFundsFromFaucet,
-  broadcast
+  getFundsFromFaucet
 } = require('../../index').utils
-
-const ownerSignCallback = (tx) => {
-  tx.sign(issuerPrivateKey)
-}
-
-const paymentSignCallback = (tx) => {
-  tx.sign(fundingPrivateKey)
-}
 
 let issuerPrivateKey
 let fundingPrivateKey
@@ -29,140 +20,12 @@ const supply = 10000
 const symbol = 'TAALT'
 let schema
 
-beforeEach(async () => {
+beforeAll(async () => {
   await setup()
 })
 
-it('Contract - Successful With Fees', async () => {
-  const contractHex = contract(
-    issuerPrivateKey,
-    contractUtxos,
-    fundingUtxos,
-    fundingPrivateKey,
-    schema,
-    supply
-  )
-  const contractTxid = await broadcast(contractHex)
-  const amount = await utils.getVoutAmount(contractTxid, 0)
-  expect(amount).to.equal(supply / 100000000)
-})
-
-it('Contract - Successful No Fees', async () => {
-  const contractHex = contract(
-    issuerPrivateKey,
-    contractUtxos,
-    null,
-    null,
-    schema,
-    supply
-  )
-  const contractTxid = await broadcast(contractHex)
-  const amount = await utils.getVoutAmount(contractTxid, 0)
-  expect(amount).to.equal(supply / 100000000)
-})
-
-it('Contract - Successful No Fees Empty Array', async () => {
-  const contractHex = contract(
-    issuerPrivateKey,
-    contractUtxos,
-    [],
-    fundingPrivateKey,
-    schema,
-    supply
-  )
-  const contractTxid = await broadcast(contractHex)
-  const amount = await utils.getVoutAmount(contractTxid, 0)
-  expect(amount).to.equal(supply / 100000000)
-})
-
-it('Contract - Successful With Callback Fee', async () => {
-  const contractHex = contractWithCallback(
-    issuerPrivateKey.publicKey,
-    contractUtxos,
-    fundingUtxos,
-    fundingPrivateKey.publicKey,
-    schema,
-    supply,
-    ownerSignCallback,
-    paymentSignCallback
-  )
-  const contractTxid = await broadcast(contractHex)
-  const amount = await utils.getVoutAmount(contractTxid, 0)
-  expect(amount).to.equal(supply / 100000000)
-})
-
-it('Contract - Successful With Callback No Fee', async () => {
-  const contractHex = contractWithCallback(
-    issuerPrivateKey.publicKey,
-    contractUtxos,
-    null,
-    null,
-    schema,
-    supply,
-    ownerSignCallback,
-    null
-  )
-  const contractTxid = await broadcast(contractHex)
-  const amount = await utils.getVoutAmount(contractTxid, 0)
-  expect(amount).to.equal(supply / 100000000)
-})
-
-it('Contract - Wrong Funding Private Key Throws Error', async () => {
-  const incorrectPrivateKey = bsv.PrivateKey()
-  const contractHex = contract(
-    issuerPrivateKey,
-    contractUtxos,
-    fundingUtxos,
-    incorrectPrivateKey,
-    schema,
-    supply
-  )
-  try {
-    await broadcast(contractHex)
-    expect(false).toBeTruthy()
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.response.data).to.contain('mandatory-script-verify-flag-failed')
-  }
-})
-
-it('Contract - Wrong Contract Private Key Throws Error', async () => {
-  const incorrectPrivateKey = bsv.PrivateKey()
-  const contractHex = contract(
-    incorrectPrivateKey,
-    contractUtxos,
-    fundingUtxos,
-    fundingPrivateKey,
-    schema,
-    supply
-  )
-  try {
-    await broadcast(contractHex)
-    expect(false).toBeTruthy()
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.response.data).to.contain('mandatory-script-verify-flag-failed')
-  }
-})
-
-it('Contract - Duplicate UTXOS Throws Error', async () => {
-  const contractHex = contract(
-    issuerPrivateKey,
-    fundingUtxos,
-    fundingUtxos,
-    fundingPrivateKey,
-    schema,
-    supply
-  )
-
-  try {
-    await broadcast(contractHex)
-    expect(false).toBeTruthy()
-    return
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.response.data).to.contain('bad-txns-inputs-duplicate')
-  }
+afterEach(async () => {
+  schema.symbol = symbol
 })
 
 it('Contract - Null Issuer Private Key Throws Error', async () => {

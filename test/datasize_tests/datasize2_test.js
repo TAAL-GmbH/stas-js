@@ -18,7 +18,7 @@ const {
 
 // Symbol size of 128 bytes
 const symbol = 'CallmeIshmaelSomeyearsagosdnevermindhowlongpreciselyhavinglittleornomoneyinmypurseandnothingparticulartointerestmeotoadasdfasfgg'
-const wait = 30000
+const wait = 5000
 let issuerPrivateKey
 let fundingPrivateKey
 let alicePrivateKey

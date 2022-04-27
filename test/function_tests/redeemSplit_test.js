@@ -51,7 +51,6 @@ it('Successful RedeemSplit With 1 Split', async () => {
   await new Promise(resolve => setTimeout(resolve, wait))
   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000035) // first utxo goes to redemption address
   expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000035)
-  console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
   expect(await utils.getTokenBalance(bobAddr)).to.equal(6500)
 })
 
@@ -74,8 +73,6 @@ it('Successful RedeemSplit With 2 Split', async () => {
   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000042) // first utxo goes to redemption address
   expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000014)
   expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.000014)
-  console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
-  console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(1400)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(4400)
 })
@@ -103,9 +100,6 @@ it('Successful RedeemSplit With 3 Split', async () => {
   expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000007)
   expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.000007)
   expect(await utils.getVoutAmount(redeemTxid, 3)).to.equal(0.000007)
-  console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
-  console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
-  console.log('Dave Balance ' + (await utils.getTokenBalance(daveAddr)))
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(700)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(3700)
   expect(await utils.getTokenBalance(daveAddr)).to.equal(700)
@@ -154,8 +148,6 @@ it('RedeemSplit - No Split Completes Successfully', async () => {
   const redeemTxid = await broadcast(redeemSplitHex)
   await new Promise(resolve => setTimeout(resolve, wait))
   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000035)
-  console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
-  console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(6500)
 })
