@@ -118,6 +118,7 @@ describe('regression, testnet', () => {
     const transferTxid = await broadcast(transferHex)
     console.log(`Transfer TX:     ${transferTxid}`)
     const transferTx = await getTransaction(transferTxid)
+    await new Promise(resolve => setTimeout(resolve, wait))
     expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00008)
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
     expect(await utils.getTokenBalance(bobAddr)).to.equal(12000)
