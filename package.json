@@ -56,8 +56,11 @@
   },
   "jest": {
     "testRegex": "tests/.*\\.(js|jsx)$",
+    "testPathIgnorePatterns" : [
+      "<rootDir>/test/mainnet_tests/" 
+    ],
     "verbose": true,
-    "testTimeout": 120000,
+    "testTimeout": 180000,
     "reporters": [
       "default",
       [
