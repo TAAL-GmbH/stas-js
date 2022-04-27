@@ -36,7 +36,7 @@ let contractTxid
 let contractTx
 let issueTx
 let issueTxid
-const wait = 3000
+const wait = 5000
 
 const bobSignatureCallback = (tx, i, script, satoshis) => {
   return bsv.Transaction.sighash.sign(tx, bobPrivateKey, sighash, i, script, satoshis)
@@ -94,26 +94,26 @@ it('Merge - Successful Merge With Fee 2', async () => {
 })
 
 // no fee disabled in tests
-// it('Merge - Merge With No Fee', async () => {
-//   const mergeHex = merge(
-//     bobPrivateKey,
-//     utils.getMergeUtxo(splitTxObj),
-//     aliceAddr,
-//     null,
-//     null
-//   )
-//   const mergeTxid = await broadcast(mergeHex)
-//   const tokenIdMerge = await utils.getToken(mergeTxid)
-//   const response = await utils.getTokenResponse(tokenIdMerge)
-//   expect(response.symbol).to.equal('TAALT')
-//   expect(response.contract_txs).to.contain(contractTxid)
-//   expect(response.issuance_txs).to.contain(issueTxid)
-//   console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
-//   console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
-//   expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007)
-//   expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
-//   expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
-// })
+it('Merge - Merge With No Fee', async () => {
+  const mergeHex = merge(
+    bobPrivateKey,
+    utils.getMergeUtxo(splitTxObj),
+    aliceAddr,
+    null,
+    null
+  )
+  const mergeTxid = await broadcast(mergeHex)
+  const tokenIdMerge = await utils.getToken(mergeTxid)
+  const response = await utils.getTokenResponse(tokenIdMerge)
+  expect(response.symbol).to.equal('TAALT')
+  expect(response.contract_txs).to.contain(contractTxid)
+  expect(response.issuance_txs).to.contain(issueTxid)
+  console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
+  console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
+  expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007)
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+})
 
 it('Merge - Successful Merge With Callback And Fee', async () => {
   const mergeHex = mergeWithCallback(
@@ -140,28 +140,28 @@ it('Merge - Successful Merge With Callback And Fee', async () => {
 })
 
 // no fee disabled in tests
-// it('Merge - Successful Merge With Callback And No Fee', async () => {
-//   const mergeHex = mergeWithCallback(
-//     bobPrivateKey.publicKey,
-//     utils.getMergeUtxo(splitTxObj),
-//     aliceAddr,
-//     null,
-//     null,
-//     bobSignatureCallback,
-//     null
-//   )
-//   const mergeTxid = await broadcast(mergeHex)
-//   const tokenIdMerge = await utils.getToken(mergeTxid)
-//   const response = await utils.getTokenResponse(tokenIdMerge)
-//   expect(response.symbol).to.equal('TAALT')
-//   expect(response.contract_txs).to.contain(contractTxid)
-//   expect(response.issuance_txs).to.contain(issueTxid)
-//   expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007)
-//   console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
-//   console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
-//   expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
-//   expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
-// })
+it('Merge - Successful Merge With Callback And No Fee', async () => {
+  const mergeHex = mergeWithCallback(
+    bobPrivateKey.publicKey,
+    utils.getMergeUtxo(splitTxObj),
+    aliceAddr,
+    null,
+    null,
+    bobSignatureCallback,
+    null
+  )
+  const mergeTxid = await broadcast(mergeHex)
+  const tokenIdMerge = await utils.getToken(mergeTxid)
+  const response = await utils.getTokenResponse(tokenIdMerge)
+  expect(response.symbol).to.equal('TAALT')
+  expect(response.contract_txs).to.contain(contractTxid)
+  expect(response.issuance_txs).to.contain(issueTxid)
+  expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007)
+  console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
+  console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+})
 
 it('Merge - Incorrect Owner Private Key Throws Error', async () => {
   const incorrectPrivateKey = bsv.PrivateKey()
@@ -198,122 +198,6 @@ it('Merge - Incorrect Funding Private Key Throws Error', async () => {
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
     expect(e.response.data).to.contain('mandatory-script-verify-flag-failed (Script failed an OP_EQUALVERIFY operation)')
-  }
-})
-
-it('Merge - Attempt to Merge More Than 2 Tokens', async () => {
-  try {
-    merge(
-      bobPrivateKey,
-      [{
-        tx: splitTxObj,
-        vout: 0
-      },
-      {
-        tx: splitTxObj,
-        vout: 1
-      },
-      {
-        tx: splitTxObj,
-        vout: 2
-      }],
-      aliceAddr,
-      utils.getUtxo(splitTxid, splitTx, 2),
-      fundingPrivateKey
-    )
-    expect(false).toBeTruthy()
-    return
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('This function can only merge exactly 2 STAS tokens')
-  }
-})
-
-it('Merge - Attempt to Merge Less Than Two Tokens', async () => {
-  try {
-    merge(
-      bobPrivateKey,
-      [{
-        tx: splitTxObj,
-        vout: 0
-      }],
-      aliceAddr,
-      utils.getUtxo(splitTxid, splitTx, 2),
-      fundingPrivateKey
-    )
-    expect(false).toBeTruthy()
-    return
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('This function can only merge exactly 2 STAS tokens')
-  }
-})
-
-it('Merge - Null Token Owner Private Key Throws Error', async () => {
-  try {
-    merge(
-      null,
-      utils.getMergeUtxo(splitTxObj),
-      aliceAddr,
-      utils.getUtxo(splitTxid, splitTx, 2),
-      fundingPrivateKey
-    )
-    expect(false).toBeTruthy()
-    return
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Token owner private key is null')
-  }
-})
-
-it('Merge - Null Merge STAS UTXO Throws Error', async () => {
-  try {
-    merge(
-      bobPrivateKey,
-      null,
-      aliceAddr,
-      utils.getUtxo(splitTxid, splitTx, 2),
-      fundingPrivateKey
-    )
-    expect(false).toBeTruthy()
-    return
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('MergeUtxos is invalid')
-  }
-})
-
-it('Merge - Null Destination Address Throws Error', async () => {
-  try {
-    merge(
-      bobPrivateKey,
-      utils.getMergeUtxo(splitTxObj),
-      null,
-      utils.getUtxo(splitTxid, splitTx, 2),
-      fundingPrivateKey
-    )
-    expect(false).toBeTruthy()
-    return
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.contains('Destination address is null')
-  }
-})
-
-it('Merge - Null Funding Private Key Throws Error', async () => {
-  try {
-    merge(
-      bobPrivateKey,
-      utils.getMergeUtxo(splitTxObj),
-      aliceAddr,
-      utils.getUtxo(splitTxid, splitTx, 2),
-      null
-    )
-    expect(false).toBeTruthy()
-    return
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Payment UTXO provided but payment key is null')
   }
 })
 

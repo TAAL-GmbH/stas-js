@@ -1,0 +1,365 @@
+const expect = require('chai').expect
+const utils = require('../utils/test_utils')
+const bsv = require('bsv')
+require('dotenv').config()
+
+const {
+  contract,
+  issue,
+  transfer,
+  split,
+  mergeSplit,
+  mergeSplitWithCallback
+} = require('../../index')
+
+const {
+  bitcoinToSatoshis,
+  getTransaction,
+  getFundsFromFaucet,
+  broadcast
+} = require('../../index').utils
+
+const { sighash } = require('../../lib/stas')
+
+let issuerPrivateKey
+let fundingPrivateKey
+let contractUtxos
+let fundingUtxos
+let publicKeyHash
+let bobPrivateKey
+let alicePrivateKey
+let bobAddr
+let aliceAddr
+let splitTxid
+let splitTx
+let splitTxObj
+const wait = 7000
+
+const bobSignatureCallback = (tx, i, script, satoshis) => {
+  return bsv.Transaction.sighash.sign(tx, bobPrivateKey, sighash, i, script, satoshis)
+}
+const paymentSignatureCallback = (tx, i, script, satoshis) => {
+  return bsv.Transaction.sighash.sign(tx, fundingPrivateKey, sighash, i, script, satoshis)
+}
+
+it('MergeSplit - Successful MergeSplit With Fees 1', async () => {
+  await setup() // contract, issue, transfer then split
+
+  const issueOutFundingVout = splitTx.vout.length - 1
+
+  const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
+  const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
+
+  const mergeSplitHex = mergeSplit(
+    bobPrivateKey,
+    utils.getMergeSplitUtxo(splitTxObj, splitTx),
+    aliceAddr,
+    aliceAmountSatoshis,
+    bobAddr,
+    bobAmountSatoshis,
+    utils.getUtxo(splitTxid, splitTx, issueOutFundingVout),
+    fundingPrivateKey
+  )
+  const mergeSplitTxid = await broadcast(mergeSplitHex)
+  await new Promise(resolve => setTimeout(resolve, wait))
+  expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075)
+  expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
+  console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
+  console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7750)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(2250)
+})
+
+it('MergeSplit - Successful MergeSplit With Fees 2', async () => {
+  await setup() // contract, issue, transfer then split
+
+  const issueOutFundingVout = splitTx.vout.length - 1
+
+  const amount1 = bitcoinToSatoshis(splitTx.vout[0].value) / 2
+  const amount2 = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - amount1
+
+  const mergeSplitHex = mergeSplit(
+    bobPrivateKey,
+    utils.getMergeSplitUtxo(splitTxObj, splitTx),
+    bobAddr,
+    amount1,
+    bobAddr,
+    amount2,
+    utils.getUtxo(splitTxid, splitTx, issueOutFundingVout),
+    fundingPrivateKey
+  )
+  const mergeSplitTxid = await broadcast(mergeSplitHex)
+  await new Promise(resolve => setTimeout(resolve, wait))
+  expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075)
+  expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
+  console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
+  console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+})
+
+// no fees disabled for tests
+it('MergeSplit - Successful MergeSplit No Fees', async () => {
+  await setup() // contract, issue, transfer then split
+
+  const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
+  const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
+
+  const mergeSplitHex = mergeSplit(
+    bobPrivateKey,
+    utils.getMergeSplitUtxo(splitTxObj, splitTx),
+    aliceAddr,
+    aliceAmountSatoshis,
+    bobAddr,
+    bobAmountSatoshis,
+    null,
+    null
+  )
+  const mergeSplitTxid = await broadcast(mergeSplitHex)
+  await new Promise(resolve => setTimeout(resolve, wait))
+  expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075)
+  expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7750)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(2250)
+  console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
+  console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
+})
+
+it(
+  'MergeSplit - Successful MergeSplit With Callback And Fees',
+  async () => {
+    await setup() // contract, issue, transfer then split
+
+    const issueOutFundingVout = splitTx.vout.length - 1
+
+    const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
+    const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
+
+    const mergeSplitHex = mergeSplitWithCallback(
+      bobPrivateKey.publicKey,
+      utils.getMergeSplitUtxo(splitTxObj, splitTx),
+      aliceAddr,
+      aliceAmountSatoshis,
+      bobAddr,
+      bobAmountSatoshis,
+      utils.getUtxo(splitTxid, splitTx, issueOutFundingVout),
+      fundingPrivateKey.publicKey,
+      bobSignatureCallback,
+      paymentSignatureCallback
+    )
+    const mergeSplitTxid = await broadcast(mergeSplitHex)
+    await new Promise(resolve => setTimeout(resolve, wait))
+    expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075)
+    expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
+    expect(await utils.getTokenBalance(aliceAddr)).to.equal(7750)
+    expect(await utils.getTokenBalance(bobAddr)).to.equal(2250)
+    console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
+    console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
+  }
+)
+
+// no fees currently disabled for tests
+it('MergeSplit - Successful MergeSplit With Callback No Fees',
+  async () => {
+    await setup() // contract, issue, transfer then split
+
+    const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
+    const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
+
+    const mergeSplitHex = mergeSplitWithCallback(
+      bobPrivateKey.publicKey,
+      utils.getMergeSplitUtxo(splitTxObj, splitTx),
+      aliceAddr,
+      aliceAmountSatoshis,
+      bobAddr,
+      bobAmountSatoshis,
+      null,
+      null,
+      bobSignatureCallback,
+      null
+    )
+    const mergeSplitTxid = await broadcast(mergeSplitHex)
+    await new Promise(resolve => setTimeout(resolve, wait))
+    expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075)
+    expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
+    expect(await utils.getTokenBalance(aliceAddr)).to.equal(7750)
+    expect(await utils.getTokenBalance(bobAddr)).to.equal(2250)
+    console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
+    console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
+  }
+)
+
+it('MergeSplit - Incorrect Destination 1 Satoshi Amount', async () => {
+  await setup() // contract, issue, transfer then split
+
+  const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
+  const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
+
+  const mergeSplitHex = mergeSplit(
+    alicePrivateKey,
+    utils.getMergeSplitUtxo(splitTxObj, splitTx),
+    aliceAddr,
+    100,
+    bobAddr,
+    bobAmountSatoshis,
+    utils.getUtxo(splitTxid, splitTx, 2),
+    fundingPrivateKey
+  )
+  try {
+    await broadcast(mergeSplitHex)
+    expect(false).toBeTruthy()
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.response.data).to.contain('mandatory-script-verify-flag-failed (Script failed an OP_EQUALVERIFY operation)')
+  }
+})
+
+it('MergeSplit - Incorrect Destination 2 Satoshi Amount', async () => {
+  await setup() // contract, issue, transfer then split
+
+  const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
+
+  const mergeSplitHex = mergeSplit(
+    alicePrivateKey,
+    utils.getMergeSplitUtxo(splitTxObj, splitTx),
+    aliceAddr,
+    aliceAmountSatoshis,
+    bobAddr,
+    100,
+    utils.getUtxo(splitTxid, splitTx, 2),
+    fundingPrivateKey
+  )
+  try {
+    await broadcast(mergeSplitHex)
+    expect(false).toBeTruthy()
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.response.data).to.contain('mandatory-script-verify-flag-failed (Script failed an OP_EQUALVERIFY operation)')
+  }
+})
+
+it('MergeSplit - Incorrect Owner Private Key Throws Error',
+  async () => {
+    await setup() // contract, issue, transfer then split
+
+    const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
+    const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
+    const incorrectPrivateKey = bsv.PrivateKey()
+
+    const mergeSplitHex = mergeSplit(
+      incorrectPrivateKey,
+      utils.getMergeSplitUtxo(splitTxObj, splitTx),
+      aliceAddr,
+      aliceAmountSatoshis,
+      bobAddr,
+      bobAmountSatoshis,
+      utils.getUtxo(splitTxid, splitTx, 2),
+      fundingPrivateKey
+    )
+    try {
+      await broadcast(mergeSplitHex)
+      expect(false).toBeTruthy()
+      return
+    } catch (e) {
+      expect(e).to.be.instanceOf(Error)
+      expect(e.response.data).to.contain('mandatory-script-verify-flag-failed (Script failed an OP_EQUALVERIFY operation)')
+    }
+  }
+)
+
+it('MergeSplit - Incorrect Payments Private Key Throws Error',
+  async () => {
+    await setup() // contract, issue, transfer then split
+
+    const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
+    const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
+    const incorrectPrivateKey = bsv.PrivateKey()
+
+    const mergeSplitHex = mergeSplit(
+      issuerPrivateKey,
+      utils.getMergeSplitUtxo(splitTxObj, splitTx),
+      aliceAddr,
+      aliceAmountSatoshis,
+      bobAddr,
+      bobAmountSatoshis,
+      utils.getUtxo(splitTxid, splitTx, 2),
+      incorrectPrivateKey
+    )
+    try {
+      await broadcast(mergeSplitHex)
+      expect(false).toBeTruthy()
+      return
+    } catch (e) {
+      expect(e).to.be.instanceOf(Error)
+      expect(e.response.data).to.contain('mandatory-script-verify-flag-failed (Script failed an OP_EQUALVERIFY operation)')
+    }
+  }
+)
+
+async function setup () {
+  issuerPrivateKey = bsv.PrivateKey()
+  fundingPrivateKey = bsv.PrivateKey()
+  bobPrivateKey = bsv.PrivateKey()
+  alicePrivateKey = bsv.PrivateKey()
+  bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
+  aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
+  contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
+  fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
+  publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
+  const symbol = 'TAALT'
+  const supply = 10000
+  const schema = utils.schema(publicKeyHash, symbol, supply)
+
+  const contractHex = contract(
+    issuerPrivateKey,
+    contractUtxos,
+    fundingUtxos,
+    fundingPrivateKey,
+    schema,
+    supply
+  )
+  const contractTxid = await broadcast(contractHex)
+  const contractTx = await getTransaction(contractTxid)
+
+  const issueHex = issue(
+    issuerPrivateKey,
+    utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+    utils.getUtxo(contractTxid, contractTx, 0),
+    utils.getUtxo(contractTxid, contractTx, 1),
+    fundingPrivateKey,
+    true,
+    symbol,
+    2
+  )
+  const issueTxid = await broadcast(issueHex)
+  const issueTx = await getTransaction(issueTxid)
+  const issueOutFundingVout = issueTx.vout.length - 1
+
+  const transferHex = transfer(
+    bobPrivateKey,
+    utils.getUtxo(issueTxid, issueTx, 1),
+    aliceAddr,
+    utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
+    fundingPrivateKey
+  )
+  const transferTxid = await broadcast(transferHex)
+  const transferTx = await getTransaction(transferTxid)
+
+  const bobAmount1 = transferTx.vout[0].value / 2
+  const bobAmount2 = transferTx.vout[0].value - bobAmount1
+  const splitDestinations = []
+  splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount1) }
+  splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
+
+  const splitHex = split(
+    alicePrivateKey,
+    utils.getUtxo(transferTxid, transferTx, 0),
+    splitDestinations,
+    utils.getUtxo(transferTxid, transferTx, 1),
+    fundingPrivateKey
+  )
+  splitTxid = await broadcast(splitHex)
+  splitTx = await getTransaction(splitTxid)
+  splitTxObj = new bsv.Transaction(splitHex)
+}
