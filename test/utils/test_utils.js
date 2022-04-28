@@ -301,28 +301,6 @@ async function getTokenBalance (address) {
   return response.data.tokens[0].balance
 }
 
-async function countNumOfTokens (txid, isThereAFee) {
-  const url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/tx/hash/${txid}`
-  const response = await axios({
-    method: 'get',
-    url,
-    auth: {
-      username: process.env.API_USERNAME,
-      password: process.env.API_PASSWORD
-    }
-  })
-
-  let count = 0
-  for (let i = 0; i < response.data.vout.length; i++) {
-    if (response.data.vout[i].value != null) {
-      count++
-    }
-  }
-  if (isThereAFee === true) { // output decreased by 1 if fees charged
-    return count - 1
-  } else { return count }
-}
-
 async function getAmount (txid, vout) {
   const url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/tx/hash/${txid}`
   const response = await axios({
@@ -474,7 +452,7 @@ async function getUtxoMainNet (address, forContract) {
   const array = []
   if (forContract) {
     for (const key in response.data) {
-      if (response.data[key].value === 1505139) {
+      if (response.data[key].value > 30000) {
         array.push(response.data[key].tx_hash)
         array.push(response.data[key].tx_pos)
         break
@@ -482,8 +460,8 @@ async function getUtxoMainNet (address, forContract) {
     }
   } else {
     for (const key in response.data) {
-      if (response.data[key].value === 1495253) {
-        //  if ((response.data[key].value > 900000) && (response.data[key].value < 1300000)) {
+      // if (response.data[key].value > 10000 && array[0] !== response.data[key].tx_hash) {
+      if ((response.data[key].value > 10000) && (response.data[key].value < 30000)) {
         array.push(response.data[key].tx_hash)
         array.push(response.data[key].tx_pos)
         break
@@ -592,7 +570,6 @@ module.exports = {
   getTokenWithSymbol,
   addData,
   byteCount,
-  countNumOfTokens,
   getAmount,
   broadcastToMainNet,
   getTransactionMainNet,

@@ -60,12 +60,8 @@ it('Split - Successful Split Into Two Tokens With Fee', async () => {
   )
   const splitTxid = await broadcast(splitHex)
   await new Promise(resolve => setTimeout(resolve, wait))
-  const noOfTokens = await utils.countNumOfTokens(splitTxid, true)
-  expect(splitDestinations).to.have.length(noOfTokens) // ensure that tx output contains 2 values
   expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035)
   expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000035)
-  console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
-  console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(3500)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(6500)
 })
@@ -89,13 +85,9 @@ it('Split - Successful Split Into Three Tokens', async () => {
   )
   const splitTxid = await broadcast(splitHex)
   await new Promise(resolve => setTimeout(resolve, wait))
-  const noOfTokens = await utils.countNumOfTokens(splitTxid, true)
-  expect(splitDestinations).to.have.length(noOfTokens) // ensure that tx output contains 4 values
   expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035)
   expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.0000175)
   expect(await utils.getVoutAmount(splitTxid, 2)).to.equal(0.0000175)
-  console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
-  console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(1750)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(8250)
 })
@@ -118,14 +110,10 @@ it('Split - Successful Split Into Four Tokens 1', async () => {
   )
   const splitTxid = await broadcast(splitHex)
   await new Promise(resolve => setTimeout(resolve, wait))
-  const noOfTokens = await utils.countNumOfTokens(splitTxid, true)
-  expect(splitDestinations).to.have.length(noOfTokens) // ensure that tx output contains 4 values
   expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.0000175)
   expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.0000175)
   expect(await utils.getVoutAmount(splitTxid, 2)).to.equal(0.0000175)
   expect(await utils.getVoutAmount(splitTxid, 3)).to.equal(0.0000175)
-  console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
-  console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(1750)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(8250)
 })
@@ -152,16 +140,10 @@ it('Split - Successful Split Into Four Tokens 2', async () => {
   )
   const splitTxid = await broadcast(splitHex)
   await new Promise(resolve => setTimeout(resolve, wait))
-  const noOfTokens = await utils.countNumOfTokens(splitTxid, true)
-  expect(splitDestinations).to.have.length(noOfTokens) // ensure that tx output contains 4 values
   expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.0000175)
   expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.0000175)
   expect(await utils.getVoutAmount(splitTxid, 2)).to.equal(0.0000175)
   expect(await utils.getVoutAmount(splitTxid, 3)).to.equal(0.0000175)
-  console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
-  console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
-  console.log('Dave Balance ' + (await utils.getTokenBalance(daveAddr)))
-  console.log('Emma Balance ' + (await utils.getTokenBalance(emmaAddr)))
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(1750)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(4750)
   expect(await utils.getTokenBalance(daveAddr)).to.equal(1750)
@@ -181,67 +163,38 @@ it('Split - No Split Completes Successfully', async () => {
     fundingPrivateKey
   )
   const splitTxid = await broadcast(splitHex)
+  expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.00007)
   await new Promise(resolve => setTimeout(resolve, wait))
-  const noOfTokens = await utils.countNumOfTokens(splitTxid, true)
-  expect(splitDestinations).to.have.length(noOfTokens) // ensure that tx output contains 1
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(10000)
 })
 
-// no fees currently disabled in tests
-// it('Split - Successful Split Into Two Tokens With No Fee',
-//   async () => {
-//     const issueTxSats = bitcoinToSatoshis(issueTx.vout[0].value)
-//     const bobAmount1 = Math.floor(issueTxSats / 2)
-//     const bobAmount2 = issueTxSats - bobAmount1
-//     const splitDestinations = []
-//     splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount1) }
-//     splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
+it('Split - Successful Split Into Two Tokens With No Fee',
+  async () => {
+    const issueTxSats = issueTx.vout[0].value
+    const bobAmount1 = issueTxSats / 2
+    const bobAmount2 = issueTxSats - bobAmount1
+    const splitDestinations = []
+    splitDestinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(bobAmount1) } // 3500 tokens
+    splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) } // 3500 tokens
 
-//     const splitHex = split(
-//       alicePrivateKey,
-//       utils.getUtxo(issueTxid, issueTx, 0),
-//       splitDestinations,
-//       null,
-//       null
-//     )
-//     const splitTxid = await broadcast(splitHex)
-//     const noOfTokens = await utils.countNumOfTokens(splitTxid, false)
-//     expect(splitDestinations).to.have.length(noOfTokens) // ensure that tx output contains 2 values
-//     expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035)
-//     expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000035)
-//     expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
-//     expect(await utils.getTokenBalance(bobAddr)).to.equal(10000)
-//   }
-// )
+    const splitHex = split(
+      alicePrivateKey,
+      utils.getUtxo(issueTxid, issueTx, 0),
+      splitDestinations,
+      null,
+      null
+    )
+    const splitTxid = await broadcast(splitHex)
+    expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035)
+    expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000035)
+    await new Promise(resolve => setTimeout(resolve, wait))
+    expect(await utils.getTokenBalance(aliceAddr)).to.equal(3500)
+    expect(await utils.getTokenBalance(bobAddr)).to.equal(6500)
+  }
+)
 
-// it('Split - Successful Split Into Two Tokens With No Fee Empty Array',
-//   async () => {
-//     const issueTxSats = bitcoinToSatoshis(issueTx.vout[0].value)
-//     const bobAmount1 = Math.floor(issueTxSats / 2)
-//     const bobAmount2 = issueTxSats - bobAmount1
-//     const splitDestinations = []
-//     splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount1) }
-//     splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
-
-//     const splitHex = split(
-//       alicePrivateKey,
-//       utils.getUtxo(issueTxid, issueTx, 0),
-//       splitDestinations,
-//       null,
-//       null
-//     )
-//     const splitTxid = await broadcast(splitHex)
-//     const noOfTokens = await utils.countNumOfTokens(splitTxid, false)
-//     expect(splitDestinations).to.have.length(noOfTokens) // ensure that tx output contains 2 values
-//     expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035)
-//     expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000035)
-//     expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
-//     expect(await utils.getTokenBalance(bobAddr)).to.equal(10000)
-//   }
-// )
-
-it('Split - Successful Split With Callback and Fee ', async () => {
+it('Split - Successful Split With Callback and Fee', async () => {
   const issueTxSats = issueTx.vout[0].value
   const bobAmount1 = issueTxSats / 2
   const bobAmount2 = issueTxSats - bobAmount1
@@ -262,46 +215,36 @@ it('Split - Successful Split With Callback and Fee ', async () => {
   )
   const splitTxid = await broadcast(splitHex)
   await new Promise(resolve => setTimeout(resolve, wait))
-  const noOfTokens = await utils.countNumOfTokens(splitTxid, true)
-  expect(splitDestinations).to.have.length(noOfTokens) // ensure that tx output contains 2 values
   expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035)
   expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000035)
-  console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
-  console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(3500)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(6500)
 })
 
-// no fees currently disabled in tests
-// it('Split - Successful Split With Callback and No Fee ', async () => {
-//   const issueTxSats = bitcoinToSatoshis(issueTx.vout[0].value)
-//   const bobAmount1 = Math.floor(issueTxSats / 2)
-//   const bobAmount2 = issueTxSats - bobAmount1
-//   console.log(bobAmount1)
-//   console.log(bobAmount2)
-//   const splitDestinations = []
-//   splitDestinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(bobAmount1) } // 3500 tokens
-//   splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) } // 3500 tokens
+it('Split - Successful Split With Callback and No Fee ', async () => {
+  const issueTxSats = issueTx.vout[0].value
+  const bobAmount1 = issueTxSats / 2
+  const bobAmount2 = issueTxSats - bobAmount1
+  const splitDestinations = []
+  splitDestinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(bobAmount1) }
+  splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
 
-//   const splitHex = splitWithCallback(
-//     alicePrivateKey.publicKey,
-//     utils.getUtxo(issueTxid, issueTx, 0),
-//     splitDestinations,
-//     null,
-//     null,
-//     aliceSignatureCallback,
-//     null
-//   )
-//   const splitTxid = await broadcast(splitHex)
-//   const noOfTokens = await utils.countNumOfTokens(splitTxid, false)
-//   expect(splitDestinations).to.have.length(noOfTokens) // ensure that tx output contains 2 values
-//   expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035)
-//   expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000035)
-//   console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
-//   console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
-//   expect(await utils.getTokenBalance(aliceAddr)).to.equal(3500)
-//   expect(await utils.getTokenBalance(bobAddr)).to.equal(6500)
-// })
+  const splitHex = splitWithCallback(
+    alicePrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 0),
+    splitDestinations,
+    null,
+    null,
+    aliceSignatureCallback,
+    null
+  )
+  const splitTxid = await broadcast(splitHex)
+  expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035)
+  expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000035)
+  await new Promise(resolve => setTimeout(resolve, wait))
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(3500)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(6500)
+})
 
 it('Split - Splitting Into Too Many Tokens Throws Error', async () => {
   const bobAmount = issueTx.vout[0].value / 5
@@ -324,111 +267,6 @@ it('Split - Splitting Into Too Many Tokens Throws Error', async () => {
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
     expect(e.message).to.eql('Must have less than 5 segments')
-  }
-})
-
-it('Split - Empty Array Split Throws Error', async () => {
-  const splitDestinations = []
-  try {
-    split(
-      alicePrivateKey,
-      utils.getUtxo(issueTxid, issueTx, 0),
-      splitDestinations,
-      utils.getUtxo(issueTxid, issueTx, 2),
-      fundingPrivateKey
-    )
-    expect(false).toBeTruthy()
-    return
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('split destinations array is null or empty')
-  }
-})
-
-it('Split - Add Zero Sats to Split Throws Error', async () => {
-  const splitDestinations = []
-  splitDestinations[0] = { address: bobAddr, amount: 0 }
-  splitDestinations[1] = { address: bobAddr, amount: 0 }
-
-  try {
-    split(
-      alicePrivateKey,
-      utils.getUtxo(issueTxid, issueTx, 0),
-      splitDestinations,
-      utils.getUtxo(issueTxid, issueTx, 2),
-      fundingPrivateKey
-    )
-    expect(false).toBeTruthy()
-    return
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Invalid ammount in split destination')
-  }
-})
-
-it('Split - Negative Integer Sats to Split Throws Error', async () => {
-  const splitDestinations = []
-  splitDestinations[0] = { address: bobAddr, amount: -15000 }
-  splitDestinations[1] = { address: bobAddr, amount: 15000 }
-
-  try {
-    split(
-      alicePrivateKey,
-      utils.getUtxo(issueTxid, issueTx, 0),
-      splitDestinations,
-      utils.getUtxo(issueTxid, issueTx, 2),
-      fundingPrivateKey
-    )
-    expect(false).toBeTruthy()
-    return
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Invalid ammount in split destination')
-  }
-})
-
-it('Split - Add Too Much To Split Throws Error', async () => {
-  const bobAmount = issueTx.vout[0].value * 2
-  const splitDestinations = []
-  splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount) }
-
-  const splitHex = split(
-    alicePrivateKey,
-    utils.getUtxo(issueTxid, issueTx, 0),
-    splitDestinations,
-    utils.getUtxo(issueTxid, issueTx, 2),
-    fundingPrivateKey
-  )
-  try {
-    await broadcast(splitHex)
-    expect(false).toBeTruthy()
-    return
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Request failed with status code 400')
-  }
-})
-
-it('Split - Address Too Long Throws Error', async () => {
-  const bobAmount1 = issueTx.vout[0].value / 2
-  const bobAmount2 = issueTx.vout[0].value - bobAmount1
-  console.log(bobAddr)
-  const splitDestinations = []
-  splitDestinations[0] = { address: '1LF2wNCBT9dp5jN7fa6xSAaUGjJ5Pyz5VGaUG', amount: bitcoinToSatoshis(bobAmount1) }
-  splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
-  try {
-    split(
-      alicePrivateKey,
-      utils.getUtxo(issueTxid, issueTx, 0),
-      splitDestinations,
-      utils.getUtxo(issueTxid, issueTx, 2),
-      fundingPrivateKey
-    )
-    expect(false).toBeTruthy()
-    return
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Invalid Address in split destination')
   }
 })
 
@@ -503,89 +341,6 @@ it('Split - Incorrect Payments Private Key Throws Error', async () => {
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
     expect(e.message).to.eql('Request failed with status code 400')
-  }
-})
-
-it('Split - Null Token Owner Private Key Throws Error', async () => {
-  const bobAmount1 = issueTx.vout[0].value / 2
-  const bobAmount2 = issueTx.vout[0].value - bobAmount1
-  const splitDestinations = []
-  splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount1) }
-  splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
-  try {
-    split(
-      null,
-      utils.getUtxo(issueTxid, issueTx, 0),
-      splitDestinations,
-      utils.getUtxo(issueTxid, issueTx, 2),
-      fundingPrivateKey
-    )
-    expect(false).toBeTruthy()
-    return
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Token owner private key is null')
-  }
-})
-
-it('Split - Null  STAS UTXO Throws Error', async () => {
-  const bobAmount1 = issueTx.vout[0].value / 2
-  const bobAmount2 = issueTx.vout[0].value - bobAmount1
-  const splitDestinations = []
-  splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount1) }
-  splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
-  try {
-    split(
-      alicePrivateKey,
-      null,
-      splitDestinations,
-      utils.getUtxo(issueTxid, issueTx, 2),
-      fundingPrivateKey
-    )
-    expect(false).toBeTruthy()
-    return
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Invalid Argument: Must provide an object from where to extract data')
-  }
-})
-
-it('Split - Null Split Addresses Throws Error', async () => {
-  try {
-    split(
-      alicePrivateKey,
-      utils.getUtxo(issueTxid, issueTx, 0),
-      null,
-      utils.getUtxo(issueTxid, issueTx, 2),
-      fundingPrivateKey
-    )
-    expect(false).toBeTruthy()
-    return
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('split destinations array is null or empty')
-  }
-})
-
-it('Split - Null Funding Private Key Throws Error', async () => {
-  const bobAmount1 = Math.floor(issueTx.vout[0].value / 2)
-  const bobAmount2 = issueTx.vout[0].value - bobAmount1
-  const splitDestinations = []
-  splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount1) }
-  splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
-  try {
-    split(
-      alicePrivateKey,
-      utils.getUtxo(issueTxid, issueTx, 0),
-      splitDestinations,
-      utils.getUtxo(issueTxid, issueTx, 2),
-      null
-    )
-    expect(false).toBeTruthy()
-    return
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Payment UTXO provided but payment key is null')
   }
 })
 

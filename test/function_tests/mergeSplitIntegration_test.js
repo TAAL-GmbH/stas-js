@@ -33,7 +33,7 @@ let aliceAddr
 let splitTxid
 let splitTx
 let splitTxObj
-const wait = 7000
+const wait = 5000
 
 const bobSignatureCallback = (tx, i, script, satoshis) => {
   return bsv.Transaction.sighash.sign(tx, bobPrivateKey, sighash, i, script, satoshis)
@@ -64,17 +64,14 @@ it('MergeSplit - Successful MergeSplit With Fees 1', async () => {
   await new Promise(resolve => setTimeout(resolve, wait))
   expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075)
   expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
-  console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
-  console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(7750)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(2250)
 })
 
-it('MergeSplit - Successful MergeSplit With Fees 2', async () => {
+it.only('MergeSplit - Successful MergeSplit With Fees 2', async () => {
   await setup() // contract, issue, transfer then split
 
   const issueOutFundingVout = splitTx.vout.length - 1
-
   const amount1 = bitcoinToSatoshis(splitTx.vout[0].value) / 2
   const amount2 = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - amount1
 
@@ -92,14 +89,11 @@ it('MergeSplit - Successful MergeSplit With Fees 2', async () => {
   await new Promise(resolve => setTimeout(resolve, wait))
   expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075)
   expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
-  console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
-  console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
 })
 
-// no fees disabled for tests
-it('MergeSplit - Successful MergeSplit No Fees', async () => {
+it.only('MergeSplit - Successful MergeSplit No Fees', async () => {
   await setup() // contract, issue, transfer then split
 
   const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
@@ -121,8 +115,6 @@ it('MergeSplit - Successful MergeSplit No Fees', async () => {
   expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(7750)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(2250)
-  console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
-  console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
 })
 
 it(
@@ -153,12 +145,9 @@ it(
     expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(7750)
     expect(await utils.getTokenBalance(bobAddr)).to.equal(2250)
-    console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
-    console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
   }
 )
 
-// no fees currently disabled for tests
 it('MergeSplit - Successful MergeSplit With Callback No Fees',
   async () => {
     await setup() // contract, issue, transfer then split
@@ -184,8 +173,6 @@ it('MergeSplit - Successful MergeSplit With Callback No Fees',
     expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(7750)
     expect(await utils.getTokenBalance(bobAddr)).to.equal(2250)
-    console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
-    console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
   }
 )
 
