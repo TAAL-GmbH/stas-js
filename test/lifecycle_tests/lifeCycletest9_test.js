@@ -22,7 +22,7 @@ const {
 
 // ongoing - need to merge funding utxos
 it(
-  'Full Life Cycle Test 10 - Issuance with 10mb of data',
+  'Full Life Cycle Test 9 - Issuance with 10mb of data',
   async () => {
     const wait = 5000 // slight delay on token issuance due to size of tx
 

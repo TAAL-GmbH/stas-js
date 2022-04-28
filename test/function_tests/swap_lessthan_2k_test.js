@@ -47,7 +47,6 @@ let tokenBIssueTxid
 let fundingUTXO
 let alicePublicKeyHash
 let bobPublicKeyHash
-const wait = 5000 // Wait for balance check
 
 beforeEach(async function () {
   await setup()
@@ -55,7 +54,7 @@ beforeEach(async function () {
 
 describe('atomic swap failing - when token B sats are set to > 2k the broadcast fails with (Signature must be zero for failed CHECK(MULTI)SIG operation)', function () {
   // swap two STAS tokens
-  it('Swap - 3 step token-token swap', async function () {
+  it('Swap - Swap Less Than 2K ', async function () {
     const takerStasInputScriptHex = tokenAObj.outputs[0].script.toHex()
     const makerStasInputScript = tokenBObj.outputs[0].script
 
@@ -88,7 +87,8 @@ describe('atomic swap failing - when token B sats are set to > 2k the broadcast 
     const swapTxid = await broadcast(fullySignedSwapHex)
     expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.00006)
     expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.00002)
-    await new Promise(resolve => setTimeout(resolve, wait))
+    await utils.isTokenBalance(aliceAddr, 6000)
+    await utils.isTokenBalance(bobAddr, 2000)
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(6000)
     expect(await utils.getTokenBalance(bobAddr)).to.equal(2000)
   })

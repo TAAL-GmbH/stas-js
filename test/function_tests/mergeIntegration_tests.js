@@ -63,8 +63,8 @@ it('Merge - Successful Merge With Fee', async () => {
   const response = await utils.getTokenResponse(tokenIdMerge)
   expect(response.symbol).to.equal('TAALT')
   expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+  await utils.isTokenBalance(aliceAddr, 7000)
+  await utils.isTokenBalance(bobAddr, 3000)
 })
 
 it('Merge - Successful Merge With Fee 2', async () => {
@@ -81,8 +81,8 @@ it('Merge - Successful Merge With Fee 2', async () => {
   const response = await utils.getTokenResponse(tokenIdMerge)
   expect(response.symbol).to.equal('TAALT')
   expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(10000)
+  await utils.isTokenBalance(aliceAddr, 0)
+  await utils.isTokenBalance(bobAddr, 10000)
 })
 
 it('Merge - Merge With No Fee', async () => {
@@ -99,8 +99,8 @@ it('Merge - Merge With No Fee', async () => {
   const response = await utils.getTokenResponse(tokenIdMerge)
   expect(response.symbol).to.equal('TAALT')
   expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+  await utils.isTokenBalance(aliceAddr, 7000)
+  await utils.isTokenBalance(bobAddr, 3000)
 })
 
 it('Merge - Successful Merge With Callback And Fee', async () => {
@@ -119,8 +119,8 @@ it('Merge - Successful Merge With Callback And Fee', async () => {
   const response = await utils.getTokenResponse(tokenIdMerge)
   expect(response.symbol).to.equal('TAALT')
   expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+  await utils.isTokenBalance(aliceAddr, 7000)
+  await utils.isTokenBalance(bobAddr, 3000)
 })
 
 it('Merge - Successful Merge With Callback And No Fee', async () => {
@@ -139,8 +139,8 @@ it('Merge - Successful Merge With Callback And No Fee', async () => {
   const response = await utils.getTokenResponse(tokenIdMerge)
   expect(response.symbol).to.equal('TAALT')
   expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+  await utils.isTokenBalance(aliceAddr, 7000)
+  await utils.isTokenBalance(bobAddr, 3000)
 })
 
 it('Merge - Incorrect Owner Private Key Throws Error', async () => {

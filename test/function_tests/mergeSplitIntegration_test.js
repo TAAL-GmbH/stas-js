@@ -61,11 +61,10 @@ it('MergeSplit - Successful MergeSplit With Fees 1', async () => {
     fundingPrivateKey
   )
   const mergeSplitTxid = await broadcast(mergeSplitHex)
-  await new Promise(resolve => setTimeout(resolve, wait))
   expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075)
   expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7750)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(2250)
+  await utils.isTokenBalance(aliceAddr, 7750)
+  await utils.isTokenBalance(bobAddr, 2250)
 })
 
 it('MergeSplit - Successful MergeSplit With Fees 2', async () => {
@@ -86,11 +85,10 @@ it('MergeSplit - Successful MergeSplit With Fees 2', async () => {
     fundingPrivateKey
   )
   const mergeSplitTxid = await broadcast(mergeSplitHex)
-  await new Promise(resolve => setTimeout(resolve, wait))
   expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075)
   expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+  await utils.isTokenBalance(aliceAddr, 7000)
+  await utils.isTokenBalance(bobAddr, 3000)
 })
 
 it('MergeSplit - Successful MergeSplit No Fees', async () => {
@@ -110,11 +108,10 @@ it('MergeSplit - Successful MergeSplit No Fees', async () => {
     null
   )
   const mergeSplitTxid = await broadcast(mergeSplitHex)
-  await new Promise(resolve => setTimeout(resolve, wait))
   expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075)
   expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7750)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(2250)
+  await utils.isTokenBalance(aliceAddr, 7750)
+  await utils.isTokenBalance(bobAddr, 2250)
 })
 
 it(
@@ -140,11 +137,10 @@ it(
       paymentSignatureCallback
     )
     const mergeSplitTxid = await broadcast(mergeSplitHex)
-    await new Promise(resolve => setTimeout(resolve, wait))
     expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075)
     expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
-    expect(await utils.getTokenBalance(aliceAddr)).to.equal(7750)
-    expect(await utils.getTokenBalance(bobAddr)).to.equal(2250)
+    await utils.isTokenBalance(aliceAddr, 7750)
+    await utils.isTokenBalance(bobAddr, 2250)
   }
 )
 
@@ -168,11 +164,10 @@ it('MergeSplit - Successful MergeSplit With Callback No Fees',
       null
     )
     const mergeSplitTxid = await broadcast(mergeSplitHex)
-    await new Promise(resolve => setTimeout(resolve, wait))
     expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075)
     expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
-    expect(await utils.getTokenBalance(aliceAddr)).to.equal(7750)
-    expect(await utils.getTokenBalance(bobAddr)).to.equal(2250)
+    await utils.isTokenBalance(aliceAddr, 7750)
+    await utils.isTokenBalance(bobAddr, 2250)
   }
 )
 
