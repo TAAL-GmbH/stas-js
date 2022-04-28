@@ -53,8 +53,6 @@ it('Redeem - Successful Redeem 1', async () => {
   const redeemTxid = await broadcast(redeemHex)
   await new Promise(resolve => setTimeout(resolve, wait))
   expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007)
-  console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
-  console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
 })
@@ -70,28 +68,24 @@ it('Redeem - Successful Redeem 2', async () => {
   const redeemTxid = await broadcast(redeemHex)
   await new Promise(resolve => setTimeout(resolve, wait))
   expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00003)
-  console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
-  console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
 })
 
-// no fees disabled in tests currently
-// it('Redeem - Successful Redeem No Fee ', async () => {
-//   const redeemHex = redeem(
-//     alicePrivateKey,
-//     issuerPrivateKey.publicKey,
-//     utils.getUtxo(issueTxid, issueTx, 0),
-//     null,
-//     null
-//   )
-//   const redeemTxid = await broadcast(redeemHex)
-//   expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007)
-//   console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
-//   console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
-//   expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
-//   expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
-// })
+it('Redeem - Successful Redeem No Fee ', async () => {
+  const redeemHex = redeem(
+    alicePrivateKey,
+    issuerPrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 0),
+    null,
+    null
+  )
+  const redeemTxid = await broadcast(redeemHex)
+  expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007)
+  await new Promise(resolve => setTimeout(resolve, wait))
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+})
 
 it('Redeem - Successful Redeem With Callback and Fee', async () => {
   const redeemHex = redeemWithCallback(
@@ -106,47 +100,27 @@ it('Redeem - Successful Redeem With Callback and Fee', async () => {
   const redeemTxid = await broadcast(redeemHex)
   await new Promise(resolve => setTimeout(resolve, wait))
   expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007)
-  console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
-  console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
+  await new Promise(resolve => setTimeout(resolve, wait))
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
 })
 
-// no fees disabled in tests currently
-// it('Redeem - Successful Redeem With Callback and No Fee', async () => {
-//   const redeemHex = redeemWithCallback(
-//     alicePrivateKey.publicKey,
-//     issuerPrivateKey.publicKey,
-//     utils.getUtxo(issueTxid, issueTx, 0),
-//     null,
-//     null,
-//     aliceSignatureCallback,
-//     null
-//   )
-//   const redeemTxid = await broadcast(redeemHex)
-//   expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007)
-//   console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
-//   console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
-//   expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
-//   expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
-// })
-
-// no fees currently disabled in tests
-// it('Redeem - Successful Redeem No Fee Empty Array ', async () => {
-//   const redeemHex = redeem(
-//     alicePrivateKey,
-//     issuerPrivateKey.publicKey,
-//     utils.getUtxo(issueTxid, issueTx, 0),
-//     [],
-//     null
-//   )
-//   const redeemTxid = await broadcast(redeemHex)
-//   expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007)
-//   console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
-//   console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
-//   expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
-//   expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
-// })
+it('Redeem - Successful Redeem With Callback and No Fee', async () => {
+  const redeemHex = redeemWithCallback(
+    alicePrivateKey.publicKey,
+    issuerPrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 0),
+    null,
+    null,
+    aliceSignatureCallback,
+    null
+  )
+  const redeemTxid = await broadcast(redeemHex)
+  expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007)
+  await new Promise(resolve => setTimeout(resolve, wait))
+  expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
+  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+})
 
 it('Redeem - Incorrect Stas UTXO Amount Throws Error', async () => {
   const redeemHex = redeem(
@@ -267,75 +241,6 @@ it(
     }
   }
 )
-
-it('Redeem - Null Token Owner Private Key Throws Error', async () => {
-  try {
-    redeem(
-      null,
-      issuerPrivateKey.publicKey,
-      utils.getUtxo(issueTxid, issueTx, 0),
-      utils.getUtxo(issueTxid, issueTx, 2),
-      fundingPrivateKey
-    )
-    expect(false).toBeTruthy()
-    return
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Token owner private key is null')
-  }
-})
-
-it('Redeem - Null STAS UTXO Throws Error', async () => {
-  try {
-    redeem(
-      alicePrivateKey,
-      issuerPrivateKey.publicKey,
-      null,
-      utils.getUtxo(issueTxid, issueTx, 2),
-      fundingPrivateKey
-    )
-    expect(false).toBeTruthy()
-    return
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('stasUtxo is null')
-  }
-})
-
-it(
-  'Redeem -  No Fee UTXO but funding pk provided throws error',
-  async () => {
-    try {
-      redeem(
-        alicePrivateKey,
-        issuerPrivateKey.publicKey,
-        utils.getUtxo(issueTxid, issueTx, 0),
-        null,
-        fundingPrivateKey
-      )
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('Payment key provided but payment UTXO is null')
-    }
-  }
-)
-
-it('Redeem - Null Funding Private Key Throws Error', async () => {
-  try {
-    redeem(
-      alicePrivateKey,
-      issuerPrivateKey.publicKey,
-      utils.getUtxo(issueTxid, issueTx, 0),
-      utils.getUtxo(issueTxid, issueTx, 2),
-      null
-    )
-    expect(false).toBeTruthy()
-    return
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Payment UTXO provided but payment key is null')
-  }
-})
 
 async function setup () {
   issuerPrivateKey = bsv.PrivateKey()

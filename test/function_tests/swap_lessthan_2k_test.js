@@ -47,6 +47,7 @@ let tokenBIssueTxid
 let fundingUTXO
 let alicePublicKeyHash
 let bobPublicKeyHash
+const wait = 5000 // Wait for balance check
 
 beforeEach(async function () {
   await setup()
@@ -87,6 +88,7 @@ describe('atomic swap failing - when token B sats are set to > 2k the broadcast 
     const swapTxid = await broadcast(fullySignedSwapHex)
     expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.00006)
     expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.00002)
+    await new Promise(resolve => setTimeout(resolve, wait))
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(6000)
     expect(await utils.getTokenBalance(bobAddr)).to.equal(2000)
   })

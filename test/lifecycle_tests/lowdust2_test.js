@@ -39,7 +39,7 @@ describe('regression, testnet', () => {
     const supply = 1000
     const symbol = 'TAALT'
     const schema = utils.schema(publicKeyHash, symbol, supply)
-    const wait = 5000
+    const wait = 7000
 
     // change goes back to the fundingPrivateKey
     const contractHex = contract(

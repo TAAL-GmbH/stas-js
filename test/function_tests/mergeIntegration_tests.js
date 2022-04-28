@@ -85,7 +85,6 @@ it('Merge - Successful Merge With Fee 2', async () => {
   expect(await utils.getTokenBalance(bobAddr)).to.equal(10000)
 })
 
-// no fee disabled in tests
 it('Merge - Merge With No Fee', async () => {
   const mergeHex = merge(
     bobPrivateKey,
@@ -96,6 +95,7 @@ it('Merge - Merge With No Fee', async () => {
   )
   const mergeTxid = await broadcast(mergeHex)
   const tokenIdMerge = await utils.getToken(mergeTxid)
+  await new Promise(resolve => setTimeout(resolve, wait))
   const response = await utils.getTokenResponse(tokenIdMerge)
   expect(response.symbol).to.equal('TAALT')
   expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007)
@@ -123,7 +123,6 @@ it('Merge - Successful Merge With Callback And Fee', async () => {
   expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
 })
 
-// no fee disabled in tests
 it('Merge - Successful Merge With Callback And No Fee', async () => {
   const mergeHex = mergeWithCallback(
     bobPrivateKey.publicKey,
@@ -136,6 +135,7 @@ it('Merge - Successful Merge With Callback And No Fee', async () => {
   )
   const mergeTxid = await broadcast(mergeHex)
   const tokenIdMerge = await utils.getToken(mergeTxid)
+  await new Promise(resolve => setTimeout(resolve, wait))
   const response = await utils.getTokenResponse(tokenIdMerge)
   expect(response.symbol).to.equal('TAALT')
   expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007)

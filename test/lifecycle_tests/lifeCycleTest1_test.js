@@ -26,7 +26,6 @@ it('Full Life Cycle Test 1', async () => {
 
   const alicePrivateKey = bsv.PrivateKey()
   const aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
-  console.log(aliceAddr)
 
   const bobPrivateKey = bsv.PrivateKey()
   const bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
@@ -38,7 +37,7 @@ it('Full Life Cycle Test 1', async () => {
   const supply = 10000
   const symbol = 'TAALT'
   const schema = utils.schema(publicKeyHash, symbol, supply)
-  const wait = 5000 // set wait before token balance check
+  const wait = 7000 // set wait before token balance check
 
   // change goes back to the fundingPrivateKey
   const contractHex = contract(
