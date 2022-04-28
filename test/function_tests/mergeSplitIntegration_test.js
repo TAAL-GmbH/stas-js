@@ -33,7 +33,7 @@ let aliceAddr
 let splitTxid
 let splitTx
 let splitTxObj
-const wait = 5000
+const wait = 7000
 
 const bobSignatureCallback = (tx, i, script, satoshis) => {
   return bsv.Transaction.sighash.sign(tx, bobPrivateKey, sighash, i, script, satoshis)
@@ -68,7 +68,7 @@ it('MergeSplit - Successful MergeSplit With Fees 1', async () => {
   expect(await utils.getTokenBalance(bobAddr)).to.equal(2250)
 })
 
-it.only('MergeSplit - Successful MergeSplit With Fees 2', async () => {
+it('MergeSplit - Successful MergeSplit With Fees 2', async () => {
   await setup() // contract, issue, transfer then split
 
   const issueOutFundingVout = splitTx.vout.length - 1
@@ -93,7 +93,7 @@ it.only('MergeSplit - Successful MergeSplit With Fees 2', async () => {
   expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
 })
 
-it.only('MergeSplit - Successful MergeSplit No Fees', async () => {
+it('MergeSplit - Successful MergeSplit No Fees', async () => {
   await setup() // contract, issue, transfer then split
 
   const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
