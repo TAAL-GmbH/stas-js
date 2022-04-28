@@ -30,7 +30,7 @@ const davePrivateKey = bsv.PrivateKey()
 const daveAddr = davePrivateKey.toAddress(process.env.NETWORK).toString()
 const emmaPrivateKey = bsv.PrivateKey()
 const emmaAddr = emmaPrivateKey.toAddress(process.env.NETWORK).toString()
-const wait = 3000
+const wait = 5000
 
 it(
   'Full Life Cycle Test With Multiple Transfers & Splits',

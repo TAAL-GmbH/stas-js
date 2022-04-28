@@ -68,7 +68,7 @@ it(
     const validSplitTxObj = await validToken()
     const invalidSplitTxObj = await invalidToken()
 
-    const mergeHex = mergeUtil.mergeWithoutValidation(
+    const mergeHex = mergeUtil.mergeWithOutValidation(
       bobPrivateKey,
       [{
         tx: validSplitTxObj,

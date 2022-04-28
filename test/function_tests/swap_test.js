@@ -207,7 +207,7 @@ describe('atomic swap', function () {
     const tokenId = await utils.getToken(swapTxid, 1)
     const response = await utils.getTokenResponse(tokenId, tokenBSymbol)
     expect(response.symbol).to.equal(tokenBSymbol)
-    expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.01)
+    expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.0099)
     expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.00003)
   })
 

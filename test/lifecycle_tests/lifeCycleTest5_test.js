@@ -50,7 +50,7 @@ it('Full Life Cycle Test With 10 Issuance Addresses', async () => {
   const supply = 10000
   const symbol = 'TAALT'
   const schema = utils.schema(publicKeyHash, symbol, supply)
-  const wait = 3000
+  const wait = 5000
 
   // change goes back to the fundingPrivateKey
   const contractHex = contract(
