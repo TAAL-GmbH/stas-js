@@ -37,7 +37,7 @@ it('Full Life Cycle Test 1', async () => {
   const supply = 10000
   const symbol = 'TAALT'
   const schema = utils.schema(publicKeyHash, symbol, supply)
-  const wait = 7000 // set wait before token balance check
+  const wait = 5000 // set wait before token balance check
 
   // change goes back to the fundingPrivateKey
   const contractHex = contract(
@@ -72,6 +72,8 @@ it('Full Life Cycle Test 1', async () => {
   expect(response.symbol).to.equal(symbol)
   expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
   expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
+  await utils.isTokenBalance(aliceAddr, 7000)
+  await utils.isTokenBalance(bobAddr, 3000)
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
 
@@ -87,10 +89,10 @@ it('Full Life Cycle Test 1', async () => {
   const transferTxid = await broadcast(transferHex)
   console.log(`Transfer TX:     ${transferTxid}`)
   const transferTx = await getTransaction(transferTxid)
-  await new Promise(resolve => setTimeout(resolve, wait))
+  // await new Promise(resolve => setTimeout(resolve, wait))
   expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
+  await utils.isTokenBalance(aliceAddr, 10000)
+  await utils.isTokenBalance(bobAddr, 0)
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
 
@@ -111,9 +113,11 @@ it('Full Life Cycle Test 1', async () => {
   const splitTxid = await broadcast(splitHex)
   console.log(`Split TX:        ${splitTxid}`)
   const splitTx = await getTransaction(splitTxid)
-  await new Promise(resolve => setTimeout(resolve, wait))
+  // await new Promise(resolve => setTimeout(resolve, wait))
   expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000015)
   expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000015)
+  await utils.isTokenBalance(aliceAddr, 7000)
+  await utils.isTokenBalance(bobAddr, 3000)
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
 
@@ -131,11 +135,13 @@ it('Full Life Cycle Test 1', async () => {
   const mergeTxid = await broadcast(mergeHex)
   console.log(`Merge TX:        ${mergeTxid}`)
   const mergeTx = await getTransaction(mergeTxid)
-  await new Promise(resolve => setTimeout(resolve, wait))
+  // await new Promise(resolve => setTimeout(resolve, wait))
   expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00003)
   const tokenIdMerge = await utils.getToken(mergeTxid)
   const responseMerge = await utils.getTokenResponse(tokenIdMerge)
   expect(responseMerge.symbol).to.equal(symbol)
+  await utils.isTokenBalance(aliceAddr, 10000)
+  await utils.isTokenBalance(bobAddr, 0)
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
 
@@ -156,11 +162,13 @@ it('Full Life Cycle Test 1', async () => {
   const splitTxid2 = await broadcast(splitHex2)
   console.log(`Split TX2:       ${splitTxid2}`)
   const splitTx2 = await getTransaction(splitTxid2)
-  await new Promise(resolve => setTimeout(resolve, wait))
+  // await new Promise(resolve => setTimeout(resolve, wait))
   expect(await utils.getVoutAmount(splitTxid2, 0)).to.equal(0.000015)
   expect(await utils.getVoutAmount(splitTxid2, 1)).to.equal(0.000015)
   console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
   console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
+  await utils.isTokenBalance(aliceAddr, 7000)
+  await utils.isTokenBalance(bobAddr, 3000)
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
 
@@ -184,9 +192,11 @@ it('Full Life Cycle Test 1', async () => {
   const mergeSplitTxid = await broadcast(mergeSplitHex)
   console.log(`MergeSplit TX:   ${mergeSplitTxid}`)
   const mergeSplitTx = await getTransaction(mergeSplitTxid)
-  await new Promise(resolve => setTimeout(resolve, wait))
+  // await new Promise(resolve => setTimeout(resolve, wait))
   expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075)
   expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
+  await utils.isTokenBalance(aliceAddr, 7750)
+  await utils.isTokenBalance(bobAddr, 2250)
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(7750)
   expect(await utils.getTokenBalance(bobAddr)).to.equal(2250)
 
@@ -200,8 +210,10 @@ it('Full Life Cycle Test 1', async () => {
   )
   const redeemTxid = await broadcast(redeemHex)
   console.log(`Redeem TX:       ${redeemTxid}`)
-  await new Promise(resolve => setTimeout(resolve, wait))
+  // await new Promise(resolve => setTimeout(resolve, wait))
   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.0000075)
+  await utils.isTokenBalance(aliceAddr, 7000)
+  await utils.isTokenBalance(bobAddr, 2250)
   expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000) // 750 of alice tokens were redeemed
   expect(await utils.getTokenBalance(bobAddr)).to.equal(2250)
 })

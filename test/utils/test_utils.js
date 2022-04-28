@@ -1,4 +1,5 @@
 const axios = require('axios')
+const expect = require('chai').expect
 const axiosRetry = require('axios-retry')
 const bsv = require('bsv')
 require('dotenv').config()
@@ -301,6 +302,26 @@ async function getTokenBalance (address) {
   return response.data.tokens[0].balance
 }
 
+async function isTokenBalance (address, expectedBalance) {
+  for (let i = 0; i < 30; i++) {
+    const url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/address/${address}/tokens`
+    const response = await axios({
+      method: 'get',
+      url,
+      auth: {
+        username: process.env.API_USERNAME,
+        password: process.env.API_PASSWORD
+      }
+    })
+    const balance = response.data.tokens[0].balance
+    if (balance === expectedBalance) {
+      return
+    }
+    await new Promise(resolve => setTimeout(resolve, 1000))
+  }
+  expect(false).to.true()
+}
+
 async function getAmount (txid, vout) {
   const url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/tx/hash/${txid}`
   const response = await axios({
@@ -580,5 +601,6 @@ module.exports = {
   getUtxoMainNet,
   getUnspentMainNet,
   setupMainNetTest,
-  randomSymbol
+  randomSymbol,
+  isTokenBalance
 }
