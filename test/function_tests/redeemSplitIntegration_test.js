@@ -27,13 +27,12 @@ let fundingUtxos
 let publicKeyHash
 let issueTxid
 let issueTx
-const wait = 5000
 
 beforeEach(async () => {
   await setup()
 })
 
-it('Successful RedeemSplit With 1 Split', async () => {
+it.only('Successful RedeemSplit With 1 Split', async () => {
   const amount = issueTx.vout[0].value / 2
   const rSplitDestinations = []
   rSplitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
@@ -47,10 +46,10 @@ it('Successful RedeemSplit With 1 Split', async () => {
     fundingPrivateKey
   )
   const redeemTxid = await broadcast(redeemSplitHex)
-  await new Promise(resolve => setTimeout(resolve, wait))
   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000035) // first utxo goes to redemption address
   expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000035)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(6500)
+  await utils.isTokenBalance(aliceAddr, 0)
+  await utils.isTokenBalance(bobAddr, 6500)
 })
 
 it('Successful RedeemSplit With 2 Split', async () => {
@@ -68,12 +67,11 @@ it('Successful RedeemSplit With 2 Split', async () => {
     fundingPrivateKey
   )
   const redeemTxid = await broadcast(redeemSplitHex)
-  await new Promise(resolve => setTimeout(resolve, wait))
   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000042) // first utxo goes to redemption address
   expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000014)
   expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.000014)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(1400)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(4400)
+  await utils.isTokenBalance(aliceAddr, 1400)
+  await utils.isTokenBalance(bobAddr, 4400)
 })
 
 it('Successful RedeemSplit With 3 Split', async () => {
@@ -94,14 +92,13 @@ it('Successful RedeemSplit With 3 Split', async () => {
     fundingPrivateKey
   )
   const redeemTxid = await broadcast(redeemSplitHex)
-  await new Promise(resolve => setTimeout(resolve, wait))
   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000049)
   expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000007)
   expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.000007)
   expect(await utils.getVoutAmount(redeemTxid, 3)).to.equal(0.000007)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(700)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(3700)
-  expect(await utils.getTokenBalance(daveAddr)).to.equal(700)
+  await utils.isTokenBalance(aliceAddr, 700)
+  await utils.isTokenBalance(bobAddr, 3700)
+  await utils.isTokenBalance(daveAddr, 700)
 })
 
 it('Successful RedeemSplit With No Fees', async () => {
@@ -120,12 +117,11 @@ it('Successful RedeemSplit With No Fees', async () => {
     null
   )
   const redeemTxid = await broadcast(redeemSplitHex)
-  await new Promise(resolve => setTimeout(resolve, wait))
   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00002334)
   expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.00002333)
   expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.00002333)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(2333)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(5333)
+  await utils.isTokenBalance(aliceAddr, 2333)
+  await utils.isTokenBalance(bobAddr, 5333)
 })
 
 it('RedeemSplit - No Split Completes Successfully', async () => {
@@ -142,10 +138,9 @@ it('RedeemSplit - No Split Completes Successfully', async () => {
     fundingPrivateKey
   )
   const redeemTxid = await broadcast(redeemSplitHex)
-  await new Promise(resolve => setTimeout(resolve, wait))
   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000035)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(6500)
+  await utils.isTokenBalance(aliceAddr, 0)
+  await utils.isTokenBalance(bobAddr, 6500)
 })
 
 it('RedeemSplit - Too Many Outputs Throws Error', async () => {
@@ -497,6 +492,112 @@ it('RedeemSplit - Null Contract Public Key Throws Error', async () => {
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
     expect(e.message).to.eql('contract public key is null')
+  }
+})
+
+// check with liam - we can split to issuer address
+it('RedeemSplit - Send to Issuer Address Throws Error', async () => {
+  const amount = bitcoinToSatoshis(issueTx.vout[0].value / 5)
+  const issuerAddr = issuerPrivateKey.toAddress(process.env.NETWORK).toString()
+  const rSplitDestinations = []
+  rSplitDestinations[0] = { address: issuerAddr, amount: amount }
+  rSplitDestinations[1] = { address: issuerAddr, amount: amount }
+
+  const redeemSplitHex = redeemSplit(
+    alicePrivateKey,
+    issuerPrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 0),
+    rSplitDestinations,
+    utils.getUtxo(issueTxid, issueTx, 2),
+    fundingPrivateKey
+  )
+  const redeemTxid = await broadcast(redeemSplitHex)
+  console.log(redeemTxid)
+})
+
+it(
+  'RedeemSplit - Incorrect Owner Private Key Throws Error',
+  async () => {
+    const bobAmount = bitcoinToSatoshis(issueTx.vout[0].value / 3)
+    const splitDestinations = []
+    splitDestinations[0] = { address: bobAddr, amount: bobAmount }
+    splitDestinations[1] = { address: bobAddr, amount: bobAmount }
+    const issueOutFundingVout = issueTx.vout.length - 1
+    const incorrectPrivateKey = bsv.PrivateKey()
+
+    const redeemHex = redeemSplit(
+      incorrectPrivateKey,
+      issuerPrivateKey.publicKey,
+      utils.getUtxo(issueTxid, issueTx, 0),
+      splitDestinations,
+      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
+      fundingPrivateKey
+    )
+    try {
+      await broadcast(redeemHex)
+      expect(false).toBeTruthy()
+      return
+    } catch (e) {
+      expect(e).to.be.instanceOf(Error)
+      expect(e.message).to.eql('Request failed with status code 400')
+    }
+  }
+)
+
+it(
+  'RedeemSplit - Incorrect Funding Private Key Throws Error',
+  async () => {
+    const bobAmount = bitcoinToSatoshis(issueTx.vout[0].value / 4)
+    const splitDestinations = []
+    splitDestinations[0] = { address: bobAddr, amount: bobAmount }
+    splitDestinations[1] = { address: bobAddr, amount: bobAmount }
+    const issueOutFundingVout = issueTx.vout.length - 1
+    const incorrectPrivateKey = bsv.PrivateKey()
+
+    const redeemHex = redeemSplit(
+      alicePrivateKey,
+      issuerPrivateKey.publicKey,
+      utils.getUtxo(issueTxid, issueTx, 0),
+      splitDestinations,
+      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
+      incorrectPrivateKey
+    )
+
+    try {
+      await broadcast(redeemHex)
+      expect(false).toBeTruthy()
+      return
+    } catch (e) {
+      expect(e).to.be.instanceOf(Error)
+      expect(e.message).to.eql('Request failed with status code 400')
+    }
+  }
+)
+
+it('RedeemSplit - Incorrect Public Key Throws Error', async () => {
+  const bobAmount = bitcoinToSatoshis(issueTx.vout[0].value / 4)
+  const splitDestinations = []
+  splitDestinations[0] = { address: bobAddr, amount: bobAmount }
+  splitDestinations[1] = { address: bobAddr, amount: bobAmount }
+  const issueOutFundingVout = issueTx.vout.length - 1
+  const incorrectPrivateKey = bsv.PrivateKey()
+
+  const redeemHex = redeemSplit(
+    alicePrivateKey,
+    incorrectPrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 0),
+    splitDestinations,
+    utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
+    fundingPrivateKey
+  )
+
+  try {
+    await broadcast(redeemHex)
+    expect(false).toBeTruthy()
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Request failed with status code 400')
   }
 })
 
