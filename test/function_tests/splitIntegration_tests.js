@@ -144,7 +144,7 @@ it('Split - Successful Split Into Four Tokens 2', async () => {
   await utils.isTokenBalance(aliceAddr, 1750)
   await utils.isTokenBalance(bobAddr, 4750)
   await utils.isTokenBalance(aliceAddr, 1750)
-  await utils.isTokenBalance(bobAddr, 1750)
+  await utils.isTokenBalance(bobAddr, 4750)
 })
 
 it('Split - No Split Completes Successfully', async () => {
@@ -161,7 +161,7 @@ it('Split - No Split Completes Successfully', async () => {
   )
   const splitTxid = await broadcast(splitHex)
   expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.00007)
-  await utils.isTokenBalance(aliceAddr, 10000)
+  await utils.isTokenBalance(bobAddr, 10000)
 })
 
 it('Split - Successful Split Into Two Tokens With No Fee',

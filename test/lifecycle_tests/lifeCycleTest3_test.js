@@ -95,7 +95,7 @@ describe('regression, testnet', () => {
     expect(await utils.getVoutAmount(issueTxid, 2)).to.equal(0.00002)
     await utils.isTokenBalance(aliceAddr, 5000)
     await utils.isTokenBalance(bobAddr, 3000)
-    await utils.isTokenBalance(bobAddr, 2000)
+    await utils.isTokenBalance(daveAddr, 2000)
 
     const issueOutFundingVout = issueTx.vout.length - 1
 
@@ -112,7 +112,7 @@ describe('regression, testnet', () => {
     expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
     await utils.isTokenBalance(aliceAddr, 8000)
     await utils.isTokenBalance(bobAddr, 0)
-    await utils.isTokenBalance(bobAddr, 2000)
+    await utils.isTokenBalance(daveAddr, 2000)
 
     // Split tokens into 2 - both payable to Bob...
     const bobAmount1 = transferTx.vout[0].value / 2
@@ -135,7 +135,7 @@ describe('regression, testnet', () => {
     expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000015)
     await utils.isTokenBalance(aliceAddr, 5000)
     await utils.isTokenBalance(bobAddr, 3000)
-    await utils.isTokenBalance(bobAddr, 2000)
+    await utils.isTokenBalance(daveAddr, 2000)
 
     // Now let's merge the last split back together
     const splitTxObj = new bsv.Transaction(splitHex)
@@ -157,7 +157,7 @@ describe('regression, testnet', () => {
     expect(responseMerge.symbol).to.equal(symbol)
     await utils.isTokenBalance(aliceAddr, 8000)
     await utils.isTokenBalance(bobAddr, 0)
-    await utils.isTokenBalance(bobAddr, 2000)
+    await utils.isTokenBalance(daveAddr, 2000)
 
     // Split again - both payable to Alice...
     const amount = bitcoinToSatoshis(mergeTx.vout[0].value / 2)
@@ -180,7 +180,7 @@ describe('regression, testnet', () => {
     expect(await utils.getVoutAmount(splitTxid2, 1)).to.equal(0.000015)
     await utils.isTokenBalance(aliceAddr, 5000)
     await utils.isTokenBalance(bobAddr, 3000)
-    await utils.isTokenBalance(bobAddr, 2000)
+    await utils.isTokenBalance(daveAddr, 2000)
 
     // Now mergeSplit
     const splitTxObj2 = new bsv.Transaction(splitHex2)
@@ -206,7 +206,7 @@ describe('regression, testnet', () => {
     expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
     await utils.isTokenBalance(aliceAddr, 5750)
     await utils.isTokenBalance(bobAddr, 2250)
-    await utils.isTokenBalance(bobAddr, 2000)
+    await utils.isTokenBalance(daveAddr, 2000)
 
     // Alice wants to redeem the money from bob...
     const redeemHex = redeem(
@@ -221,6 +221,6 @@ describe('regression, testnet', () => {
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.0000075)
     await utils.isTokenBalance(aliceAddr, 5000)
     await utils.isTokenBalance(bobAddr, 2250)
-    await utils.isTokenBalance(bobAddr, 2000)
+    await utils.isTokenBalance(daveAddr, 2000)
   })
 })

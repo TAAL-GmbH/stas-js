@@ -107,7 +107,7 @@ it('MergeSplit - Successful MergeSplit No Fees', async () => {
     null
   )
   const mergeSplitTxid = await broadcast(mergeSplitHex)
-  expect(await utils.getVoutAmount(mergeSplitTxid``, 0)).to.equal(0.0000075)
+  expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075)
   expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
   await utils.isTokenBalance(aliceAddr, 7750)
   await utils.isTokenBalance(bobAddr, 2250)

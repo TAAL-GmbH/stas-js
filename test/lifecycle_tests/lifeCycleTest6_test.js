@@ -98,14 +98,13 @@ it(
     for (let i = 1; i < 4; i++) {
       expect(await utils.getVoutAmount(issueTxid, i)).to.equal(0.0001)
     }
-    expect(await utils.getTokenBalance(bobAddr)).to.equal(10000)
-    expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
-    expect(await utils.getTokenBalance(daveAddr)).to.equal(10000)
-    expect(await utils.getTokenBalance(emmaAddr)).to.equal(10000)
+    await utils.isTokenBalance(bobAddr, 10000)
+    await utils.isTokenBalance(aliceAddr, 10000)
+    await utils.isTokenBalance(daveAddr, 10000)
+    await utils.isTokenBalance(emmaAddr, 10000)
 
     const issueOutFundingVout = issueTx.vout.length - 1
 
-    // transfer from bob to alice
     const transferHex = transfer(
       bobPrivateKey,
       utils.getUtxo(issueTxid, issueTx, 0),
@@ -114,12 +113,13 @@ it(
       fundingPrivateKey
     )
     const transferTxid = await broadcast(transferHex)
-    await new Promise(resolve => setTimeout(resolve, wait))
     console.log(`Transfer TX:     ${transferTxid}`)
     const transferTx = await getTransaction(transferTxid)
-    // console.log('addr3 ' + await utils.getTokenBalance(addr3))
+    await utils.isTokenBalance(bobAddr, 0)
+    await utils.isTokenBalance(aliceAddr, 20000)
+    await utils.isTokenBalance(daveAddr, 10000)
+    await utils.isTokenBalance(emmaAddr, 10000)
 
-    // transfer from Dave to Emma
     const transferHex2 = transfer(
       alicePrivateKey,
       utils.getUtxo(issueTxid, issueTx, 1),
@@ -127,12 +127,13 @@ it(
       utils.getUtxo(transferTxid, transferTx, 1),
       fundingPrivateKey
     )
-    console.log(transferHex2)
     const transferTxid2 = await broadcast(transferHex2)
-    await new Promise(resolve => setTimeout(resolve, wait))
     console.log(`Transfer TX2:     ${transferTxid2}`)
     const transferTx2 = await getTransaction(transferTxid2)
-    // console.log('addr3 ' + await utils.getTokenBalance(addr3))
+    await utils.isTokenBalance(bobAddr, 0)
+    await utils.isTokenBalance(aliceAddr, 10000)
+    await utils.isTokenBalance(daveAddr, 10000)
+    await utils.isTokenBalance(emmaAddr, 20000)
 
     const transferHex3 = transfer(
       davePrivateKey,
@@ -142,9 +143,12 @@ it(
       fundingPrivateKey
     )
     const transferTxid3 = await broadcast(transferHex3)
-    await new Promise(resolve => setTimeout(resolve, wait))
     console.log(`Transfer TX3:     ${transferTxid3}`)
     const transferTx3 = await getTransaction(transferTxid3)
+    await utils.isTokenBalance(bobAddr, 0)
+    await utils.isTokenBalance(aliceAddr, 10000)
+    await utils.isTokenBalance(daveAddr, 0)
+    await utils.isTokenBalance(emmaAddr, 30000)
 
     const transferHex4 = transfer(
       emmaPrivateKey,
@@ -157,82 +161,80 @@ it(
     console.log(`Transfer TX4:     ${transferTxid4}`)
     const transferTx4 = await getTransaction(transferTxid4)
 
-    //   expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
-    //   // expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
-    //   // expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
-    //   console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
-    //   console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
+    expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.0001)
+    await utils.isTokenBalance(bobAddr, 10000)
+    await utils.isTokenBalance(aliceAddr, 10000)
+    await utils.isTokenBalance(daveAddr, 0)
+    await utils.isTokenBalance(emmaAddr, 20000)
 
-    //   // Split tokens into 2 - both payable to Bob...
-    //   const bobAmount1 = transferTx.vout[0].value / 2
-    //   const bobAmount2 = transferTx.vout[0].value - bobAmount1
-    //   const splitDestinations = []
-    //   splitDestinations[0] = { address: bobAddr, amount: bobAmount1 }
-    //   splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
+    const bobAmount1 = transferTx.vout[0].value / 2
+    const bobAmount2 = transferTx.vout[0].value - bobAmount1
+    const splitDestinations = []
+    splitDestinations[0] = { address: emmaAddr, amount: bitcoinToSatoshis(bobAmount1) }
+    splitDestinations[1] = { address: daveAddr, amount: bitcoinToSatoshis(bobAmount2) }
 
-    //   const splitHex = split(
-    //     alicePrivateKey,
-    //     issuerPrivateKey.publicKey,
-    //     utils.getUtxo(transferTxid, transferTx, 0),
-    //     splitDestinations,
-    //     utils.getUtxo(transferTxid, transferTx, 1),
-    //     fundingPrivateKey
-    //   )
-    //   const splitTxid = await broadcast(splitHex)
-    //   console.log(`Split TX:        ${splitTxid}`)
-    //   const splitTx = await getTransaction(splitTxid)
-    //   expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000015)
-    //   expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000015)
-    //   console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
-    //   console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
+    const splitHex = split(
+      bobPrivateKey,
+      utils.getUtxo(transferTxid4, transferTx4, 0),
+      splitDestinations,
+      utils.getUtxo(transferTxid4, transferTx4, 1),
+      fundingPrivateKey
+    )
+    const splitTxid = await broadcast(splitHex)
+    console.log(`Split TX:        ${splitTxid}`)
+    const splitTx = await getTransaction(splitTxid)
+    expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.00005)
+    expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.00005)
+    await utils.isTokenBalance(bobAddr, 0)
+    await utils.isTokenBalance(aliceAddr, 10000)
+    await utils.isTokenBalance(daveAddr, 5000)
+    await utils.isTokenBalance(emmaAddr, 25000)
 
-    //   // Now let's merge the last split back together
-    //   const splitTxObj = new bsv.Transaction(splitHex)
+    const splitTxObj = new bsv.Transaction(splitHex)
 
-    //   const mergeHex = merge(
-    //     bobPrivateKey,
-    //     issuerPrivateKey.publicKey,
-    //     utils.getMergeUtxo(splitTxObj),
-    //     aliceAddr,
-    //     utils.getUtxo(splitTxid, splitTx, 2),
-    //     fundingPrivateKey
-    //   )
+    const mergeHex = merge(
+      bobPrivateKey,
+      utils.getMergeUtxo(splitTxObj),
+      aliceAddr,
+      utils.getUtxo(splitTxid, splitTx, 2),
+      fundingPrivateKey
+    )
 
-    //   const mergeTxid = await broadcast(mergeHex)
-    //   console.log(`Merge TX:        ${mergeTxid}`)
-    //   const mergeTx = await getTransaction(mergeTxid)
-    //   expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00003)
-    //   // const tokenIdMerge = await utils.getToken(issueTxid)
-    //   // let responseMerge = await utils.getTokenResponse(tokenIdMerge)
-    //   // expect(responseMerge.token.symbol).to.equal(symbol)
-    //   // expect(responseMerge.token.contract_txs).to.contain(contractTxid)
-    //   // expect(responseMerge.token.issuance_txs).to.contain(issueTxid)
-    //   console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
-    //   console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
+    const mergeTxid = await broadcast(mergeHex)
+    console.log(`Merge TX:        ${mergeTxid}`)
+    const mergeTx = await getTransaction(mergeTxid)
+    expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.0001)
+    const tokenIdMerge = await utils.getToken(issueTxid)
+    const responseMerge = await utils.getTokenResponse(tokenIdMerge)
+    expect(responseMerge.token.symbol).to.equal(symbol)
+    await utils.isTokenBalance(bobAddr, 0)
+    await utils.isTokenBalance(aliceAddr, 20000)
+    await utils.isTokenBalance(daveAddr, 0)
+    await utils.isTokenBalance(emmaAddr, 0)
 
-    //   // Split again - both payable to Alice...
-    //   const aliceAmount1 = mergeTx.vout[0].value / 2
-    //   const aliceAmount2 = mergeTx.vout[0].value - aliceAmount1
+    const aliceAmount1 = mergeTx.vout[0].value / 2
+    const aliceAmount2 = mergeTx.vout[0].value - aliceAmount1
 
-    //   const split2Destinations = []
-    //   split2Destinations[0] = { address: aliceAddr, amount: aliceAmount1 }
-    //   split2Destinations[1] = { address: aliceAddr, amount: aliceAmount2 }
+    const split2Destinations = []
+    split2Destinations[0] = { address: aliceAddr, amount: aliceAmount1 }
+    split2Destinations[1] = { address: aliceAddr, amount: aliceAmount2 }
 
-    //   const splitHex2 = split(
-    //     alicePrivateKey,
-    //     issuerPrivateKey.publicKey,
-    //     utils.getUtxo(mergeTxid, mergeTx, 0),
-    //     split2Destinations,
-    //     utils.getUtxo(mergeTxid, mergeTx, 1),
-    //     fundingPrivateKey
-    //   )
-    //   const splitTxid2 = await broadcast(splitHex2)
-    //   console.log(`Split TX2:       ${splitTxid2}`)
-    //   const splitTx2 = await getTransaction(splitTxid2)
-    //   expect(await utils.getVoutAmount(splitTxid2, 0)).to.equal(0.000015)
-    //   expect(await utils.getVoutAmount(splitTxid2, 1)).to.equal(0.000015)
-    //   console.log('Alice Balance ' + await utils.getTokenBalance(aliceAddr))
-    //   console.log('Bob Balance ' + await utils.getTokenBalance(bobAddr))
+    const splitHex2 = split(
+      alicePrivateKey,
+      utils.getUtxo(mergeTxid, mergeTx, 0),
+      split2Destinations,
+      utils.getUtxo(mergeTxid, mergeTx, 1),
+      fundingPrivateKey
+    )
+    const splitTxid2 = await broadcast(splitHex2)
+    console.log(`Split TX2:       ${splitTxid2}`)
+    const splitTx2 = await getTransaction(splitTxid2)
+    expect(await utils.getVoutAmount(splitTxid2, 0)).to.equal(0.0005)
+    expect(await utils.getVoutAmount(splitTxid2, 1)).to.equal(0.0005)
+    await utils.isTokenBalance(bobAddr, 0)
+    await utils.isTokenBalance(aliceAddr, 10000)
+    await utils.isTokenBalance(daveAddr, 5000)
+    await utils.isTokenBalance(emmaAddr, 5000)
 
     //   // Now mergeSplit
     //   const splitTxObj2 = new bsv.Transaction(splitHex2)
