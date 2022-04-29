@@ -99,12 +99,9 @@ describe('regression, testnet', () => {
     expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00008)
     expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00004)
     expect(await utils.getVoutAmount(issueTxid, 2)).to.equal(0.00002)
-    console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
-    console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
-    console.log('Dave Balance ' + (await utils.getTokenBalance(daveAddr)))
-    expect(await utils.getTokenBalance(aliceAddr)).to.equal(8000)
-    expect(await utils.getTokenBalance(bobAddr)).to.equal(4000)
-    expect(await utils.getTokenBalance(daveAddr)).to.equal(2000)
+    await utils.isTokenBalance(aliceAddr, 8000)
+    await utils.isTokenBalance(bobAddr, 4000)
+    await utils.isTokenBalance(bobAddr, 2000)
 
     const issueOutFundingVout = issueTx.vout.length - 1
 
@@ -118,11 +115,10 @@ describe('regression, testnet', () => {
     const transferTxid = await broadcast(transferHex)
     console.log(`Transfer TX:     ${transferTxid}`)
     const transferTx = await getTransaction(transferTxid)
-    await new Promise(resolve => setTimeout(resolve, wait))
     expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00008)
-    expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
-    expect(await utils.getTokenBalance(bobAddr)).to.equal(12000)
-    expect(await utils.getTokenBalance(daveAddr)).to.equal(2000)
+    await utils.isTokenBalance(aliceAddr, 8000)
+    await utils.isTokenBalance(bobAddr, 12000)
+    await utils.isTokenBalance(bobAddr, 2000)
 
     // Attempt to split - throws error
     const bobAmount1 = transferTx.vout[0].value / 2
@@ -155,10 +151,9 @@ describe('regression, testnet', () => {
     )
     const redeemTxid = await broadcast(redeemHex)
     console.log(`Redeem TX:       ${redeemTxid}`)
-    await new Promise(resolve => setTimeout(resolve, wait))
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00008)
-    expect(await utils.getTokenBalance(bobAddr)).to.equal(4000)
-    expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
-    expect(await utils.getTokenBalance(daveAddr)).to.equal(2000)
+    await utils.isTokenBalance(aliceAddr, 4000)
+    await utils.isTokenBalance(bobAddr, 0)
+    await utils.isTokenBalance(bobAddr, 2000)
   })
 })

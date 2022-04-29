@@ -74,8 +74,8 @@ describe('regression, testnet', () => {
     expect(response.symbol).to.equal(symbol)
     expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
     expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
-    expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
-    expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+    await utils.isTokenBalance(aliceAddr, 7000)
+    await utils.isTokenBalance(bobAddr, 3000)
 
     const issueOutFundingVout = issueTx.vout.length - 1
     const transferHex = transfer(
@@ -88,10 +88,9 @@ describe('regression, testnet', () => {
     const transferTxid = await broadcast(transferHex)
     console.log(`Transfer TX:     ${transferTxid}`)
     const transferTx = await getTransaction(transferTxid)
-    await new Promise(resolve => setTimeout(resolve, wait))
     expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
-    expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
-    expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
+    await utils.isTokenBalance(aliceAddr, 10000)
+    await utils.isTokenBalance(bobAddr, 0)
 
     // Split tokens into 2 - both payable to Bob...
     const bobAmount1 = transferTx.vout[0].value / 2
@@ -126,10 +125,8 @@ describe('regression, testnet', () => {
 
     const redeemTxid = await broadcast(redeemHex)
     console.log(`Redeem TX:       ${redeemTxid}`)
-    await new Promise(resolve => setTimeout(resolve, wait))
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00003)
-    await new Promise(resolve => setTimeout(resolve, wait))
-    expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
-    expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
+    await utils.isTokenBalance(aliceAddr, 7000)
+    await utils.isTokenBalance(bobAddr, 0)
   })
 })

@@ -303,10 +303,11 @@ async function getTokenBalance (address) {
 }
 
 async function isTokenBalance (address, expectedBalance) {
+  let response
   await new Promise(resolve => setTimeout(resolve, 2000))
   for (let i = 0; i < 30; i++) {
     const url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/address/${address}/tokens`
-    const response = await axios({
+    response = await axios({
       method: 'get',
       url,
       auth: {
@@ -320,6 +321,7 @@ async function isTokenBalance (address, expectedBalance) {
     }
     await new Promise(resolve => setTimeout(resolve, 1000))
   }
+  console.log('Incorrect balance, actual balance is ' + response.data.tokens[0].balance)
   expect(false).to.true()
 }
 

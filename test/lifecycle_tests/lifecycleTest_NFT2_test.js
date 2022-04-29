@@ -85,6 +85,7 @@ describe('regression, testnet', () => {
     expect(response.symbol).to.equal(symbol)
     expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00010)
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
+    await utils.isTokenBalance(aliceAddr, 10000)
 
     const issueOutFundingVout = issueTx.vout.length - 1
 
@@ -98,10 +99,9 @@ describe('regression, testnet', () => {
     const transferTxid = await broadcast(transferHex)
     console.log(`Transfer TX:     ${transferTxid}`)
     const transferTx = await getTransaction(transferTxid)
-    await new Promise(resolve => setTimeout(resolve, wait))
     expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00010)
-    expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
-    expect(await utils.getTokenBalance(bobAddr)).to.equal(10000)
+    await utils.isTokenBalance(aliceAddr, 0)
+    await utils.isTokenBalance(bobAddr, 10000)
 
     // Attempt to split - throws error
     const bobAmount1 = transferTx.vout[0].value / 2
@@ -134,9 +134,8 @@ describe('regression, testnet', () => {
     )
     const redeemTxid = await broadcast(redeemHex)
     console.log(`Redeem TX:       ${redeemTxid}`)
-    await new Promise(resolve => setTimeout(resolve, wait))
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.0001)
-    expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
-    expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
+    await utils.isTokenBalance(aliceAddr, 0)
+    await utils.isTokenBalance(bobAddr, 0)
   })
 })
