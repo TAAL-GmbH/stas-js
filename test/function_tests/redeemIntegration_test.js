@@ -29,7 +29,6 @@ let bobAddr
 let aliceAddr
 let issueTxid
 let issueTx
-const wait = 5000
 
 const aliceSignatureCallback = (tx, i, script, satoshis) => {
   return bsv.Transaction.sighash.sign(tx, alicePrivateKey, sighash, i, script, satoshis)
@@ -51,10 +50,9 @@ it('Redeem - Successful Redeem 1', async () => {
     fundingPrivateKey
   )
   const redeemTxid = await broadcast(redeemHex)
-  await new Promise(resolve => setTimeout(resolve, wait))
   expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+  await utils.isTokenBalance(aliceAddr, 0)
+  await utils.isTokenBalance(bobAddr, 3000)
 })
 
 it('Redeem - Successful Redeem 2', async () => {
@@ -66,10 +64,9 @@ it('Redeem - Successful Redeem 2', async () => {
     fundingPrivateKey
   )
   const redeemTxid = await broadcast(redeemHex)
-  await new Promise(resolve => setTimeout(resolve, wait))
   expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00003)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
+  await utils.isTokenBalance(aliceAddr, 7000)
+  await utils.isTokenBalance(bobAddr, 0)
 })
 
 it('Redeem - Successful Redeem No Fee ', async () => {
@@ -82,9 +79,8 @@ it('Redeem - Successful Redeem No Fee ', async () => {
   )
   const redeemTxid = await broadcast(redeemHex)
   expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007)
-  await new Promise(resolve => setTimeout(resolve, wait))
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+  await utils.isTokenBalance(aliceAddr, 0)
+  await utils.isTokenBalance(bobAddr, 3000)
 })
 
 it('Redeem - Successful Redeem With Callback and Fee', async () => {
@@ -98,11 +94,9 @@ it('Redeem - Successful Redeem With Callback and Fee', async () => {
     paymentSignatureCallback
   )
   const redeemTxid = await broadcast(redeemHex)
-  await new Promise(resolve => setTimeout(resolve, wait))
   expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007)
-  await new Promise(resolve => setTimeout(resolve, wait))
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+  await utils.isTokenBalance(aliceAddr, 0)
+  await utils.isTokenBalance(bobAddr, 3000)
 })
 
 it('Redeem - Successful Redeem With Callback and No Fee', async () => {
@@ -117,9 +111,8 @@ it('Redeem - Successful Redeem With Callback and No Fee', async () => {
   )
   const redeemTxid = await broadcast(redeemHex)
   expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007)
-  await new Promise(resolve => setTimeout(resolve, wait))
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+  await utils.isTokenBalance(aliceAddr, 0)
+  await utils.isTokenBalance(bobAddr, 3000)
 })
 
 it('Redeem - Incorrect Stas UTXO Amount Throws Error', async () => {

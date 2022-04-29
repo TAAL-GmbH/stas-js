@@ -59,11 +59,10 @@ it('Split - Successful Split Into Two Tokens With Fee', async () => {
     fundingPrivateKey
   )
   const splitTxid = await broadcast(splitHex)
-  await new Promise(resolve => setTimeout(resolve, wait))
   expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035)
   expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000035)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(3500)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(6500)
+  await utils.isTokenBalance(aliceAddr, 3500)
+  await utils.isTokenBalance(bobAddr, 6500)
 })
 
 it('Split - Successful Split Into Three Tokens', async () => {
@@ -84,12 +83,11 @@ it('Split - Successful Split Into Three Tokens', async () => {
     fundingPrivateKey
   )
   const splitTxid = await broadcast(splitHex)
-  await new Promise(resolve => setTimeout(resolve, wait))
   expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035)
   expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.0000175)
   expect(await utils.getVoutAmount(splitTxid, 2)).to.equal(0.0000175)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(1750)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(8250)
+  await utils.isTokenBalance(aliceAddr, 1750)
+  await utils.isTokenBalance(bobAddr, 8250)
 })
 
 it('Split - Successful Split Into Four Tokens 1', async () => {
@@ -109,13 +107,12 @@ it('Split - Successful Split Into Four Tokens 1', async () => {
     fundingPrivateKey
   )
   const splitTxid = await broadcast(splitHex)
-  await new Promise(resolve => setTimeout(resolve, wait))
   expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.0000175)
   expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.0000175)
   expect(await utils.getVoutAmount(splitTxid, 2)).to.equal(0.0000175)
   expect(await utils.getVoutAmount(splitTxid, 3)).to.equal(0.0000175)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(1750)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(8250)
+  await utils.isTokenBalance(aliceAddr, 1750)
+  await utils.isTokenBalance(bobAddr, 8250)
 })
 
 it('Split - Successful Split Into Four Tokens 2', async () => {
@@ -144,10 +141,10 @@ it('Split - Successful Split Into Four Tokens 2', async () => {
   expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.0000175)
   expect(await utils.getVoutAmount(splitTxid, 2)).to.equal(0.0000175)
   expect(await utils.getVoutAmount(splitTxid, 3)).to.equal(0.0000175)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(1750)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(4750)
-  expect(await utils.getTokenBalance(daveAddr)).to.equal(1750)
-  expect(await utils.getTokenBalance(emmaAddr)).to.equal(1750)
+  await utils.isTokenBalance(aliceAddr, 1750)
+  await utils.isTokenBalance(bobAddr, 4750)
+  await utils.isTokenBalance(aliceAddr, 1750)
+  await utils.isTokenBalance(bobAddr, 1750)
 })
 
 it('Split - No Split Completes Successfully', async () => {
@@ -164,9 +161,7 @@ it('Split - No Split Completes Successfully', async () => {
   )
   const splitTxid = await broadcast(splitHex)
   expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.00007)
-  await new Promise(resolve => setTimeout(resolve, wait))
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(10000)
+  await utils.isTokenBalance(aliceAddr, 10000)
 })
 
 it('Split - Successful Split Into Two Tokens With No Fee',
@@ -188,9 +183,8 @@ it('Split - Successful Split Into Two Tokens With No Fee',
     const splitTxid = await broadcast(splitHex)
     expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035)
     expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000035)
-    await new Promise(resolve => setTimeout(resolve, wait))
-    expect(await utils.getTokenBalance(aliceAddr)).to.equal(3500)
-    expect(await utils.getTokenBalance(bobAddr)).to.equal(6500)
+    await utils.isTokenBalance(aliceAddr, 3500)
+    await utils.isTokenBalance(bobAddr, 6500)
   }
 )
 
@@ -214,11 +208,10 @@ it('Split - Successful Split With Callback and Fee', async () => {
     paymentSignatureCallback
   )
   const splitTxid = await broadcast(splitHex)
-  await new Promise(resolve => setTimeout(resolve, wait))
   expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035)
   expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000035)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(3500)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(6500)
+  await utils.isTokenBalance(aliceAddr, 3500)
+  await utils.isTokenBalance(bobAddr, 6500)
 })
 
 it('Split - Successful Split With Callback and No Fee ', async () => {
@@ -241,33 +234,8 @@ it('Split - Successful Split With Callback and No Fee ', async () => {
   const splitTxid = await broadcast(splitHex)
   expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035)
   expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000035)
-  await new Promise(resolve => setTimeout(resolve, wait))
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(3500)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(6500)
-})
-
-it('Split - Splitting Into Too Many Tokens Throws Error', async () => {
-  const bobAmount = issueTx.vout[0].value / 5
-  const splitDestinations = []
-  splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount) }
-  splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount) }
-  splitDestinations[2] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount) }
-  splitDestinations[3] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount) }
-  splitDestinations[4] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount) }
-  try {
-    split(
-      alicePrivateKey,
-      utils.getUtxo(issueTxid, issueTx, 0),
-      splitDestinations,
-      utils.getUtxo(issueTxid, issueTx, 2),
-      fundingPrivateKey
-    )
-    expect(false).toBeTruthy()
-    return
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Must have less than 5 segments')
-  }
+  await utils.isTokenBalance(aliceAddr, 3500)
+  await utils.isTokenBalance(bobAddr, 6500)
 })
 
 it('Split - Send to Issuer Address Throws Error', async () => {

@@ -89,8 +89,6 @@ describe('atomic swap failing - when token B sats are set to > 2k the broadcast 
     expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.00002)
     await utils.isTokenBalance(aliceAddr, 6000)
     await utils.isTokenBalance(bobAddr, 2000)
-    expect(await utils.getTokenBalance(aliceAddr)).to.equal(6000)
-    expect(await utils.getTokenBalance(bobAddr)).to.equal(2000)
   })
 })
 

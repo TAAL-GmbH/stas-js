@@ -56,14 +56,9 @@ it('Transfer - Successful With Fee 1', async () => {
     fundingPrivateKey
   )
   const transferTxid = await broadcast(transferHex)
-  const tokenId = await utils.getToken(transferTxid)
-  await new Promise(resolve => setTimeout(resolve, wait))
-  console.log(tokenId)
-  const response = await utils.getTokenResponse(tokenId)
-  expect(response.symbol).to.equal(symbol)
   expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
+  await utils.isTokenBalance(aliceAddr, 10000)
+  await utils.isTokenBalance(bobAddr, 0)
 })
 
 it('Transfer - Successful With Fee 2', async () => {
@@ -74,17 +69,10 @@ it('Transfer - Successful With Fee 2', async () => {
     utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
     fundingPrivateKey
   )
-  console.log(transferHex)
   const transferTxid = await broadcast(transferHex)
-  const tokenId = await utils.getToken(transferTxid)
-  await new Promise(resolve => setTimeout(resolve, wait))
-  const response = await utils.getTokenResponse(tokenId)
-  expect(response.symbol).to.equal(symbol)
   expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00007)
-  console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
-  console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(10000)
+  await utils.isTokenBalance(aliceAddr, 0)
+  await utils.isTokenBalance(bobAddr, 10000)
 })
 
 it('Transfer - Successful With Fee 3', async () => {
@@ -98,14 +86,10 @@ it('Transfer - Successful With Fee 3', async () => {
     fundingPrivateKey
   )
   const transferTxid = await broadcast(transferHex)
-  const tokenId = await utils.getToken(transferTxid)
-  await new Promise(resolve => setTimeout(resolve, wait))
-  const response = await utils.getTokenResponse(tokenId)
-  expect(response.symbol).to.equal(symbol)
   expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
-  expect(await utils.getTokenBalance(daveAddr)).to.equal(3000)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+  await utils.isTokenBalance(aliceAddr, 7000)
+  await utils.isTokenBalance(bobAddr, 0)
+  await utils.isTokenBalance(daveAddr, 3000)
 })
 
 it('Transfer - Successful With Fee 4', async () => {
@@ -117,13 +101,9 @@ it('Transfer - Successful With Fee 4', async () => {
     fundingPrivateKey
   )
   const transferTxid = await broadcast(transferHex)
-  const tokenId = await utils.getToken(transferTxid)
-  await new Promise(resolve => setTimeout(resolve, wait))
-  const response = await utils.getTokenResponse(tokenId)
-  expect(response.symbol).to.equal(symbol)
   expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+  await utils.isTokenBalance(aliceAddr, 7000)
+  await utils.isTokenBalance(bobAddr, 3000)
 })
 
 it('Transfer - Successful to Funding Address', async () => {
@@ -135,54 +115,40 @@ it('Transfer - Successful to Funding Address', async () => {
     fundingPrivateKey
   )
   const transferTxid = await broadcast(transferHex)
-  const tokenId = await utils.getToken(transferTxid)
-  await new Promise(resolve => setTimeout(resolve, wait))
-  const response = await utils.getTokenResponse(tokenId)
-  expect(response.symbol).to.equal(symbol)
   expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
-  expect(await utils.getTokenBalance(fundingAddress)).to.equal(3000)
+  await utils.isTokenBalance(aliceAddr, 7000)
+  await utils.isTokenBalance(fundingAddress, 3000)
 })
 
-// no fees disabled for tests
-// it('Transfer - Successful No Fee', async () => {
-//   const transferHex = transfer(
-//     bobPrivateKey,
-//     utils.getUtxo(issueTxid, issueTx, 1),
-//     aliceAddr,
-//     null,
-//     null
-//   )
-//   const transferTxid = await broadcast(transferHex)
-//   const tokenId = await utils.getToken(transferTxid)
-//   await new Promise(resolve => setTimeout(resolve, wait))
-//   const response = await utils.getTokenResponse(tokenId)
-//   expect(response.symbol).to.equal(symbol)
-//   expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
-//   expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
-//   expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
-// })
+it('Transfer - Successful No Fee', async () => {
+  const transferHex = transfer(
+    bobPrivateKey,
+    utils.getUtxo(issueTxid, issueTx, 1),
+    aliceAddr,
+    null,
+    null
+  )
+  const transferTxid = await broadcast(transferHex)
+  expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
+  await utils.isTokenBalance(aliceAddr, 10000)
+  await utils.isTokenBalance(bobAddr, 0)
+})
 
-// it('Transfer - Successful Callback With No Fee', async () => {
-//   const transferHex = transferWithCallback(
-//     bobPrivateKey.publicKey,
-//     utils.getUtxo(issueTxid, issueTx, 1),
-//     bobAddr,
-//     null,
-//     null,
-//     bobSignatureCallback,
-//     null
-//   )
-//   const transferTxid = await broadcast(transferHex)
-//   const tokenId = await utils.getToken(transferTxid)
-//   await new Promise(resolve => setTimeout(resolve, wait))
-//   const response = await utils.getTokenResponse(tokenId)
-//   expect(response.symbol).to.equal(symbol)
-//   expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
-//   expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
-//   expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
-// })
+it('Transfer - Successful Callback With No Fee', async () => {
+  const transferHex = transferWithCallback(
+    bobPrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 1),
+    aliceAddr,
+    null,
+    null,
+    bobSignatureCallback,
+    null
+  )
+  const transferTxid = await broadcast(transferHex)
+  expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
+  await utils.isTokenBalance(aliceAddr, 10000)
+  await utils.isTokenBalance(bobAddr, 0)
+})
 
 it('Transfer - Successful Callback With Fee', async () => {
   const transferHex = transferWithCallback(
@@ -195,13 +161,9 @@ it('Transfer - Successful Callback With Fee', async () => {
     paymentSignatureCallback
   )
   const transferTxid = await broadcast(transferHex)
-  const tokenId = await utils.getToken(transferTxid)
-  await new Promise(resolve => setTimeout(resolve, wait))
-  const response = await utils.getTokenResponse(tokenId)
-  expect(response.symbol).to.equal(symbol)
   expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
+  await utils.isTokenBalance(bobAddr, 3000)
+  await utils.isTokenBalance(aliceAddr, 7000)
 })
 
 it(
@@ -261,116 +223,6 @@ it('Transfer - Invalid Funding Private Key Throws Error', async () => {
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
     expect(e.response.data).to.contain('mandatory-script-verify-flag-failed (Script failed an OP_EQUALVERIFY operation)')
-  }
-})
-
-it('Transfer - Address Validation - Too Few Chars', async () => {
-  const invalidAddr = '1MSCReQT9E4GpxuK1K7uyD5q'
-  try {
-    transfer(
-      bobPrivateKey,
-      utils.getUtxo(issueTxid, issueTx, 1),
-      invalidAddr,
-      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-      fundingPrivateKey
-    )
-    expect(false).toBeTruthy()
-    return
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Invalid destination address')
-  }
-})
-
-it(
-  'Transfer -  Address Validation - Too Many Chars throws error',
-  async () => {
-    const invalidAddr = '1MSCReQT9E4GpxuK1K7uyD5qF1EmznXjkrmoFCgGtkmhyaL2frwff84p2bwTf3FDpkZcCgGtkmhyaL2frwff84p2bwTf3FDpkZcCgGtkmhy'
-    try {
-      transfer(
-        bobPrivateKey,
-        utils.getUtxo(issueTxid, issueTx, 1),
-        invalidAddr,
-        utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-        fundingPrivateKey
-      )
-      expect(false).toBeTruthy()
-      return
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('Invalid destination address')
-    }
-  }
-)
-
-it(
-  'Transfer - Null Token Owner Private Key Throws Error',
-  async () => {
-    try {
-      transfer(
-        null,
-        utils.getUtxo(issueTxid, issueTx, 1),
-        aliceAddr,
-        utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-        fundingPrivateKey
-      )
-      expect(false).toBeTruthy()
-      return
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('Token owner private key is null')
-    }
-  }
-)
-
-it('Transfer - Null STAS UTXO Throws Error', async () => {
-  try {
-    transfer(
-      bobPrivateKey,
-      null,
-      aliceAddr,
-      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-      fundingPrivateKey
-    )
-    expect(false).toBeTruthy()
-    return
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('stasUtxo is null')
-  }
-})
-
-it('Transfer - Null Destination Address Throws Error', async () => {
-  try {
-    transfer(
-      bobPrivateKey,
-      utils.getUtxo(issueTxid, issueTx, 1),
-      null,
-      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-      fundingPrivateKey
-    )
-    expect(false).toBeTruthy()
-    return
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.contains('destination address is null')
-  }
-})
-
-it('Transfer - Null Funding Private Key Throws Error', async () => {
-  try {
-    transfer(
-      bobPrivateKey,
-      utils.getUtxo(issueTxid, issueTx, 1),
-      aliceAddr,
-      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-      null
-    )
-    expect(false).toBeTruthy()
-    return
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Payment UTXO provided but payment key is null')
   }
 })
 
