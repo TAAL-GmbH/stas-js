@@ -32,7 +32,7 @@ beforeEach(async () => {
   await setup()
 })
 
-it.only('Successful RedeemSplit With 1 Split', async () => {
+it('Successful RedeemSplit With 1 Split', async () => {
   const amount = issueTx.vout[0].value / 2
   const rSplitDestinations = []
   rSplitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
