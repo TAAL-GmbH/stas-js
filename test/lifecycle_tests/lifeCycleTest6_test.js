@@ -170,7 +170,7 @@ it(
     const bobAmount1 = transferTx.vout[0].value / 2
     const bobAmount2 = transferTx.vout[0].value - bobAmount1
     const splitDestinations = []
-    splitDestinations[0] = { address: emmaAddr, amount: bitcoinToSatoshis(bobAmount1) }
+    splitDestinations[0] = { address: daveAddr, amount: bitcoinToSatoshis(bobAmount1) }
     splitDestinations[1] = { address: daveAddr, amount: bitcoinToSatoshis(bobAmount2) }
 
     const splitHex = split(
@@ -187,37 +187,33 @@ it(
     expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.00005)
     await utils.isTokenBalance(bobAddr, 0)
     await utils.isTokenBalance(aliceAddr, 10000)
-    await utils.isTokenBalance(daveAddr, 5000)
-    await utils.isTokenBalance(emmaAddr, 25000)
+    await utils.isTokenBalance(daveAddr, 10000)
+    await utils.isTokenBalance(emmaAddr, 20000)
 
     const splitTxObj = new bsv.Transaction(splitHex)
 
     const mergeHex = merge(
-      bobPrivateKey,
+      davePrivateKey,
       utils.getMergeUtxo(splitTxObj),
       aliceAddr,
       utils.getUtxo(splitTxid, splitTx, 2),
       fundingPrivateKey
     )
-
     const mergeTxid = await broadcast(mergeHex)
     console.log(`Merge TX:        ${mergeTxid}`)
     const mergeTx = await getTransaction(mergeTxid)
     expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.0001)
-    const tokenIdMerge = await utils.getToken(issueTxid)
-    const responseMerge = await utils.getTokenResponse(tokenIdMerge)
-    expect(responseMerge.token.symbol).to.equal(symbol)
     await utils.isTokenBalance(bobAddr, 0)
     await utils.isTokenBalance(aliceAddr, 20000)
     await utils.isTokenBalance(daveAddr, 0)
-    await utils.isTokenBalance(emmaAddr, 0)
+    await utils.isTokenBalance(emmaAddr, 20000)
 
     const aliceAmount1 = mergeTx.vout[0].value / 2
     const aliceAmount2 = mergeTx.vout[0].value - aliceAmount1
 
     const split2Destinations = []
-    split2Destinations[0] = { address: aliceAddr, amount: aliceAmount1 }
-    split2Destinations[1] = { address: aliceAddr, amount: aliceAmount2 }
+    split2Destinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(aliceAmount1) }
+    split2Destinations[1] = { address: aliceAddr, amount: bitcoinToSatoshis(aliceAmount2) }
 
     const splitHex2 = split(
       alicePrivateKey,
@@ -226,15 +222,16 @@ it(
       utils.getUtxo(mergeTxid, mergeTx, 1),
       fundingPrivateKey
     )
+
     const splitTxid2 = await broadcast(splitHex2)
     console.log(`Split TX2:       ${splitTxid2}`)
     const splitTx2 = await getTransaction(splitTxid2)
-    expect(await utils.getVoutAmount(splitTxid2, 0)).to.equal(0.0005)
-    expect(await utils.getVoutAmount(splitTxid2, 1)).to.equal(0.0005)
+    expect(await utils.getVoutAmount(splitTxid2, 0)).to.equal(0.00005)
+    expect(await utils.getVoutAmount(splitTxid2, 1)).to.equal(0.00005)
     await utils.isTokenBalance(bobAddr, 0)
-    await utils.isTokenBalance(aliceAddr, 10000)
-    await utils.isTokenBalance(daveAddr, 5000)
-    await utils.isTokenBalance(emmaAddr, 5000)
+    await utils.isTokenBalance(aliceAddr, 20000)
+    await utils.isTokenBalance(daveAddr, 0)
+    await utils.isTokenBalance(emmaAddr, 20000)
 
     //   // Now mergeSplit
     //   const splitTxObj2 = new bsv.Transaction(splitHex2)
