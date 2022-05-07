@@ -5,12 +5,7 @@ require('dotenv').config()
 
 const {
   contract,
-  issue,
-  transfer,
-  split,
-  merge,
-  mergeSplit,
-  redeem
+  issue
 } = require('../../index')
 
 const {

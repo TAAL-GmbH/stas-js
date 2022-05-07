@@ -6,19 +6,14 @@ require('dotenv').config()
 
 const {
 
-  createSwapOffer,
-  acceptSwapOffer,
-  allInOneSwap,
   createUnsignedSwapOffer,
   acceptUnsignedSwapOffer,
-  acceptUnsignedNativeSwapOffer,
   makerSignSwapOffer
 } = require('../../index').swap
 
 const {
   bitcoinToSatoshis,
   getTransaction,
-  getRawTransaction,
   getFundsFromFaucet,
   broadcast
 } = require('../../index').utils
