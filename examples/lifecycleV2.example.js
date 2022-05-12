@@ -125,13 +125,8 @@ const {
     console.log('error issuing token', e)
     return
   }
-  console.log('here ' + contractTx.vout[1].value)
-  console.log('---------')
-  console.log(contractTx.vout[0].value)
 
-  console.log('---------')
   const issueTxid = await broadcast(issueHex)
-  console.log(`Issue TX:        ${issueTxid}`)
   const issueTx = await getTransaction(issueTxid)
 
   const issueOutFundingVout = issueTx.vout.length - 1
