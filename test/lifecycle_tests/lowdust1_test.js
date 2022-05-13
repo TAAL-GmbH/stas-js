@@ -171,7 +171,6 @@ describe('regression, testnet, dust', () => {
     )
     console.log(mergeSplitHex)
     // returning "unexpected response code 200: 64: non-mandatory-script-verify-flag (Data push larger than necessary)"
-    return
     const mergeSplitTxid = await broadcast(mergeSplitHex)
     console.log(`MergeSplit TX:   ${mergeSplitTxid}`)
     const mergeSplitTx = await getTransaction(mergeSplitTxid)
