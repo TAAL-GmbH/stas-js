@@ -54,7 +54,7 @@ it(
       return
     } catch (e) {
       expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('Invalid Issue info Error')
+      expect(e.message).to.eql('issueInfo requires values for \'addr\' and \'satoshis\'')
     }
   }
 )
@@ -82,35 +82,7 @@ it(
       return
     } catch (e) {
       expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('Invalid Issue info Error')
-    }
-  }
-)
-it(
-  'Issue Info with no Data',
-  async () => {
-    const issueInfo = [
-      {
-        addr: aliceAddr,
-        satoshis: 10000
-      }
-    ]
-
-    try {
-      issue(
-        issuerPrivateKey,
-        issueInfo,
-        utils.getUtxo(contractTxid, contractTx, 0),
-        utils.getUtxo(contractTxid, contractTx, 1),
-        fundingPrivateKey,
-        true,
-        symbol
-      )
-      expect(false).toBeTruthy()
-      return
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('Invalid Issue info Error')
+      expect(e.message).to.eql('issueInfo requires values for \'addr\' and \'satoshis\'')
     }
   }
 )
