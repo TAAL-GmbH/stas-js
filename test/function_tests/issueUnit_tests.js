@@ -30,12 +30,32 @@ let issueInfo
 let aliceAddr
 let bobAddr
 let fundingAddress
+let issuerAddress
 let symbol
-
 
 beforeAll(async () => {
   await setup() // set up contract
 })
+
+it.only('Issue - Try to Issue to Issuer Address',
+  async () => {
+    try {
+      issue(
+        issuerPrivateKey,
+        utils.getIssueInfo(issuerAddress, 10000),
+        utils.getUtxo(contractTxid, contractTx, 0),
+        utils.getUtxo(contractTxid, contractTx, 1),
+        fundingPrivateKey,
+        true,
+        symbol
+      )
+      expect(false).toBeTruthy()
+      return
+    } catch (e) {
+      expect(e).to.be.instanceOf(Error)
+      expect(e.message).to.eql('Issuer cannot receieve tokens')
+    }
+  })
 
 it(
   'Issue - Issue to Address with a negative token amount(?)',
@@ -404,6 +424,7 @@ async function setup () {
   aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
   bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
   fundingAddress = fundingPrivateKey.toAddress(process.env.NETWORK).toString()
+  issuerAddress = issuerPrivateKey.toAddress(process.env.NETWORK).toString()
   symbol = 'TAALT'
   const supply = 10000
   const schema = utils.schema(publicKeyHash, symbol, supply)
