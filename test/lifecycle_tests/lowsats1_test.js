@@ -21,7 +21,7 @@ const {
 } = require('../../index').utils
 
 describe('regression, testnet, dust', () => {
-  it('Full Life Cycle Test Low Dust 1', async () => {
+  it('Full Life Cycle Test Low Sats 1', async () => {
     const issuerPrivateKey = bsv.PrivateKey()
     const fundingPrivateKey = bsv.PrivateKey()
 
