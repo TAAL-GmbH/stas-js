@@ -69,13 +69,13 @@ function getUtxo (txid, tx, vout) {
   }
 }
 
-function getMergeUtxo (splitTxObj) {
+function getMergeUtxo (mergeObj) {
   return [{
-    tx: splitTxObj,
+    tx: mergeObj,
     vout: 0
   },
   {
-    tx: splitTxObj,
+    tx: mergeObj,
     vout: 1
   }]
 }
