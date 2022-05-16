@@ -166,7 +166,7 @@ it('Transfer - Successful Callback With Fee', async () => {
   await utils.isTokenBalance(aliceAddr, 7000)
 })
 
-it.only(
+it(
   'Transfer -  Transfer To Issuer Address (Splitable) Throws Error',
   async () => {
     const issuerAddr = issuerPrivateKey.toAddress(process.env.NETWORK).toString()

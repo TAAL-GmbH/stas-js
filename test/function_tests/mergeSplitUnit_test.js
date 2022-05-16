@@ -279,7 +279,7 @@ it(
       return
     } catch (e) {
       expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('data parameter supplied is not a string.')
+      expect(e.message).to.eql('Destination address is null')
     }
   }
 )
@@ -303,7 +303,7 @@ it('MergeSplit - Null Satoshi Amount 1 Throws Error', async () => {
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Invalid Argument: Output satoshis is not a natural number')
+    expect(e.message).to.eql('Satoshi value suppled is null')
   }
 })
 
@@ -328,7 +328,7 @@ it(
       return
     } catch (e) {
       expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('data parameter supplied is not a string.')
+      expect(e.message).to.eql('Destination address is null')
     }
   }
 )
@@ -350,7 +350,7 @@ it('MergeSplit - Null Satoshi Amount 2 Throws Error', async () => {
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Invalid Argument: Output satoshis is not a natural number')
+    expect(e.message).to.eql('Satoshi value suppled is null')
   }
 })
 
