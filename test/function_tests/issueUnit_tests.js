@@ -37,26 +37,6 @@ beforeAll(async () => {
   await setup() // set up contract
 })
 
-it.only('Issue - Try to Issue to Issuer Address',
-  async () => {
-    try {
-      issue(
-        issuerPrivateKey,
-        utils.getIssueInfo(issuerAddress, 10000),
-        utils.getUtxo(contractTxid, contractTx, 0),
-        utils.getUtxo(contractTxid, contractTx, 1),
-        fundingPrivateKey,
-        true,
-        symbol
-      )
-      expect(false).toBeTruthy()
-      return
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('Issuer cannot receieve tokens')
-    }
-  })
-
 it(
   'Issue - Issue to Address with a negative token amount(?)',
   async () => {
