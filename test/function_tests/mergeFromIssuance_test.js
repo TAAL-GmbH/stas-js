@@ -70,11 +70,11 @@ it('Merge Directly From Issuance when issued to same address',
     const issueTx = await getTransaction(issueTxid)
     const tokenId = await utils.getToken(issueTxid)
     console.log(`Token ID:        ${tokenId}`)
-    const splitTxObj = new bsv.Transaction(issueHex)
+    const mergeObj = new bsv.Transaction(issueHex)
 
     const mergeHex = merge(
       alicePrivateKey,
-      utils.getMergeUtxo(splitTxObj),
+      utils.getMergeUtxo(mergeObj),
       aliceAddr,
       utils.getUtxo(issueTxid, issueTx, 2),
       fundingPrivateKey

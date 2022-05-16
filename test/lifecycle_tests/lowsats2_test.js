@@ -1,5 +1,6 @@
 const expect = require('chai').expect
 const utils = require('../utils/test_utils')
+
 const bsv = require('bsv')
 require('dotenv').config()
 
@@ -20,8 +21,8 @@ const {
   broadcast
 } = require('../../index').utils
 
-describe('regression, testnet, dust', () => {
-  it('Full Life Cycle Test Low Dust 1', async () => {
+describe('regression, testnet', () => {
+  it('Full Life Cycle Test Low Sats 2', async () => {
     const issuerPrivateKey = bsv.PrivateKey()
     const fundingPrivateKey = bsv.PrivateKey()
 
@@ -35,12 +36,11 @@ describe('regression, testnet, dust', () => {
     const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
 
     const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
-    const supply = 100
+    const supply = 1000
     const symbol = 'TAALT'
     const schema = utils.schema(publicKeyHash, symbol, supply)
-    const wait = 3000
+    const wait = 5000
 
-    // change goes back to the fundingPrivateKey
     const contractHex = contract(
       issuerPrivateKey,
       contractUtxos,
@@ -55,7 +55,7 @@ describe('regression, testnet, dust', () => {
 
     const issueHex = issue(
       issuerPrivateKey,
-      utils.getIssueInfo(aliceAddr, 70, bobAddr, 30),
+      utils.getIssueInfo(aliceAddr, 700, bobAddr, 300),
       utils.getUtxo(contractTxid, contractTx, 0),
       utils.getUtxo(contractTxid, contractTx, 1),
       fundingPrivateKey,
@@ -69,10 +69,10 @@ describe('regression, testnet, dust', () => {
     const tokenId = await utils.getToken(issueTxid)
     const response = await utils.getTokenResponse(tokenId)
     expect(response.symbol).to.equal(symbol)
-    expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.0000007)
-    expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.0000003)
-    await utils.isTokenBalance(aliceAddr, 70)
-    await utils.isTokenBalance(bobAddr, 30)
+    expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.000007)
+    expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.000003)
+    await utils.isTokenBalance(aliceAddr, 700)
+    await utils.isTokenBalance(bobAddr, 300)
 
     const issueOutFundingVout = issueTx.vout.length - 1
 
@@ -86,9 +86,11 @@ describe('regression, testnet, dust', () => {
     const transferTxid = await broadcast(transferHex)
     console.log(`Transfer TX:     ${transferTxid}`)
     const transferTx = await getTransaction(transferTxid)
-    expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.0000003)
-    await utils.isTokenBalance(aliceAddr, 100)
+    expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.000003)
+    await utils.isTokenBalance(aliceAddr, 1000)
     await utils.isTokenBalance(bobAddr, 0)
+    expect(await utils.getTokenBalance(aliceAddr)).to.equal(1000)
+    expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
 
     // Split tokens into 2 - both payable to Bob...
     const bobAmount1 = transferTx.vout[0].value / 2
@@ -107,10 +109,10 @@ describe('regression, testnet, dust', () => {
     const splitTxid = await broadcast(splitHex)
     console.log(`Split TX:        ${splitTxid}`)
     const splitTx = await getTransaction(splitTxid)
-    expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.00000015)
-    expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.00000015)
-    await utils.isTokenBalance(aliceAddr, 70)
-    await utils.isTokenBalance(bobAddr, 30)
+    expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.0000015)
+    expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.0000015)
+    await utils.isTokenBalance(aliceAddr, 700)
+    await utils.isTokenBalance(bobAddr, 300)
 
     // Now let's merge the last split back together
     const splitTxObj = new bsv.Transaction(splitHex)
@@ -126,8 +128,8 @@ describe('regression, testnet, dust', () => {
     const mergeTxid = await broadcast(mergeHex)
     console.log(`Merge TX:        ${mergeTxid}`)
     const mergeTx = await getTransaction(mergeTxid)
-    expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.0000003)
-    await utils.isTokenBalance(aliceAddr, 100)
+    expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.000003)
+    await utils.isTokenBalance(aliceAddr, 1000)
     await utils.isTokenBalance(bobAddr, 0)
 
     // Split again - both payable to Alice...
@@ -135,8 +137,8 @@ describe('regression, testnet, dust', () => {
     const aliceAmount2 = mergeTx.vout[0].value - aliceAmount1
 
     const split2Destinations = []
-    split2Destinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(aliceAmount1) }
-    split2Destinations[1] = { address: aliceAddr, amount: bitcoinToSatoshis(aliceAmount2) }
+    split2Destinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(aliceAmount1) }
+    split2Destinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(aliceAmount2) }
 
     const splitHex2 = split(
       alicePrivateKey,
@@ -148,10 +150,10 @@ describe('regression, testnet, dust', () => {
     const splitTxid2 = await broadcast(splitHex2)
     console.log(`Split TX2:       ${splitTxid2}`)
     const splitTx2 = await getTransaction(splitTxid2)
-    expect(await utils.getVoutAmount(splitTxid2, 0)).to.equal(0.00000015)
-    expect(await utils.getVoutAmount(splitTxid2, 1)).to.equal(0.00000015)
-    await utils.isTokenBalance(aliceAddr, 100)
-    await utils.isTokenBalance(bobAddr, 0)
+    expect(await utils.getVoutAmount(splitTxid2, 0)).to.equal(0.0000015)
+    expect(await utils.getVoutAmount(splitTxid2, 1)).to.equal(0.0000015)
+    await utils.isTokenBalance(aliceAddr, 700)
+    await utils.isTokenBalance(bobAddr, 300)
 
     // Now mergeSplit
     const splitTxObj2 = new bsv.Transaction(splitHex2)
@@ -160,7 +162,7 @@ describe('regression, testnet, dust', () => {
     const aliceAmountSatoshis = bitcoinToSatoshis(splitTx2.vout[1].value)
 
     const mergeSplitHex = mergeSplit(
-      alicePrivateKey,
+      bobPrivateKey,
       utils.getMergeSplitUtxo(splitTxObj2, splitTx2),
       aliceAddr,
       aliceAmountSatoshis,
@@ -169,16 +171,13 @@ describe('regression, testnet, dust', () => {
       utils.getUtxo(splitTxid2, splitTx2, 2),
       fundingPrivateKey
     )
-    console.log(mergeSplitHex)
-    // returning "unexpected response code 200: 64: non-mandatory-script-verify-flag (Data push larger than necessary)"
-    return
     const mergeSplitTxid = await broadcast(mergeSplitHex)
     console.log(`MergeSplit TX:   ${mergeSplitTxid}`)
     const mergeSplitTx = await getTransaction(mergeSplitTxid)
-    expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075)
-    expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
-    console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
-    console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
+    expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000015)
+    expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000015)
+    await utils.isTokenBalance(aliceAddr, 850)
+    await utils.isTokenBalance(bobAddr, 150)
 
     // Alice wants to redeem the money from bob...
     const redeemHex = redeem(
@@ -190,6 +189,8 @@ describe('regression, testnet, dust', () => {
     )
     const redeemTxid = await broadcast(redeemHex)
     console.log(`Redeem TX:       ${redeemTxid}`)
-    expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.0000075)
+    expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.0000015)
+    await utils.isTokenBalance(aliceAddr, 700)
+    await utils.isTokenBalance(bobAddr, 150)
   })
 })
