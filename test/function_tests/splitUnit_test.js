@@ -119,6 +119,29 @@ it('Split - Negative Integer Sats to Split Throws Error', async () => {
   }
 })
 
+it('Split - Sending to Issuer Throws Error', async () => {
+  const bobAmount1 = issueTx.vout[0].value / 2
+  const bobAmount2 = issueTx.vout[0].value - bobAmount1
+  const issuerAddress = issuerPrivateKey.toAddress(process.env.NETWORK).toString()
+  const splitDestinations = []
+  splitDestinations[0] = { address: issuerAddress, amount: bitcoinToSatoshis(bobAmount1) }
+  splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
+  try {
+    split(
+      alicePrivateKey,
+      utils.getUtxo(issueTxid, issueTx, 0),
+      splitDestinations,
+      utils.getUtxo(issueTxid, issueTx, 2),
+      fundingPrivateKey
+    )
+    expect(false).toBeTruthy()
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Token UTXO cannot be sent to issuer address')
+  }
+})
+
 it('Split - Address Too Long Throws Error', async () => {
   const bobAmount1 = issueTx.vout[0].value / 2
   const bobAmount2 = issueTx.vout[0].value - bobAmount1

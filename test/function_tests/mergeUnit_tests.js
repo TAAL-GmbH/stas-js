@@ -7,8 +7,7 @@ const {
   contract,
   issue,
   split,
-  merge,
-  mergeWithCallback
+  merge
 } = require('../../index')
 
 const {
@@ -17,8 +16,6 @@ const {
   getFundsFromFaucet,
   broadcast
 } = require('../../index').utils
-
-const { sighash } = require('../../lib/stas')
 
 let issuerPrivateKey
 let fundingPrivateKey
@@ -86,6 +83,24 @@ it('Merge - Attempt to Merge Less Than Two Tokens', async () => {
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
     expect(e.message).to.eql('This function can only merge exactly 2 STAS tokens')
+  }
+})
+
+it('Merge - Send Merged UTXO to issuer throws error', async () => {
+  const issuerAddress = issuerPrivateKey.toAddress(process.env.NETWORK).toString()
+  try {
+    merge(
+      bobPrivateKey,
+      utils.getMergeUtxo(splitTxObj),
+      issuerAddress,
+      utils.getUtxo(splitTxid, splitTx, 2),
+      fundingPrivateKey
+    )
+    expect(false).toBeTruthy()
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Token UTXO cannot be sent to issuer address')
   }
 })
 

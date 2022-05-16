@@ -30,8 +30,8 @@ let issueInfo
 let aliceAddr
 let bobAddr
 let fundingAddress
+let issuerAddress
 let symbol
-
 
 beforeAll(async () => {
   await setup() // set up contract
@@ -404,6 +404,7 @@ async function setup () {
   aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
   bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
   fundingAddress = fundingPrivateKey.toAddress(process.env.NETWORK).toString()
+  issuerAddress = issuerPrivateKey.toAddress(process.env.NETWORK).toString()
   symbol = 'TAALT'
   const supply = 10000
   const schema = utils.schema(publicKeyHash, symbol, supply)
