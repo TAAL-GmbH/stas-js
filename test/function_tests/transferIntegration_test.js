@@ -166,24 +166,23 @@ it('Transfer - Successful Callback With Fee', async () => {
   await utils.isTokenBalance(aliceAddr, 7000)
 })
 
-it(
+it.only(
   'Transfer -  Transfer To Issuer Address (Splitable) Throws Error',
   async () => {
     const issuerAddr = issuerPrivateKey.toAddress(process.env.NETWORK).toString()
-    const transferHex = transfer(
-      issuerPrivateKey,
-      utils.getUtxo(issueTxid, issueTx, 1),
-      issuerAddr,
-      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-      fundingPrivateKey
-    )
     try {
-      await broadcast(transferHex)
+      transfer(
+        issuerPrivateKey,
+        utils.getUtxo(issueTxid, issueTx, 1),
+        issuerAddr,
+        utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
+        fundingPrivateKey
+      )
       expect(false).toBeTruthy()
       return
     } catch (e) {
       expect(e).to.be.instanceOf(Error)
-      expect(e.response.data).to.contain('mandatory-script-verify-flag-failed')
+      expect(e.message).to.contain('Token UTXO cannot be sent to issuer address')
     }
   }
 )
