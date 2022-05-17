@@ -109,6 +109,58 @@ it('MergeSplit - Attempt to MergeSplit Less Than Two Tokens Throws Error',
   }
 )
 
+it('MergeSplit - Split to Issuer Address 1 Throws Error',
+  async () => {
+    const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
+    const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
+    const issuerAddress = issuerPrivateKey.toAddress(process.env.NETWORK).toString()
+
+    try {
+      mergeSplit(
+        issuerPrivateKey,
+        utils.getMergeSplitUtxo(splitTxObj, splitTx),
+        issuerAddress,
+        aliceAmountSatoshis,
+        bobAddr,
+        bobAmountSatoshis,
+        utils.getUtxo(splitTxid, splitTx, 2),
+        fundingPrivateKey
+      )
+      expect(false).toBeTruthy()
+      return
+    } catch (e) {
+      expect(e).to.be.instanceOf(Error)
+      expect(e.message).to.eql('Token UTXO cannot be sent to issuer address')
+    }
+  }
+)
+
+it('MergeSplit - Split to Issuer Address 2 Throws Error',
+  async () => {
+    const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
+    const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
+    const issuerAddress = issuerPrivateKey.toAddress(process.env.NETWORK).toString()
+
+    try {
+      mergeSplit(
+        issuerPrivateKey,
+        utils.getMergeSplitUtxo(splitTxObj, splitTx),
+        issuerAddress,
+        aliceAmountSatoshis,
+        bobAddr,
+        bobAmountSatoshis,
+        utils.getUtxo(splitTxid, splitTx, 2),
+        fundingPrivateKey
+      )
+      expect(false).toBeTruthy()
+      return
+    } catch (e) {
+      expect(e).to.be.instanceOf(Error)
+      expect(e.message).to.eql('Token UTXO cannot be sent to issuer address')
+    }
+  }
+)
+
 it('MergeSplit - Invalid Address Destination Address 1 Throws Error',
   async () => {
     const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2

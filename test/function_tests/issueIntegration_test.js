@@ -247,29 +247,6 @@ it('Issue - Successful Issue Token Non Split', async () => {
   await utils.isTokenBalance(bobAddr, 3000)
 })
 
-it('Issue - Issue to Issuer Address', async () => {
-  const issuerAddr = issuerPrivateKey.toAddress(process.env.NETWORK).toString()
-  const issueHex = issue(
-    issuerPrivateKey,
-    utils.getIssueInfo(issuerAddr, 7000, bobAddr, 3000),
-    utils.getUtxo(contractTxid, contractTx, 0),
-    utils.getUtxo(contractTxid, contractTx, 1),
-    fundingPrivateKey,
-    false,
-    symbol
-  )
-  const issueTxid = await broadcast(issueHex)
-  const tokenId = await utils.getToken(issueTxid)
-  await new Promise(resolve => setTimeout(resolve, wait))
-  const response = await utils.getTokenResponse(tokenId)
-  expect(response.symbol).to.equal(symbol)
-  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
-  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
-  await utils.isTokenBalance(issuerAddr, 7000)
-  await utils.isTokenBalance(bobAddr, 3000)
-})
-
-// No Fees disabled currently for tests
 it('Issue - Successful Issue Token With Split No Fee', async () => {
   const issueHex = issue(
     issuerPrivateKey,
