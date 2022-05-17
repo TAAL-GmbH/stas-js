@@ -227,7 +227,7 @@ it('Issue - Issue Amount Decimal Throws Error', async () => {
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Invalid Argument: Output satoshis is not a natural number')
+    expect(e.message).to.eql('issueInfo Satoshis must be a natual number')
   }
 })
 
