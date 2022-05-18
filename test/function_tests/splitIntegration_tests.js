@@ -246,19 +246,18 @@ it('Split - Send to Issuer Address Throws Error', async () => {
   splitDestinations[0] = { address: issuerAddr, amount: bitcoinToSatoshis(bobAmount1) }
   splitDestinations[1] = { address: issuerAddr, amount: bitcoinToSatoshis(bobAmount2) }
   try {
-    const splitHex = split(
+    split(
       alicePrivateKey,
       utils.getUtxo(issueTxid, issueTx, 0),
       splitDestinations,
       utils.getUtxo(issueTxid, issueTx, 2),
       fundingPrivateKey
     )
-    await broadcast(splitHex)
     expect(false).toBeTruthy()
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.response.data).to.contain('mandatory-script-verify-flag-failed (Script evaluated without error but finished with a false/empty top stack element)')
+    expect(e.response.data).to.contain('Token UTXO cannot be sent to issuer address')
   }
 })
 
