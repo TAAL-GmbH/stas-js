@@ -68,7 +68,7 @@ it('Attemmpt to Transfer Non Splittable Token to Issuer', async () => {
 
   const issueOutFundingVout = issueTx.vout.length - 1
 
-  const transferHex = transfer(
+  transfer(
     bobPrivateKey,
     utils.getUtxo(issueTxid, issueTx, 1),
     issuerAddr,
@@ -76,11 +76,10 @@ it('Attemmpt to Transfer Non Splittable Token to Issuer', async () => {
     fundingPrivateKey
   )
   try {
-    await broadcast(transferHex)
     assert(false)
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.response.data).to.contain('mandatory-script-verify-flag-failed')
+    expect(e.message).to.contain('Token UTXO cannot be sent to issuer address')
   }
 })

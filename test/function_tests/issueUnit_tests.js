@@ -54,7 +54,7 @@ it(
       return
     } catch (e) {
       expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('issueInfo satoshis < 1')
+      expect(e.message).to.eql('issueInfo Satoshis must be a natural number')
     }
   }
 )
@@ -76,7 +76,7 @@ it(
       return
     } catch (e) {
       expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('issueInfo satoshis < 1')
+      expect(e.message).to.eql('issueInfo Satoshis must be a natural number')
     }
   }
 )
@@ -227,7 +227,7 @@ it('Issue - Issue Amount Decimal Throws Error', async () => {
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('issueInfo Satoshis must be a natual number')
+    expect(e.message).to.eql('issueInfo Satoshis must be a natural number')
   }
 })
 

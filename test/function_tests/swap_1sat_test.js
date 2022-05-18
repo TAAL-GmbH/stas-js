@@ -52,7 +52,7 @@ beforeEach(async function () {
 })
 
 describe('atomic swap', function () {
-  it('Swap - 3 step token-p2pkh swap', async function () {
+  it('Swap - 3 step token-p2pkh swap  with 1 token', async function () {
     // first get some funds
     const bobUtxos = await getFundsFromFaucet(bobPrivateKey.toAddress(process.env.NETWORK).toString())
     // get input transaction
@@ -90,11 +90,11 @@ describe('atomic swap', function () {
     const response = await utils.getTokenResponse(tokenId, tokenBSymbol)
     expect(response.symbol).to.equal(tokenBSymbol)
     expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.01)
-    expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.0000001)
+    expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.00000001)
   })
 
   // the maker offers sats for a token
-  it('Swap - 3 step p2pkh-token swap', async function () {
+  it('Swap - 3 step p2pkh-token swap with 1 token', async function () {
     const takerStasInputScriptHex = tokenAObj.outputs[0].script.toHex()
     // first get some funds
     const aliceUtxos = await getFundsFromFaucet(alicePrivateKey.toAddress(process.env.NETWORK).toString())
@@ -120,13 +120,12 @@ describe('atomic swap', function () {
       fundingUTXO, fundingPrivateKey)
 
     const fullySignedSwapHex = makerSignSwapOffer(takerSignedSwapHex, makerInputTx, tokenAIssueHex, alicePrivateKey, bobPublicKeyHash, paymentPublicKeyHash, fundingUTXO)
-    console.log(fullySignedSwapHex)
     const swapTxid = await broadcast(fullySignedSwapHex)
     console.log('swaptxid ', swapTxid)
     const tokenId = await utils.getToken(swapTxid, 0)
     const response = await utils.getTokenResponse(tokenId, tokenASymbol)
     expect(response.symbol).to.equal(tokenASymbol)
-    expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.0000001)
+    expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.00000001)
     expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.01)
   })
 })
@@ -180,7 +179,7 @@ async function setup () {
     tokenASymbol,
     2
   )
-  tokenAIssueTxid = await broadcast(tokenAIssueHex)
+  await broadcast(tokenAIssueHex)
   tokenAObj = new bsv.Transaction(tokenAIssueHex)
 
   // Token B

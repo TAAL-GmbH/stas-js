@@ -86,8 +86,6 @@ describe('regression, testnet', () => {
     console.log(`Token ID:        ${tokenId}`)
     const response = await utils.getTokenResponse(tokenId)
     expect(response.symbol).to.equal(symbol)
-    expect(response.contract_txs).to.contain(contractTxid)
-    expect(response.issuance_txs).to.contain(issueTxid)
     expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
     expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
     expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
