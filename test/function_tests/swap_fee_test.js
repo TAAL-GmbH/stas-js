@@ -39,6 +39,7 @@ let tokenBIssueTxid
 let fundingUTXO
 let alicePublicKeyHash
 let bobPublicKeyHash
+let fundingPublicKeyHash
 let tokenASymbol
 let tokenBSymbol
 
@@ -69,6 +70,7 @@ describe('atomic swap', function () {
       makerInputUtxo,
       wantedInfo
     )
+    console.log('funding ' + fundingUTXO.amount)
 
     // now bob takes the offer
     const takerSignedSwapHex = acceptUnsignedSwapOffer(unsignedSwapOfferHex, tokenBIssueHex,
@@ -76,6 +78,7 @@ describe('atomic swap', function () {
       fundingUTXO, fundingPrivateKey)
 
     const fullySignedSwapHex = makerSignSwapOffer(takerSignedSwapHex, tokenBIssueHex, tokenAIssueHex, alicePrivateKey, bobPublicKeyHash, paymentPublicKeyHash, fundingUTXO)
+    console.log(fullySignedSwapHex)
     const swapTxid = await broadcast(fullySignedSwapHex)
     console.log('swaptxid ', swapTxid)
 
@@ -216,8 +219,8 @@ async function setup () {
   tokenBObj = new bsv.Transaction(tokenBIssueHex)
   fundingUTXO = {
     txid: tokenBIssueTxid,
-    vout: 1,
-    scriptPubKey: tokenBIssueTx.vout[1].scriptPubKey.hex,
-    amount: bitcoinToSatoshis(tokenBIssueTx.vout[1].value)
+    vout: 5,
+    scriptPubKey: tokenBIssueTx.vout[5].scriptPubKey.hex,
+    amount: bitcoinToSatoshis(tokenBIssueTx.vout[5].value)
   }
 }

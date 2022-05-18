@@ -76,7 +76,7 @@ it(
       return
     } catch (e) {
       expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('issueInfo Satoshis must be a natural number')
+      expect(e.message).to.eql('issueInfo satoshis < 1')
     }
   }
 )

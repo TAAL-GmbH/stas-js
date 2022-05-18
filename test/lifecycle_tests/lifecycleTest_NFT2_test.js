@@ -84,7 +84,6 @@ describe('regression, testnet', () => {
     const response = await utils.getTokenResponse(tokenId)
     expect(response.symbol).to.equal(symbol)
     expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00010)
-    expect(await utils.getTokenBalance(aliceAddr)).to.equal(10000)
     await utils.isTokenBalance(aliceAddr, 10000)
 
     const issueOutFundingVout = issueTx.vout.length - 1
