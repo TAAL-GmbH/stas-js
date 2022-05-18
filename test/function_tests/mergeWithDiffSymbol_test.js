@@ -41,6 +41,7 @@ beforeEach(async () => {
   await setup()
 })
 
+// failing due to https://taaltech.atlassian.net/browse/BPAAS-64
 it('Merge - Successful Merge With Fee', async () => {
   const mergeHex = merge(
     bobPrivateKey,
@@ -138,6 +139,5 @@ async function setup () {
     2
   )
   const issueTxid2 = await broadcast(issueHex2)
-  // const issueTx = await getTransaction(issueTxid2)
   issueObj2 = bsv.Transaction(issueHex2)
 }

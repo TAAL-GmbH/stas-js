@@ -67,16 +67,15 @@ it('Attemmpt to Transfer Non Splittable Token to Issuer', async () => {
   expect(response.symbol).to.equal(symbol)
 
   const issueOutFundingVout = issueTx.vout.length - 1
-
-  transfer(
-    bobPrivateKey,
-    utils.getUtxo(issueTxid, issueTx, 1),
-    issuerAddr,
-    utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-    fundingPrivateKey
-  )
   try {
-    assert(false)
+    transfer(
+      bobPrivateKey,
+      utils.getUtxo(issueTxid, issueTx, 1),
+      issuerAddr,
+      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
+      fundingPrivateKey
+    )
+    expect(false).toBeTruthy()
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
