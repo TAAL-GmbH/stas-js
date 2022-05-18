@@ -57,10 +57,11 @@
   "jest": {
     "testRegex": "tests/.*\\.(js|jsx)$",
     "testPathIgnorePatterns" : [
-      "<rootDir>/test/mainnet_tests/" 
+      "<rootDir>/test/mainnet_tests/",
+      "<rootDir>/test/lifecycle_tests/lifecycleTest_1000Addresses_test.js"
     ],
     "verbose": true,
-    "testTimeout": 180000,
+    "testTimeout": 240000,
     "reporters": [
       "default",
       [
