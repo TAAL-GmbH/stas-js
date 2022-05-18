@@ -242,29 +242,6 @@ it('RedeemSplit - Address Too Long Throws Error', async () => {
   }
 })
 
-it('RedeemSplit - Send to Issuer Address Throws Error', async () => {
-  const amount = bitcoinToSatoshis(issueTx.vout[0].value / 5)
-  const issuerAddr = issuerPrivateKey.toAddress(process.env.NETWORK).toString()
-  const rSplitDestinations = []
-  rSplitDestinations[0] = { address: issuerAddr, amount: amount }
-  rSplitDestinations[1] = { address: issuerAddr, amount: amount }
-  try {
-    redeemSplit(
-      alicePrivateKey,
-      issuerPrivateKey.publicKey,
-      utils.getUtxo(issueTxid, issueTx, 0),
-      rSplitDestinations,
-      utils.getUtxo(issueTxid, issueTx, 2),
-      fundingPrivateKey
-    )
-    expect(false).toBeTruthy()
-    return
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('This function can only merge exactly 2 STAS tokens')
-  }
-})
-
 it(
   'RedeemSplit - Incorrect Owner Private Key Throws Error',
   async () => {
@@ -506,16 +483,21 @@ it('RedeemSplit - Send to Issuer Address Throws Error', async () => {
   rSplitDestinations[0] = { address: issuerAddr, amount: amount }
   rSplitDestinations[1] = { address: issuerAddr, amount: amount }
 
-  const redeemSplitHex = redeemSplit(
-    alicePrivateKey,
-    issuerPrivateKey.publicKey,
-    utils.getUtxo(issueTxid, issueTx, 0),
-    rSplitDestinations,
-    utils.getUtxo(issueTxid, issueTx, 2),
-    fundingPrivateKey
-  )
-  const redeemTxid = await broadcast(redeemSplitHex)
-  console.log(redeemTxid)
+  try {
+    redeemSplit(
+      alicePrivateKey,
+      issuerPrivateKey.publicKey,
+      utils.getUtxo(issueTxid, issueTx, 0),
+      rSplitDestinations,
+      utils.getUtxo(issueTxid, issueTx, 2),
+      fundingPrivateKey
+    )
+    expect(false).to.toBeTruthy()
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Token UTXO cannot be sent to issuer address')
+  }
 })
 
 it(

@@ -61,7 +61,7 @@
       "<rootDir>/test/lifecycle_tests/lifecycleTest_1000Addresses_test.js"
     ],
     "verbose": true,
-    "testTimeout": 240000,
+    "testTimeout": 180000,
     "reporters": [
       "default",
       [
