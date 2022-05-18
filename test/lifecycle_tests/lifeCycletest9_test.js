@@ -77,7 +77,12 @@ it(
       issuerPrivateKey,
       issueInfo,
       utils.getUtxo(contractTxid, contractTx, 0),
-      utils.getUtxo(contractTxid, contractTx, 1),
+      {
+        txid: fundingUtxos2[0].txid,
+        vout: 0,
+        scriptPubKey: fundingUtxos2[0].scriptPubKey,
+        amount: fundingUtxos2[0].amount
+      },
       fundingPrivateKey,
       true,
       symbol,
@@ -144,10 +149,6 @@ it(
 
     // Now let's merge the last split back together
     const splitTxObj = new bsv.Transaction(splitHex)
-    console.log(fundingUtxos2)
-    console.log(fundingUtxos2[0].txid)
-    console.log(fundingUtxos2[0].scriptPubKey)
-    console.log(fundingUtxos2[0].amount)
 
     const mergeHex = merge(
       bobPrivateKey,
