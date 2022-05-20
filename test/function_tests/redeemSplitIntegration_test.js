@@ -6,7 +6,8 @@ require('dotenv').config()
 const {
   contract,
   issue,
-  redeemSplit
+  redeemSplit,
+  redeemSplitWithCallback
 } = require('../../index')
 
 const {
@@ -15,6 +16,9 @@ const {
   getFundsFromFaucet,
   broadcast
 } = require('../../index').utils
+
+const { sighash } = require('../../lib/stas')
+const PublicKey = require('bsv/lib/publickey')
 
 let issuerPrivateKey
 let fundingPrivateKey
@@ -27,6 +31,13 @@ let fundingUtxos
 let publicKeyHash
 let issueTxid
 let issueTx
+
+const aliceSignatureCallback = (tx, i, script, satoshis) => {
+  return bsv.Transaction.sighash.sign(tx, alicePrivateKey, sighash, i, script, satoshis)
+}
+const paymentSignatureCallback = (tx, i, script, satoshis) => {
+  return bsv.Transaction.sighash.sign(tx, fundingPrivateKey, sighash, i, script, satoshis)
+}
 
 beforeEach(async () => {
   await setup()
@@ -141,6 +152,54 @@ it('RedeemSplit - No Split Completes Successfully', async () => {
   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000035)
   await utils.isTokenBalance(aliceAddr, 0)
   await utils.isTokenBalance(bobAddr, 6500)
+})
+
+it('Successful RedeemSplit With Callback & Fees', async () => {
+  const amount = issueTx.vout[0].value / 5
+  const rSplitDestinations = []
+  rSplitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
+  rSplitDestinations[1] = { address: aliceAddr, amount: bitcoinToSatoshis(amount) }
+
+  const redeemSplitHex = redeemSplitWithCallback(
+    alicePrivateKey.publicKey,
+    issuerPrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 0),
+    rSplitDestinations,
+    utils.getUtxo(issueTxid, issueTx, 2),
+    fundingPrivateKey.publicKey,
+    aliceSignatureCallback,
+    paymentSignatureCallback
+  )
+  const redeemTxid = await broadcast(redeemSplitHex)
+  expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000042) // first utxo goes to redemption address
+  expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000014)
+  expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.000014)
+  await utils.isTokenBalance(aliceAddr, 1400)
+  await utils.isTokenBalance(bobAddr, 4400)
+})
+
+it.only('Successful RedeemSplit With Callback & No fees', async () => {
+  const amount = issueTx.vout[0].value / 5
+  const rSplitDestinations = []
+  rSplitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
+  rSplitDestinations[1] = { address: aliceAddr, amount: bitcoinToSatoshis(amount) }
+
+  const redeemSplitHex = redeemSplitWithCallback(
+    alicePrivateKey.publicKey,
+    issuerPrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 0),
+    rSplitDestinations,
+    null,
+    null,
+    aliceSignatureCallback,
+    null
+  )
+  const redeemTxid = await broadcast(redeemSplitHex)
+  expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000042) // first utxo goes to redemption address
+  expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000014)
+  expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.000014)
+  await utils.isTokenBalance(aliceAddr, 1400)
+  await utils.isTokenBalance(bobAddr, 4400)
 })
 
 it('RedeemSplit - Too Many Outputs Throws Error', async () => {
