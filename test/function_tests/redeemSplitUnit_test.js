@@ -230,6 +230,26 @@ it('RedeemSplit - Null Split Destinations Throws Error', async () => {
   }
 })
 
+it('RedeemSplit - Empty Split Destinations Throws Error', async () => {
+  const splitDestinations = []
+  const issueOutFundingVout = issueTx.vout.length - 1
+  try {
+    redeemSplit(
+      alicePrivateKey,
+      issuerPrivateKey.publicKey,
+      utils.getUtxo(issueTxid, issueTx, 0),
+      splitDestinations,
+      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
+      fundingPrivateKey
+    )
+    expect(false).toBeTruthy()
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('split destinations array is null or empty')
+  }
+})
+
 it('RedeemSplit - Null Funding Private Key Throws Error', async () => {
   const bobAmount = bitcoinToSatoshis(issueTx.vout[0].value / 2)
   const splitDestinations = []
