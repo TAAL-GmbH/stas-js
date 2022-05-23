@@ -178,7 +178,7 @@ it('Successful RedeemSplit With Callback & Fees', async () => {
   await utils.isTokenBalance(bobAddr, 4400)
 })
 
-it.only('Successful RedeemSplit With Callback & No fees', async () => {
+it('Successful RedeemSplit With Callback & No fees', async () => {
   const amount = issueTx.vout[0].value / 5
   const rSplitDestinations = []
   rSplitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
