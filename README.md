@@ -29,7 +29,7 @@ We include examples that run on the private Taalnet. They contain no real error 
 To use the examples the following environment variables must be set inside the .env file
 API_USERNAME=  The API username
 API_PASSWORD=  The API password
-NETWORK= The netork that the tests will run on. 'livenet' is the main network
+NETWORK= The network that the tests will run on. 'livenet' is the main network
 
 
 ## Testing
