@@ -16,6 +16,8 @@ const {
   reverseEndian
 } = require('../../lib/utils')
 
+const feeSettings = require('./constants')
+
 // merge will take 2 existing STAS UTXOs and combine them and assign the single UTXO to another address.
 // The tokenOwnerPrivateKey must own the existing STAS UTXOs, the payment UTXOs and will be the owner of the change, if any.
 function mergeWithCallbackWithoutValidation (tokenOwnerPublicKey, mergeUtxos, destinationAddr, paymentUtxo, paymentPublicKey, ownerSignatureCallback, paymentSignatureCallback) {
@@ -94,7 +96,7 @@ function mergeWithCallbackWithoutValidation (tokenOwnerPublicKey, mergeUtxos, de
     if (i === 0) {
       // STAS input
       const signature = ownerSignatureCallback(tx, i, input.output._script, input.output._satoshisBN)
-      const sigASM = signature.toTxFormat().toString('hex')
+      const sigASM = signature
       let s
       if (isZeroFee) {
         s = numberToLESM(stasAmount) + ' ' + destinationPubkeyHash +
@@ -116,8 +118,7 @@ function mergeWithCallbackWithoutValidation (tokenOwnerPublicKey, mergeUtxos, de
 
       tx.inputs[0].setScript(bsv.Script.fromASM(s))
     } else if (i === 1) {
-      const signature = ownerSignatureCallback(tx, i, input.output._script, input.output._satoshisBN)
-      const sigASM = signature.toTxFormat().toString('hex')
+      const sigASM = ownerSignatureCallback(tx, i, input.output._script, input.output._satoshisBN)
       let s
       if (isZeroFee) {
         s = numberToLESM(stasAmount) + ' ' + destinationPubkeyHash +
@@ -140,7 +141,7 @@ function mergeWithCallbackWithoutValidation (tokenOwnerPublicKey, mergeUtxos, de
       tx.inputs[1].setScript(bsv.Script.fromASM(s))
     } else if (!isZeroFee) {
       const signature = paymentSignatureCallback(tx, i, input.output._script, input.output._satoshisBN)
-      const unlockingScript = bsv.Script.fromASM(signature.toTxFormat().toString('hex') + ' ' + paymentPublicKey.toString('hex'))
+      const unlockingScript = bsv.Script.fromASM(signature + ' ' + paymentPublicKey.toString('hex'))
       input.setScript(unlockingScript)
     }
   })
@@ -195,7 +196,7 @@ function handleChangeForMerge (tx, extraDataBytes, publicKey) {
     }
   })
 
-  const fee = Math.ceil(txSizeInBytes * process.env.SATS / process.env.PERBYTE)
+  const fee = Math.ceil(txSizeInBytes * feeSettings.Sats / feeSettings.PerByte)
 
   tx.outputs[tx.outputs.length - 1].satoshis = satoshis - fee
 }

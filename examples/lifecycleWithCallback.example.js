@@ -84,7 +84,7 @@ const {
     }
   }
 
-  const ownerSignCallback = (tx) => {
+  const ownerSignCallback = async (tx) => {
     tx.sign(issuerPrivateKey)
   }
 
@@ -92,14 +92,14 @@ const {
   // console.log(ownerSignCallback.toString())
   // console.log('------------')
 
-  const paymentSignCallback = (tx) => {
+  const paymentSignCallback = async (tx) => {
     tx.sign(fundingPrivateKey)
   }
 
   // return contractWithCallback(privateKey.publicKey, inputUtxos, paymentUtxos, paymentPrivateKey ? paymentPrivateKey.publicKey : null, schema, tokenSatoshis, ownerSignCallback, paymentSignCallback)
 
   // change goes back to the fundingPrivateKey
-  const contractHex = contractWithCallback(
+  const contractHex = await contractWithCallback(
     issuerPublicKey,
     contractUtxos,
     fundingUtxos,
@@ -126,22 +126,22 @@ const {
     }
   ]
 
-  const issuerSignatureCallback = (tx, i, script, satoshis) => {
+  const issuerSignatureCallback = async (tx, i, script, satoshis) => {
     return bsv.Transaction.sighash.sign(tx, issuerPrivateKey, sighash, i, script, satoshis)
   }
-  const aliceSignatureCallback = (tx, i, script, satoshis) => {
+  const aliceSignatureCallback = async (tx, i, script, satoshis) => {
     return bsv.Transaction.sighash.sign(tx, alicePrivateKey, sighash, i, script, satoshis)
   }
-  const bobSignatureCallback = (tx, i, script, satoshis) => {
+  const bobSignatureCallback = async (tx, i, script, satoshis) => {
     return bsv.Transaction.sighash.sign(tx, bobPrivateKey, sighash, i, script, satoshis)
   }
-  const paymentSignatureCallback = (tx, i, script, satoshis) => {
+  const paymentSignatureCallback = async (tx, i, script, satoshis) => {
     return bsv.Transaction.sighash.sign(tx, fundingPrivateKey, sighash, i, script, satoshis)
   }
 
   let issueHex
   try {
-    issueHex = issueWithCallback(
+    issueHex = await issueWithCallback(
       issuerPublicKey,
       issueInfo,
       {
@@ -173,7 +173,7 @@ const {
 
   const issueOutFundingVout = issueTx.vout.length - 1
 
-  const transferHex = transferWithCallback(
+  const transferHex = await transferWithCallback(
     bobPublicKey,
     {
       txid: issueTxid,
@@ -204,7 +204,7 @@ const {
   splitDestinations[0] = { address: bobAddr, amount: bobAmount1 }
   splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
 
-  const splitHex = splitWithCallback(
+  const splitHex = await splitWithCallback(
     alicePublicKey,
     {
       txid: transferTxid,
@@ -230,7 +230,7 @@ const {
   // Now let's merge the last split back together
   const splitTxObj = new bsv.Transaction(splitHex)
 
-  const mergeHex = mergeWithCallback(
+  const mergeHex = await mergeWithCallback(
     bobPublicKey,
     [{
       tx: splitTxObj,
@@ -265,7 +265,7 @@ const {
   split2Destinations[0] = { address: aliceAddr, amount: aliceAmount1 }
   split2Destinations[1] = { address: aliceAddr, amount: aliceAmount2 }
 
-  const splitHex2 = splitWithCallback(
+  const splitHex2 = await splitWithCallback(
     alicePublicKey,
     {
       txid: mergeTxid,
@@ -295,7 +295,7 @@ const {
   const aliceAmountSatoshis = bitcoinToSatoshis(splitTx2.vout[0].value) / 2
   const bobAmountSatoshis = bitcoinToSatoshis(splitTx2.vout[0].value) + bitcoinToSatoshis(splitTx2.vout[1].value) - aliceAmountSatoshis
 
-  const mergeSplitHex = mergeSplitWithCallback(
+  const mergeSplitHex = await mergeSplitWithCallback(
     alicePublicKey,
     [{
       tx: splitTxObj2,
@@ -330,7 +330,7 @@ const {
   const mergeSplitTx = await getTransaction(mergeSplitTxid)
 
   // Alice wants to redeem the money from bob...
-  const redeemHex = redeemWithCallback(
+  const redeemHex = await redeemWithCallback(
     alicePublicKey,
     issuerPrivateKey.publicKey,
     {

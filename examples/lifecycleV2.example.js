@@ -76,7 +76,7 @@ const {
   }
 
   // change goes back to the fundingPrivateKey
-  const contractHex = contract(
+  const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
     fundingUtxos,
@@ -102,7 +102,7 @@ const {
   ]
   let issueHex
   try {
-    issueHex = issue(
+    issueHex = await issue(
       issuerPrivateKey,
       issueInfo,
       {
@@ -131,7 +131,7 @@ const {
 
   const issueOutFundingVout = issueTx.vout.length - 1
 
-  const transferHex = transfer(
+  const transferHex = await transfer(
     bobPrivateKey,
     {
       txid: issueTxid,
@@ -159,7 +159,7 @@ const {
   splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount1) }
   splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
 
-  const splitHex = split(
+  const splitHex = await split(
     alicePrivateKey,
     {
       txid: transferTxid,
@@ -183,7 +183,7 @@ const {
   // Now let's merge the last split back together
   const splitTxObj = new bsv.Transaction(splitHex)
 
-  const mergeHex = merge(
+  const mergeHex = await merge(
     bobPrivateKey,
     [{
       tx: splitTxObj,
@@ -215,7 +215,7 @@ const {
   split2Destinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(aliceAmount1) }
   split2Destinations[1] = { address: aliceAddr, amount: bitcoinToSatoshis(aliceAmount2) }
 
-  const splitHex2 = split(
+  const splitHex2 = await split(
     alicePrivateKey,
     {
       txid: mergeTxid,
@@ -242,7 +242,7 @@ const {
   const aliceAmountSatoshis = bitcoinToSatoshis(splitTx2.vout[0].value) / 2
   const bobAmountSatoshis = bitcoinToSatoshis(splitTx2.vout[0].value) + bitcoinToSatoshis(splitTx2.vout[1].value) - aliceAmountSatoshis
 
-  const mergeSplitHex = mergeSplit(
+  const mergeSplitHex = await mergeSplit(
     alicePrivateKey,
     [{
       tx: splitTxObj2,
@@ -275,7 +275,7 @@ const {
   const mergeSplitTx = await getTransaction(mergeSplitTxid)
 
   // Alice wants to redeem the money from bob...
-  const redeemHex = redeem(
+  const redeemHex = await redeem(
     alicePrivateKey,
     issuerPrivateKey.publicKey,
     {

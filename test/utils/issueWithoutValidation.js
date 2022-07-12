@@ -7,6 +7,8 @@ const {
 } = require('../../lib/stas')
 const { bitcoinToSatoshis, addressToPubkeyhash } = require('../../lib/utils')
 
+const feeSettings = require('./constants')
+
 // the minimum length of a bitcoin address
 const ADDRESS_MIN_LENGTH = 26
 // the maximum length of a bitcoin address
@@ -71,7 +73,7 @@ function issueWithoutValiation (privateKey, issueInfo, contractUtxo, paymentUtxo
     const changeScript = bsv.Script.fromASM(`OP_DUP OP_HASH160 ${paymentPubKeyHash} OP_EQUALVERIFY OP_CHECKSIG`)
     // Calculate the change amount
     const txSize = (tx.serialize(true).length / 2) + 1 + 8 + changeScript.toBuffer().length + (tx.inputs.length * P2PKH_UNLOCKING_SCRIPT_BYTES)
-    const fee = Math.ceil(txSize * process.env.SATS / process.env.PERBYTE)
+    const fee = Math.ceil(txSize * feeSettings.Sats / feeSettings.PerByte)
 
     tx.addOutput(new bsv.Transaction.Output({
       script: changeScript,
@@ -90,7 +92,7 @@ function issueWithoutValiation (privateKey, issueInfo, contractUtxo, paymentUtxo
       privKey = paymentPrivateKey
     }
     const signature = bsv.Transaction.sighash.sign(tx, privKey, sighash, i, input.output._script, input.output._satoshisBN)
-    const unlockingScript = bsv.Script.fromASM(signature.toTxFormat().toString('hex') + ' ' + privKey.publicKey.toString('hex'))
+    const unlockingScript = bsv.Script.fromASM(signature + ' ' + privKey.publicKey.toString('hex'))
     input.setScript(unlockingScript)
   })
 

@@ -69,7 +69,7 @@ const {
     }
   }
 
-  const contractHex = contract(
+  const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
     fundingUtxos,
@@ -94,7 +94,7 @@ const {
     }
   ]
 
-  const issueHex = issue(
+  const issueHex = await issue(
     issuerPrivateKey,
     issueInfo,
     {
@@ -120,7 +120,7 @@ const {
 
   const issueOutFundingVout = issueTx.vout.length - 1
 
-  const transferHex = transfer(
+  const transferHex = await transfer(
     bobPrivateKey,
     {
       txid: issueTxid,
@@ -148,7 +148,7 @@ const {
   splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount1) }
   splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
 
-  const splitHex = split(
+  const splitHex = await split(
     alicePrivateKey,
     {
       txid: transferTxid,
