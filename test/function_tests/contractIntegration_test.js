@@ -13,11 +13,11 @@ const {
 } = require('../../index').utils
 
 const ownerSignCallback = async (tx) => {
-  tx.sign(issuerPrivateKey).toTxFormat().toString('hex')
+  tx.sign(issuerPrivateKey)
 }
 
 const paymentSignCallback = async (tx) => {
-  tx.sign(fundingPrivateKey).toTxFormat().toString('hex')
+  tx.sign(fundingPrivateKey)
 }
 
 let issuerPrivateKey

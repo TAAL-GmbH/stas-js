@@ -46,7 +46,7 @@ describe('regression, testnet', () => {
     console.log(`Contract TX:     ${contractTxid}`)
     const contractTx = await getTransaction(contractTxid)
     try {
-      await issueHex = issue(
+      await issue(
         issuerPrivateKey,
         utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
         utils.getUtxo(contractTxid, contractTx, 0),
