@@ -170,6 +170,7 @@ it('Successful RedeemSplit With Callback & Fees', async () => {
     aliceSignatureCallback,
     paymentSignatureCallback
   )
+  console.log(redeemSplitHex)
   const redeemTxid = await broadcast(redeemSplitHex)
   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000042) // first utxo goes to redemption address
   expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000014)
@@ -397,7 +398,7 @@ it(
     const issueOutFundingVout = issueTx.vout.length - 1
     const incorrectPrivateKey = bsv.PrivateKey()
 
-    const redeemHex = redeemSplit(
+    const redeemHex = await redeemSplit(
       incorrectPrivateKey,
       issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
@@ -426,7 +427,7 @@ it(
     const issueOutFundingVout = issueTx.vout.length - 1
     const incorrectPrivateKey = bsv.PrivateKey()
 
-    const redeemHex = redeemSplit(
+    const redeemHex = await redeemSplit(
       alicePrivateKey,
       issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
@@ -454,7 +455,7 @@ it('RedeemSplit - Incorrect Public Key Throws Error', async () => {
   const issueOutFundingVout = issueTx.vout.length - 1
   const incorrectPrivateKey = bsv.PrivateKey()
 
-  const redeemHex = redeemSplit(
+  const redeemHex = await redeemSplit(
     alicePrivateKey,
     incorrectPrivateKey.publicKey,
     utils.getUtxo(issueTxid, issueTx, 0),
