@@ -42,7 +42,7 @@ describe('regression, testnet', () => {
     const wait = 5000
 
     // change goes back to the fundingPrivateKey
-    const contractHex = contract(
+    const contractHex = await contract(
       issuerPrivateKey,
       contractUtxos,
       fundingUtxos,
@@ -54,7 +54,7 @@ describe('regression, testnet', () => {
     console.log(`Contract TX:     ${contractTxid}`)
     const contractTx = await getTransaction(contractTxid)
 
-    const issueHex = issue(
+    const issueHex = await issue(
       issuerPrivateKey,
       utils.getIssueInfo(aliceAddr, 1, bobAddr, 1),
       utils.getUtxo(contractTxid, contractTx, 0),
@@ -77,7 +77,7 @@ describe('regression, testnet', () => {
 
     const issueOutFundingVout = issueTx.vout.length - 1
 
-    const transferHex = transfer(
+    const transferHex = await transfer(
       bobPrivateKey,
       utils.getUtxo(issueTxid, issueTx, 1),
       aliceAddr,
@@ -91,7 +91,7 @@ describe('regression, testnet', () => {
     await utils.isTokenBalance(aliceAddr, 2)
     await utils.isTokenBalance(bobAddr, 0)
 
-    const redeemHex = redeem(
+    const redeemHex = await redeem(
       alicePrivateKey,
       issuerPrivateKey.publicKey,
       utils.getUtxo(transferTxid, transferTx, 0),
@@ -105,7 +105,7 @@ describe('regression, testnet', () => {
     await utils.isTokenBalance(aliceAddr, 1)
     await utils.isTokenBalance(bobAddr, 0)
 
-    const redeemHex2 = redeem(
+    const redeemHex2 = await redeem(
       alicePrivateKey,
       issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),

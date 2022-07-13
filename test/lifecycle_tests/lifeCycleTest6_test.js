@@ -43,7 +43,7 @@ it(
     const schema = utils.schema(publicKeyHash, symbol, supply)
 
     // change goes back to the fundingPrivateKey
-    const contractHex = contract(
+    const contractHex = await contract(
       issuerPrivateKey,
       contractUtxos,
       fundingUtxos,
@@ -77,7 +77,7 @@ it(
         data: '4_data'
       }]
 
-    const issueHex = issue(
+    const issueHex = await issue(
       issuerPrivateKey,
       issueInfo,
       utils.getUtxo(contractTxid, contractTx, 0),
@@ -105,7 +105,7 @@ it(
 
     const issueOutFundingVout = issueTx.vout.length - 1
 
-    const transferHex = transfer(
+    const transferHex = await transfer(
       bobPrivateKey,
       utils.getUtxo(issueTxid, issueTx, 0),
       aliceAddr,
@@ -120,7 +120,7 @@ it(
     await utils.isTokenBalance(daveAddr, 10000)
     await utils.isTokenBalance(emmaAddr, 10000)
 
-    const transferHex2 = transfer(
+    const transferHex2 = await transfer(
       alicePrivateKey,
       utils.getUtxo(issueTxid, issueTx, 1),
       emmaAddr,
@@ -135,7 +135,7 @@ it(
     await utils.isTokenBalance(daveAddr, 10000)
     await utils.isTokenBalance(emmaAddr, 20000)
 
-    const transferHex3 = transfer(
+    const transferHex3 = await transfer(
       davePrivateKey,
       utils.getUtxo(issueTxid, issueTx, 2),
       emmaAddr,
@@ -173,7 +173,7 @@ it(
     splitDestinations[0] = { address: daveAddr, amount: bitcoinToSatoshis(bobAmount1) }
     splitDestinations[1] = { address: daveAddr, amount: bitcoinToSatoshis(bobAmount2) }
 
-    const splitHex = split(
+    const splitHex = await split(
       bobPrivateKey,
       utils.getUtxo(transferTxid4, transferTx4, 0),
       splitDestinations,
@@ -192,7 +192,7 @@ it(
 
     const splitTxObj = new bsv.Transaction(splitHex)
 
-    const mergeHex = merge(
+    const mergeHex = await merge(
       davePrivateKey,
       utils.getMergeUtxo(splitTxObj),
       aliceAddr,
@@ -215,7 +215,7 @@ it(
     split2Destinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(aliceAmount1) }
     split2Destinations[1] = { address: aliceAddr, amount: bitcoinToSatoshis(aliceAmount2) }
 
-    const splitHex2 = split(
+    const splitHex2 = await split(
       alicePrivateKey,
       utils.getUtxo(mergeTxid, mergeTx, 0),
       split2Destinations,

@@ -32,7 +32,7 @@ const wait = 5000 // due to delay in token issuance
 
 it('Issue With Invalid Schema 1', async () => {
   await setup(invalidSchema1) // set up contract
-  const issueHex = issue(
+  const issueHex = await issue(
     issuerPrivateKey,
     utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
     utils.getUtxo(contractTxid, contractTx, 0),
@@ -50,7 +50,7 @@ it('Issue With Invalid Schema 1', async () => {
 
 it('Issue With Invalid Schema 2', async () => {
   await setup(invalidSchema2) // set up contract
-  const issueHex = issue(
+  const issueHex = await issue(
     issuerPrivateKey,
     utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
     utils.getUtxo(contractTxid, contractTx, 0),
@@ -81,7 +81,7 @@ async function setup (schemaIn) {
   const supply = 10000
   const schema = schemaIn(publicKeyHash, symbol, supply)
 
-  const contractHex = contract(
+  const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
     fundingUtxos,

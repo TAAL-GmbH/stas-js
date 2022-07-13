@@ -48,7 +48,7 @@ it(
     console.log('Alice  ' + aliceAddr)
     console.log('Bob  ' + bobAddr)
 
-    const contractHex = contract(
+    const contractHex = await contract(
       issuerPrivateKey,
       contractUtxos,
       fundingUtxos,
@@ -73,7 +73,7 @@ it(
       }
     ]
 
-    const issueHex = issue(
+    const issueHex = await issue(
       issuerPrivateKey,
       issueInfo,
       utils.getUtxo(contractTxid, contractTx, 0),
@@ -105,7 +105,7 @@ it(
 
     const issueOutFundingVout = issueTx.vout.length - 1
 
-    const transferHex = transfer(
+    const transferHex = await transfer(
       aliceAddr,
       utils.getUtxo(issueTxid, issueTx, 0),
       bobAddr,
@@ -130,7 +130,7 @@ it(
     splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount1) }
     splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
 
-    const splitHex = split(
+    const splitHex = await split(
       alicePrivateKey,
       utils.getUtxo(transferTxid, transferTx, 0),
       splitDestinations,
@@ -150,7 +150,7 @@ it(
     // Now let's merge the last split back together
     const splitTxObj = new bsv.Transaction(splitHex)
 
-    const mergeHex = merge(
+    const mergeHex = await merge(
       bobPrivateKey,
       utils.getMergeUtxo(splitTxObj),
       aliceAddr,
@@ -184,7 +184,7 @@ it(
     split2Destinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
     split2Destinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
 
-    const splitHex2 = split(
+    const splitHex2 = await split(
       alicePrivateKey,
       utils.getUtxo(mergeTxid, mergeTx, 0),
       split2Destinations,
@@ -206,7 +206,7 @@ it(
     const aliceAmountSatoshis = bitcoinToSatoshis(splitTx2.vout[0].value) / 2
     const bobAmountSatoshis = bitcoinToSatoshis(splitTx2.vout[0].value) + bitcoinToSatoshis(splitTx2.vout[1].value) - aliceAmountSatoshis
 
-    const mergeSplitHex = mergeSplit(
+    const mergeSplitHex = await mergeSplit(
       bobPrivateKey,
       utils.getMergeSplitUtxo(splitTxObj2, splitTx2),
       aliceAddr,
@@ -228,7 +228,7 @@ it(
     expect(await utils.getTokenBalance(bobAddr)).to.equal(2250)
 
     // Alice wants to redeem the money from bob...
-    const redeemHex = redeem(
+    const redeemHex = await redeem(
       alicePrivateKey,
       issuerPrivateKey.publicKey,
       utils.getUtxo(mergeSplitTxid, mergeSplitTx, 0),

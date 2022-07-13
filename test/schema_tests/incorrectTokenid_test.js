@@ -34,7 +34,7 @@ describe('regression, testnet', () => {
     const symbol = 'TAALT'
     const schema = utils.schema(publicKeyHash, symbol, supply)
 
-    const contractHex = contract(
+    const contractHex = await contract(
       issuerPrivateKey,
       contractUtxos,
       fundingUtxos,
@@ -46,7 +46,7 @@ describe('regression, testnet', () => {
     console.log(`Contract TX:     ${contractTxid}`)
     const contractTx = await getTransaction(contractTxid)
 
-    const issueHex = issue(
+    const issueHex = await issue(
       issuerPrivateKey,
       utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
       utils.getUtxo(contractTxid, contractTx, 0),

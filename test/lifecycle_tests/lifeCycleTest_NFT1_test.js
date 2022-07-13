@@ -35,7 +35,7 @@ describe('regression, testnet', () => {
 
     const schema = utils.schema(publicKeyHash, symbol, supply)
 
-    const contractHex = contract(
+    const contractHex = await contract(
       issuerPrivateKey,
       contractUtxos,
       fundingUtxos,
@@ -51,7 +51,7 @@ describe('regression, testnet', () => {
 
     let issueHex
     try {
-      issueHex = issue(
+      issueHex = await issue(
         issuerPrivateKey,
         utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
         utils.getUtxo(contractTxid, contractTx, 0),
@@ -78,7 +78,7 @@ describe('regression, testnet', () => {
     await utils.isTokenBalance(bobAddr, 3000)
 
     const issueOutFundingVout = issueTx.vout.length - 1
-    const transferHex = transfer(
+    const transferHex = await transfer(
       bobPrivateKey,
       utils.getUtxo(issueTxid, issueTx, 1),
       aliceAddr,
@@ -99,7 +99,7 @@ describe('regression, testnet', () => {
     splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount1) }
     splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
 
-    const splitHex = split(
+    const splitHex = await split(
       alicePrivateKey,
       utils.getUtxo(transferTxid, transferTx, 0),
       splitDestinations,
@@ -115,7 +115,7 @@ describe('regression, testnet', () => {
       expect(e.message).to.eql('Request failed with status code 400')
     }
 
-    const redeemHex = redeem(
+    const redeemHex = await redeem(
       alicePrivateKey,
       issuerPrivateKey.publicKey,
       utils.getUtxo(transferTxid, transferTx, 0),

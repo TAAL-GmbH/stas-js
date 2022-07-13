@@ -53,7 +53,7 @@ it('Full Life Cycle Test With 10 Issuance Addresses', async () => {
   const wait = 7000
 
   // change goes back to the fundingPrivateKey
-  const contractHex = contract(
+  const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
     fundingUtxos,
@@ -65,7 +65,7 @@ it('Full Life Cycle Test With 10 Issuance Addresses', async () => {
   console.log(`Contract TX:     ${contractTxid}`)
   const contractTx = await getTransaction(contractTxid)
 
-  const issueHex = issue(
+  const issueHex = await issue(
     issuerPrivateKey,
     get10IssueAddresses(),
     utils.getUtxo(contractTxid, contractTx, 0),
@@ -91,7 +91,7 @@ it('Full Life Cycle Test With 10 Issuance Addresses', async () => {
 
   const issueOutFundingVout = issueTx.vout.length - 1
 
-  const transferHex = transfer(
+  const transferHex = await transfer(
     pk2,
     utils.getUtxo(issueTxid, issueTx, 1),
     addr3,
@@ -110,7 +110,7 @@ it('Full Life Cycle Test With 10 Issuance Addresses', async () => {
   splitDestinations[0] = { address: addr4, amount: amount }
   splitDestinations[1] = { address: addr4, amount: amount }
 
-  const splitHex = split(
+  const splitHex = await split(
     pk3,
     utils.getUtxo(transferTxid, transferTx, 0),
     splitDestinations,
@@ -128,7 +128,7 @@ it('Full Life Cycle Test With 10 Issuance Addresses', async () => {
   // Now let's merge the last split back together
   const splitTxObj = new bsv.Transaction(splitHex)
 
-  const mergeHex = merge(
+  const mergeHex = await merge(
     pk4,
     utils.getMergeUtxo(splitTxObj),
     addr3,
@@ -149,7 +149,7 @@ it('Full Life Cycle Test With 10 Issuance Addresses', async () => {
   split2Destinations[0] = { address: addr5, amount: bitcoinToSatoshis(aliceAmount1) }
   split2Destinations[1] = { address: addr5, amount: bitcoinToSatoshis(aliceAmount2) }
 
-  const splitHex2 = split(
+  const splitHex2 = await split(
     pk3,
     utils.getUtxo(mergeTxid, mergeTx, 0),
     split2Destinations,
@@ -170,7 +170,7 @@ it('Full Life Cycle Test With 10 Issuance Addresses', async () => {
   const amount1 = bitcoinToSatoshis(splitTx2.vout[0].value) / 2
   const amount2 = bitcoinToSatoshis(splitTx2.vout[0].value) + bitcoinToSatoshis(splitTx2.vout[1].value) - amount1
 
-  const mergeSplitHex = mergeSplit(
+  const mergeSplitHex = await mergeSplit(
     pk5,
     utils.getMergeSplitUtxo(splitTxObj2, splitTx2),
     addr6,
@@ -192,7 +192,7 @@ it('Full Life Cycle Test With 10 Issuance Addresses', async () => {
   await utils.isTokenBalance(addr7, 1750)
 
   // Alice wants to redeem the money from bob...
-  const redeemHex = redeem(
+  const redeemHex = await redeem(
     pk6,
     issuerPrivateKey.publicKey,
     utils.getUtxo(mergeSplitTxid, mergeSplitTx, 0),

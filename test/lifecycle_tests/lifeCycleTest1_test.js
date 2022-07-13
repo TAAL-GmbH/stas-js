@@ -39,7 +39,7 @@ it('Full Life Cycle Test 1', async () => {
   const schema = utils.schema(publicKeyHash, symbol, supply)
   const wait = 5000 // set wait before token balance check
 
-  const contractHex = contract(
+  const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
     fundingUtxos,
@@ -51,7 +51,7 @@ it('Full Life Cycle Test 1', async () => {
   console.log(`Contract TX:     ${contractTxid}`)
   const contractTx = await getTransaction(contractTxid)
 
-  const issueHex = issue(
+  const issueHex = await issue(
     issuerPrivateKey,
     utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
     utils.getUtxo(contractTxid, contractTx, 0),
@@ -76,7 +76,7 @@ it('Full Life Cycle Test 1', async () => {
 
   const issueOutFundingVout = issueTx.vout.length - 1
 
-  const transferHex = transfer(
+  const transferHex = await transfer(
     bobPrivateKey,
     utils.getUtxo(issueTxid, issueTx, 1),
     aliceAddr,
@@ -96,7 +96,7 @@ it('Full Life Cycle Test 1', async () => {
   splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount1) }
   splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
 
-  const splitHex = split(
+  const splitHex = await split(
     alicePrivateKey,
     utils.getUtxo(transferTxid, transferTx, 0),
     splitDestinations,
@@ -114,7 +114,7 @@ it('Full Life Cycle Test 1', async () => {
   // Now let's merge the last split back together
   const splitTxObj = new bsv.Transaction(splitHex)
 
-  const mergeHex = merge(
+  const mergeHex = await merge(
     bobPrivateKey,
     utils.getMergeUtxo(splitTxObj),
     aliceAddr,
@@ -138,7 +138,7 @@ it('Full Life Cycle Test 1', async () => {
   split2Destinations[0] = { address: bobAddr, amount: amount }
   split2Destinations[1] = { address: bobAddr, amount: amount }
 
-  const splitHex2 = split(
+  const splitHex2 = await split(
     alicePrivateKey,
     utils.getUtxo(mergeTxid, mergeTx, 0),
     split2Destinations,
@@ -159,7 +159,7 @@ it('Full Life Cycle Test 1', async () => {
   const aliceAmountSatoshis = bitcoinToSatoshis(splitTx2.vout[0].value) / 2
   const bobAmountSatoshis = bitcoinToSatoshis(splitTx2.vout[0].value) + bitcoinToSatoshis(splitTx2.vout[1].value) - aliceAmountSatoshis
 
-  const mergeSplitHex = mergeSplit(
+  const mergeSplitHex = await mergeSplit(
     bobPrivateKey,
     utils.getMergeSplitUtxo(splitTxObj2, splitTx2),
     aliceAddr,
@@ -179,7 +179,7 @@ it('Full Life Cycle Test 1', async () => {
   await utils.isTokenBalance(bobAddr, 2250)
 
   // Alice wants to redeem the money from bob...
-  const redeemHex = redeem(
+  const redeemHex = await redeem(
     alicePrivateKey,
     issuerPrivateKey.publicKey,
     utils.getUtxo(mergeSplitTxid, mergeSplitTx, 0),

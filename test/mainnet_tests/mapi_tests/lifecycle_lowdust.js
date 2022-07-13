@@ -61,7 +61,7 @@ it('Mainnet LifeCycle Test With Low Dust', async () => {
   const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
   const schema = utils.schema(publicKeyHash, symbol, supply)
 
-  const contractHex = contract(
+  const contractHex = await contract(
     issuerPrivateKey,
     [{
       txid: inputUtxoid,

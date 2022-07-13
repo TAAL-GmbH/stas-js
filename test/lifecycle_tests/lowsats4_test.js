@@ -42,7 +42,7 @@ describe('regression, testnet', () => {
     const wait = 5000
 
     // change goes back to the fundingPrivateKey
-    const contractHex = contract(
+    const contractHex = await contract(
       issuerPrivateKey,
       contractUtxos,
       fundingUtxos,
@@ -54,7 +54,7 @@ describe('regression, testnet', () => {
     console.log(`Contract TX:     ${contractTxid}`)
     const contractTx = await getTransaction(contractTxid)
 
-    const issueHex = issue(
+    const issueHex = await issue(
       issuerPrivateKey,
       utils.getIssueInfo(aliceAddr, 1, bobAddr, 2),
       utils.getUtxo(contractTxid, contractTx, 0),
@@ -77,7 +77,7 @@ describe('regression, testnet', () => {
 
     const issueOutFundingVout = issueTx.vout.length - 1
 
-    const transferHex = transfer(
+    const transferHex = await transfer(
       bobPrivateKey,
       utils.getUtxo(issueTxid, issueTx, 1),
       aliceAddr,
@@ -98,7 +98,7 @@ describe('regression, testnet', () => {
     splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount1) }
     splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
 
-    const splitHex = split(
+    const splitHex = await split(
       alicePrivateKey,
       utils.getUtxo(transferTxid, transferTx, 0),
       splitDestinations,
@@ -117,7 +117,7 @@ describe('regression, testnet', () => {
     const splitTxObj = new bsv.Transaction(splitHex)
     console.log('splitobj ' + splitTxObj.toString())
 
-    const mergeHex = merge(
+    const mergeHex = await merge(
       bobPrivateKey,
       utils.getMergeUtxo(splitTxObj),
       aliceAddr,
@@ -140,7 +140,7 @@ describe('regression, testnet', () => {
     split2Destinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(aliceAmount1) }
     split2Destinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(aliceAmount2) }
 
-    const splitHex2 = split(
+    const splitHex2 = await split(
       alicePrivateKey,
       utils.getUtxo(mergeTxid, mergeTx, 0),
       split2Destinations,
@@ -161,7 +161,7 @@ describe('regression, testnet', () => {
     const bobAmountSatoshis = bitcoinToSatoshis(splitTx2.vout[0].value)
     const aliceAmountSatoshis = bitcoinToSatoshis(splitTx2.vout[1].value)
 
-    const mergeSplitHex = mergeSplit(
+    const mergeSplitHex = await mergeSplit(
       bobPrivateKey,
       utils.getMergeSplitUtxo(splitTxObj2, splitTx2),
       aliceAddr,
@@ -179,7 +179,7 @@ describe('regression, testnet', () => {
     await utils.isTokenBalance(aliceAddr, 2)
     await utils.isTokenBalance(bobAddr, 1)
 
-    const redeemHex = redeem(
+    const redeemHex = await redeem(
       alicePrivateKey,
       issuerPrivateKey.publicKey,
       utils.getUtxo(mergeSplitTxid, mergeSplitTx, 0),
@@ -193,7 +193,7 @@ describe('regression, testnet', () => {
     await utils.isTokenBalance(aliceAddr, 1)
     await utils.isTokenBalance(bobAddr, 1)
 
-    const redeemHex2 = redeem(
+    const redeemHex2 = await redeem(
       alicePrivateKey,
       issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
