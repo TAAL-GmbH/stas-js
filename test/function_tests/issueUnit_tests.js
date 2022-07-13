@@ -160,7 +160,7 @@ it(
       }
     ]
     try {
-      issue(
+      await issue(
         issuerPrivateKey,
         issueInfo,
         utils.getUtxo(contractTxid, contractTx, 0),
