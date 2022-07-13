@@ -69,7 +69,7 @@ describe('atomic swap', function () {
     const allInOneSwapHex = await allInOneSwap(alicePrivateKey, makerInputUtxo, wantedInfo, tokenBIssueHex, 0,
       bobPrivateKey, tokenAIssueHex, 0, tokenAObj.outputs[0].satoshis, tokenBObj.outputs[0].satoshis,
       fundingUTXO, fundingPrivateKey)
-
+      
     const swapTxid = await broadcast(allInOneSwapHex)
     console.log('swaptxid', swapTxid)
     expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.00006)
@@ -370,7 +370,7 @@ async function setup () {
   tokenBSymbol = 'TOKENB'
   const tokenBSupply = 3000
   const tokenBSchema = utils.schema(tokenBIssuerPublicKeyHash, tokenBSymbol, tokenBSupply)
-  const tokenBContractHex = contract(
+  const tokenBContractHex = await contract(
     tokenBIssuerPrivateKey,
     tokenBContractUtxos,
     tokenBFundingUtxos,

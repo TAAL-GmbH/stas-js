@@ -36,10 +36,10 @@ let issueOutFundingVout
 const wait = 30000
 
 const bobSignatureCallback = async (tx, i, script, satoshis) => {
-  return bsv.Transaction.sighash.sign(tx, bobPrivateKey, sighash, i, script, satoshis)
+  return bsv.Transaction.sighash.sign(tx, bobPrivateKey, sighash, i, script, satoshis).toTxFormat().toString('hex')
 }
 const paymentSignatureCallback = async (tx, i, script, satoshis) => {
-  return bsv.Transaction.sighash.sign(tx, fundingPrivateKey, sighash, i, script, satoshis)
+  return bsv.Transaction.sighash.sign(tx, fundingPrivateKey, sighash, i, script, satoshis).toTxFormat().toString('hex')
 }
 
 beforeEach(async () => {

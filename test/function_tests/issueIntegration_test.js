@@ -34,10 +34,10 @@ let symbol
 const wait = 5000 // due to delay in token issuance
 
 const issuerSignatureCallback = async (tx, i, script, satoshis) => {
-  return bsv.Transaction.sighash.sign(tx, issuerPrivateKey, sighash, i, script, satoshis)
+  return bsv.Transaction.sighash.sign(tx, issuerPrivateKey, sighash, i, script, satoshis).toTxFormat().toString('hex')
 }
 const paymentSignatureCallback = async (tx, i, script, satoshis) => {
-  return bsv.Transaction.sighash.sign(tx, fundingPrivateKey, sighash, i, script, satoshis)
+  return bsv.Transaction.sighash.sign(tx, fundingPrivateKey, sighash, i, script, satoshis).toTxFormat().toString('hex')
 }
 
 beforeEach(async () => {

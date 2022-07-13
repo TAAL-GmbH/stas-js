@@ -33,10 +33,10 @@ let issueTxid
 let issueTx
 
 const aliceSignatureCallback = async (tx, i, script, satoshis) => {
-  return bsv.Transaction.sighash.sign(tx, alicePrivateKey, sighash, i, script, satoshis)
+  return bsv.Transaction.sighash.sign(tx, alicePrivateKey, sighash, i, script, satoshis).toTxFormat().toString('hex')
 }
 const paymentSignatureCallback = async (tx, i, script, satoshis) => {
-  return bsv.Transaction.sighash.sign(tx, fundingPrivateKey, sighash, i, script, satoshis)
+  return bsv.Transaction.sighash.sign(tx, fundingPrivateKey, sighash, i, script, satoshis).toTxFormat().toString('hex')
 }
 
 beforeEach(async () => {
