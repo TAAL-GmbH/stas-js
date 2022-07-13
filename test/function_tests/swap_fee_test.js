@@ -27,19 +27,16 @@ let fundingPrivateKey
 let bobPrivateKey
 let alicePrivateKey
 let bobAddr
-let aliceAddr
 let paymentPublicKeyHash
 let tokenAIssueHex
 let tokenBIssueHex
 let tokenAObj
 let tokenBObj
 let tokenBIssueTx
-let tokenAIssueTxid
 let tokenBIssueTxid
 let fundingUTXO
 let alicePublicKeyHash
 let bobPublicKeyHash
-let fundingPublicKeyHash
 let tokenASymbol
 let tokenBSymbol
 
@@ -65,7 +62,7 @@ describe('atomic swap', function () {
 
     const wantedInfo = { scriptHex: takerStasInputScriptHex, satoshis: makerOutputSatoshis }
 
-    const unsignedSwapOfferHex = createUnsignedSwapOffer(
+    const unsignedSwapOfferHex = await createUnsignedSwapOffer(
       alicePrivateKey,
       makerInputUtxo,
       wantedInfo
@@ -73,11 +70,11 @@ describe('atomic swap', function () {
     console.log('funding ' + fundingUTXO.amount)
 
     // now bob takes the offer
-    const takerSignedSwapHex = acceptUnsignedSwapOffer(unsignedSwapOfferHex, tokenBIssueHex,
+    const takerSignedSwapHex = await acceptUnsignedSwapOffer(unsignedSwapOfferHex, tokenBIssueHex,
       bobPrivateKey, tokenAIssueHex, 0, takerInputSatoshis, takerOutputSatoshis, alicePublicKeyHash,
       fundingUTXO, fundingPrivateKey)
 
-    const fullySignedSwapHex = makerSignSwapOffer(takerSignedSwapHex, tokenBIssueHex, tokenAIssueHex, alicePrivateKey, bobPublicKeyHash, paymentPublicKeyHash, fundingUTXO)
+    const fullySignedSwapHex = await makerSignSwapOffer(takerSignedSwapHex, tokenBIssueHex, tokenAIssueHex, alicePrivateKey, bobPublicKeyHash, paymentPublicKeyHash, fundingUTXO)
     console.log(fullySignedSwapHex)
     const swapTxid = await broadcast(fullySignedSwapHex)
     console.log('swaptxid ', swapTxid)
@@ -117,7 +114,7 @@ async function setup () {
   tokenASymbol = 'TOKENA'
   const tokenASupply = 6000
   const tokenASchema = utils.schema(tokenAIssuerPublicKeyHash, tokenASymbol, tokenASupply)
-  const tokenAContractHex = contract(
+  const tokenAContractHex = await contract(
     tokenAIssuerPrivateKey,
     tokenAContractUtxos,
     tokenAFundingUtxos,
@@ -128,7 +125,7 @@ async function setup () {
   const tokenAContractTxid = await broadcast(tokenAContractHex)
   const tokenAContractTx = await getTransaction(tokenAContractTxid)
 
-  tokenAIssueHex = issue(
+  tokenAIssueHex = await issue(
     tokenAIssuerPrivateKey,
     [{
       addr: bobAddr,
@@ -180,7 +177,7 @@ async function setup () {
   const tokenBContractTxid = await broadcast(tokenBContractHex)
   const tokenBContractTx = await getTransaction(tokenBContractTxid)
 
-  tokenBIssueHex = issue(
+  tokenBIssueHex = await issue(
     tokenBIssuerPrivateKey,
     [{
       addr: bobAddr,

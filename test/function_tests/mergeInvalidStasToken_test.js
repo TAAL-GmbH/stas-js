@@ -43,7 +43,7 @@ it('Merge Invalid Token Invalidates both token utxos', async () => {
   const symbol = 'TAALT'
   const schema = utils.schema(publicKeyHash, symbol, supply)
 
-  const contractHex = contract(
+  const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
     fundingUtxos,
@@ -69,7 +69,7 @@ it('Merge Invalid Token Invalidates both token utxos', async () => {
   ]
   let issueHex
   try {
-    issueHex = issue(
+    issueHex = await issue(
       issuerPrivateKey,
       issueInfo,
       {
@@ -97,7 +97,7 @@ it('Merge Invalid Token Invalidates both token utxos', async () => {
   console.log(`Issue TX:        ${issueTxid}`)
   const issueTx = await getTransaction(issueTxid)
 
-  const transferhex = transfer(
+  const transferhex = await transfer(
     alicePrivateKey,
     {
       txid: issueTxid,
@@ -131,7 +131,7 @@ it('Merge Invalid Token Invalidates both token utxos', async () => {
   const txId = await broadcast(tx.serialize(true))
   const attackerObj = new bsv.Transaction(tx.serialize(true))
 
-  const mergeHex = merge(
+  const mergeHex = await merge(
     attackerPrivateKey,
     [{
       tx: validSplit,

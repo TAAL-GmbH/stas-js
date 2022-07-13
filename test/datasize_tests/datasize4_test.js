@@ -44,7 +44,7 @@ it('Symbol 1 Byte Data Size Zero Bytes', async () => {
       data: data
     }
   ]
-  const issueHex = issue(
+  const issueHex = await issue(
     issuerPrivateKey,
     issueInfo,
     utils.getUtxo(contractTxid, contractTx, 0),
@@ -65,7 +65,7 @@ it('Symbol 1 Byte Data Size Zero Bytes', async () => {
   expect(response.symbol).to.equal(symbol)
   const issueTx = await getTransaction(issueTxid)
 
-  const redeemHex = redeem(
+  const redeemHex = await redeem(
     alicePrivateKey,
     issuerPrivateKey.publicKey,
     utils.getUtxo(issueTxid, issueTx, 0),
@@ -89,7 +89,7 @@ it('Symbol 1 Byte Data Size 1 Byte', async () => {
       data: data
     }
   ]
-  const issueHex = issue(
+  const issueHex = await issue(
     issuerPrivateKey,
     issueInfo,
     utils.getUtxo(contractTxid, contractTx, 0),
@@ -108,7 +108,7 @@ it('Symbol 1 Byte Data Size 1 Byte', async () => {
   expect(response.symbol).to.equal(symbol)
   const issueTx = await getTransaction(issueTxid)
 
-  const redeemHex = redeem(
+  const redeemHex = await redeem(
     alicePrivateKey,
     issuerPrivateKey.publicKey,
     utils.getUtxo(issueTxid, issueTx, 0),
@@ -132,7 +132,7 @@ it('Symbol 1 Byte Data Size < 75 Bytes', async () => {
       data: data
     }
   ]
-  const issueHex = issue(
+  const issueHex = await issue(
     issuerPrivateKey,
     issueInfo,
     utils.getUtxo(contractTxid, contractTx, 0),
@@ -151,7 +151,7 @@ it('Symbol 1 Byte Data Size < 75 Bytes', async () => {
   expect(response.symbol).to.equal(symbol)
   const issueTx = await getTransaction(issueTxid)
 
-  const redeemHex = redeem(
+  const redeemHex = await redeem(
     alicePrivateKey,
     issuerPrivateKey.publicKey,
     utils.getUtxo(issueTxid, issueTx, 0),
@@ -175,7 +175,7 @@ it('Symbol 1 Byte Data Size < 128 Bytes', async () => {
       data: data
     }
   ]
-  const issueHex = issue(
+  const issueHex = await issue(
     issuerPrivateKey,
     issueInfo,
     utils.getUtxo(contractTxid, contractTx, 0),
@@ -194,7 +194,7 @@ it('Symbol 1 Byte Data Size < 128 Bytes', async () => {
   expect(response.symbol).to.equal(symbol)
   const issueTx = await getTransaction(issueTxid)
 
-  const redeemHex = redeem(
+  const redeemHex = await redeem(
     alicePrivateKey,
     issuerPrivateKey.publicKey,
     utils.getUtxo(issueTxid, issueTx, 0),
@@ -218,7 +218,7 @@ it('Symbol 1 Byte Data Size > 128 Bytes', async () => {
       data: data
     }
   ]
-  const issueHex = issue(
+  const issueHex = await issue(
     issuerPrivateKey,
     issueInfo,
     utils.getUtxo(contractTxid, contractTx, 0),
@@ -237,7 +237,7 @@ it('Symbol 1 Byte Data Size > 128 Bytes', async () => {
   expect(response.symbol).to.equal(symbol)
   const issueTx = await getTransaction(issueTxid)
 
-  const redeemHex = redeem(
+  const redeemHex = await redeem(
     alicePrivateKey,
     issuerPrivateKey.publicKey,
     utils.getUtxo(issueTxid, issueTx, 0),
@@ -260,7 +260,7 @@ it('Symbol 1 Byte Data Size > 32768 Bytes', async () => {
       data: utils.addData(33)
     }
   ]
-  const issueHex = issue(
+  const issueHex = await issue(
     issuerPrivateKey,
     issueInfo,
     utils.getUtxo(contractTxid, contractTx, 0),
@@ -279,7 +279,7 @@ it('Symbol 1 Byte Data Size > 32768 Bytes', async () => {
   expect(response.symbol).to.equal(symbol)
   const issueTx = await getTransaction(issueTxid)
 
-  const redeemHex = redeem(
+  const redeemHex = await redeem(
     alicePrivateKey,
     issuerPrivateKey.publicKey,
     utils.getUtxo(issueTxid, issueTx, 0),
@@ -303,7 +303,7 @@ it('Symbol 1 Byte Data Size < 32768 Bytes', async () => {
       data: utils.addData(32)
     }
   ]
-  const issueHex = issue(
+  const issueHex = await issue(
     issuerPrivateKey,
     issueInfo,
     utils.getUtxo(contractTxid, contractTx, 0),
@@ -322,7 +322,7 @@ it('Symbol 1 Byte Data Size < 32768 Bytes', async () => {
   expect(response.symbol).to.equal(symbol)
   const issueTx = await getTransaction(issueTxid)
 
-  const redeemHex = redeem(
+  const redeemHex = await redeem(
     alicePrivateKey,
     issuerPrivateKey.publicKey,
     utils.getUtxo(issueTxid, issueTx, 0),
@@ -346,7 +346,7 @@ it('Symbol 1 Byte Data Size Large', async () => {
       data: utils.addData(48)
     }
   ]
-  const issueHex = issue(
+  const issueHex = await issue(
     issuerPrivateKey,
     issueInfo,
     utils.getUtxo(contractTxid, contractTx, 0),
@@ -365,7 +365,7 @@ it('Symbol 1 Byte Data Size Large', async () => {
   expect(response.symbol).to.equal(symbol)
   const issueTx = await getTransaction(issueTxid)
 
-  const redeemHex = redeem(
+  const redeemHex = await redeem(
     alicePrivateKey,
     issuerPrivateKey.publicKey,
     utils.getUtxo(issueTxid, issueTx, 0),
@@ -390,7 +390,7 @@ async function setup () {
   const supply = 10000
   const schema = utils.schema(publicKeyHash, symbol, supply)
 
-  const contractHex = contract(
+  const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
     fundingUtxos,

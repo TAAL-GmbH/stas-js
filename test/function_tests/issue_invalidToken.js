@@ -36,7 +36,7 @@ beforeEach(async () => {
   const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(incorrectPrivateKey.publicKey.toBuffer()).toString('hex')
   const schema = utils.schema(publicKeyHash, symbol, supply)
 
-  const contractHex = contract(
+  const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
     fundingUtxos,
@@ -49,7 +49,7 @@ beforeEach(async () => {
 })
 
 it('Attempt to issue invalid token', async () => {
-  const issueHex = issue(
+  const issueHex = await issue(
     issuerPrivateKey,
     issueInfo(),
     contractUtxo(),

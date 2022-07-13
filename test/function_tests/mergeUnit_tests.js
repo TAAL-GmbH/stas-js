@@ -40,7 +40,7 @@ beforeAll(async () => {
 
 it('Merge - Attempt to Merge More Than 2 Tokens', async () => {
   try {
-    merge(
+    await merge(
       bobPrivateKey,
       [{
         tx: splitTxObj,
@@ -68,7 +68,7 @@ it('Merge - Attempt to Merge More Than 2 Tokens', async () => {
 
 it('Merge - Attempt to Merge Less Than Two Tokens', async () => {
   try {
-    merge(
+    await merge(
       bobPrivateKey,
       [{
         tx: splitTxObj,
@@ -89,7 +89,7 @@ it('Merge - Attempt to Merge Less Than Two Tokens', async () => {
 it('Merge - Send Merged UTXO to issuer throws error', async () => {
   const issuerAddress = issuerPrivateKey.toAddress(process.env.NETWORK).toString()
   try {
-    merge(
+    await merge(
       bobPrivateKey,
       utils.getMergeUtxo(splitTxObj),
       issuerAddress,
@@ -106,7 +106,7 @@ it('Merge - Send Merged UTXO to issuer throws error', async () => {
 
 it('Merge - Null Token Owner Private Key Throws Error', async () => {
   try {
-    merge(
+    await merge(
       null,
       utils.getMergeUtxo(splitTxObj),
       aliceAddr,
@@ -123,7 +123,7 @@ it('Merge - Null Token Owner Private Key Throws Error', async () => {
 
 it('Merge - Null Merge STAS UTXO Throws Error', async () => {
   try {
-    merge(
+    await merge(
       bobPrivateKey,
       null,
       aliceAddr,
@@ -140,7 +140,7 @@ it('Merge - Null Merge STAS UTXO Throws Error', async () => {
 
 it('Merge - Null Destination Address Throws Error', async () => {
   try {
-    merge(
+    await merge(
       bobPrivateKey,
       utils.getMergeUtxo(splitTxObj),
       null,
@@ -157,7 +157,7 @@ it('Merge - Null Destination Address Throws Error', async () => {
 
 it('Merge - Null Funding Private Key Throws Error', async () => {
   try {
-    merge(
+    await merge(
       bobPrivateKey,
       utils.getMergeUtxo(splitTxObj),
       aliceAddr,
@@ -186,7 +186,7 @@ async function setup () {
   const supply = 10000
   const schema = utils.schema(publicKeyHash, symbol, supply)
 
-  const contractHex = contract(
+  const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
     fundingUtxos,
@@ -197,7 +197,7 @@ async function setup () {
   contractTxid = await broadcast(contractHex)
   contractTx = await getTransaction(contractTxid)
 
-  const issueHex = issue(
+  const issueHex = await issue(
     issuerPrivateKey,
     utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
     utils.getUtxo(contractTxid, contractTx, 0),
@@ -218,7 +218,7 @@ async function setup () {
   splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount1) }
   splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
 
-  const splitHex = split(
+  const splitHex = await split(
     alicePrivateKey,
     utils.getUtxo(issueTxid, issueTx, 0),
     splitDestinations,

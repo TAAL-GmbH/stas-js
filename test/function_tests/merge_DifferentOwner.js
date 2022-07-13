@@ -36,7 +36,7 @@ it('Attempt To Merge Token with Different Owners Via SDK Throws Error',
     const invalidSplitTxObj = await invalidToken()
 
     try {
-      merge(
+      await merge(
         bobPrivateKey,
         [{
           tx: validSplitTxObj,
@@ -68,7 +68,7 @@ it(
     const validSplitTxObj = await validToken()
     const invalidSplitTxObj = await invalidToken()
 
-    const mergeHex = mergeUtil.mergeWithOutValidation(
+    const mergeHex = await mergeUtil.mergeWithOutValidation(
       bobPrivateKey,
       [{
         tx: validSplitTxObj,
@@ -104,7 +104,7 @@ async function validToken () {
   const schema = utils.schema(publicKeyHash, symbol, supply)
 
   // change goes back to the fundingPrivateKey
-  const contractHex = contract(
+  const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
     fundingUtxos,
@@ -130,7 +130,7 @@ async function validToken () {
   ]
   let issueHex
   try {
-    issueHex = issue(
+    issueHex = await issue(
       issuerPrivateKey,
       issueInfo,
       {
@@ -160,7 +160,7 @@ async function validToken () {
 
   const issueOutFundingVout = issueTx.vout.length - 1
 
-  const transferHex = transfer(
+  const transferHex = await transfer(
     bobPrivateKey,
     {
       txid: issueTxid,
@@ -188,7 +188,7 @@ async function validToken () {
   splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount1) }
   splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
 
-  const splitHex = split(
+  const splitHex = await split(
     alicePrivateKey,
     {
       txid: transferTxid,
@@ -226,7 +226,7 @@ async function invalidToken () {
   const schema = utils.schema(publicKeyHash, symbol, supply)
 
   // change goes back to the fundingPrivateKey
-  const contractHex = contract(
+  const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
     fundingUtxos,
@@ -252,7 +252,7 @@ async function invalidToken () {
   ]
   let issueHex
   try {
-    issueHex = issue(
+    issueHex = await issue(
       issuerPrivateKey,
       issueInfo,
       {
@@ -282,7 +282,7 @@ async function invalidToken () {
 
   const issueOutFundingVout = issueTx.vout.length - 1
 
-  const transferHex = transfer(
+  const transferHex = await transfer(
     bobPrivateKey,
     {
       txid: issueTxid,
@@ -310,7 +310,7 @@ async function invalidToken () {
   splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount1) }
   splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
 
-  const splitHex = split(
+  const splitHex = await split(
     alicePrivateKey,
     {
       txid: transferTxid,

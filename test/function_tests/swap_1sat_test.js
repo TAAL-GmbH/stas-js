@@ -6,9 +6,6 @@ require('dotenv').config()
 
 const {
 
-  createSwapOffer,
-  acceptSwapOffer,
-  allInOneSwap,
   createUnsignedSwapOffer,
   acceptUnsignedSwapOffer,
   acceptUnsignedNativeSwapOffer,
@@ -39,7 +36,6 @@ let tokenBIssueHex
 let tokenAObj
 let tokenBObj
 let tokenBIssueTx
-let tokenAIssueTxid
 let tokenBIssueTxid
 let fundingUTXO
 let alicePublicKeyHash
@@ -73,17 +69,17 @@ describe('atomic swap', function () {
     const wantedInfo = { type: 'native', satoshis: makerOutputSatoshis }
     const takerInputInfo = { type: 'native', utxo: bobUtxos[0], satoshis: takerInputSatoshis }
 
-    const unsignedSwapOfferHex = createUnsignedSwapOffer(
+    const unsignedSwapOfferHex = await createUnsignedSwapOffer(
       alicePrivateKey,
       makerInputUtxo,
       wantedInfo
     )
 
-    const takerSignedSwapHex = acceptUnsignedNativeSwapOffer(unsignedSwapOfferHex, takerInputInfo, tokenBIssueHex,
+    const takerSignedSwapHex = await acceptUnsignedNativeSwapOffer(unsignedSwapOfferHex, takerInputInfo, tokenBIssueHex,
       bobPrivateKey, takerInputTx, bobUtxos[0].vout, takerOutputSatoshis, alicePublicKeyHash,
       fundingUTXO, fundingPrivateKey)
 
-    const fullySignedSwapHex = makerSignSwapOffer(takerSignedSwapHex, tokenBIssueHex, takerInputTx, alicePrivateKey, bobPublicKeyHash, paymentPublicKeyHash, fundingUTXO)
+    const fullySignedSwapHex = await makerSignSwapOffer(takerSignedSwapHex, tokenBIssueHex, takerInputTx, alicePrivateKey, bobPublicKeyHash, paymentPublicKeyHash, fundingUTXO)
     const swapTxid = await broadcast(fullySignedSwapHex)
     console.log('swaptxid', swapTxid)
     const tokenId = await utils.getToken(swapTxid, 1)
@@ -108,18 +104,18 @@ describe('atomic swap', function () {
 
     const wantedInfo = { scriptHex: takerStasInputScriptHex, satoshis: makerOutputSatoshis }
 
-    const unsignedSwapOfferHex = createUnsignedSwapOffer(
+    const unsignedSwapOfferHex = await createUnsignedSwapOffer(
       alicePrivateKey,
       aliceUtxos[0],
       wantedInfo
     )
 
     // now bob takes the offer
-    const takerSignedSwapHex = acceptUnsignedSwapOffer(unsignedSwapOfferHex, makerInputTx,
+    const takerSignedSwapHex = await acceptUnsignedSwapOffer(unsignedSwapOfferHex, makerInputTx,
       bobPrivateKey, tokenAIssueHex, 0, takerInputSatoshis, takerOutputSatoshis, alicePublicKeyHash,
       fundingUTXO, fundingPrivateKey)
 
-    const fullySignedSwapHex = makerSignSwapOffer(takerSignedSwapHex, makerInputTx, tokenAIssueHex, alicePrivateKey, bobPublicKeyHash, paymentPublicKeyHash, fundingUTXO)
+    const fullySignedSwapHex = await makerSignSwapOffer(takerSignedSwapHex, makerInputTx, tokenAIssueHex, alicePrivateKey, bobPublicKeyHash, paymentPublicKeyHash, fundingUTXO)
     const swapTxid = await broadcast(fullySignedSwapHex)
     console.log('swaptxid ', swapTxid)
     const tokenId = await utils.getToken(swapTxid, 0)
@@ -165,7 +161,7 @@ async function setup () {
   const tokenAContractTxid = await broadcast(tokenAContractHex)
   const tokenAContractTx = await getTransaction(tokenAContractTxid)
 
-  tokenAIssueHex = issue(
+  tokenAIssueHex = await issue(
     tokenAIssuerPrivateKey,
     [{
       addr: bobAddr,
@@ -186,7 +182,7 @@ async function setup () {
   tokenBSymbol = 'TOKENB'
   const tokenBSupply = 1
   const tokenBSchema = utils.schema(tokenBIssuerPublicKeyHash, tokenBSymbol, tokenBSupply)
-  const tokenBContractHex = contract(
+  const tokenBContractHex = await contract(
     tokenBIssuerPrivateKey,
     tokenBContractUtxos,
     tokenBFundingUtxos,
@@ -197,7 +193,7 @@ async function setup () {
   const tokenBContractTxid = await broadcast(tokenBContractHex)
   const tokenBContractTx = await getTransaction(tokenBContractTxid)
 
-  tokenBIssueHex = issue(
+  tokenBIssueHex = await issue(
     tokenBIssuerPrivateKey,
     [{
       addr: aliceAddr,

@@ -12,11 +12,11 @@ const {
   broadcast
 } = require('../../index').utils
 
-const ownerSignCallback = (tx) => {
+const ownerSignCallback = async (tx) => {
   tx.sign(issuerPrivateKey)
 }
 
-const paymentSignCallback = (tx) => {
+const paymentSignCallback = async (tx) => {
   tx.sign(fundingPrivateKey)
 }
 
@@ -34,7 +34,7 @@ beforeEach(async () => {
 })
 
 it('Contract - Successful With Fees', async () => {
-  const contractHex = contract(
+  const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
     fundingUtxos,
@@ -48,7 +48,7 @@ it('Contract - Successful With Fees', async () => {
 })
 
 it('Contract - Successful No Fees', async () => {
-  const contractHex = contract(
+  const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
     null,
@@ -62,7 +62,7 @@ it('Contract - Successful No Fees', async () => {
 })
 
 it('Contract - Successful No Fees Empty Array', async () => {
-  const contractHex = contract(
+  const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
     [],
@@ -76,7 +76,7 @@ it('Contract - Successful No Fees Empty Array', async () => {
 })
 
 it('Contract - Successful With Callback Fee', async () => {
-  const contractHex = contractWithCallback(
+  const contractHex = await contractWithCallback(
     issuerPrivateKey.publicKey,
     contractUtxos,
     fundingUtxos,
@@ -92,7 +92,7 @@ it('Contract - Successful With Callback Fee', async () => {
 })
 
 it('Contract - Successful With Callback No Fee', async () => {
-  const contractHex = contractWithCallback(
+  const contractHex = await contractWithCallback(
     issuerPrivateKey.publicKey,
     contractUtxos,
     null,
@@ -109,7 +109,7 @@ it('Contract - Successful With Callback No Fee', async () => {
 
 it('Contract - Wrong Funding Private Key Throws Error', async () => {
   const incorrectPrivateKey = bsv.PrivateKey()
-  const contractHex = contract(
+  const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
     fundingUtxos,
@@ -128,7 +128,7 @@ it('Contract - Wrong Funding Private Key Throws Error', async () => {
 
 it('Contract - Wrong Contract Private Key Throws Error', async () => {
   const incorrectPrivateKey = bsv.PrivateKey()
-  const contractHex = contract(
+  const contractHex = await contract(
     incorrectPrivateKey,
     contractUtxos,
     fundingUtxos,

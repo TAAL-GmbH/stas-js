@@ -43,7 +43,7 @@ beforeEach(async () => {
 
 // failing due to https://taaltech.atlassian.net/browse/BPAAS-64
 it('Merge - Successful Merge With Fee', async () => {
-  const mergeHex = merge(
+  const mergeHex = await merge(
     bobPrivateKey,
     [{
       tx: issueObj1,
@@ -92,7 +92,7 @@ async function setup () {
     }
   ]
 
-  const contractHex = contract(
+  const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
     fundingUtxos,
@@ -103,7 +103,7 @@ async function setup () {
   contractTxid = await broadcast(contractHex)
   contractTx = await getTransaction(contractTxid)
 
-  const issueHex = issue(
+  const issueHex = await issue(
     issuerPrivateKey,
     issueInfo,
     utils.getUtxo(contractTxid, contractTx, 0),
@@ -117,7 +117,7 @@ async function setup () {
   issueTx = await getTransaction(issueTxid)
   issueObj1 = bsv.Transaction(issueHex)
 
-  const contractHex2 = contract(
+  const contractHex2 = await contract(
     issuerPrivateKey,
     contractUtxos2,
     fundingUtxos2,
@@ -128,7 +128,7 @@ async function setup () {
   const contractTxid2 = await broadcast(contractHex2)
   const contractTx2 = await getTransaction(contractTxid2)
 
-  const issueHex2 = issue(
+  const issueHex2 = await issue(
     issuerPrivateKey,
     issueInfo,
     utils.getUtxo(contractTxid2, contractTx2, 0),

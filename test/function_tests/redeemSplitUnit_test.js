@@ -44,7 +44,7 @@ it('RedeemSplit - Too Many Outputs Throws Error', async () => {
   rSplitDestinations[2] = { address: daveAddr, amount: amount }
   rSplitDestinations[3] = { address: emmaAddr, amount: amount }
   try {
-    redeemSplit(
+    await redeemSplit(
       alicePrivateKey,
       issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
@@ -66,7 +66,7 @@ it('RedeemSplit - Add Too Much To Split Throws Error', async () => {
   splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount) }
   const issueOutFundingVout = issueTx.vout.length - 1
   try {
-    redeemSplit(
+    await redeemSplit(
       alicePrivateKey,
       issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
@@ -90,7 +90,7 @@ it('RedeemSplit - Address Too Short Throws Error', async () => {
   splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
   const issueOutFundingVout = issueTx.vout.length - 1
   try {
-    redeemSplit(
+    await redeemSplit(
       alicePrivateKey,
       issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
@@ -115,7 +115,7 @@ it('RedeemSplit - Address Too Long Throws Error', async () => {
   splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
   const issueOutFundingVout = issueTx.vout.length - 1
   try {
-    redeemSplit(
+    await redeemSplit(
       alicePrivateKey,
       issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
@@ -143,7 +143,7 @@ it(
     splitDestinations[4] = { address: bobAddr, amount: bobAmount }
     const issueOutFundingVout = issueTx.vout.length - 1
     try {
-      redeemSplit(
+      await redeemSplit(
         alicePrivateKey,
         issuerPrivateKey.publicKey,
         utils.getUtxo(issueTxid, issueTx, 0),
@@ -170,7 +170,7 @@ it(
 
     const issueOutFundingVout = issueTx.vout.length - 1
     try {
-      redeemSplit(
+      await redeemSplit(
         null,
         issuerPrivateKey.publicKey,
         utils.getUtxo(issueTxid, issueTx, 0),
@@ -195,7 +195,7 @@ it('RedeemSplit - Null STAS UTXO Throws Error', async () => {
 
   const issueOutFundingVout = issueTx.vout.length - 1
   try {
-    redeemSplit(
+    await redeemSplit(
       alicePrivateKey,
       issuerPrivateKey.publicKey,
       null,
@@ -214,7 +214,7 @@ it('RedeemSplit - Null STAS UTXO Throws Error', async () => {
 it('RedeemSplit - Null Split Destinations Throws Error', async () => {
   const issueOutFundingVout = issueTx.vout.length - 1
   try {
-    redeemSplit(
+    await redeemSplit(
       alicePrivateKey,
       issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
@@ -234,7 +234,7 @@ it('RedeemSplit - Empty Split Destinations Throws Error', async () => {
   const splitDestinations = []
   const issueOutFundingVout = issueTx.vout.length - 1
   try {
-    redeemSplit(
+    await redeemSplit(
       alicePrivateKey,
       issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
@@ -258,7 +258,7 @@ it('RedeemSplit - Null Funding Private Key Throws Error', async () => {
 
   const issueOutFundingVout = issueTx.vout.length - 1
   try {
-    redeemSplit(
+    await redeemSplit(
       alicePrivateKey,
       issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
@@ -282,7 +282,7 @@ it('RedeemSplit - Null Contract Public Key Throws Error', async () => {
 
   const issueOutFundingVout = issueTx.vout.length - 1
   try {
-    redeemSplit(
+    await redeemSplit(
       alicePrivateKey,
       null,
       utils.getUtxo(issueTxid, issueTx, 0),
@@ -312,7 +312,7 @@ async function setup () {
   const supply = 10000
   const schema = utils.schema(publicKeyHash, symbol, supply)
 
-  const contractHex = contract(
+  const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
     fundingUtxos,
@@ -323,7 +323,7 @@ async function setup () {
   const contractTxid = await broadcast(contractHex)
   const contractTx = await getTransaction(contractTxid)
 
-  const issueHex = issue(
+  const issueHex = await issue(
     issuerPrivateKey,
     utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
     utils.getUtxo(contractTxid, contractTx, 0),

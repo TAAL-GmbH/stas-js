@@ -38,10 +38,10 @@ let issueTx
 let issueTxid
 const wait = 5000
 
-const bobSignatureCallback = (tx, i, script, satoshis) => {
+const bobSignatureCallback = async (tx, i, script, satoshis) => {
   return bsv.Transaction.sighash.sign(tx, bobPrivateKey, sighash, i, script, satoshis)
 }
-const paymentSignatureCallback = (tx, i, script, satoshis) => {
+const paymentSignatureCallback = async (tx, i, script, satoshis) => {
   return bsv.Transaction.sighash.sign(tx, fundingPrivateKey, sighash, i, script, satoshis)
 }
 
@@ -50,7 +50,7 @@ beforeEach(async () => {
 })
 
 it('Merge - Successful Merge With Fee', async () => {
-  const mergeHex = merge(
+  const mergeHex = await merge(
     bobPrivateKey,
     utils.getMergeUtxo(splitTxObj),
     aliceAddr,
@@ -68,7 +68,7 @@ it('Merge - Successful Merge With Fee', async () => {
 })
 
 it('Merge - Successful Merge With Fee 2', async () => {
-  const mergeHex = merge(
+  const mergeHex = await merge(
     bobPrivateKey,
     utils.getMergeUtxo(splitTxObj),
     bobAddr,
@@ -86,7 +86,7 @@ it('Merge - Successful Merge With Fee 2', async () => {
 })
 
 it('Merge - Merge With No Fee', async () => {
-  const mergeHex = merge(
+  const mergeHex = await merge(
     bobPrivateKey,
     utils.getMergeUtxo(splitTxObj),
     aliceAddr,
@@ -104,7 +104,7 @@ it('Merge - Merge With No Fee', async () => {
 })
 
 it('Merge - Successful Merge With Callback And Fee', async () => {
-  const mergeHex = mergeWithCallback(
+  const mergeHex = await mergeWithCallback(
     bobPrivateKey.publicKey,
     utils.getMergeUtxo(splitTxObj),
     aliceAddr,
@@ -124,7 +124,7 @@ it('Merge - Successful Merge With Callback And Fee', async () => {
 })
 
 it('Merge - Successful Merge With Callback And No Fee', async () => {
-  const mergeHex = mergeWithCallback(
+  const mergeHex = await mergeWithCallback(
     bobPrivateKey.publicKey,
     utils.getMergeUtxo(splitTxObj),
     aliceAddr,
@@ -145,7 +145,7 @@ it('Merge - Successful Merge With Callback And No Fee', async () => {
 
 it('Merge - Incorrect Owner Private Key Throws Error', async () => {
   const incorrectPrivateKey = bsv.PrivateKey()
-  const mergeHex = merge(
+  const mergeHex = await merge(
     incorrectPrivateKey,
     utils.getMergeUtxo(splitTxObj),
     aliceAddr,
@@ -164,7 +164,7 @@ it('Merge - Incorrect Owner Private Key Throws Error', async () => {
 
 it('Merge - Incorrect Funding Private Key Throws Error', async () => {
   const incorrectPrivateKey = bsv.PrivateKey()
-  const mergeHex = merge(
+  const mergeHex = await merge(
     bobPrivateKey,
     utils.getMergeUtxo(splitTxObj),
     aliceAddr,
@@ -195,7 +195,7 @@ async function setup () {
   const supply = 10000
   const schema = utils.schema(publicKeyHash, symbol, supply)
 
-  const contractHex = contract(
+  const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
     fundingUtxos,
@@ -206,7 +206,7 @@ async function setup () {
   contractTxid = await broadcast(contractHex)
   contractTx = await getTransaction(contractTxid)
 
-  const issueHex = issue(
+  const issueHex = await issue(
     issuerPrivateKey,
     utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
     utils.getUtxo(contractTxid, contractTx, 0),
@@ -227,7 +227,7 @@ async function setup () {
   splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount1) }
   splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
 
-  const splitHex = split(
+  const splitHex = await split(
     alicePrivateKey,
     utils.getUtxo(issueTxid, issueTx, 0),
     splitDestinations,

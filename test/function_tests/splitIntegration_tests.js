@@ -32,10 +32,10 @@ let issueTxid
 let issueTx
 const wait = 10000
 
-const aliceSignatureCallback = (tx, i, script, satoshis) => {
+const aliceSignatureCallback = async (tx, i, script, satoshis) => {
   return bsv.Transaction.sighash.sign(tx, alicePrivateKey, sighash, i, script, satoshis)
 }
-const paymentSignatureCallback = (tx, i, script, satoshis) => {
+const paymentSignatureCallback = async (tx, i, script, satoshis) => {
   return bsv.Transaction.sighash.sign(tx, fundingPrivateKey, sighash, i, script, satoshis)
 }
 
@@ -51,7 +51,7 @@ it('Split - Successful Split Into Two Tokens With Fee', async () => {
   splitDestinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(bobAmount1) } // 3500 tokens
   splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) } // 3500 tokens
 
-  const splitHex = split(
+  const splitHex = await split(
     alicePrivateKey,
     utils.getUtxo(issueTxid, issueTx, 0),
     splitDestinations,
@@ -75,7 +75,7 @@ it('Split - Successful Split Into Three Tokens', async () => {
   splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
   splitDestinations[2] = { address: aliceAddr, amount: bitcoinToSatoshis(bobAmount3) }
 
-  const splitHex = split(
+  const splitHex = await split(
     alicePrivateKey,
     utils.getUtxo(issueTxid, issueTx, 0),
     splitDestinations,
@@ -99,7 +99,7 @@ it('Split - Successful Split Into Four Tokens 1', async () => {
   splitDestinations[2] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
   splitDestinations[3] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
 
-  const splitHex = split(
+  const splitHex = await split(
     alicePrivateKey,
     utils.getUtxo(issueTxid, issueTx, 0),
     splitDestinations,
@@ -128,7 +128,7 @@ it('Split - Successful Split Into Four Tokens 2', async () => {
   splitDestinations[2] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
   splitDestinations[3] = { address: aliceAddr, amount: bitcoinToSatoshis(amount) }
 
-  const splitHex = split(
+  const splitHex = await split(
     alicePrivateKey,
     utils.getUtxo(issueTxid, issueTx, 0),
     splitDestinations,
@@ -152,7 +152,7 @@ it('Split - No Split Completes Successfully', async () => {
   const splitDestinations = []
   splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount) }
 
-  const splitHex = split(
+  const splitHex = await split(
     alicePrivateKey,
     utils.getUtxo(issueTxid, issueTx, 0),
     splitDestinations,
@@ -173,7 +173,7 @@ it('Split - Successful Split Into Two Tokens With No Fee',
     splitDestinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(bobAmount1) } // 3500 tokens
     splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) } // 3500 tokens
 
-    const splitHex = split(
+    const splitHex = await split(
       alicePrivateKey,
       utils.getUtxo(issueTxid, issueTx, 0),
       splitDestinations,
@@ -198,7 +198,7 @@ it('Split - Successful Split With Callback and Fee', async () => {
   splitDestinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(bobAmount1) } // 3500 tokens
   splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) } // 3500 tokens
 
-  const splitHex = splitWithCallback(
+  const splitHex = await splitWithCallback(
     alicePrivateKey.publicKey,
     utils.getUtxo(issueTxid, issueTx, 0),
     splitDestinations,
@@ -222,7 +222,7 @@ it('Split - Successful Split With Callback and No Fee ', async () => {
   splitDestinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(bobAmount1) }
   splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
 
-  const splitHex = splitWithCallback(
+  const splitHex = await splitWithCallback(
     alicePrivateKey.publicKey,
     utils.getUtxo(issueTxid, issueTx, 0),
     splitDestinations,
@@ -246,7 +246,7 @@ it('Split - Send to Issuer Address Throws Error', async () => {
   splitDestinations[0] = { address: issuerAddr, amount: bitcoinToSatoshis(bobAmount1) }
   splitDestinations[1] = { address: issuerAddr, amount: bitcoinToSatoshis(bobAmount2) }
   try {
-    split(
+    await split(
       alicePrivateKey,
       utils.getUtxo(issueTxid, issueTx, 0),
       splitDestinations,
@@ -269,7 +269,7 @@ it('Split - Incorrect Owner Private Key Throws Error', async () => {
   splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
   const incorrectPrivateKey = bsv.PrivateKey()
 
-  const splitHex = split(
+  const splitHex = await split(
     incorrectPrivateKey,
     utils.getUtxo(issueTxid, issueTx, 0),
     splitDestinations,
@@ -294,7 +294,7 @@ it('Split - Incorrect Payments Private Key Throws Error', async () => {
   splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
   const incorrectPrivateKey = bsv.PrivateKey()
 
-  const splitHex = split(
+  const splitHex = await split(
     alicePrivateKey,
     utils.getUtxo(issueTxid, issueTx, 0),
     splitDestinations,
@@ -326,7 +326,7 @@ async function setup () {
   const supply = 10000
   const schema = utils.schema(publicKeyHash, symbol, supply)
 
-  const contractHex = contract(
+  const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
     fundingUtxos,
@@ -337,7 +337,7 @@ async function setup () {
   const contractTxid = await broadcast(contractHex)
   const contractTx = await getTransaction(contractTxid)
 
-  const issueHex = issue(
+  const issueHex = await issue(
     issuerPrivateKey,
     utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
     utils.getUtxo(contractTxid, contractTx, 0),

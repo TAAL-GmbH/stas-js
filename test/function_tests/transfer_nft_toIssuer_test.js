@@ -31,7 +31,7 @@ it('Attemmpt to Transfer Non Splittable Token to Issuer', async () => {
 
   const schema = utils.schema(publicKeyHash, symbol, supply)
 
-  const contractHex = contract(
+  const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
     fundingUtxos,
@@ -45,7 +45,7 @@ it('Attemmpt to Transfer Non Splittable Token to Issuer', async () => {
 
   let issueHex
   try {
-    issueHex = issue(
+    issueHex = await issue(
       issuerPrivateKey,
       utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
       utils.getUtxo(contractTxid, contractTx, 0),
@@ -68,7 +68,7 @@ it('Attemmpt to Transfer Non Splittable Token to Issuer', async () => {
 
   const issueOutFundingVout = issueTx.vout.length - 1
   try {
-    transfer(
+    await transfer(
       bobPrivateKey,
       utils.getUtxo(issueTxid, issueTx, 1),
       issuerAddr,

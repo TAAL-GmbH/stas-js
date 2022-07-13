@@ -1,26 +1,19 @@
-// const expect = require('chai').expect
-// const assert = require('chai').assert
 const utils = require('../utils/test_utils')
 const bsv = require('bsv')
-// const assert = require('assert')
 const expect = require('chai').expect
 
 require('dotenv').config()
 
 const {
-  //   createSwapOffer,
-  //   acceptSwapOffer,
-  allInOneSwap,
+
   createUnsignedSwapOffer,
   acceptUnsignedSwapOffer,
-  acceptUnsignedNativeSwapOffer,
   makerSignSwapOffer
 } = require('../../index').swap
 
 const {
   bitcoinToSatoshis,
   getTransaction,
-  getRawTransaction,
   getFundsFromFaucet,
   broadcast
 } = require('../../index').utils
@@ -29,8 +22,6 @@ const {
   contract,
   issue
 } = require('../../index')
-
-// const { sighash } = require('../../lib/stas')
 
 let fundingPrivateKey
 let bobPrivateKey
@@ -71,18 +62,18 @@ describe('atomic swap failing - when token B sats are set to > 2k the broadcast 
 
     const wantedInfo = { scriptHex: takerStasInputScriptHex, satoshis: makerOutputSatoshis }
 
-    const unsignedSwapOfferHex = createUnsignedSwapOffer(
+    const unsignedSwapOfferHex = await createUnsignedSwapOffer(
       alicePrivateKey,
       makerInputUtxo,
       wantedInfo
     )
 
     // now bob takes the offer
-    const takerSignedSwapHex = acceptUnsignedSwapOffer(unsignedSwapOfferHex, tokenBIssueHex,
+    const takerSignedSwapHex = await acceptUnsignedSwapOffer(unsignedSwapOfferHex, tokenBIssueHex,
       bobPrivateKey, tokenAIssueHex, 0, takerInputSatoshis, takerOutputSatoshis, alicePublicKeyHash,
       fundingUTXO, fundingPrivateKey)
 
-    const fullySignedSwapHex = makerSignSwapOffer(takerSignedSwapHex, tokenBIssueHex, tokenAIssueHex, alicePrivateKey, bobPublicKeyHash, paymentPublicKeyHash, fundingUTXO)
+    const fullySignedSwapHex = await makerSignSwapOffer(takerSignedSwapHex, tokenBIssueHex, tokenAIssueHex, alicePrivateKey, bobPublicKeyHash, paymentPublicKeyHash, fundingUTXO)
     console.log(fullySignedSwapHex)
     const swapTxid = await broadcast(fullySignedSwapHex)
     expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.00006)
@@ -116,7 +107,7 @@ async function setup () {
   const tokenASymbol = 'TOKENA'
   const tokenASupply = 6000
   const tokenASchema = utils.schema(tokenAIssuerPublicKeyHash, tokenASymbol, tokenASupply)
-  const tokenAContractHex = contract(
+  const tokenAContractHex = await contract(
     tokenAIssuerPrivateKey,
     tokenAContractUtxos,
     tokenAFundingUtxos,
@@ -127,7 +118,7 @@ async function setup () {
   const tokenAContractTxid = await broadcast(tokenAContractHex)
   const tokenAContractTx = await getTransaction(tokenAContractTxid)
 
-  tokenAIssueHex = issue(
+  tokenAIssueHex = await issue(
     tokenAIssuerPrivateKey,
     [{
       addr: bobAddr,
@@ -148,7 +139,7 @@ async function setup () {
   const tokenBSymbol = 'TOKENB'
   const tokenBSupply = 2000
   const tokenBSchema = utils.schema(tokenBIssuerPublicKeyHash, tokenBSymbol, tokenBSupply)
-  const tokenBContractHex = contract(
+  const tokenBContractHex = await contract(
     tokenBIssuerPrivateKey,
     tokenBContractUtxos,
     tokenBFundingUtxos,
@@ -159,7 +150,7 @@ async function setup () {
   const tokenBContractTxid = await broadcast(tokenBContractHex)
   const tokenBContractTx = await getTransaction(tokenBContractTxid)
 
-  tokenBIssueHex = issue(
+  tokenBIssueHex = await issue(
     tokenBIssuerPrivateKey,
     [{
       addr: aliceAddr,

@@ -41,7 +41,7 @@ it(
   'Issue - Issue to Address with a negative token amount(?)',
   async () => {
     try {
-      issue(
+      await issue(
         issuerPrivateKey,
         utils.getIssueInfo(aliceAddr, 13000, bobAddr, -3000),
         utils.getUtxo(contractTxid, contractTx, 0),
@@ -63,7 +63,7 @@ it(
   'Issue - Issue to Address with Zero Tokens Throws Errror',
   async () => {
     try {
-      issue(
+      await issue(
         issuerPrivateKey,
         utils.getIssueInfo(aliceAddr, 10000, bobAddr, 0),
         utils.getUtxo(contractTxid, contractTx, 0),
@@ -85,7 +85,7 @@ it(
   'Issue - Issue with Incorrect Balance (Less Than) Throws Error',
   async () => {
     try {
-      issue(
+      await issue(
         issuerPrivateKey,
         utils.getIssueInfo(aliceAddr, 5000, bobAddr, 4000),
         utils.getUtxo(contractTxid, contractTx, 0),
@@ -107,7 +107,7 @@ it(
   'Issue - Issue with Incorrect Balance (More Than) Throws Error',
   async () => {
     try {
-      issue(
+      await issue(
         issuerPrivateKey,
         utils.getIssueInfo(aliceAddr, 10000, bobAddr, 3000),
         utils.getUtxo(contractTxid, contractTx, 0),
@@ -127,7 +127,7 @@ it(
 
 it('Issue - Empty Issue Info Throws Error', async () => {
   try {
-    issue(
+    await issue(
       issuerPrivateKey,
       [],
       utils.getUtxo(contractTxid, contractTx, 0),
@@ -194,7 +194,7 @@ it(
       }
     ]
     try {
-      issue(
+      await issue(
         issuerPrivateKey,
         issueInfo,
         utils.getUtxo(contractTxid, contractTx, 0),
@@ -214,7 +214,7 @@ it(
 
 it('Issue - Issue Amount Decimal Throws Error', async () => {
   try {
-    issue(
+    await issue(
       issuerPrivateKey,
       utils.getIssueInfo(aliceAddr, 7000.5, bobAddr, 2999.5),
       utils.getUtxo(contractTxid, contractTx, 0),
@@ -233,7 +233,7 @@ it('Issue - Issue Amount Decimal Throws Error', async () => {
 
 it('Issue - Non Array Issue Info Throws Error', async () => {
   try {
-    issue(
+    await issue(
       issuerPrivateKey,
       {
         addr: bobAddr,
@@ -261,7 +261,7 @@ it('Issue - Non Array Issue Info Throws Error', async () => {
 
 it('Issue - Empty Contract UTXO Info Throws Error', async () => {
   try {
-    issue(
+    await issue(
       issuerPrivateKey,
       utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
       [],
@@ -280,7 +280,7 @@ it('Issue - Empty Contract UTXO Info Throws Error', async () => {
 
 it('Issue - Null Issuer Private Key Throws Error', async () => {
   try {
-    issue(
+    await issue(
       null,
       utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
       utils.getUtxo(contractTxid, contractTx, 0),
@@ -299,7 +299,7 @@ it('Issue - Null Issuer Private Key Throws Error', async () => {
 
 it('Issue - Null Issue Info Throws Error', async () => {
   try {
-    issue(
+    await issue(
       issuerPrivateKey,
       null,
       utils.getUtxo(contractTxid, contractTx, 0),
@@ -318,7 +318,7 @@ it('Issue - Null Issue Info Throws Error', async () => {
 
 it('Issue - Null Contract UTXO Throws Error', async () => {
   try {
-    issue(
+    await issue(
       issuerPrivateKey,
       utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
       null,
@@ -338,7 +338,7 @@ it('Issue - Null Contract UTXO Throws Error', async () => {
 
 it('Issue - Null Payment Private Key Throws Error', async () => {
   try {
-    issue(
+    await issue(
       issuerPrivateKey,
       utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
       utils.getUtxo(contractTxid, contractTx, 0),
@@ -357,7 +357,7 @@ it('Issue - Null Payment Private Key Throws Error', async () => {
 
 it('Issue - Null isSplittable Throws Error', async () => {
   try {
-    issue(
+    await issue(
       issuerPrivateKey,
       utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
       utils.getUtxo(contractTxid, contractTx, 0),
@@ -376,7 +376,7 @@ it('Issue - Null isSplittable Throws Error', async () => {
 
 it('Issue - Null Symbol Throws Error', async () => {
   try {
-    issue(
+    await issue(
       issuerPrivateKey,
       utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
       utils.getUtxo(contractTxid, contractTx, 0),
@@ -409,7 +409,7 @@ async function setup () {
   const supply = 10000
   const schema = utils.schema(publicKeyHash, symbol, supply)
 
-  const contractHex = contract(
+  const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
     fundingUtxos,

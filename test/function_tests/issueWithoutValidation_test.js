@@ -36,7 +36,7 @@ it(
   async () => {
     let issueHex
     try {
-      issueHex = issueUtil.issueWithoutValiation(
+      issueHex = await issueUtil.issueWithoutValiation(
         issuerPrivateKey,
         utils.getIssueInfo(aliceAddr, 10000, bobAddr, 3000),
         utils.getUtxo(contractTxid, contractTx, 0),
@@ -73,7 +73,7 @@ async function setup () {
   aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
   bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
 
-  const contractHex = contract(
+  const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
     fundingUtxos,

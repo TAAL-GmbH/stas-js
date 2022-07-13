@@ -33,10 +33,10 @@ let fundingAddress
 let symbol
 const wait = 5000 // due to delay in token issuance
 
-const issuerSignatureCallback = (tx, i, script, satoshis) => {
+const issuerSignatureCallback = async (tx, i, script, satoshis) => {
   return bsv.Transaction.sighash.sign(tx, issuerPrivateKey, sighash, i, script, satoshis)
 }
-const paymentSignatureCallback = (tx, i, script, satoshis) => {
+const paymentSignatureCallback = async (tx, i, script, satoshis) => {
   return bsv.Transaction.sighash.sign(tx, fundingPrivateKey, sighash, i, script, satoshis)
 }
 
@@ -45,7 +45,7 @@ beforeEach(async () => {
 })
 
 it('Issue - Successful Issue Token With Split And Fee 1', async () => {
-  const issueHex = issue(
+  const issueHex = await issue(
     issuerPrivateKey,
     utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
     utils.getUtxo(contractTxid, contractTx, 0),
@@ -73,7 +73,7 @@ it('Issue - Successful Issue Token With Split And Fee 2', async () => {
       data: 'one'
     }
   ]
-  const issueHex = issue(
+  const issueHex = await issue(
     issuerPrivateKey,
     issueInfo,
     utils.getUtxo(contractTxid, contractTx, 0),
@@ -112,7 +112,7 @@ it('Issue - Successful Issue Token With Split And Fee 3', async () => {
       data: 'three'
     }
   ]
-  const issueHex = issue(
+  const issueHex = await issue(
     issuerPrivateKey,
     issueInfo,
     utils.getUtxo(contractTxid, contractTx, 0),
@@ -162,7 +162,7 @@ it('Issue - Successful Issue Token With Split And Fee 4', async () => {
       data: 'three'
     }
   ]
-  const issueHex = issue(
+  const issueHex = await issue(
     issuerPrivateKey,
     issueInfo,
     utils.getUtxo(contractTxid, contractTx, 0),
@@ -187,7 +187,7 @@ it('Issue - Successful Issue Token With Split And Fee 4', async () => {
 })
 
 it('Issue - Successful Issue Token To Same Address', async () => {
-  const issueHex = issue(
+  const issueHex = await issue(
     issuerPrivateKey,
     utils.getIssueInfo(aliceAddr, 7000, aliceAddr, 3000),
     utils.getUtxo(contractTxid, contractTx, 0),
@@ -207,7 +207,7 @@ it('Issue - Successful Issue Token To Same Address', async () => {
 })
 
 it('Issue - Successful Issue Token To Funding Address', async () => {
-  const issueHex = issue(
+  const issueHex = await issue(
     issuerPrivateKey,
     utils.getIssueInfo(aliceAddr, 7000, fundingAddress, 3000),
     utils.getUtxo(contractTxid, contractTx, 0),
@@ -228,7 +228,7 @@ it('Issue - Successful Issue Token To Funding Address', async () => {
 })
 
 it('Issue - Successful Issue Token Non Split', async () => {
-  const issueHex = issue(
+  const issueHex = await issue(
     issuerPrivateKey,
     utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
     utils.getUtxo(contractTxid, contractTx, 0),
@@ -248,7 +248,7 @@ it('Issue - Successful Issue Token Non Split', async () => {
 })
 
 it('Issue - Successful Issue Token With Split No Fee', async () => {
-  const issueHex = issue(
+  const issueHex = await issue(
     issuerPrivateKey,
     utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
     utils.getUtxo(contractTxid, contractTx, 0),
@@ -269,7 +269,7 @@ it('Issue - Successful Issue Token With Split No Fee', async () => {
 })
 
 it('Issue - Succesful Empty Funding UTXO', async () => {
-  const issueHex = issue(
+  const issueHex = await issue(
     issuerPrivateKey,
     utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
     utils.getUtxo(contractTxid, contractTx, 0),
@@ -289,7 +289,7 @@ it('Issue - Succesful Empty Funding UTXO', async () => {
 })
 
 it('Issue - Successful Callback with Fee', async () => {
-  const issueHex = issueWithCallback(
+  const issueHex = await issueWithCallback(
     issuerPrivateKey.publicKey,
     utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
     utils.getUtxo(contractTxid, contractTx, 0),
@@ -312,7 +312,7 @@ it('Issue - Successful Callback with Fee', async () => {
 })
 
 it('Issue - Successful No Fee with callback', async () => {
-  const issueHex = issueWithCallback(
+  const issueHex = await issueWithCallback(
     issuerPrivateKey.publicKey,
     utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
     utils.getUtxo(contractTxid, contractTx, 0),
@@ -357,7 +357,7 @@ it('Issue - Successful Issue Token 10 Addresses', async () => {
   const pk8 = bsv.PrivateKey()
   const add8 = pk8.toAddress(process.env.NETWORK).toString()
 
-  const issueHex = issue(
+  const issueHex = await issue(
     issuerPrivateKey,
     utils.getTenIssueInfo(add1, add2, add3, add4, add5, add6, add7, add8, aliceAddr, bobAddr),
     utils.getUtxo(contractTxid, contractTx, 0),
@@ -394,7 +394,7 @@ async function setup () {
   const supply = 10000
   const schema = utils.schema(publicKeyHash, symbol, supply)
 
-  const contractHex = contract(
+  const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
     fundingUtxos,

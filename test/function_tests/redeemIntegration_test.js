@@ -30,10 +30,10 @@ let aliceAddr
 let issueTxid
 let issueTx
 
-const aliceSignatureCallback = (tx, i, script, satoshis) => {
+const aliceSignatureCallback = async (tx, i, script, satoshis) => {
   return bsv.Transaction.sighash.sign(tx, alicePrivateKey, sighash, i, script, satoshis)
 }
-const paymentSignatureCallback = (tx, i, script, satoshis) => {
+const paymentSignatureCallback = async (tx, i, script, satoshis) => {
   return bsv.Transaction.sighash.sign(tx, fundingPrivateKey, sighash, i, script, satoshis)
 }
 
@@ -42,7 +42,7 @@ beforeEach(async () => {
 })
 
 it('Redeem - Successful Redeem 1', async () => {
-  const redeemHex = redeem(
+  const redeemHex = await redeem(
     alicePrivateKey,
     issuerPrivateKey.publicKey,
     utils.getUtxo(issueTxid, issueTx, 0),
@@ -56,7 +56,7 @@ it('Redeem - Successful Redeem 1', async () => {
 })
 
 it('Redeem - Successful Redeem 2', async () => {
-  const redeemHex = redeem(
+  const redeemHex = await redeem(
     bobPrivateKey,
     issuerPrivateKey.publicKey,
     utils.getUtxo(issueTxid, issueTx, 1),
@@ -70,7 +70,7 @@ it('Redeem - Successful Redeem 2', async () => {
 })
 
 it('Redeem - Successful Redeem No Fee ', async () => {
-  const redeemHex = redeem(
+  const redeemHex = await redeem(
     alicePrivateKey,
     issuerPrivateKey.publicKey,
     utils.getUtxo(issueTxid, issueTx, 0),
@@ -84,7 +84,7 @@ it('Redeem - Successful Redeem No Fee ', async () => {
 })
 
 it('Redeem - Successful Redeem With Callback and Fee', async () => {
-  const redeemHex = redeemWithCallback(
+  const redeemHex = await redeemWithCallback(
     alicePrivateKey.publicKey,
     issuerPrivateKey.publicKey,
     utils.getUtxo(issueTxid, issueTx, 0),
@@ -100,7 +100,7 @@ it('Redeem - Successful Redeem With Callback and Fee', async () => {
 })
 
 it('Redeem - Successful Redeem With Callback and No Fee', async () => {
-  const redeemHex = redeemWithCallback(
+  const redeemHex = await redeemWithCallback(
     alicePrivateKey.publicKey,
     issuerPrivateKey.publicKey,
     utils.getUtxo(issueTxid, issueTx, 0),
@@ -116,7 +116,7 @@ it('Redeem - Successful Redeem With Callback and No Fee', async () => {
 })
 
 it('Redeem - Incorrect Stas UTXO Amount Throws Error', async () => {
-  const redeemHex = redeem(
+  const redeemHex = await redeem(
     alicePrivateKey,
     issuerPrivateKey.publicKey,
     {
@@ -143,7 +143,7 @@ it('Redeem - Incorrect Stas UTXO Amount Throws Error', async () => {
 })
 
 it('Redeem - Incorrect Funding UTXO Amount Throws Error', async () => {
-  const redeemHex = redeem(
+  const redeemHex = await redeem(
     alicePrivateKey,
     issuerPrivateKey.publicKey,
     {
@@ -174,7 +174,7 @@ it(
   async () => {
     const incorrectKey = bsv.PrivateKey()
 
-    const redeemHex = redeem(
+    const redeemHex = await redeem(
       alicePrivateKey,
       incorrectKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
@@ -196,7 +196,7 @@ it(
   async () => {
     const incorrectKey = bsv.PrivateKey()
 
-    const redeemHex = redeem(
+    const redeemHex = await redeem(
       incorrectKey,
       issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
@@ -218,7 +218,7 @@ it(
   async () => {
     const incorrectKey = bsv.PrivateKey()
 
-    const redeemHex = redeem(
+    const redeemHex = await redeem(
       alicePrivateKey,
       issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
@@ -249,7 +249,7 @@ async function setup () {
   const supply = 10000
   const schema = utils.schema(publicKeyHash, symbol, supply)
 
-  const contractHex = contract(
+  const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
     fundingUtxos,
@@ -260,7 +260,7 @@ async function setup () {
   const contractTxid = await broadcast(contractHex)
   const contractTx = await getTransaction(contractTxid)
 
-  const issueHex = issue(
+  const issueHex = await issue(
     issuerPrivateKey,
     utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
     utils.getUtxo(contractTxid, contractTx, 0),

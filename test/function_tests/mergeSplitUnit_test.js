@@ -41,7 +41,7 @@ it('MergeSplit - Attempt to MergeSplit More Than Two Tokens Throws Error',
     const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
     const incorrectPrivateKey = bsv.PrivateKey()
     try {
-      mergeSplit(
+      await mergeSplit(
         incorrectPrivateKey,
         [{
           tx: splitTxObj,
@@ -85,7 +85,7 @@ it('MergeSplit - Attempt to MergeSplit Less Than Two Tokens Throws Error',
     const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
     const incorrectPrivateKey = bsv.PrivateKey()
     try {
-      mergeSplit(
+      await mergeSplit(
         incorrectPrivateKey,
         [{
           tx: splitTxObj,
@@ -116,7 +116,7 @@ it('MergeSplit - Split to Issuer Address 1 Throws Error',
     const issuerAddress = issuerPrivateKey.toAddress(process.env.NETWORK).toString()
 
     try {
-      mergeSplit(
+      await mergeSplit(
         issuerPrivateKey,
         utils.getMergeSplitUtxo(splitTxObj, splitTx),
         issuerAddress,
@@ -142,7 +142,7 @@ it('MergeSplit - Split to Issuer Address 2 Throws Error',
     const issuerAddress = issuerPrivateKey.toAddress(process.env.NETWORK).toString()
 
     try {
-      mergeSplit(
+      await mergeSplit(
         issuerPrivateKey,
         utils.getMergeSplitUtxo(splitTxObj, splitTx),
         issuerAddress,
@@ -168,7 +168,7 @@ it('MergeSplit - Invalid Address Destination Address 1 Throws Error',
     const invalidAddr = '1MSCReQT9E4GpxuK1K'
 
     try {
-      mergeSplit(
+      await mergeSplit(
         issuerPrivateKey,
         utils.getMergeSplitUtxo(splitTxObj, splitTx),
         invalidAddr,
@@ -194,7 +194,7 @@ it('MergeSplit - Invalid Address Destination Address 2 Throws Error',
     const invalidAddr = '1MSCReQT9E4GpxuK1K'
 
     try {
-      mergeSplit(
+      await mergeSplit(
         issuerPrivateKey,
         utils.getMergeSplitUtxo(splitTxObj, splitTx),
         aliceAddr,
@@ -217,7 +217,7 @@ it('MergeSplit - Null Issuer Private Key Throws Error', async () => {
   const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
   const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
   try {
-    mergeSplit(
+    await mergeSplit(
       null,
       utils.getMergeSplitUtxo(splitTxObj, splitTx),
       aliceAddr,
@@ -240,7 +240,7 @@ it('MergeSplit - Null STAS Merge UTXO Throws Error', async () => {
   const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
 
   try {
-    mergeSplit(
+    await mergeSplit(
       issuerPrivateKey,
       null,
       aliceAddr,
@@ -265,7 +265,7 @@ it(
     const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
 
     try {
-      mergeSplit(
+      await mergeSplit(
         issuerPrivateKey,
         utils.getMergeSplitUtxo(splitTxObj, splitTx),
         null,
@@ -289,7 +289,7 @@ it('MergeSplit - Null Satoshi Amount 1 Throws Error', async () => {
   const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
 
   try {
-    mergeSplit(
+    await mergeSplit(
       issuerPrivateKey,
       utils.getMergeSplitUtxo(splitTxObj, splitTx),
       aliceAddr,
@@ -314,7 +314,7 @@ it(
     const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
 
     try {
-      mergeSplit(
+      await mergeSplit(
         issuerPrivateKey,
         utils.getMergeSplitUtxo(splitTxObj, splitTx),
         aliceAddr,
@@ -336,7 +336,7 @@ it(
 it('MergeSplit - Null Satoshi Amount 2 Throws Error', async () => {
   const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
   try {
-    mergeSplit(
+    await mergeSplit(
       issuerPrivateKey,
       utils.getMergeSplitUtxo(splitTxObj, splitTx),
       aliceAddr,
@@ -359,7 +359,7 @@ it('MergeSplit - Null Funding Private Key Throws Error', async () => {
   const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
 
   try {
-    mergeSplit(
+    await mergeSplit(
       issuerPrivateKey,
       utils.getMergeSplitUtxo(splitTxObj, splitTx),
       aliceAddr,
@@ -391,7 +391,7 @@ async function setup () {
   const supply = 10000
   const schema = utils.schema(publicKeyHash, symbol, supply)
 
-  const contractHex = contract(
+  const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
     fundingUtxos,
@@ -402,7 +402,7 @@ async function setup () {
   const contractTxid = await broadcast(contractHex)
   const contractTx = await getTransaction(contractTxid)
 
-  const issueHex = issue(
+  const issueHex = await issue(
     issuerPrivateKey,
     utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
     utils.getUtxo(contractTxid, contractTx, 0),
@@ -416,7 +416,7 @@ async function setup () {
   const issueTx = await getTransaction(issueTxid)
   const issueOutFundingVout = issueTx.vout.length - 1
 
-  const transferHex = transfer(
+  const transferHex = await transfer(
     bobPrivateKey,
     utils.getUtxo(issueTxid, issueTx, 1),
     aliceAddr,
@@ -432,7 +432,7 @@ async function setup () {
   splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount1) }
   splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
 
-  const splitHex = split(
+  const splitHex = await split(
     alicePrivateKey,
     utils.getUtxo(transferTxid, transferTx, 0),
     splitDestinations,

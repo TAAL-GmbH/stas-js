@@ -44,7 +44,7 @@ it('Split - Splitting Into Too Many Tokens Throws Error', async () => {
   splitDestinations[3] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount) }
   splitDestinations[4] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount) }
   try {
-    split(
+    await split(
       alicePrivateKey,
       utils.getUtxo(issueTxid, issueTx, 0),
       splitDestinations,
@@ -62,7 +62,7 @@ it('Split - Splitting Into Too Many Tokens Throws Error', async () => {
 it('Split - Empty Array Split Throws Error', async () => {
   const splitDestinations = []
   try {
-    split(
+    await split(
       alicePrivateKey,
       utils.getUtxo(issueTxid, issueTx, 0),
       splitDestinations,
@@ -83,7 +83,7 @@ it('Split - Add Zero Sats to Split Throws Error', async () => {
   splitDestinations[1] = { address: bobAddr, amount: 0 }
 
   try {
-    split(
+    await split(
       alicePrivateKey,
       utils.getUtxo(issueTxid, issueTx, 0),
       splitDestinations,
@@ -104,7 +104,7 @@ it('Split - Negative Integer Sats to Split Throws Error', async () => {
   splitDestinations[1] = { address: bobAddr, amount: 15000 }
 
   try {
-    split(
+    await split(
       alicePrivateKey,
       utils.getUtxo(issueTxid, issueTx, 0),
       splitDestinations,
@@ -127,7 +127,7 @@ it('Split - Sending to Issuer Throws Error', async () => {
   splitDestinations[0] = { address: issuerAddress, amount: bitcoinToSatoshis(bobAmount1) }
   splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
   try {
-    split(
+    await split(
       alicePrivateKey,
       utils.getUtxo(issueTxid, issueTx, 0),
       splitDestinations,
@@ -150,7 +150,7 @@ it('Split - Address Too Long Throws Error', async () => {
   splitDestinations[0] = { address: '1LF2wNCBT9dp5jN7fa6xSAaUGjJ5Pyz5VGaUG', amount: bitcoinToSatoshis(bobAmount1) }
   splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
   try {
-    split(
+    await split(
       alicePrivateKey,
       utils.getUtxo(issueTxid, issueTx, 0),
       splitDestinations,
@@ -172,7 +172,7 @@ it('Split - Null  STAS UTXO Throws Error', async () => {
   splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount1) }
   splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
   try {
-    split(
+    await split(
       alicePrivateKey,
       null,
       splitDestinations,
@@ -189,7 +189,7 @@ it('Split - Null  STAS UTXO Throws Error', async () => {
 
 it('Split - Null Split Addresses Throws Error', async () => {
   try {
-    split(
+    await split(
       alicePrivateKey,
       utils.getUtxo(issueTxid, issueTx, 0),
       null,
@@ -211,7 +211,7 @@ it('Split - Null Funding Private Key Throws Error', async () => {
   splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount1) }
   splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
   try {
-    split(
+    await split(
       alicePrivateKey,
       utils.getUtxo(issueTxid, issueTx, 0),
       splitDestinations,
@@ -241,7 +241,7 @@ async function setup () {
   const supply = 10000
   const schema = utils.schema(publicKeyHash, symbol, supply)
 
-  const contractHex = contract(
+  const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
     fundingUtxos,
@@ -252,7 +252,7 @@ async function setup () {
   const contractTxid = await broadcast(contractHex)
   const contractTx = await getTransaction(contractTxid)
 
-  const issueHex = issue(
+  const issueHex = await issue(
     issuerPrivateKey,
     utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
     utils.getUtxo(contractTxid, contractTx, 0),

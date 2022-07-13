@@ -8,7 +8,6 @@ const {
 
   createSwapOffer,
   acceptSwapOffer,
-  allInOneSwap,
   createUnsignedSwapOffer,
   acceptUnsignedSwapOffer,
   acceptUnsignedNativeSwapOffer,
@@ -80,7 +79,7 @@ describe('atomic swap', function () {
 
     const wantedInfo = { type: 'native', satoshis: makerOutputSatoshis - 1000 }
 
-    const swapOfferHex = createSwapOffer(
+    const swapOfferHex = await createSwapOffer(
       alicePrivateKey,
       makerInputUtxo,
       wantedInfo
@@ -100,7 +99,7 @@ describe('atomic swap', function () {
       satoshis: takerInputSatoshis
     }
 
-    const fullySignedSwapHex = acceptSwapOffer(swapOfferHex, tokenBIssueHex,
+    const fullySignedSwapHex = await acceptSwapOffer(swapOfferHex, tokenBIssueHex,
       bobPrivateKey, takerInputTxHex, takerInputUTXO, takerOutputSatoshis, alicePublicKeyHash,
       fundingUTXO, fundingPrivateKey)
 
@@ -138,7 +137,7 @@ describe('atomic swap', function () {
       script: bsv.Script.fromHex(aliceUtxos[0].scriptPubKey), // makerStasInputScript,
       satoshis: makerInputSatoshis
     }
-    const swapOfferHex = createSwapOffer(
+    const swapOfferHex = await createSwapOffer(
       alicePrivateKey,
       makerUtxo,
       wantedInfo
@@ -154,7 +153,7 @@ describe('atomic swap', function () {
     }
 
     // now bob takes the offer
-    const fullySignedSwapHex = acceptSwapOffer(swapOfferHex, makerInputHex,
+    const fullySignedSwapHex = await acceptSwapOffer(swapOfferHex, makerInputHex,
       bobPrivateKey, tokenAIssueHex, takerInputUTXO, takerOutputSatoshis, alicePublicKeyHash,
       fundingUTXO, fundingPrivateKey)
 
@@ -193,7 +192,7 @@ describe('atomic swap', function () {
     const wantedInfo = { type: 'native', satoshis: makerOutputSatoshis - 1000 }
     const takerInputInfo = { type: 'native', utxo: bobUtxos[0], satoshis: takerInputSatoshis - 1000 }
 
-    const unsignedSwapOfferHex = createUnsignedSwapOffer(
+    const unsignedSwapOfferHex = await createUnsignedSwapOffer(
       alicePrivateKey,
       makerInputUtxo,
       wantedInfo
@@ -203,7 +202,7 @@ describe('atomic swap', function () {
       bobPrivateKey, takerInputTx, bobUtxos[0].vout, takerOutputSatoshis, alicePublicKeyHash,
       fundingUTXO, fundingPrivateKey)
 
-    const fullySignedSwapHex = makerSignSwapOffer(takerSignedSwapHex, tokenBIssueHex, takerInputTx, alicePrivateKey, bobPublicKeyHash, paymentPublicKeyHash, fundingUTXO)
+    const fullySignedSwapHex = await makerSignSwapOffer(takerSignedSwapHex, tokenBIssueHex, takerInputTx, alicePrivateKey, bobPublicKeyHash, paymentPublicKeyHash, fundingUTXO)
     console.log('fullySignedSwapHex', fullySignedSwapHex)
     // Script failed an OP_NUMEQUALVERIFY operation
 
@@ -231,7 +230,7 @@ describe('atomic swap', function () {
 
     const wantedInfo = { scriptHex: takerStasInputScriptHex, satoshis: makerOutputSatoshis - 1000 }
 
-    const unsignedSwapOfferHex = createUnsignedSwapOffer(
+    const unsignedSwapOfferHex = await createUnsignedSwapOffer(
       alicePrivateKey,
       aliceUtxos[0],
       wantedInfo
@@ -280,7 +279,7 @@ async function setup () {
   tokenASymbol = 'TOKENA'
   const tokenASupply = 6000
   const tokenASchema = utils.schema(tokenAIssuerPublicKeyHash, tokenASymbol, tokenASupply)
-  const tokenAContractHex = contract(
+  const tokenAContractHex = await contract(
     tokenAIssuerPrivateKey,
     tokenAContractUtxos,
     tokenAFundingUtxos,
@@ -291,7 +290,7 @@ async function setup () {
   const tokenAContractTxid = await broadcast(tokenAContractHex)
   const tokenAContractTx = await getTransaction(tokenAContractTxid)
 
-  tokenAIssueHex = issue(
+  tokenAIssueHex = await issue(
     tokenAIssuerPrivateKey,
     [{
       addr: bobAddr,
@@ -312,7 +311,7 @@ async function setup () {
   tokenBSymbol = 'TOKENB'
   const tokenBSupply = 3000
   const tokenBSchema = utils.schema(tokenBIssuerPublicKeyHash, tokenBSymbol, tokenBSupply)
-  const tokenBContractHex = contract(
+  const tokenBContractHex = await contract(
     tokenBIssuerPrivateKey,
     tokenBContractUtxos,
     tokenBFundingUtxos,
@@ -323,7 +322,7 @@ async function setup () {
   const tokenBContractTxid = await broadcast(tokenBContractHex)
   const tokenBContractTx = await getTransaction(tokenBContractTxid)
 
-  tokenBIssueHex = issue(
+  tokenBIssueHex = await issue(
     tokenBIssuerPrivateKey,
     [{
       addr: aliceAddr,

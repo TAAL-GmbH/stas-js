@@ -32,10 +32,10 @@ let publicKeyHash
 let issueTxid
 let issueTx
 
-const aliceSignatureCallback = (tx, i, script, satoshis) => {
+const aliceSignatureCallback = async (tx, i, script, satoshis) => {
   return bsv.Transaction.sighash.sign(tx, alicePrivateKey, sighash, i, script, satoshis)
 }
-const paymentSignatureCallback = (tx, i, script, satoshis) => {
+const paymentSignatureCallback = async (tx, i, script, satoshis) => {
   return bsv.Transaction.sighash.sign(tx, fundingPrivateKey, sighash, i, script, satoshis)
 }
 
@@ -48,7 +48,7 @@ it('Successful RedeemSplit With 1 Split', async () => {
   const rSplitDestinations = []
   rSplitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
 
-  const redeemSplitHex = redeemSplit(
+  const redeemSplitHex = await redeemSplit(
     alicePrivateKey,
     issuerPrivateKey.publicKey,
     utils.getUtxo(issueTxid, issueTx, 0),
@@ -69,7 +69,7 @@ it('Successful RedeemSplit With 2 Split', async () => {
   rSplitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
   rSplitDestinations[1] = { address: aliceAddr, amount: bitcoinToSatoshis(amount) }
 
-  const redeemSplitHex = redeemSplit(
+  const redeemSplitHex = await redeemSplit(
     alicePrivateKey,
     issuerPrivateKey.publicKey,
     utils.getUtxo(issueTxid, issueTx, 0),
@@ -94,7 +94,7 @@ it('Successful RedeemSplit With 3 Split', async () => {
   rSplitDestinations[1] = { address: aliceAddr, amount: bitcoinToSatoshis(amount) }
   rSplitDestinations[2] = { address: daveAddr, amount: bitcoinToSatoshis(amount) }
 
-  const redeemSplitHex = redeemSplit(
+  const redeemSplitHex = await redeemSplit(
     alicePrivateKey,
     issuerPrivateKey.publicKey,
     utils.getUtxo(issueTxid, issueTx, 0),
@@ -119,7 +119,7 @@ it('Successful RedeemSplit With No Fees', async () => {
   rSplitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(rsBobAmount) }
   rSplitDestinations[1] = { address: aliceAddr, amount: bitcoinToSatoshis(rsAliceAmount1) }
 
-  const redeemSplitHex = redeemSplit(
+  const redeemSplitHex = await redeemSplit(
     alicePrivateKey,
     issuerPrivateKey.publicKey,
     utils.getUtxo(issueTxid, issueTx, 0),
@@ -140,7 +140,7 @@ it('RedeemSplit - No Split Completes Successfully', async () => {
   const rSplitDestinations = []
   rSplitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(rsBobAmount) }
 
-  const redeemSplitHex = redeemSplit(
+  const redeemSplitHex = await redeemSplit(
     alicePrivateKey,
     issuerPrivateKey.publicKey,
     utils.getUtxo(issueTxid, issueTx, 0),
@@ -160,7 +160,7 @@ it('Successful RedeemSplit With Callback & Fees', async () => {
   rSplitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
   rSplitDestinations[1] = { address: aliceAddr, amount: bitcoinToSatoshis(amount) }
 
-  const redeemSplitHex = redeemSplitWithCallback(
+  const redeemSplitHex = await redeemSplitWithCallback(
     alicePrivateKey.publicKey,
     issuerPrivateKey.publicKey,
     utils.getUtxo(issueTxid, issueTx, 0),
@@ -184,7 +184,7 @@ it('Successful RedeemSplit With Callback & No fees', async () => {
   rSplitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
   rSplitDestinations[1] = { address: aliceAddr, amount: bitcoinToSatoshis(amount) }
 
-  const redeemSplitHex = redeemSplitWithCallback(
+  const redeemSplitHex = await redeemSplitWithCallback(
     alicePrivateKey.publicKey,
     issuerPrivateKey.publicKey,
     utils.getUtxo(issueTxid, issueTx, 0),
@@ -214,7 +214,7 @@ it('RedeemSplit - Too Many Outputs Throws Error', async () => {
   rSplitDestinations[2] = { address: daveAddr, amount: amount }
   rSplitDestinations[3] = { address: emmaAddr, amount: amount }
   try {
-    redeemSplit(
+    await redeemSplit(
       alicePrivateKey,
       issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
@@ -236,7 +236,7 @@ it('RedeemSplit - Add Too Much To Split Throws Error', async () => {
   splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount) }
   const issueOutFundingVout = issueTx.vout.length - 1
   try {
-    redeemSplit(
+    await redeemSplit(
       alicePrivateKey,
       issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
@@ -260,7 +260,7 @@ it('RedeemSplit - Address Too Short Throws Error', async () => {
   splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
   const issueOutFundingVout = issueTx.vout.length - 1
   try {
-    redeemSplit(
+    await redeemSplit(
       alicePrivateKey,
       issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
@@ -285,7 +285,7 @@ it('RedeemSplit - Address Too Long Throws Error', async () => {
   splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
   const issueOutFundingVout = issueTx.vout.length - 1
   try {
-    redeemSplit(
+    await redeemSplit(
       alicePrivateKey,
       issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
@@ -311,7 +311,7 @@ it(
     const issueOutFundingVout = issueTx.vout.length - 1
     const incorrectPrivateKey = bsv.PrivateKey()
 
-    const redeemHex = redeemSplit(
+    const redeemHex = await redeemSplit(
       incorrectPrivateKey,
       issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
@@ -340,7 +340,7 @@ it(
     const issueOutFundingVout = issueTx.vout.length - 1
     const incorrectPrivateKey = bsv.PrivateKey()
 
-    const redeemHex = redeemSplit(
+    const redeemHex = await redeemSplit(
       alicePrivateKey,
       issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
@@ -368,7 +368,7 @@ it('RedeemSplit - Incorrect Public Key Throws Error', async () => {
   const issueOutFundingVout = issueTx.vout.length - 1
   const incorrectPrivateKey = bsv.PrivateKey()
 
-  const redeemHex = redeemSplit(
+  const redeemHex = await redeemSplit(
     alicePrivateKey,
     incorrectPrivateKey.publicKey,
     utils.getUtxo(issueTxid, issueTx, 0),
@@ -384,178 +384,6 @@ it('RedeemSplit - Incorrect Public Key Throws Error', async () => {
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
     expect(e.message).to.eql('Request failed with status code 400')
-  }
-})
-
-it(
-  'RedeemSplit - Splitting Into Too Many Tokens Throws Error',
-  async () => {
-    const bobAmount = bitcoinToSatoshis(issueTx.vout[0].value / 10)
-    const splitDestinations = []
-    splitDestinations[0] = { address: bobAddr, amount: bobAmount }
-    splitDestinations[1] = { address: bobAddr, amount: bobAmount }
-    splitDestinations[2] = { address: bobAddr, amount: bobAmount }
-    splitDestinations[3] = { address: bobAddr, amount: bobAmount }
-    splitDestinations[4] = { address: bobAddr, amount: bobAmount }
-    const issueOutFundingVout = issueTx.vout.length - 1
-    try {
-      redeemSplit(
-        alicePrivateKey,
-        issuerPrivateKey.publicKey,
-        utils.getUtxo(issueTxid, issueTx, 0),
-        splitDestinations,
-        utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-        fundingPrivateKey
-      )
-      expect(false).toBeTruthy()
-      return
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('Must have less than 5 segments')
-    }
-  }
-)
-
-it(
-  'RedeemSplit - Null Token Owner Private Key Throws Error',
-  async () => {
-    const bobAmount = bitcoinToSatoshis(issueTx.vout[0].value / 2)
-    const splitDestinations = []
-    splitDestinations[0] = { address: bobAddr, amount: bobAmount }
-    splitDestinations[1] = { address: bobAddr, amount: bobAmount }
-
-    const issueOutFundingVout = issueTx.vout.length - 1
-    try {
-      redeemSplit(
-        null,
-        issuerPrivateKey.publicKey,
-        utils.getUtxo(issueTxid, issueTx, 0),
-        splitDestinations,
-        utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-        fundingPrivateKey
-      )
-      expect(false).toBeTruthy()
-      return
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('Token owner private key is null')
-    }
-  }
-)
-
-it('RedeemSplit - Null STAS UTXO Throws Error', async () => {
-  const bobAmount = bitcoinToSatoshis(issueTx.vout[0].value / 2)
-  const splitDestinations = []
-  splitDestinations[0] = { address: bobAddr, amount: bobAmount }
-  splitDestinations[1] = { address: bobAddr, amount: bobAmount }
-
-  const issueOutFundingVout = issueTx.vout.length - 1
-  try {
-    redeemSplit(
-      alicePrivateKey,
-      issuerPrivateKey.publicKey,
-      null,
-      splitDestinations,
-      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-      fundingPrivateKey
-    )
-    expect(false).toBeTruthy()
-    return
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Invalid Argument: Must provide an object from where to extract data')
-  }
-})
-
-it('RedeemSplit - Null Split Destinations Throws Error', async () => {
-  const issueOutFundingVout = issueTx.vout.length - 1
-  try {
-    redeemSplit(
-      alicePrivateKey,
-      issuerPrivateKey.publicKey,
-      utils.getUtxo(issueTxid, issueTx, 0),
-      null,
-      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-      fundingPrivateKey
-    )
-    expect(false).toBeTruthy()
-    return
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('split destinations array is null or empty')
-  }
-})
-
-it('RedeemSplit - Null Funding Private Key Throws Error', async () => {
-  const bobAmount = bitcoinToSatoshis(issueTx.vout[0].value / 2)
-  const splitDestinations = []
-  splitDestinations[0] = { address: bobAddr, amount: bobAmount }
-  splitDestinations[1] = { address: bobAddr, amount: bobAmount }
-
-  const issueOutFundingVout = issueTx.vout.length - 1
-  try {
-    redeemSplit(
-      alicePrivateKey,
-      issuerPrivateKey.publicKey,
-      utils.getUtxo(issueTxid, issueTx, 0),
-      splitDestinations,
-      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-      null
-    )
-    expect(false).toBeTruthy()
-    return
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Payment UTXO provided but payment public key is null')
-  }
-})
-
-it('RedeemSplit - Null Contract Public Key Throws Error', async () => {
-  const bobAmount = bitcoinToSatoshis(issueTx.vout[0].value / 2)
-  const splitDestinations = []
-  splitDestinations[0] = { address: bobAddr, amount: bobAmount }
-  splitDestinations[1] = { address: bobAddr, amount: bobAmount }
-
-  const issueOutFundingVout = issueTx.vout.length - 1
-  try {
-    redeemSplit(
-      alicePrivateKey,
-      null,
-      utils.getUtxo(issueTxid, issueTx, 0),
-      splitDestinations,
-      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-      null
-    )
-    expect(false).toBeTruthy()
-    return
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('contract public key is null')
-  }
-})
-
-// check with liam - we can split to issuer address
-it('RedeemSplit - Send to Issuer Address Throws Error', async () => {
-  const amount = bitcoinToSatoshis(issueTx.vout[0].value / 5)
-  const issuerAddr = issuerPrivateKey.toAddress(process.env.NETWORK).toString()
-  const rSplitDestinations = []
-  rSplitDestinations[0] = { address: issuerAddr, amount: amount }
-  rSplitDestinations[1] = { address: issuerAddr, amount: amount }
-
-  try {
-    redeemSplit(
-      alicePrivateKey,
-      issuerPrivateKey.publicKey,
-      utils.getUtxo(issueTxid, issueTx, 0),
-      rSplitDestinations,
-      utils.getUtxo(issueTxid, issueTx, 2),
-      fundingPrivateKey
-    )
-    expect(false).to.toBeTruthy()
-    return
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Token UTXO cannot be sent to issuer address')
   }
 })
 
@@ -659,7 +487,7 @@ async function setup () {
   const supply = 10000
   const schema = utils.schema(publicKeyHash, symbol, supply)
 
-  const contractHex = contract(
+  const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
     fundingUtxos,
@@ -670,7 +498,7 @@ async function setup () {
   const contractTxid = await broadcast(contractHex)
   const contractTx = await getTransaction(contractTxid)
 
-  const issueHex = issue(
+  const issueHex = await issue(
     issuerPrivateKey,
     utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
     utils.getUtxo(contractTxid, contractTx, 0),

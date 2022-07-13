@@ -41,7 +41,7 @@ it(
     ]
 
     try {
-      issue(
+      await issue(
         issuerPrivateKey,
         issueInfo,
         utils.getUtxo(contractTxid, contractTx, 0),
@@ -69,7 +69,7 @@ it(
     ]
 
     try {
-      issue(
+      await issue(
         issuerPrivateKey,
         issueInfo,
         utils.getUtxo(contractTxid, contractTx, 0),
@@ -102,7 +102,7 @@ async function setup () {
   const supply = 10000
   const schema = utils.schema(publicKeyHash, symbol, supply)
 
-  const contractHex = contract(
+  const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
     fundingUtxos,

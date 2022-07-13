@@ -44,7 +44,7 @@ it('Merge Directly From Issuance when issued to same address',
 
     const wait = 0 // set wait before token balance check
 
-    const contractHex = contract(
+    const contractHex = await contract(
       issuerPrivateKey,
       contractUtxos,
       fundingUtxos,
@@ -56,7 +56,7 @@ it('Merge Directly From Issuance when issued to same address',
     console.log(`Contract TX:     ${contractTxid}`)
     const contractTx = await getTransaction(contractTxid)
 
-    const issueHex = issue(
+    const issueHex = await issue(
       issuerPrivateKey,
       utils.getIssueInfo(aliceAddr, 7000, aliceAddr, 3000), // issued to same address
       utils.getUtxo(contractTxid, contractTx, 0),
@@ -72,7 +72,7 @@ it('Merge Directly From Issuance when issued to same address',
     console.log(`Token ID:        ${tokenId}`)
     const mergeObj = new bsv.Transaction(issueHex)
 
-    const mergeHex = merge(
+    const mergeHex = await merge(
       alicePrivateKey,
       utils.getMergeUtxo(mergeObj),
       aliceAddr,

@@ -33,7 +33,7 @@ beforeAll(async () => {
 
 it('Redeem - Null Token Owner Private Key Throws Error', async () => {
   try {
-    redeem(
+    await redeem(
       null,
       issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
@@ -50,7 +50,7 @@ it('Redeem - Null Token Owner Private Key Throws Error', async () => {
 
 it('Redeem - Null STAS UTXO Throws Error', async () => {
   try {
-    redeem(
+    await redeem(
       alicePrivateKey,
       issuerPrivateKey.publicKey,
       null,
@@ -69,7 +69,7 @@ it(
   'Redeem -  No Fee UTXO but funding pk provided throws error',
   async () => {
     try {
-      redeem(
+      await redeem(
         alicePrivateKey,
         issuerPrivateKey.publicKey,
         utils.getUtxo(issueTxid, issueTx, 0),
@@ -85,7 +85,7 @@ it(
 
 it('Redeem - Null Funding Private Key Throws Error', async () => {
   try {
-    redeem(
+    await redeem(
       alicePrivateKey,
       issuerPrivateKey.publicKey,
       utils.getUtxo(issueTxid, issueTx, 0),
@@ -114,7 +114,7 @@ async function setup () {
   const supply = 10000
   const schema = utils.schema(publicKeyHash, symbol, supply)
 
-  const contractHex = contract(
+  const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
     fundingUtxos,
@@ -125,7 +125,7 @@ async function setup () {
   const contractTxid = await broadcast(contractHex)
   const contractTx = await getTransaction(contractTxid)
 
-  const issueHex = issue(
+  const issueHex = await issue(
     issuerPrivateKey,
     utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
     utils.getUtxo(contractTxid, contractTx, 0),

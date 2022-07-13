@@ -6,8 +6,7 @@ require('dotenv').config()
 const {
   contract,
   issue,
-  transfer,
-  transferWithCallback
+  transfer
 } = require('../../index')
 
 const {
@@ -16,7 +15,6 @@ const {
   broadcast
 } = require('../../index').utils
 
-const { sighash } = require('../../lib/stas')
 
 let issuerPrivateKey
 let fundingPrivateKey
@@ -27,7 +25,6 @@ let fundingUtxos
 let publicKeyHash
 let aliceAddr
 let bobAddr
-let fundingAddress
 let symbol
 let issueTxid
 let issueTx
@@ -41,7 +38,7 @@ beforeAll(async () => {
 it('Transfer - Address Validation - Too Few Chars', async () => {
   const invalidAddr = '1MSCReQT9E4GpxuK1K7uyD5q'
   try {
-    transfer(
+    await transfer(
       bobPrivateKey,
       utils.getUtxo(issueTxid, issueTx, 1),
       invalidAddr,
@@ -61,7 +58,7 @@ it(
   async () => {
     const invalidAddr = '1MSCReQT9E4GpxuK1K7uyD5qF1EmznXjkrmoFCgGtkmhyaL2frwff84p2bwTf3FDpkZcCgGtkmhyaL2frwff84p2bwTf3FDpkZcCgGtkmhy'
     try {
-      transfer(
+      await transfer(
         bobPrivateKey,
         utils.getUtxo(issueTxid, issueTx, 1),
         invalidAddr,
@@ -81,7 +78,7 @@ it(
   'Transfer - Null Token Owner Private Key Throws Error',
   async () => {
     try {
-      transfer(
+      await transfer(
         null,
         utils.getUtxo(issueTxid, issueTx, 1),
         aliceAddr,
@@ -99,7 +96,7 @@ it(
 
 it('Transfer - Null STAS UTXO Throws Error', async () => {
   try {
-    transfer(
+    await transfer(
       bobPrivateKey,
       null,
       aliceAddr,
@@ -116,7 +113,7 @@ it('Transfer - Null STAS UTXO Throws Error', async () => {
 
 it('Transfer - Null Destination Address Throws Error', async () => {
   try {
-    transfer(
+    await transfer(
       bobPrivateKey,
       utils.getUtxo(issueTxid, issueTx, 1),
       null,
@@ -133,7 +130,7 @@ it('Transfer - Null Destination Address Throws Error', async () => {
 
 it('Transfer - Null Funding Private Key Throws Error', async () => {
   try {
-    transfer(
+    await transfer(
       bobPrivateKey,
       utils.getUtxo(issueTxid, issueTx, 1),
       aliceAddr,
@@ -163,7 +160,7 @@ async function setup () {
   bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
   fundingAddress = fundingPrivateKey.toAddress(process.env.NETWORK).toString()
 
-  const contractHex = contract(
+  const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
     fundingUtxos,
@@ -174,7 +171,7 @@ async function setup () {
   const contractTxid = await broadcast(contractHex)
   const contractTx = await getTransaction(contractTxid)
 
-  const issueHex = issue(
+  const issueHex = await issue(
     issuerPrivateKey,
     utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
     utils.getUtxo(contractTxid, contractTx, 0),
