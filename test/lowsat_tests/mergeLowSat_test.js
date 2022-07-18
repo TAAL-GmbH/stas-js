@@ -45,11 +45,9 @@ const paymentSignatureCallback = async (tx, i, script, satoshis) => {
   return bsv.Transaction.sighash.sign(tx, fundingPrivateKey, sighash, i, script, satoshis).toTxFormat().toString('hex')
 }
 
-beforeEach(async () => {
-  await setup()
-})
-
-it('Merge - Successful Merge With Low Sats 1', async () => {
+//add callback tests
+it('Merge - Successful Merge With Low Sats (20)', async () => {
+  await setup(40)
   const mergeHex = await merge(
     bobPrivateKey,
     utils.getMergeUtxo(splitTxObj),
@@ -57,18 +55,70 @@ it('Merge - Successful Merge With Low Sats 1', async () => {
     utils.getUtxo(splitTxid, splitTx, 2),
     fundingPrivateKey
   )
-  console.log(mergeHex)
   const mergeTxid = await broadcast(mergeHex)
   await new Promise(resolve => setTimeout(resolve, wait))
   const tokenIdMerge = await utils.getToken(mergeTxid)
   const response = await utils.getTokenResponse(tokenIdMerge)
   expect(response.symbol).to.equal('TAALT')
-  expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007)
-  await utils.isTokenBalance(aliceAddr, 7000)
-  await utils.isTokenBalance(bobAddr, 3000)
+  expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.0000004)
+  await utils.isTokenBalance(aliceAddr, 40)
 })
 
-async function setup () {
+it('Merge - Successful Merge With Low Sats (10)', async () => {
+  await setup(20)
+  const mergeHex = await merge(
+    bobPrivateKey,
+    utils.getMergeUtxo(splitTxObj),
+    aliceAddr,
+    utils.getUtxo(splitTxid, splitTx, 2),
+    fundingPrivateKey
+  )
+  const mergeTxid = await broadcast(mergeHex)
+  await new Promise(resolve => setTimeout(resolve, wait))
+  const tokenIdMerge = await utils.getToken(mergeTxid)
+  const response = await utils.getTokenResponse(tokenIdMerge)
+  expect(response.symbol).to.equal('TAALT')
+  expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.0000002)
+  await utils.isTokenBalance(aliceAddr, 20)
+})
+
+it('Merge - Successful Merge With Low Sats (5)', async () => {
+  await setup(10)
+  const mergeHex = await merge(
+    bobPrivateKey,
+    utils.getMergeUtxo(splitTxObj),
+    aliceAddr,
+    utils.getUtxo(splitTxid, splitTx, 2),
+    fundingPrivateKey
+  )
+  const mergeTxid = await broadcast(mergeHex)
+  await new Promise(resolve => setTimeout(resolve, wait))
+  const tokenIdMerge = await utils.getToken(mergeTxid)
+  const response = await utils.getTokenResponse(tokenIdMerge)
+  expect(response.symbol).to.equal('TAALT')
+  expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.0000001)
+  await utils.isTokenBalance(aliceAddr, 10)
+})
+
+it('Merge - Successful Merge With Low Sats (1)', async () => {
+  await setup(2)
+  const mergeHex = await merge(
+    bobPrivateKey,
+    utils.getMergeUtxo(splitTxObj),
+    aliceAddr,
+    utils.getUtxo(splitTxid, splitTx, 2),
+    fundingPrivateKey
+  )
+  const mergeTxid = await broadcast(mergeHex)
+  await new Promise(resolve => setTimeout(resolve, wait))
+  const tokenIdMerge = await utils.getToken(mergeTxid)
+  const response = await utils.getTokenResponse(tokenIdMerge)
+  expect(response.symbol).to.equal('TAALT')
+  expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00000002)
+  await utils.isTokenBalance(aliceAddr, 2)
+})
+
+async function setup (satSupply) {
   issuerPrivateKey = bsv.PrivateKey()
   fundingPrivateKey = bsv.PrivateKey()
   bobPrivateKey = bsv.PrivateKey()
@@ -79,7 +129,7 @@ async function setup () {
   fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
   publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
   const symbol = 'TAALT'
-  const supply = 26
+  const supply = satSupply
   const schema = utils.schema(publicKeyHash, symbol, supply)
 
   const contractHex = await contract(
@@ -95,7 +145,13 @@ async function setup () {
 
   const issueHex = await issue(
     issuerPrivateKey,
-    utils.getIssueInfo(aliceAddr, 16, bobAddr, 10),
+    [
+      {
+        addr: aliceAddr,
+        satoshis: satSupply,
+        data: 'one'
+      }
+    ],
     utils.getUtxo(contractTxid, contractTx, 0),
     utils.getUtxo(contractTxid, contractTx, 1),
     fundingPrivateKey,

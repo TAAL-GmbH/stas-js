@@ -1,0 +1,102 @@
+const expect = require('chai').expect
+const utils = require('../utils/test_utils')
+const bsv = require('bsv')
+require('dotenv').config()
+
+const {
+  contract, contractWithCallback
+} = require('../../index')
+
+const {
+  getFundsFromFaucet,
+  broadcast
+} = require('../../index').utils
+
+const ownerSignCallback = async (tx) => {
+  tx.sign(issuerPrivateKey)
+}
+
+const paymentSignCallback = async (tx) => {
+  tx.sign(fundingPrivateKey)
+}
+
+let issuerPrivateKey
+let fundingPrivateKey
+let contractUtxos
+let fundingUtxos
+let publicKeyHash
+const symbol = 'TAALT'
+let schema
+
+beforeEach(async () => {
+  await setup()
+})
+
+it('Contract - Successful With Low Sats (20)', async () => {
+    supply = 20
+  const contractHex = await contract(
+    issuerPrivateKey,
+    contractUtxos,
+    fundingUtxos,
+    fundingPrivateKey,
+    schema,
+    supply
+  )
+  const contractTxid = await broadcast(contractHex)
+  const amount = await utils.getVoutAmount(contractTxid, 0)
+  expect(amount).to.equal(supply / 100000000)
+})
+
+it('Contract - Successful With Low Sats (10)', async () => {
+    supply = 20
+  const contractHex = await contract(
+    issuerPrivateKey,
+    contractUtxos,
+    fundingUtxos,
+    fundingPrivateKey,
+    schema,
+    supply
+  )
+  const contractTxid = await broadcast(contractHex)
+  const amount = await utils.getVoutAmount(contractTxid, 0)
+  expect(amount).to.equal(supply / 100000000)
+})
+
+it('Contract - Successful With Low Sats (5)', async () => {
+    supply = 20
+  const contractHex = await contract(
+    issuerPrivateKey,
+    contractUtxos,
+    fundingUtxos,
+    fundingPrivateKey,
+    schema,
+    supply
+  )
+  const contractTxid = await broadcast(contractHex)
+  const amount = await utils.getVoutAmount(contractTxid, 0)
+  expect(amount).to.equal(supply / 100000000)
+})
+
+it('Contract - Successful With Low Sats (1)', async () => {
+    supply = 20
+  const contractHex = await contract(
+    issuerPrivateKey,
+    contractUtxos,
+    fundingUtxos,
+    fundingPrivateKey,
+    schema,
+    supply
+  )
+  const contractTxid = await broadcast(contractHex)
+  const amount = await utils.getVoutAmount(contractTxid, 0)
+  expect(amount).to.equal(supply / 100000000)
+})
+
+async function setup (satSupply) {
+  issuerPrivateKey = bsv.PrivateKey()
+  fundingPrivateKey = bsv.PrivateKey()
+  contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
+  fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
+  publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
+  schema = utils.schema(publicKeyHash, symbol, satSupply)
+}
