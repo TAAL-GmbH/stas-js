@@ -37,6 +37,7 @@ const paymentSignatureCallback = async (tx, i, script, satoshis) => {
   return bsv.Transaction.sighash.sign(tx, fundingPrivateKey, sighash, i, script, satoshis).toTxFormat().toString('hex')
 }
 
+// add callback tests
 it('Redeem - Successful Redeem With Low Sats (20)', async () => {
   await setup(20)
   const redeemHex = await redeem(
@@ -52,46 +53,46 @@ it('Redeem - Successful Redeem With Low Sats (20)', async () => {
 })
 
 it('Redeem - Successful Redeem With Low Sats (10)', async () => {
-    await setup(10)
-    const redeemHex = await redeem(
-      alicePrivateKey,
-      issuerPrivateKey.publicKey,
-      utils.getUtxo(issueTxid, issueTx, 0),
-      utils.getUtxo(issueTxid, issueTx, 1),
-      fundingPrivateKey
-    )
-    const redeemTxid = await broadcast(redeemHex)
-    expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.0000001)
-    await utils.isTokenBalance(aliceAddr, 0)
-  })
+  await setup(10)
+  const redeemHex = await redeem(
+    alicePrivateKey,
+    issuerPrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 0),
+    utils.getUtxo(issueTxid, issueTx, 1),
+    fundingPrivateKey
+  )
+  const redeemTxid = await broadcast(redeemHex)
+  expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.0000001)
+  await utils.isTokenBalance(aliceAddr, 0)
+})
 
-  it('Redeem - Successful Redeem With Low Sats (5)', async () => {
-    await setup(5)
-    const redeemHex = await redeem(
-      alicePrivateKey,
-      issuerPrivateKey.publicKey,
-      utils.getUtxo(issueTxid, issueTx, 0),
-      utils.getUtxo(issueTxid, issueTx, 1),
-      fundingPrivateKey
-    )
-    const redeemTxid = await broadcast(redeemHex)
-    expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00000005)
-    await utils.isTokenBalance(aliceAddr, 0)
-  })
+it('Redeem - Successful Redeem With Low Sats (5)', async () => {
+  await setup(5)
+  const redeemHex = await redeem(
+    alicePrivateKey,
+    issuerPrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 0),
+    utils.getUtxo(issueTxid, issueTx, 1),
+    fundingPrivateKey
+  )
+  const redeemTxid = await broadcast(redeemHex)
+  expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00000005)
+  await utils.isTokenBalance(aliceAddr, 0)
+})
 
-  it('Redeem - Successful Redeem With Low Sats (1)', async () => {
-    await setup(1)
-    const redeemHex = await redeem(
-      alicePrivateKey,
-      issuerPrivateKey.publicKey,
-      utils.getUtxo(issueTxid, issueTx, 0),
-      utils.getUtxo(issueTxid, issueTx, 1),
-      fundingPrivateKey
-    )
-    const redeemTxid = await broadcast(redeemHex)
-    expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00000001)
-    await utils.isTokenBalance(aliceAddr, 0)
-  })
+it('Redeem - Successful Redeem With Low Sats (1)', async () => {
+  await setup(1)
+  const redeemHex = await redeem(
+    alicePrivateKey,
+    issuerPrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 0),
+    utils.getUtxo(issueTxid, issueTx, 1),
+    fundingPrivateKey
+  )
+  const redeemTxid = await broadcast(redeemHex)
+  expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00000001)
+  await utils.isTokenBalance(aliceAddr, 0)
+})
 
 async function setup (satSupply) {
   issuerPrivateKey = bsv.PrivateKey()
@@ -120,10 +121,10 @@ async function setup (satSupply) {
   const issueHex = await issue(
     issuerPrivateKey,
     [
-        {
-          addr: aliceAddr,
-          satoshis: satSupply
-        }
+      {
+        addr: aliceAddr,
+        satoshis: satSupply
+      }
     ],
     utils.getUtxo(contractTxid, contractTx, 0),
     utils.getUtxo(contractTxid, contractTx, 1),
