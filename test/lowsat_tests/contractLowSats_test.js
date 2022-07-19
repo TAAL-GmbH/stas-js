@@ -33,7 +33,7 @@ beforeEach(async () => {
 })
 
 it('Contract - Successful With Low Sats (20)', async () => {
-    supply = 20
+  const supply = 20
   const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
@@ -48,7 +48,7 @@ it('Contract - Successful With Low Sats (20)', async () => {
 })
 
 it('Contract - Successful With Low Sats (10)', async () => {
-    supply = 20
+  const supply = 10
   const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
@@ -63,7 +63,7 @@ it('Contract - Successful With Low Sats (10)', async () => {
 })
 
 it('Contract - Successful With Low Sats (5)', async () => {
-    supply = 20
+  const supply = 5
   const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
@@ -78,7 +78,7 @@ it('Contract - Successful With Low Sats (5)', async () => {
 })
 
 it('Contract - Successful With Low Sats (1)', async () => {
-    supply = 20
+  const supply = 1
   const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
