@@ -86,7 +86,7 @@ it('MergeSplit - Successful MergeSplit With Low Sats(10)', async () => {
   await utils.isTokenBalance(aliceAddr, 20)
 })
 
-it.only('MergeSplit - Successful MergeSplit With Low Sats(5)', async () => {
+it('MergeSplit - Successful MergeSplit With Low Sats(5)', async () => {
   await setup(10) // contract, issue, transfer then split
 
   const issueOutFundingVout = splitTx.vout.length - 1
