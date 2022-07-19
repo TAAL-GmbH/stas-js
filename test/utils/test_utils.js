@@ -304,7 +304,6 @@ async function getTokenBalance (address) {
 
 async function isTokenBalance (address, expectedBalance) {
   let response
-  await new Promise(resolve => setTimeout(resolve, 2000))
   for (let i = 0; i < 60; i++) {
     const url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/address/${address}/tokens`
     response = await axios({
@@ -316,17 +315,15 @@ async function isTokenBalance (address, expectedBalance) {
       }
     })
     let balance
-    let retry = 0
     try {
       balance = response.data.tokens[0].balance
     } catch (e) {
-      console.log('Balance Not Updated, retrying: ', retry)
-      retry += 1
+      console.log('Balance Not Updated, retrying')
     }
     if (balance === expectedBalance) {
       return
     }
-    await new Promise(resolve => setTimeout(resolve, 2000))
+    await new Promise(resolve => setTimeout(resolve, 1000))
   }
   console.log('Incorrect balance, actual balance is ' + response.data.tokens[0].balance)
   expect(false).to.true()
