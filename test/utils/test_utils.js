@@ -319,7 +319,7 @@ async function isTokenBalance (address, expectedBalance) {
     if (balance === expectedBalance) {
       return
     }
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    await new Promise(resolve => setTimeout(resolve, 2000))
   }
   console.log('Incorrect balance, actual balance is ' + response.data.tokens[0].balance)
   expect(false).to.true()
