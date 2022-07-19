@@ -315,7 +315,14 @@ async function isTokenBalance (address, expectedBalance) {
         password: process.env.API_PASSWORD
       }
     })
-    const balance = response.data.tokens[0].balance
+    let balance
+    let retry = 0
+    try {
+      balance = response.data.tokens[0].balance
+    } catch (e) {
+      console.log('Balance Not Updated, retrying: ', retry)
+      retry += 1
+    }
     if (balance === expectedBalance) {
       return
     }
