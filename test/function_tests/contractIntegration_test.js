@@ -1,6 +1,7 @@
 const expect = require('chai').expect
 const utils = require('../utils/test_utils')
 const bsv = require('bsv')
+const { tags } = require('jest-tags')
 require('dotenv').config()
 
 const {
@@ -33,7 +34,7 @@ beforeEach(async () => {
   await setup()
 })
 
-it('Contract - Successful With Fees', async () => {
+tags('smoke', 'regression').it('Contract - Successful With Fees', async () => {
   const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
@@ -47,7 +48,7 @@ it('Contract - Successful With Fees', async () => {
   expect(amount).to.equal(supply / 100000000)
 })
 
-it('Contract - Successful No Fees', async () => {
+tags('smoke', 'regression').it('Contract - Successful No Fees', async () => {
   const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
@@ -75,7 +76,7 @@ it('Contract - Successful No Fees Empty Array', async () => {
   expect(amount).to.equal(supply / 100000000)
 })
 
-it('Contract - Successful With Callback Fee', async () => {
+tags('smoke', 'regression').it('Contract - Successful With Callback Fee', async () => {
   const contractHex = await contractWithCallback(
     issuerPrivateKey.publicKey,
     contractUtxos,
@@ -91,7 +92,7 @@ it('Contract - Successful With Callback Fee', async () => {
   expect(amount).to.equal(supply / 100000000)
 })
 
-it('Contract - Successful With Callback No Fee', async () => {
+tags('smoke', 'regression').it('Contract - Successful With Callback No Fee', async () => {
   const contractHex = await contractWithCallback(
     issuerPrivateKey.publicKey,
     contractUtxos,
