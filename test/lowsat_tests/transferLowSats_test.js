@@ -38,6 +38,7 @@ const bobSignatureCallback = async (tx, i, script, satoshis) => {
 const paymentSignatureCallback = async (tx, i, script, satoshis) => {
   return bsv.Transaction.sighash.sign(tx, fundingPrivateKey, sighash, i, script, satoshis).toTxFormat().toString('hex')
 }
+
 // add callback tests
 it('Transfer - Successful With Low Sats (20)', async () => {
   await setup(20)
