@@ -38,9 +38,10 @@ const bobSignatureCallback = async (tx, i, script, satoshis) => {
 const paymentSignatureCallback = async (tx, i, script, satoshis) => {
   return bsv.Transaction.sighash.sign(tx, fundingPrivateKey, sighash, i, script, satoshis).toTxFormat().toString('hex')
 }
-//add callback tests
+
+// add callback tests
 it('Transfer - Successful With Low Sats (20)', async () => {
-    await setup(20)
+  await setup(20)
   const transferHex = await transfer(
     alicePrivateKey,
     utils.getUtxo(issueTxid, issueTx, 0),
@@ -54,7 +55,7 @@ it('Transfer - Successful With Low Sats (20)', async () => {
 })
 
 it('Transfer - Successful With Low Sats (10)', async () => {
-    await setup(10)
+  await setup(10)
   const transferHex = await transfer(
     alicePrivateKey,
     utils.getUtxo(issueTxid, issueTx, 0),
@@ -68,7 +69,7 @@ it('Transfer - Successful With Low Sats (10)', async () => {
 })
 
 it('Transfer - Successful With Low Sats (5)', async () => {
-    await setup(5)
+  await setup(5)
   const transferHex = await transfer(
     alicePrivateKey,
     utils.getUtxo(issueTxid, issueTx, 0),
@@ -82,7 +83,7 @@ it('Transfer - Successful With Low Sats (5)', async () => {
 })
 
 it('Transfer - Successful With Low Sats (1)', async () => {
-    await setup(1)
+  await setup(1)
   const transferHex = await transfer(
     alicePrivateKey,
     utils.getUtxo(issueTxid, issueTx, 0),
@@ -94,7 +95,6 @@ it('Transfer - Successful With Low Sats (1)', async () => {
   expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00000001)
   await utils.isTokenBalance(bobAddr, 1)
 })
-
 
 async function setup (satSupply) {
   issuerPrivateKey = bsv.PrivateKey()
@@ -125,10 +125,10 @@ async function setup (satSupply) {
   const issueHex = await issue(
     issuerPrivateKey,
     [
-        {
-          addr: aliceAddr,
-          satoshis: satSupply
-        }
+      {
+        addr: aliceAddr,
+        satoshis: satSupply
+      }
     ],
     utils.getUtxo(contractTxid, contractTx, 0),
     utils.getUtxo(contractTxid, contractTx, 1),
