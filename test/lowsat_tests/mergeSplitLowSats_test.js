@@ -40,6 +40,7 @@ const paymentSignatureCallback = async (tx, i, script, satoshis) => {
   return bsv.Transaction.sighash.sign(tx, fundingPrivateKey, sighash, i, script, satoshis).toTxFormat().toString('hex')
 }
 
+// add callback tests
 it('MergeSplit - Successful MergeSplit With Low Sats(20)', async () => {
   await setup(40) // contract, issue, transfer then split
 
