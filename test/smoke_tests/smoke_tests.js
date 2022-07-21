@@ -1,7 +1,6 @@
 const expect = require('chai').expect
 const utils = require('../utils/test_utils')
 const bsv = require('bsv')
-const { tags } = require('jest-tags')
 require('dotenv').config()
 
 const { sighash } = require('../../lib/stas')

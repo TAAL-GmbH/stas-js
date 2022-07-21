@@ -1,7 +1,6 @@
 const expect = require('chai').expect
 const utils = require('../utils/test_utils')
 const bsv = require('bsv')
-const { tags } = require('jest-tags')
 require('dotenv').config()
 
 const {
@@ -33,8 +32,7 @@ let schema
 beforeEach(async () => {
   await setup()
 })
-
-tags('smoke', 'regression').it('Contract - Successful With Fees', async () => {
+it('Contract - Successful With Fees', async () => {
   const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
@@ -47,8 +45,7 @@ tags('smoke', 'regression').it('Contract - Successful With Fees', async () => {
   const amount = await utils.getVoutAmount(contractTxid, 0)
   expect(amount).to.equal(supply / 100000000)
 })
-
-tags('smoke', 'regression').it('Contract - Successful No Fees', async () => {
+it('Contract - Successful No Fees', async () => {
   const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
