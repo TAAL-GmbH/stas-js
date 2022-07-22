@@ -19,7 +19,9 @@ const {
   redeem,
   redeemWithCallback,
   transfer,
-  transferWithCallback
+  transferWithCallback,
+  redeemSplit,
+  redeemSplitWithCallback
 } = require('../../index')
 
 const {
@@ -406,6 +408,82 @@ it('Transfer - Successful Callback With Fee', async () => {
   expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
   await utils.isTokenBalance(bobAddr, 3000)
   await utils.isTokenBalance(aliceAddr, 7000)
+})
+
+it('Successful RedeemSplit With 2 Split', async () => {
+  await setupRedeem()
+  const amount = issueTx.vout[0].value / 5
+  const rSplitDestinations = []
+  rSplitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
+  rSplitDestinations[1] = { address: aliceAddr, amount: bitcoinToSatoshis(amount) }
+
+  const redeemSplitHex = await redeemSplit(
+    alicePrivateKey,
+    issuerPrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 0),
+    rSplitDestinations,
+    utils.getUtxo(issueTxid, issueTx, 2),
+    fundingPrivateKey
+  )
+  const redeemTxid = await broadcast(redeemSplitHex)
+  expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000042)
+  expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000014)
+  expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.000014)
+  await utils.isTokenBalance(aliceAddr, 1400)
+  await utils.isTokenBalance(bobAddr, 4400)
+})
+
+it('Successful RedeemSplit With Callback & Fees', async () => {
+  await setupRedeem()
+  const amount = issueTx.vout[0].value / 5
+  const rSplitDestinations = []
+  rSplitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
+  rSplitDestinations[1] = { address: aliceAddr, amount: bitcoinToSatoshis(amount) }
+
+  const redeemSplitHex = await redeemSplitWithCallback(
+    alicePrivateKey.publicKey,
+    issuerPrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 0),
+    rSplitDestinations,
+    utils.getUtxo(issueTxid, issueTx, 2),
+    fundingPrivateKey.publicKey,
+    aliceSignatureCallback,
+    paymentSignatureCallback
+  )
+  const redeemTxid = await broadcast(redeemSplitHex)
+  expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000042) // first utxo goes to redemption address
+  expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000014)
+  expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.000014)
+  await utils.isTokenBalance(aliceAddr, 1400)
+  await utils.isTokenBalance(bobAddr, 4400)
+})
+
+it('Successful RedeemSplit With 3 Split', async () => {
+  await setupRedeem()
+  const davePrivateKey = bsv.PrivateKey()
+  const daveAddr = davePrivateKey.toAddress(process.env.NETWORK).toString()
+  const amount = issueTx.vout[0].value / 10
+  const rSplitDestinations = []
+  rSplitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
+  rSplitDestinations[1] = { address: aliceAddr, amount: bitcoinToSatoshis(amount) }
+  rSplitDestinations[2] = { address: daveAddr, amount: bitcoinToSatoshis(amount) }
+
+  const redeemSplitHex = await redeemSplit(
+    alicePrivateKey,
+    issuerPrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 0),
+    rSplitDestinations,
+    utils.getUtxo(issueTxid, issueTx, 2),
+    fundingPrivateKey
+  )
+  const redeemTxid = await broadcast(redeemSplitHex)
+  expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000049)
+  expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000007)
+  expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.000007)
+  expect(await utils.getVoutAmount(redeemTxid, 3)).to.equal(0.000007)
+  await utils.isTokenBalance(aliceAddr, 700)
+  await utils.isTokenBalance(bobAddr, 3700)
+  await utils.isTokenBalance(daveAddr, 700)
 })
 
 // the maker offers a token for sats

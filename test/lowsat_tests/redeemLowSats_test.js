@@ -100,7 +100,7 @@ it('Redeem - Successful Redeem With Callback and Fee', async () => {
     alicePrivateKey.publicKey,
     issuerPrivateKey.publicKey,
     utils.getUtxo(issueTxid, issueTx, 0),
-    utils.getUtxo(issueTxid, issueTx, 2),
+    utils.getUtxo(issueTxid, issueTx, 1),
     fundingPrivateKey.publicKey,
     aliceSignatureCallback,
     paymentSignatureCallback

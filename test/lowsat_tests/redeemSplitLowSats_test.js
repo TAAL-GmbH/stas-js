@@ -161,6 +161,8 @@ async function setup (satSupply) {
   fundingPrivateKey = bsv.PrivateKey()
   alicePrivateKey = bsv.PrivateKey()
   aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
+  bobPrivateKey = bsv.PrivateKey()
+  bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
   contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
   fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
   publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')

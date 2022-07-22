@@ -62,6 +62,7 @@ it('Issue With Invalid Schema 2', async () => {
   const issueTxid = await broadcast(issueHex)
   const tokenId = await utils.getToken(issueTxid)
   await new Promise(resolve => setTimeout(resolve, wait))
+
   const response = await utils.getTokenResponse(tokenId)
   expect(response).to.equal('Token Not Found')
 })
@@ -110,13 +111,7 @@ function invalidSchema1 (publicKeyHash, symbol, supply) {
 
 function invalidSchema2 (publicKeyHash, symbol, supply) {
   const schema = {
-    // name: 'Taal Token',
     tokenId: `${publicKeyHash}`,
-    // protocolId: 'To be decided',
-    symbol: `${symbol}`,
-    // description: 'Example token on private Taalnet',
-    // image: 'https://www.taal.com/wp-content/themes/taal_v2/img/favicon/favicon-96x96.png',
-    totalSupply: supply,
     decimals: 0,
     satsPerToken: 1,
     properties: {
