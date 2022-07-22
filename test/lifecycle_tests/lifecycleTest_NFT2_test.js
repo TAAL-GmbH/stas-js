@@ -30,14 +30,12 @@ describe('regression, testnet', () => {
     const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
     const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
     const supply = 10000
-    const satsPerSupply = 10000 // 1 token worth 10k sats
+    const satsPerSupply = 1 // 1 token worth 10k sats
     const symbol = 'TAALT'
     const wait = 5000 // set wait before token balance check
 
-    const schema = utils.schema(publicKeyHash, symbol, supply, satsPerSupply)
+    const schema = utils.schema(publicKeyHash, symbol, supply)
     schema.satsPerToken = satsPerSupply
-
-    console.log(aliceAddr)
 
     const contractHex = await contract(
       issuerPrivateKey,

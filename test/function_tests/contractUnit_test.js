@@ -188,7 +188,7 @@ it('Contract - Invalid Contract UTXO Throw Error', async () => {
         {
           txid: '71ea4669224ce874ce79f71d609a48ce1cc7a32fcd22afee52b09a326ad22eff',
           vout: 0,
-          amount: 0.01
+          amount: 10000
         }
       ],
       fundingUtxos,

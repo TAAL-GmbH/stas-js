@@ -55,7 +55,7 @@ describe('regression, testnet', () => {
 
     let issueHex
     try {
-      await issueHex = issue(
+      issueHex = issue(
         issuerPrivateKey,
         utils.getIssueInfo(aliceAddr, 400000, bobAddr, 100000),
         utils.getUtxo(contractTxid, contractTx, 0),

@@ -73,7 +73,7 @@ it('Contract - Successful No Fees Empty Array', async () => {
   expect(amount).to.equal(supply / 100000000)
 })
 
-tags('smoke', 'regression').it('Contract - Successful With Callback Fee', async () => {
+it('Contract - Successful With Callback Fee', async () => {
   const contractHex = await contractWithCallback(
     issuerPrivateKey.publicKey,
     contractUtxos,
@@ -89,7 +89,7 @@ tags('smoke', 'regression').it('Contract - Successful With Callback Fee', async 
   expect(amount).to.equal(supply / 100000000)
 })
 
-tags('smoke', 'regression').it('Contract - Successful With Callback No Fee', async () => {
+it('Contract - Successful With Callback No Fee', async () => {
   const contractHex = await contractWithCallback(
     issuerPrivateKey.publicKey,
     contractUtxos,
