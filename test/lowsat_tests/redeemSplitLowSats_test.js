@@ -131,6 +131,31 @@ it('Successful RedeemSplit With Low Sats (1)', async () => {
   await utils.isTokenBalance(aliceAddr, 2)
 })
 
+it('Successful RedeemSplit With Callback & Fees', async () => {
+  await setup(3)
+  const amount = issueTx.vout[0].value / 5
+  const rSplitDestinations = []
+  rSplitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
+  rSplitDestinations[1] = { address: aliceAddr, amount: bitcoinToSatoshis(amount) }
+
+  const redeemSplitHex = await redeemSplitWithCallback(
+    alicePrivateKey.publicKey,
+    issuerPrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 0),
+    rSplitDestinations,
+    utils.getUtxo(issueTxid, issueTx, 1),
+    fundingPrivateKey.publicKey,
+    aliceSignatureCallback,
+    paymentSignatureCallback
+  )
+  console.log(redeemSplitHex)
+  const redeemTxid = await broadcast(redeemSplitHex)
+  expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00000001) // first utxo goes to redemption address
+  expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00000001) // first utxo goes to redemption address
+  expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00000001) // first utxo goes to redemption address
+  await utils.isTokenBalance(aliceAddr, 2)
+})
+
 async function setup (satSupply) {
   issuerPrivateKey = bsv.PrivateKey()
   fundingPrivateKey = bsv.PrivateKey()

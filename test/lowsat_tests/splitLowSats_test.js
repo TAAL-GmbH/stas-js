@@ -38,15 +38,15 @@ const aliceSignatureCallback = async (tx, i, script, satoshis) => {
 const paymentSignatureCallback = async (tx, i, script, satoshis) => {
   return bsv.Transaction.sighash.sign(tx, fundingPrivateKey, sighash, i, script, satoshis).toTxFormat().toString('hex')
 }
-//add callback tests
+// add callback tests
 
 it('Split - Successful Split Into Two Tokens With Low Sats (20)', async () => {
   await setup(40)
   const issueTxSats = issueTx.vout[0].value
   const amount = issueTxSats / 2
   const splitDestinations = []
-  splitDestinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(amount) } 
-  splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(amount) } 
+  splitDestinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(amount) }
+  splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
 
   const splitHex = await split(
     alicePrivateKey,
@@ -61,65 +61,89 @@ it('Split - Successful Split Into Two Tokens With Low Sats (20)', async () => {
 })
 
 it('Split - Successful Split Into Two Tokens With Low Sats (10)', async () => {
-    await setup(20)
-    const issueTxSats = issueTx.vout[0].value
-    const amount = issueTxSats / 2
-    const splitDestinations = []
-    splitDestinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(amount) } 
-    splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(amount) } 
-  
-    const splitHex = await split(
-      alicePrivateKey,
-      utils.getUtxo(issueTxid, issueTx, 0),
-      splitDestinations,
-      utils.getUtxo(issueTxid, issueTx, 1),
-      fundingPrivateKey
-    )
-    const splitTxid = await broadcast(splitHex)
-    expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.0000001)
-    await utils.isTokenBalance(bobAddr, 10)
-  })
+  await setup(20)
+  const issueTxSats = issueTx.vout[0].value
+  const amount = issueTxSats / 2
+  const splitDestinations = []
+  splitDestinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(amount) }
+  splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
 
-  it('Split - Successful Split Into Two Tokens With Low Sats (5)', async () => {
-    await setup(10)
-    const issueTxSats = issueTx.vout[0].value
-    const amount = issueTxSats / 2
-    const splitDestinations = []
-    splitDestinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(amount) } 
-    splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(amount) } 
-  
-    const splitHex = await split(
-      alicePrivateKey,
-      utils.getUtxo(issueTxid, issueTx, 0),
-      splitDestinations,
-      utils.getUtxo(issueTxid, issueTx, 1),
-      fundingPrivateKey
-    )
-    const splitTxid = await broadcast(splitHex)
-    expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.00000005)
-    await utils.isTokenBalance(bobAddr, 5)
-  })
+  const splitHex = await split(
+    alicePrivateKey,
+    utils.getUtxo(issueTxid, issueTx, 0),
+    splitDestinations,
+    utils.getUtxo(issueTxid, issueTx, 1),
+    fundingPrivateKey
+  )
+  const splitTxid = await broadcast(splitHex)
+  expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.0000001)
+  await utils.isTokenBalance(bobAddr, 10)
+})
 
-  it('Split - Successful Split Into Two Tokens With Low Sats (1)', async () => {
-    await setup(2)
-    const issueTxSats = issueTx.vout[0].value
-    const amount = issueTxSats / 2
-    const splitDestinations = []
-    splitDestinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(amount) } 
-    splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(amount) } 
-  
-    const splitHex = await split(
-      alicePrivateKey,
-      utils.getUtxo(issueTxid, issueTx, 0),
-      splitDestinations,
-      utils.getUtxo(issueTxid, issueTx, 1),
-      fundingPrivateKey
-    )
-    const splitTxid = await broadcast(splitHex)
-    expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.00000001)
-    await utils.isTokenBalance(bobAddr, 1)
-  })
+it('Split - Successful Split Into Two Tokens With Low Sats (5)', async () => {
+  await setup(10)
+  const issueTxSats = issueTx.vout[0].value
+  const amount = issueTxSats / 2
+  const splitDestinations = []
+  splitDestinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(amount) }
+  splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
 
+  const splitHex = await split(
+    alicePrivateKey,
+    utils.getUtxo(issueTxid, issueTx, 0),
+    splitDestinations,
+    utils.getUtxo(issueTxid, issueTx, 1),
+    fundingPrivateKey
+  )
+  const splitTxid = await broadcast(splitHex)
+  expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.00000005)
+  await utils.isTokenBalance(bobAddr, 5)
+})
+
+it('Split - Successful Split Into Two Tokens With Low Sats (1)', async () => {
+  await setup(2)
+  const issueTxSats = issueTx.vout[0].value
+  const amount = issueTxSats / 2
+  const splitDestinations = []
+  splitDestinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(amount) }
+  splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
+
+  const splitHex = await split(
+    alicePrivateKey,
+    utils.getUtxo(issueTxid, issueTx, 0),
+    splitDestinations,
+    utils.getUtxo(issueTxid, issueTx, 1),
+    fundingPrivateKey
+  )
+  const splitTxid = await broadcast(splitHex)
+  expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.00000001)
+  await utils.isTokenBalance(aliceAddr, 1)
+  await utils.isTokenBalance(bobAddr, 1)
+})
+
+it.only('Split - Successful Split With Callback and Fee', async () => {
+  await setup(2)
+  const issueTxSats = issueTx.vout[0].value
+  const amount = issueTxSats / 2
+  const splitDestinations = []
+  splitDestinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(amount) }
+  splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
+
+  const splitHex = await splitWithCallback(
+    alicePrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 0),
+    splitDestinations,
+    utils.getUtxo(issueTxid, issueTx, 1),
+    fundingPrivateKey.publicKey,
+    aliceSignatureCallback,
+    paymentSignatureCallback
+  )
+  const splitTxid = await broadcast(splitHex)
+  expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.00000001)
+  expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.00000001)
+  await utils.isTokenBalance(aliceAddr, 1)
+  await utils.isTokenBalance(bobAddr, 1)
+})
 
 async function setup (satSupply) {
   issuerPrivateKey = bsv.PrivateKey()
@@ -148,10 +172,10 @@ async function setup (satSupply) {
   const issueHex = await issue(
     issuerPrivateKey,
     [
-        {
-          addr: aliceAddr,
-          satoshis: satSupply
-        }
+      {
+        addr: aliceAddr,
+        satoshis: satSupply
+      }
     ],
     utils.getUtxo(contractTxid, contractTx, 0),
     utils.getUtxo(contractTxid, contractTx, 1),

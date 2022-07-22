@@ -27,13 +27,12 @@ let fundingUtxos
 let publicKeyHash
 let aliceAddr
 let bobAddr
-let fundingAddress
 let symbol
 let issueTxid
 let issueTx
 
-const bobSignatureCallback = async (tx, i, script, satoshis) => {
-  return bsv.Transaction.sighash.sign(tx, bobPrivateKey, sighash, i, script, satoshis).toTxFormat().toString('hex')
+const aliceSignatureCallback = async (tx, i, script, satoshis) => {
+  return bsv.Transaction.sighash.sign(tx, alicePrivateKey, sighash, i, script, satoshis).toTxFormat().toString('hex')
 }
 const paymentSignatureCallback = async (tx, i, script, satoshis) => {
   return bsv.Transaction.sighash.sign(tx, fundingPrivateKey, sighash, i, script, satoshis).toTxFormat().toString('hex')
@@ -96,6 +95,22 @@ it('Transfer - Successful With Low Sats (1)', async () => {
   await utils.isTokenBalance(bobAddr, 1)
 })
 
+it('Transfer - Successful Callback With Fee', async () => {
+  await setup(1)
+  const transferHex = await transferWithCallback(
+    alicePrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 0),
+    bobAddr,
+    utils.getUtxo(issueTxid, issueTx, 1),
+    fundingPrivateKey.publicKey,
+    aliceSignatureCallback,
+    paymentSignatureCallback
+  )
+  const transferTxid = await broadcast(transferHex)
+  expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00000001)
+  await utils.isTokenBalance(bobAddr, 1)
+})
+
 async function setup (satSupply) {
   issuerPrivateKey = bsv.PrivateKey()
   fundingPrivateKey = bsv.PrivateKey()
@@ -109,7 +124,6 @@ async function setup (satSupply) {
   const schema = utils.schema(publicKeyHash, symbol, supply)
   aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
   bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
-  fundingAddress = fundingPrivateKey.toAddress(process.env.NETWORK).toString()
 
   const contractHex = await contract(
     issuerPrivateKey,

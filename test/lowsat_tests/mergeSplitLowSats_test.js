@@ -6,7 +6,6 @@ require('dotenv').config()
 const {
   contract,
   issue,
-  transfer,
   split,
   mergeSplit,
   mergeSplitWithCallback
@@ -26,15 +25,14 @@ let fundingPrivateKey
 let contractUtxos
 let fundingUtxos
 let publicKeyHash
-let bobPrivateKey
 let alicePrivateKey
 let aliceAddr
 let splitTxid
 let splitTx
 let splitTxObj
 
-const bobSignatureCallback = async (tx, i, script, satoshis) => {
-  return bsv.Transaction.sighash.sign(tx, bobPrivateKey, sighash, i, script, satoshis).toTxFormat().toString('hex')
+const aliceSignatureCallback = async (tx, i, script, satoshis) => {
+  return bsv.Transaction.sighash.sign(tx, alicePrivateKey, sighash, i, script, satoshis).toTxFormat().toString('hex')
 }
 const paymentSignatureCallback = async (tx, i, script, satoshis) => {
   return bsv.Transaction.sighash.sign(tx, fundingPrivateKey, sighash, i, script, satoshis).toTxFormat().toString('hex')
@@ -134,34 +132,34 @@ it('MergeSplit - Successful MergeSplit With Low Sats(1)', async () => {
   await utils.isTokenBalance(aliceAddr, 2)
 })
 
-it('MergeSplit - Successful MergeSplit With Fees', async () => {
+it('MergeSplit - Successful MergeSplit With Callback and low fees', async () => {
   await setup(2) // contract, issue, transfer then split
 
   const issueOutFundingVout = splitTx.vout.length - 1
+  const amount = bitcoinToSatoshis(splitTx.vout[0].value)
 
-  const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
-  const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
-
-  const mergeSplitHex = await mergeSplit(
-    bobPrivateKey,
+  const mergeSplitHex = await mergeSplitWithCallback(
+    alicePrivateKey.publicKey,
     utils.getMergeSplitUtxo(splitTxObj, splitTx),
     aliceAddr,
-    aliceAmountSatoshis,
+    amount,
     aliceAddr,
-    bobAmountSatoshis,
+    amount,
     utils.getUtxo(splitTxid, splitTx, issueOutFundingVout),
-    fundingPrivateKey
+    fundingPrivateKey.publicKey,
+    aliceSignatureCallback,
+    paymentSignatureCallback
   )
   const mergeSplitTxid = await broadcast(mergeSplitHex)
   expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.00000001)
   expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.00000001)
   await utils.isTokenBalance(aliceAddr, 2)
-})
+}
+)
 
 async function setup (satSupply) {
   issuerPrivateKey = bsv.PrivateKey()
   fundingPrivateKey = bsv.PrivateKey()
-  bobPrivateKey = bsv.PrivateKey()
   alicePrivateKey = bsv.PrivateKey()
   aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
   contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
