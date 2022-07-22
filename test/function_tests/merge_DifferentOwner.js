@@ -1,7 +1,6 @@
 const expect = require('chai').expect
 const utils = require('../utils/test_utils')
 const bsv = require('bsv')
-const mergeUtil = require('../utils/mergeWithOutValidation')
 require('dotenv').config()
 
 const {
@@ -58,40 +57,6 @@ it('Attempt To Merge Token with Different Owners Via SDK Throws Error',
     } catch (e) {
       expect(e).to.be.instanceOf(Error)
       expect(e.message).to.eql('This function only merges STAS tokens with the same owner')
-    }
-  }
-)
-
-it(
-  'Attempt To Merge Token with Different Owners Without SDK Validation Throws Error',
-  async () => {
-    const validSplitTxObj = await validToken()
-    const invalidSplitTxObj = await invalidToken()
-
-    const mergeHex = await mergeUtil.mergeWithOutValidation(
-      bobPrivateKey,
-      [{
-        tx: validSplitTxObj,
-        vout: 0
-      },
-      {
-        tx: invalidSplitTxObj,
-        vout: 1
-      }],
-      aliceAddr,
-      {
-        txid: splitTxid,
-        vout: 2,
-        scriptPubKey: splitTx.vout[2].scriptPubKey.hex,
-        amount: splitTx.vout[2].value
-      },
-      fundingPrivateKey
-    )
-    try {
-      await broadcast(mergeHex)
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('Request failed with status code 400')
     }
   }
 )

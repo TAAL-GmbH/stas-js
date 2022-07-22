@@ -82,8 +82,8 @@ it('Full Life Cycle Test 7 - Issuance with 32kb of data', async () => {
   expect(response.symbol).to.equal(symbol)
   expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
   expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+  expect(await utils.isTokenBalance(aliceAddr, 7000))
+  expect(await utils.isTokenBalance(bobAddr, 3000))
 
   const issueOutFundingVout = issueTx.vout.length - 1
 
@@ -98,8 +98,8 @@ it('Full Life Cycle Test 7 - Issuance with 32kb of data', async () => {
   console.log(`Transfer TX:     ${transferTxid}`)
   const transferTx = await getTransaction(transferTxid)
   expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00007)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(10000)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
+  expect(await utils.isTokenBalance(bobAddr, 10000))
+  expect(await utils.isTokenBalance(aliceAddr, 0))
 
   // Split tokens into 2 - both payable to Bob...
   const bobAmount1 = transferTx.vout[0].value / 2
@@ -120,8 +120,8 @@ it('Full Life Cycle Test 7 - Issuance with 32kb of data', async () => {
   const splitTx = await getTransaction(splitTxid)
   expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035)
   expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000035)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+  expect(await utils.isTokenBalance(aliceAddr, 7000))
+  expect(await utils.isTokenBalance(bobAddr, 3000))
 
   // Now let's merge the last split back together
   const splitTxObj = new bsv.Transaction(splitHex)
@@ -143,10 +143,9 @@ it('Full Life Cycle Test 7 - Issuance with 32kb of data', async () => {
   expect(responseMerge.symbol).to.equal(symbol)
   expect(responseMerge.contract_txs).to.contain(contractTxid)
   expect(responseMerge.issuance_txs).to.contain(issueTxid)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(10000)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(0)
+  expect(await utils.isTokenBalance(bobAddr, 10000))
+  expect(await utils.isTokenBalance(aliceAddr, 0))
 
-  // Split again - both payable to Bob...
   const amount = mergeTx.vout[0].value / 2
 
   const split2Destinations = []
@@ -165,8 +164,8 @@ it('Full Life Cycle Test 7 - Issuance with 32kb of data', async () => {
   const splitTx2 = await getTransaction(splitTxid2)
   expect(await utils.getVoutAmount(splitTxid2, 0)).to.equal(0.000035)
   expect(await utils.getVoutAmount(splitTxid2, 1)).to.equal(0.000035)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(7000)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(3000)
+  expect(await utils.isTokenBalance(aliceAddr, 7000))
+  expect(await utils.isTokenBalance(bobAddr, 3000))
 
   // Now mergeSplit
   const splitTxObj2 = new bsv.Transaction(splitHex2)
@@ -190,8 +189,8 @@ it('Full Life Cycle Test 7 - Issuance with 32kb of data', async () => {
   const mergeSplitTx = await getTransaction(mergeSplitTxid)
   expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000175)
   expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000525)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(1750)
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(8250)
+  expect(await utils.isTokenBalance(aliceAddr, 1750))
+  expect(await utils.isTokenBalance(bobAddr, 8250))
 
   // Alice wants to redeem the money from bob...
   const redeemHex = await redeem(
@@ -204,6 +203,6 @@ it('Full Life Cycle Test 7 - Issuance with 32kb of data', async () => {
   const redeemTxid = await broadcast(redeemHex)
   console.log(`Redeem TX:       ${redeemTxid}`)
   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.0000175)
-  expect(await utils.getTokenBalance(aliceAddr)).to.equal(0) // 750 of alice tokens were redeemed
-  expect(await utils.getTokenBalance(bobAddr)).to.equal(8250)
+  expect(await utils.isTokenBalance(aliceAddr, 0)) // 750 of alice's tokens were redeemed
+  expect(await utils.isTokenBalance(bobAddr, 8250))
 })
