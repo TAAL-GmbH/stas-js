@@ -94,15 +94,29 @@ it('Redeem - Successful Redeem With Low Sats (1)', async () => {
   await utils.isTokenBalance(aliceAddr, 0)
 })
 
+it('Redeem - Successful Redeem With Callback and Fee', async () => {
+  await setup(1)
+  const redeemHex = await redeemWithCallback(
+    alicePrivateKey.publicKey,
+    issuerPrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 0),
+    utils.getUtxo(issueTxid, issueTx, 2),
+    fundingPrivateKey.publicKey,
+    aliceSignatureCallback,
+    paymentSignatureCallback
+  )
+  const redeemTxid = await broadcast(redeemHex)
+  expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00000001)
+  await utils.isTokenBalance(aliceAddr, 0)
+})
+
 async function setup (satSupply) {
   issuerPrivateKey = bsv.PrivateKey()
   fundingPrivateKey = bsv.PrivateKey()
-  bobPrivateKey = bsv.PrivateKey()
   alicePrivateKey = bsv.PrivateKey()
   contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
   fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
   publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
-  bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
   aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
   const symbol = 'TAALT'
   const schema = utils.schema(publicKeyHash, symbol, satSupply)

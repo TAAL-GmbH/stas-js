@@ -92,6 +92,24 @@ it('Contract - Successful With Low Sats (1)', async () => {
   expect(amount).to.equal(supply / 100000000)
 })
 
+it('Contract - Successful With Callback and Low Sats', async () => {
+  const supply = 1
+  await setup(1)
+  const contractHex = await contractWithCallback(
+    issuerPrivateKey.publicKey,
+    contractUtxos,
+    fundingUtxos,
+    fundingPrivateKey.publicKey,
+    schema,
+    supply,
+    ownerSignCallback,
+    paymentSignCallback
+  )
+  const contractTxid = await broadcast(contractHex)
+  const amount = await utils.getVoutAmount(contractTxid, 0)
+  expect(amount).to.equal(supply / 100000000)
+})
+
 async function setup (satSupply) {
   issuerPrivateKey = bsv.PrivateKey()
   fundingPrivateKey = bsv.PrivateKey()

@@ -118,6 +118,26 @@ it('Merge - Successful Merge With Low Sats (1)', async () => {
   await utils.isTokenBalance(aliceAddr, 2)
 })
 
+it('Merge - Successful Merge With Callback And Low Sats', async () => {
+  await setup(2)
+  const mergeHex = await mergeWithCallback(
+    bobPrivateKey.publicKey,
+    utils.getMergeUtxo(splitTxObj),
+    aliceAddr,
+    utils.getUtxo(splitTxid, splitTx, 2),
+    fundingPrivateKey.publicKey,
+    bobSignatureCallback,
+    paymentSignatureCallback
+  )
+  const mergeTxid = await broadcast(mergeHex)
+  await new Promise(resolve => setTimeout(resolve, wait))
+  const tokenIdMerge = await utils.getToken(mergeTxid)
+  const response = await utils.getTokenResponse(tokenIdMerge)
+  expect(response.symbol).to.equal('TAALT')
+  expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00000002)
+  await utils.isTokenBalance(aliceAddr, 2)
+})
+
 async function setup (satSupply) {
   issuerPrivateKey = bsv.PrivateKey()
   fundingPrivateKey = bsv.PrivateKey()

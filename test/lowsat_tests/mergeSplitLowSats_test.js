@@ -134,6 +134,30 @@ it('MergeSplit - Successful MergeSplit With Low Sats(1)', async () => {
   await utils.isTokenBalance(aliceAddr, 2)
 })
 
+it('MergeSplit - Successful MergeSplit With Fees', async () => {
+  await setup(2) // contract, issue, transfer then split
+
+  const issueOutFundingVout = splitTx.vout.length - 1
+
+  const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
+  const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
+
+  const mergeSplitHex = await mergeSplit(
+    bobPrivateKey,
+    utils.getMergeSplitUtxo(splitTxObj, splitTx),
+    aliceAddr,
+    aliceAmountSatoshis,
+    aliceAddr,
+    bobAmountSatoshis,
+    utils.getUtxo(splitTxid, splitTx, issueOutFundingVout),
+    fundingPrivateKey
+  )
+  const mergeSplitTxid = await broadcast(mergeSplitHex)
+  expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.00000001)
+  expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.00000001)
+  await utils.isTokenBalance(aliceAddr, 2)
+})
+
 async function setup (satSupply) {
   issuerPrivateKey = bsv.PrivateKey()
   fundingPrivateKey = bsv.PrivateKey()
