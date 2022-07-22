@@ -89,8 +89,6 @@ describe('regression, testnet', () => {
     expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.000003)
     await utils.isTokenBalance(aliceAddr, 1000)
     await utils.isTokenBalance(bobAddr, 0)
-    expect(await utils.getTokenBalance(aliceAddr)).to.equal(1000)
-    expect(await utils.getTokenBalance(bobAddr)).to.equal(0)
 
     // Split tokens into 2 - both payable to Bob...
     const bobAmount1 = transferTx.vout[0].value / 2

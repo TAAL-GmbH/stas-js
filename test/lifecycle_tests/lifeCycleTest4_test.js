@@ -136,8 +136,6 @@ describe('regression, testnet', () => {
       const tokenIdMerge = await utils.getToken(issueTxid)
       const responseMerge = await utils.getTokenResponse(tokenIdMerge)
       expect(responseMerge.symbol).to.equal(symbol)
-      console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
-      console.log('Bob Balance ' + (await utils.getTokenBalance(bobAddr)))
       await utils.isTokenBalance(aliceAddr, 10000)
       await utils.isTokenBalance(bobAddr, 0)
 

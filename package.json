@@ -52,7 +52,8 @@
     "testRegex": "tests/.*\\.(js|jsx)$",
     "testPathIgnorePatterns" : [
       "<rootDir>/test/mainnet_tests/",
-      "<rootDir>/test/lifecycle_tests/lifecycleTest_1000Addresses_test.js"
+      "<rootDir>/test/lifecycle_tests/lifecycleTest_1000Addresses_test.js",
+      "<rootDir>test/function_tests/swap_fewerSatsThanOfferedUTXO_test.js"
     ],
     "verbose": true,
     "testTimeout": 240000,

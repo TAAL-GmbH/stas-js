@@ -73,7 +73,6 @@ it('Symbol 75 Data Size Zero Bytes', async () => {
   const redeemTxid = await broadcast(redeemHex)
   console.log(`Redeem TX:       ${redeemTxid}`)
   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00010000)
-  console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
   await utils.isTokenBalance(aliceAddr, 0)
 })
 
@@ -116,7 +115,6 @@ it('Symbol 75 Data Size 1 Byte', async () => {
   const redeemTxid = await broadcast(redeemHex)
   console.log(`Redeem TX:       ${redeemTxid}`)
   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00010000)
-  console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
   await utils.isTokenBalance(aliceAddr, 0)
 })
 
@@ -159,7 +157,6 @@ it('Symbol 75 Data Size < 75 Bytes', async () => {
   const redeemTxid = await broadcast(redeemHex)
   console.log(`Redeem TX:       ${redeemTxid}`)
   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00010000)
-  console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
   await utils.isTokenBalance(aliceAddr, 0)
 })
 
@@ -202,7 +199,6 @@ it('Symbol 75 Data Size < 128 Bytes', async () => {
   const redeemTxid = await broadcast(redeemHex)
   console.log(`Redeem TX:       ${redeemTxid}`)
   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00010000)
-  console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
   await utils.isTokenBalance(aliceAddr, 0)
 })
 
@@ -245,7 +241,6 @@ it('Symbol 75 Data Size > 128 Bytes', async () => {
   const redeemTxid = await broadcast(redeemHex)
   console.log(`Redeem TX:       ${redeemTxid}`)
   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00010000)
-  console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
   await utils.isTokenBalance(aliceAddr, 0)
 })
 
@@ -287,7 +282,6 @@ it('Symbol 75 Data Size > 32768 Bytes', async () => {
   const redeemTxid = await broadcast(redeemHex)
   console.log(`Redeem TX:       ${redeemTxid}`)
   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00010000)
-  console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
   await utils.isTokenBalance(aliceAddr, 0)
 })
 
@@ -330,7 +324,6 @@ it('Symbol 75 Data Size < 32768 Bytes', async () => {
   const redeemTxid = await broadcast(redeemHex)
   console.log(`Redeem TX:       ${redeemTxid}`)
   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00010000)
-  console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
   await utils.isTokenBalance(aliceAddr, 0)
 })
 
@@ -373,7 +366,6 @@ it('Symbol 75 Data Size Large', async () => {
   const redeemTxid = await broadcast(redeemHex)
   console.log(`Redeem TX:       ${redeemTxid}`)
   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00010000)
-  console.log('Alice Balance ' + (await utils.getTokenBalance(aliceAddr)))
   await utils.isTokenBalance(aliceAddr, 0)
 })
 

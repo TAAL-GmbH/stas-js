@@ -152,6 +152,5 @@ it('Merge Invalid Token Invalidates both token utxos', async () => {
   )
   const mergeTxId = await broadcast(mergeHex)
   console.log(`Merge TX: ${mergeTxId}`)
-  console.log('Bob Balance ' + (await utils.getTokenBalance(attackerAddress)))
-  expect(await utils.getTokenBalance(attackerAddress)).to.equal(0)
+  expect(await utils.isTokenBalance(attackerAddress, 0))
 })

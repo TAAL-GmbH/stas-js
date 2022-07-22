@@ -288,19 +288,19 @@ async function getTokenWithSymbol (txid, symbol, vout) {
   return tokenId
 }
 
-async function getTokenBalance (address) {
-  const url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/address/${address}/tokens`
-  const response = await axios({
-    method: 'get',
-    url,
-    auth: {
-      username: process.env.API_USERNAME,
-      password: process.env.API_PASSWORD
-    }
-  })
+// async function getTokenBalance (address) {
+//   const url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/address/${address}/tokens`
+//   const response = await axios({
+//     method: 'get',
+//     url,
+//     auth: {
+//       username: process.env.API_USERNAME,
+//       password: process.env.API_PASSWORD
+//     }
+//   })
 
-  return response.data.tokens[0].balance
-}
+//   return response.data.tokens[0].balance
+// }
 
 async function isTokenBalance (address, expectedBalance) {
   let response
@@ -593,7 +593,6 @@ module.exports = {
   getVoutAmount,
   getToken,
   getTokenResponse,
-  getTokenBalance,
   getTenIssueInfo,
   getTokenWithSymbol,
   addData,
