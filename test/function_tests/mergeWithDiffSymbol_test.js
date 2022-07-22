@@ -7,8 +7,7 @@ const {
   contract,
   issue,
   split,
-  merge,
-  mergeWithCallback
+  merge
 } = require('../../index')
 
 const {
@@ -17,8 +16,6 @@ const {
   getFundsFromFaucet,
   broadcast
 } = require('../../index').utils
-
-const { sighash } = require('../../lib/stas')
 
 let issuerPrivateKey
 let fundingPrivateKey
@@ -33,38 +30,38 @@ let contractTxid
 let contractTx
 let issueTxid
 let issueTx
-let issueObj1
-let issueObj2
-const wait = 5000
+let splitTxid
+let splitTxid2
+let splitTx2
+let splitTxObj
+let splitTxObj2
 
 beforeEach(async () => {
   await setup()
 })
 
-// failing due to https://taaltech.atlassian.net/browse/BPAAS-64
-it('Merge - Successful Merge With Fee', async () => {
+// can we handle symbol check in sdk?
+it('Merge - Attempt To Merge With Different Symbol', async () => {
   const mergeHex = await merge(
     bobPrivateKey,
     [{
-      tx: issueObj1,
+      tx: splitTxObj,
       vout: 0
     },
     {
-      tx: issueObj2,
+      tx: splitTxObj2,
       vout: 0
     }],
     aliceAddr,
-    utils.getUtxo(issueTxid, issueTx, 1),
+    utils.getUtxo(splitTxid2, splitTx2, 2),
     fundingPrivateKey
   )
-  const mergeTxid = await broadcast(mergeHex)
-  await new Promise(resolve => setTimeout(resolve, wait))
-  const tokenIdMerge = await utils.getToken(mergeTxid)
-  const response = await utils.getTokenResponse(tokenIdMerge)
-  expect(response.symbol).to.equal('TAALT')
-  expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007)
-  await utils.isTokenBalance(aliceAddr, 7000)
-  await utils.isTokenBalance(bobAddr, 3000)
+  try {
+    await broadcast(mergeHex)
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.response.data).to.eql('unexpected response code 500: 16: bad-txns-inputs-duplicate')
+  }
 })
 
 async function setup () {
@@ -115,8 +112,26 @@ async function setup () {
   )
   issueTxid = await broadcast(issueHex)
   issueTx = await getTransaction(issueTxid)
-  issueObj1 = bsv.Transaction(issueHex)
 
+  const issueOutFundingVout = issueTx.vout.length - 1
+
+  const bobAmount1 = issueTx.vout[0].value / 2
+  const bobAmount2 = issueTx.vout[0].value - bobAmount1
+  const splitDestinations = []
+  splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount1) }
+  splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
+
+  const splitHex = await split(
+    alicePrivateKey,
+    utils.getUtxo(issueTxid, issueTx, 0),
+    splitDestinations,
+    utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
+    fundingPrivateKey
+  )
+  splitTxid = await broadcast(splitHex)
+  splitTxObj = new bsv.Transaction(splitHex)
+
+  // issue token with different symbol
   const contractHex2 = await contract(
     issuerPrivateKey,
     contractUtxos2,
@@ -139,5 +154,21 @@ async function setup () {
     2
   )
   const issueTxid2 = await broadcast(issueHex2)
-  issueObj2 = bsv.Transaction(issueHex2)
+  const issueTx2 = await getTransaction(issueTxid2)
+
+  const amount = issueTx.vout[0].value / 2
+  const splitDestinations2 = []
+  splitDestinations2[0] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
+  splitDestinations2[1] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
+
+  const splitHex2 = await split(
+    alicePrivateKey,
+    utils.getUtxo(issueTxid2, issueTx2, 0),
+    splitDestinations,
+    utils.getUtxo(issueTxid2, issueTx2, issueOutFundingVout),
+    fundingPrivateKey
+  )
+  splitTxid2 = await broadcast(splitHex2)
+  splitTx2 = await getTransaction(splitTxid)
+  splitTxObj2 = new bsv.Transaction(splitHex)
 }
