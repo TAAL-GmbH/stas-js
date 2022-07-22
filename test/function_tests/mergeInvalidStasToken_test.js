@@ -99,24 +99,19 @@ it('Merge Invalid Token Invalidates both token utxos', async () => {
 
   const transferhex = await transfer(
     alicePrivateKey,
-    {
-      txid: issueTxid,
-      vout: 0,
-      scriptPubKey: issueTx.vout[0].scriptPubKey.hex,
-      amount: issueTx.vout[0].value
-    },
+    utils.getUtxo(issueTxid, issueTx, 0),
     attackerAddress,
-    fundingUtxos2,
+    utils.getUtxo(issueTxid, issueTx, 2),
     fundingPrivateKey
   )
-
+  console.log(transferhex)
   const transferTxid = await broadcast(transferhex)
   console.log(`Transfer TX:     ${transferTxid}`)
   const transfertx = await getTransaction(transferTxid)
   const validSplit = new bsv.Transaction(transferhex)
 
   // we create stas tx and assign to attacker address
-  hexSymbol = Buffer.from(symbol).toString('hex')
+  const hexSymbol = Buffer.from(symbol).toString('hex')
   attackerFundsUtxo = attackerFundsUtxo[0]
   console.log(attackerFundsUtxo)
   const tx = new bsv.Transaction()
@@ -127,7 +122,7 @@ it('Merge Invalid Token Invalidates both token utxos', async () => {
     satoshis: attackerFundsUtxo.amount
   }))
   tx.sign(attackerPrivateKey)
-
+  console.log(tx.serialize(true))
   const txId = await broadcast(tx.serialize(true))
   const attackerObj = new bsv.Transaction(tx.serialize(true))
 
@@ -142,14 +137,10 @@ it('Merge Invalid Token Invalidates both token utxos', async () => {
       vout: 0
     }],
     attackerAddress,
-    {
-      txid: issueTxid,
-      vout: 2,
-      scriptPubKey: issueTx.vout[2].scriptPubKey.hex,
-      amount: issueTx.vout[2].value
-    },
+    utils.getUtxo(transferTxid, transfertx, 1),
     fundingPrivateKey
   )
+  console.log(mergeHex)
   const mergeTxId = await broadcast(mergeHex)
   console.log(`Merge TX: ${mergeTxId}`)
   expect(await utils.isTokenBalance(attackerAddress, 0))

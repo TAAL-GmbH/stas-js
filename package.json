@@ -56,7 +56,7 @@
       "<rootDir>/test/function_tests/swap_fewerSatsThanOfferedUTXO_test.js"
     ],
     "verbose": true,
-    "testTimeout": 240000,
+    "testTimeout": 300000,
     "reporters": [
       "default",
       [

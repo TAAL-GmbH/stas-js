@@ -112,6 +112,7 @@ function invalidSchema1 (publicKeyHash, symbol, supply) {
 function invalidSchema2 (publicKeyHash, symbol, supply) {
   const schema = {
     tokenId: `${publicKeyHash}`,
+    symbol: `${symbol}`,
     decimals: 0,
     satsPerToken: 1,
     properties: {
@@ -127,16 +128,6 @@ function invalidSchema2 (publicKeyHash, symbol, supply) {
         issuerCountry: 'CYM',
         jurisdiction: '',
         email: 'info@taal.com'
-      },
-      meta: {
-        schemaId: 'token1',
-        website: 'https://taal.com',
-        legal: {
-          terms: 'blah blah'
-        },
-        media: {
-          type: 'mp4'
-        }
       }
     }
   }
