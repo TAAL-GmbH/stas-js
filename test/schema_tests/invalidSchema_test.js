@@ -26,12 +26,12 @@ let contractTx
 let contractTxid
 let aliceAddr
 let bobAddr
-let fundingAddress
-let symbol
+const symbol = 'TAALT'
 const wait = 5000 // due to delay in token issuance
 
 it('Issue With Invalid Schema 1', async () => {
-  await setup(invalidSchema1) // set up contract
+  const invalidSchema = invalidSchema1(publicKeyHash, symbol, 5000)
+  await setup(invalidSchema) // set up contract
   const issueHex = await issue(
     issuerPrivateKey,
     utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
@@ -49,7 +49,88 @@ it('Issue With Invalid Schema 1', async () => {
 })
 
 it('Issue With Invalid Schema 2', async () => {
-  await setup(invalidSchema2) // set up contract
+  const invalidSchema = invalidSchema2(publicKeyHash, symbol)
+  await setup(invalidSchema) // set up contract
+  const issueHex = await issue(
+    issuerPrivateKey,
+    utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+    utils.getUtxo(contractTxid, contractTx, 0),
+    utils.getUtxo(contractTxid, contractTx, 1),
+    fundingPrivateKey,
+    true,
+    symbol
+  )
+  const issueTxid = await broadcast(issueHex)
+  const tokenId = await utils.getToken(issueTxid)
+  await new Promise(resolve => setTimeout(resolve, wait))
+
+  const response = await utils.getTokenResponse(tokenId)
+  expect(response).to.equal('Token Not Found')
+})
+
+it('Issue With Invalid Schema 3', async () => {
+  const invalidSchema = invalidSchema3(publicKeyHash, symbol, 5000)
+  await setup(invalidSchema) // set up contract
+  const issueHex = await issue(
+    issuerPrivateKey,
+    utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+    utils.getUtxo(contractTxid, contractTx, 0),
+    utils.getUtxo(contractTxid, contractTx, 1),
+    fundingPrivateKey,
+    true,
+    symbol
+  )
+  const issueTxid = await broadcast(issueHex)
+  const tokenId = await utils.getToken(issueTxid)
+  await new Promise(resolve => setTimeout(resolve, wait))
+
+  const response = await utils.getTokenResponse(tokenId)
+  expect(response).to.equal('Token Not Found')
+})
+
+it('Issue With Invalid Schema 4', async () => {
+  const invalidSchema = invalidSchema4(symbol, 5000)
+  await setup(invalidSchema) // set up contract
+  const issueHex = await issue(
+    issuerPrivateKey,
+    utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+    utils.getUtxo(contractTxid, contractTx, 0),
+    utils.getUtxo(contractTxid, contractTx, 1),
+    fundingPrivateKey,
+    true,
+    symbol
+  )
+  const issueTxid = await broadcast(issueHex)
+  const tokenId = await utils.getToken(issueTxid)
+  await new Promise(resolve => setTimeout(resolve, wait))
+
+  const response = await utils.getTokenResponse(tokenId)
+  expect(response).to.equal('Token Not Found')
+})
+
+it('Issue With Invalid Schema 5', async () => {
+  const invalidSchema = invalidSchema5(publicKeyHash, symbol, 5000)
+  await setup(invalidSchema) // set up contract
+  const issueHex = await issue(
+    issuerPrivateKey,
+    utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+    utils.getUtxo(contractTxid, contractTx, 0),
+    utils.getUtxo(contractTxid, contractTx, 1),
+    fundingPrivateKey,
+    true,
+    symbol
+  )
+  const issueTxid = await broadcast(issueHex)
+  const tokenId = await utils.getToken(issueTxid)
+  await new Promise(resolve => setTimeout(resolve, wait))
+
+  const response = await utils.getTokenResponse(tokenId)
+  expect(response).to.equal('Token Not Found')
+})
+
+it('Issue With Invalid Schema 6', async () => {
+  const invalidSchema = invalidSchema6(publicKeyHash, symbol)
+  await setup(invalidSchema) // set up contract
   const issueHex = await issue(
     issuerPrivateKey,
     utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
@@ -77,17 +158,14 @@ async function setup (schemaIn) {
   publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
   aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
   bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
-  fundingAddress = fundingPrivateKey.toAddress(process.env.NETWORK).toString()
-  symbol = 'TAALT'
   const supply = 10000
-  const schema = schemaIn(publicKeyHash, symbol, supply)
 
   const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
     fundingUtxos,
     fundingPrivateKey,
-    schema,
+    schemaIn,
     supply
   )
   contractTxid = await broadcast(contractHex)
@@ -109,7 +187,7 @@ function invalidSchema1 (publicKeyHash, symbol, supply) {
   return schema
 }
 
-function invalidSchema2 (publicKeyHash, symbol, supply) {
+function invalidSchema2 (publicKeyHash, symbol) {
   const schema = {
     tokenId: `${publicKeyHash}`,
     symbol: `${symbol}`,
@@ -128,6 +206,144 @@ function invalidSchema2 (publicKeyHash, symbol, supply) {
         issuerCountry: 'CYM',
         jurisdiction: '',
         email: 'info@taal.com'
+      }
+    }
+  }
+  return schema
+}
+
+function invalidSchema3 (publicKeyHash, symbol, supply) {
+  const schema = {
+    name: 'Taal Token',
+    tokenId: `${publicKeyHash}`,
+    protocolId: 'To be decided',
+    symbol: `${symbol}`,
+    description: 'Example token on private Taalnet',
+    image: 'https://www.taal.com/wp-content/themes/taal_v2/img/favicon/favicon-96x96.png',
+    totalSupply: supply,
+    decimals: 0,
+    satsPerToken: 1,
+    properties: {
+      legal: {
+        terms: '© 2020 TAAL TECHNOLOGIES SEZC\nALL RIGHTS RESERVED. ANY USE OF THIS SOFTWARE IS SUBJECT TO TERMS AND CONDITIONS OF LICENSE. USE OF THIS SOFTWARE WITHOUT LICENSE CONSTITUTES INFRINGEMENT OF INTELLECTUAL PROPERTY. FOR LICENSE DETAILS OF THE SOFTWARE, PLEASE REFER TO: www.taal.com/stas-token-license-agreement',
+        licenceId: '1234'
+      }
+    }
+  }
+  return schema
+}
+
+function invalidSchema4 (symbol, supply) {
+  const schema = {
+    name: 'Taal Token',
+    protocolId: 'To be decided',
+    symbol: `${symbol}`,
+    description: 'Example token on private Taalnet',
+    image: 'https://www.taal.com/wp-content/themes/taal_v2/img/favicon/favicon-96x96.png',
+    totalSupply: supply,
+    decimals: 0,
+    satsPerToken: 1,
+    properties: {
+      legal: {
+        terms: '© 2020 TAAL TECHNOLOGIES SEZC\nALL RIGHTS RESERVED. ANY USE OF THIS SOFTWARE IS SUBJECT TO TERMS AND CONDITIONS OF LICENSE. USE OF THIS SOFTWARE WITHOUT LICENSE CONSTITUTES INFRINGEMENT OF INTELLECTUAL PROPERTY. FOR LICENSE DETAILS OF THE SOFTWARE, PLEASE REFER TO: www.taal.com/stas-token-license-agreement',
+        licenceId: '1234'
+      },
+      issuer: {
+        organisation: 'Taal Technologies SEZC',
+        legalForm: 'Limited Liability Public Company',
+        governingLaw: 'CA',
+        mailingAddress: '1 Volcano Stret, Canada',
+        issuerCountry: 'CYM',
+        jurisdiction: '',
+        email: 'info@taal.com'
+      },
+      meta: {
+        schemaId: 'token1',
+        website: 'https://taal.com',
+        legal: {
+          terms: 'blah blah'
+        },
+        media: {
+          type: 'mp4'
+        }
+      }
+    }
+  }
+  return schema
+}
+
+function invalidSchema5 (publicKeyHash, symbol, supply) {
+  const schema = {
+    name: 'Taal Token',
+    tokenId: `${publicKeyHash}`,
+    protocolId: 'To be decided',
+    symbol: `${symbol}`,
+    description: 'Example token on private Taalnet',
+    image: 'https://www.taal.com/wp-content/themes/taal_v2/img/favicon/favicon-96x96.png',
+    totalSupply: supply,
+    satsPerToken: 1,
+    properties: {
+      legal: {
+        terms: '© 2020 TAAL TECHNOLOGIES SEZC\nALL RIGHTS RESERVED. ANY USE OF THIS SOFTWARE IS SUBJECT TO TERMS AND CONDITIONS OF LICENSE. USE OF THIS SOFTWARE WITHOUT LICENSE CONSTITUTES INFRINGEMENT OF INTELLECTUAL PROPERTY. FOR LICENSE DETAILS OF THE SOFTWARE, PLEASE REFER TO: www.taal.com/stas-token-license-agreement',
+        licenceId: '1234'
+      },
+      issuer: {
+        organisation: 'Taal Technologies SEZC',
+        legalForm: 'Limited Liability Public Company',
+        governingLaw: 'CA',
+        mailingAddress: '1 Volcano Stret, Canada',
+        issuerCountry: 'CYM',
+        jurisdiction: '',
+        email: 'info@taal.com'
+      },
+      meta: {
+        schemaId: 'token1',
+        website: 'https://taal.com',
+        legal: {
+          terms: 'blah blah'
+        },
+        media: {
+          type: 'mp4'
+        }
+      }
+    }
+  }
+  return schema
+}
+
+function invalidSchema6 (publicKeyHash, symbol) {
+  const schema = {
+    name: 'Taal Token',
+    tokenId: `${publicKeyHash}`,
+    protocolId: 'To be decided',
+    symbol: `${symbol}`,
+    description: 'Example token on private Taalnet',
+    image: 'https://www.taal.com/wp-content/themes/taal_v2/img/favicon/favicon-96x96.png',
+    decimals: 0,
+    satsPerToken: 1,
+    properties: {
+      legal: {
+        terms: '© 2020 TAAL TECHNOLOGIES SEZC\nALL RIGHTS RESERVED. ANY USE OF THIS SOFTWARE IS SUBJECT TO TERMS AND CONDITIONS OF LICENSE. USE OF THIS SOFTWARE WITHOUT LICENSE CONSTITUTES INFRINGEMENT OF INTELLECTUAL PROPERTY. FOR LICENSE DETAILS OF THE SOFTWARE, PLEASE REFER TO: www.taal.com/stas-token-license-agreement',
+        licenceId: '1234'
+      },
+      issuer: {
+        organisation: 'Taal Technologies SEZC',
+        legalForm: 'Limited Liability Public Company',
+        governingLaw: 'CA',
+        mailingAddress: '1 Volcano Stret, Canada',
+        issuerCountry: 'CYM',
+        jurisdiction: '',
+        email: 'info@taal.com'
+      },
+      meta: {
+        schemaId: 'token1',
+        website: 'https://taal.com',
+        legal: {
+          terms: 'blah blah'
+        },
+        media: {
+          type: 'mp4'
+        }
       }
     }
   }
