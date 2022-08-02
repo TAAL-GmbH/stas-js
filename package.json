@@ -59,6 +59,7 @@
     ],
     "verbose": true,
     "testTimeout": 300000,
+    "setupFilesAfterEnv": ["jest-allure/dist/setup"],
     "reporters": [
       "default",
       [
