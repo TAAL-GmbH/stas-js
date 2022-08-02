@@ -10,6 +10,7 @@ const {
   split,
   redeem
 } = require('../../index')
+const { assert } = require('chai')
 
 const {
   bitcoinToSatoshis,
@@ -33,6 +34,7 @@ describe('regression, testnet', () => {
     const symbol = 'TAALT'
     const wait = 5000
 
+    expect(true).to.equal(false)
     const schema = utils.schema(publicKeyHash, symbol, supply)
 
     const contractHex = await contract(
