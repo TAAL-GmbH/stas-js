@@ -6,6 +6,7 @@
   "module": "dist/index",
   "scripts": {
     "test": "jest",
+    "test:smoke:ci": "jest --testPathPattern=test/smoke_tests/smoke_lifeCycle_test.js --runInBand",
     "watch": "npm-watch",
     "build": "rollup -c",
     "lint": "standard"
@@ -26,6 +27,7 @@
     "chai": "^4.3.4",
     "chai-as-promised": "^7.1.1",
     "dotenv": "^10.0.0",
+    "jest-allure": "0.1.3",
     "jest-html-reporter": "^3.4.2",
     "node-fetch": "^2.6.6",
     "test": "^0.6.0"
