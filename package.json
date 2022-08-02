@@ -6,7 +6,7 @@
   "module": "dist/index",
   "scripts": {
     "test": "jest",
-    "test:smoke:ci": "jest --testPathPattern=test/smoke_tests/smoke_lifeCycle_test.js --runInBand",
+    "test:smoke:ci": "jest --testPathPattern=test/smoke_tests --runInBand",
     "watch": "npm-watch",
     "build": "rollup -c",
     "lint": "standard"
@@ -52,14 +52,16 @@
   },
   "jest": {
     "testRegex": "tests/.*\\.(js|jsx)$",
-    "testPathIgnorePatterns" : [
+    "testPathIgnorePatterns": [
       "<rootDir>/test/mainnet_tests/",
       "<rootDir>/test/lifecycle_tests/lifecycleTest_1000Addresses_test.js",
       "<rootDir>/test/function_tests/swap_fewerSatsThanOfferedUTXO_test.js"
     ],
     "verbose": true,
     "testTimeout": 300000,
-    "setupFilesAfterEnv": ["jest-allure/dist/setup"],
+    "setupFilesAfterEnv": [
+      "jest-allure/dist/setup"
+    ],
     "testRunner": "jest-jasmine2",
     "reporters": [
       "default",
