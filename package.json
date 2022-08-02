@@ -60,6 +60,7 @@
     "verbose": true,
     "testTimeout": 300000,
     "setupFilesAfterEnv": ["jest-allure/dist/setup"],
+    "testRunner": "jest-jasmine2",
     "reporters": [
       "default",
       [
