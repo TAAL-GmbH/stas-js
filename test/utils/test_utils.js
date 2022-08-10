@@ -570,6 +570,34 @@ function randomSymbol (length) {
   return result
 }
 
+function calcuateFeesForContract (inputTx, utxo, fundingUtxo) {
+  let outputSats = 0
+  for (let i = 0; i < inputTx.vout.length; i++) {
+    outputSats += inputTx.vout[i].value
+  }
+
+  const inputSats = (bitcoinToSatoshis(utxo[0].amount) + bitcoinToSatoshis(fundingUtxo[0].amount))
+  const fees = inputSats - bitcoinToSatoshis(outputSats)
+  console.log(fees)
+  return fees
+}
+
+function calcuateFees (inputTx, outputTx) {
+  let inputSats = 0
+  for (let i = 0; i < inputTx.vout.length; i++) {
+    inputSats += inputTx.vout[i].value
+  }
+
+  let outputSats = 0
+  for (let i = 0; i < outputTx.vout.length; i++) {
+    outputSats += outputTx.vout[i].value
+  }
+
+  const fees = bitcoinToSatoshis(inputSats) - bitcoinToSatoshis(outputSats)
+  console.log(fees)
+  return fees
+}
+
 module.exports = {
   schema,
   getIssueInfo,
@@ -594,5 +622,7 @@ module.exports = {
   getUnspentMainNet,
   setupMainNetTest,
   randomSymbol,
-  isTokenBalance
+  isTokenBalance,
+  calcuateFeesForContract,
+  calcuateFees
 }
