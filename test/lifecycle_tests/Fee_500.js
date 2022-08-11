@@ -58,7 +58,7 @@ it('Full Life Cycle Test With Fees 500 sats/byte', async () => {
   console.log(`Contract TX:     ${contractTxid}`)
   const contractTx = await getTransaction(contractTxid)
   const contractFees = utils.calcuateFeesForContract(contractTx, contractUtxos, fundingUtxos)
-  expect(contractFees).to.equal(347)
+  expect(contractFees).to.be.above(690).and.to.be.below(695)
 
   const issueHex = await issue(
     issuerPrivateKey,
@@ -83,7 +83,7 @@ it('Full Life Cycle Test With Fees 500 sats/byte', async () => {
   await utils.isTokenBalance(aliceAddr, 7000)
   await utils.isTokenBalance(bobAddr, 3000)
   const issueFees = utils.calcuateFees(contractTx, issueTx)
-  expect(issueFees).to.equal(812)
+  expect(issueFees).to.be.above(1620).and.to.be.below(1625)
 
   const issueOutFundingVout = issueTx.vout.length - 1
 
@@ -100,9 +100,8 @@ it('Full Life Cycle Test With Fees 500 sats/byte', async () => {
   expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
   await utils.isTokenBalance(aliceAddr, 10000)
   await utils.isTokenBalance(bobAddr, 0)
-  console.log(utils.calcuateFees(issueTx, transferTx))
   const transferFees = utils.calcuateFees(issueTx, transferTx)
-  expect(transferFees).to.equal(7876)
+  expect(transferFees).to.be.above(8745).and.to.be.below(8760)
 
   const bobAmount1 = transferTx.vout[0].value / 2
   const bobAmount2 = transferTx.vout[0].value - bobAmount1
@@ -125,7 +124,7 @@ it('Full Life Cycle Test With Fees 500 sats/byte', async () => {
   await utils.isTokenBalance(aliceAddr, 7000)
   await utils.isTokenBalance(bobAddr, 3000)
   const splitFees = utils.calcuateFees(transferTx, splitTx)
-  expect(splitFees).to.be.above(1246).and.to.be.below(1248)
+  expect(splitFees).to.be.above(2488).and.to.be.below(2494)
 
   // Now let's merge the last split back together
   const splitTxObj = new bsv.Transaction(splitHex)
@@ -149,7 +148,7 @@ it('Full Life Cycle Test With Fees 500 sats/byte', async () => {
   await utils.isTokenBalance(bobAddr, 0)
   console.log(utils.calcuateFees(splitTx, mergeTx))
   const mergeFees = utils.calcuateFees(splitTx, mergeTx)
-  expect(mergeFees).to.be.above(2015).and.to.be.below(2019)
+  expect(mergeFees).to.be.above(4030).and.to.be.below(4045)
 
   const amount = bitcoinToSatoshis(mergeTx.vout[0].value / 2)
 
@@ -197,7 +196,7 @@ it('Full Life Cycle Test With Fees 500 sats/byte', async () => {
   await utils.isTokenBalance(aliceAddr, 7750)
   await utils.isTokenBalance(bobAddr, 2250)
   const mergeSplitFees = utils.calcuateFees(splitTx2, mergeSplitTx)
-  expect(mergeSplitFees).to.be.above(2378).and.to.be.below(2384)
+  expect(mergeSplitFees).to.be.above(4755).and.to.be.below(4770)
 
   // Alice wants to redeem the money from bob...
   const redeemHex = await redeem(
@@ -214,5 +213,5 @@ it('Full Life Cycle Test With Fees 500 sats/byte', async () => {
   await utils.isTokenBalance(aliceAddr, 7000)
   await utils.isTokenBalance(bobAddr, 2250)
   const redeemFees = utils.calcuateFees(mergeSplitTx, redeemTx)
-  expect(redeemFees).to.be.above(2770).and.to.be.below(2774)
+  expect(redeemFees).to.be.above(3285).and.to.be.below(3300)
 })
