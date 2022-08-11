@@ -47,7 +47,7 @@
       "type": "node",
       "request": "launch",
       "name": "lifecycleV2 no fee",
-      "program": "${workspaceFolder}/lifecycleV2.nofee.test.js",
+      "program": "${workspaceFolder}/examples/lifecycleV2.nofee.example.js",
       "args": [],
       "console": "internalConsole",
       "outputCapture": "std"

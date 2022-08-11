@@ -274,6 +274,7 @@ const {
   rSplitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(rsBobAmount) }
   rSplitDestinations[1] = { address: aliceAddr, amount: bitcoinToSatoshis(rsAliceAmount1) }
 
+  // bob want's to redeem his tokens
   const redeemSplitHex = await redeemSplit(
     bobPrivateKey,
     issuerPrivateKey.publicKey,
