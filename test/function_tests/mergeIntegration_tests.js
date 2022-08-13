@@ -8,7 +8,8 @@ const {
   issue,
   split,
   merge,
-  mergeWithCallback
+  mergeWithCallback,
+  unsignedMerge
 } = require('../../index')
 
 const {
@@ -37,6 +38,7 @@ let contractTx
 let issueTx
 let issueTxid
 const wait = 5000
+const keyMap = new Map()
 
 const bobSignatureCallback = async (tx, i, script, satoshis) => {
   return bsv.Transaction.sighash.sign(tx, bobPrivateKey, sighash, i, script, satoshis).toTxFormat().toString('hex')
@@ -143,6 +145,46 @@ it('Merge - Successful Merge With Callback And No Fee', async () => {
   await utils.isTokenBalance(bobAddr, 3000)
 })
 
+it.only('Merge - Successful Merge unsigned & Fee', async () => {
+  const unsignedMergeReturn = await unsignedMerge(
+    bobPrivateKey.publicKey,
+    utils.getMergeUtxo(splitTxObj),
+    aliceAddr,
+    utils.getUtxo(splitTxid, splitTx, 2),
+    fundingPrivateKey.publicKey
+  )
+  const mergeTx = bsv.Transaction(unsignedMergeReturn.hex)
+  utils.signScriptWithUnlocking(unsignedMergeReturn, mergeTx, keyMap)
+  const mergeTxid = await broadcast(mergeTx.serialize(true))
+  await new Promise(resolve => setTimeout(resolve, wait))
+  const tokenIdMerge = await utils.getToken(mergeTxid)
+  const response = await utils.getTokenResponse(tokenIdMerge)
+  expect(response.symbol).to.equal('TAALT')
+  expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007)
+  await utils.isTokenBalance(aliceAddr, 7000)
+  await utils.isTokenBalance(bobAddr, 3000)
+})
+
+it.only('Merge - Successful Merge Unsigned & No Fee', async () => {
+  const unsignedMergeReturn = await unsignedMerge(
+    bobPrivateKey.publicKey,
+    utils.getMergeUtxo(splitTxObj),
+    aliceAddr,
+    null,
+    null
+  )
+  const mergeTx = bsv.Transaction(unsignedMergeReturn.hex)
+  utils.signScriptWithUnlocking(unsignedMergeReturn, mergeTx, keyMap)
+  const mergeTxid = await broadcast(mergeTx.serialize(true))
+  await new Promise(resolve => setTimeout(resolve, wait))
+  const tokenIdMerge = await utils.getToken(mergeTxid)
+  const response = await utils.getTokenResponse(tokenIdMerge)
+  expect(response.symbol).to.equal('TAALT')
+  expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007)
+  await utils.isTokenBalance(aliceAddr, 7000)
+  await utils.isTokenBalance(bobAddr, 3000)
+})
+
 it('Merge - Incorrect Owner Private Key Throws Error', async () => {
   const incorrectPrivateKey = bsv.PrivateKey()
   const mergeHex = await merge(
@@ -183,9 +225,13 @@ it('Merge - Incorrect Funding Private Key Throws Error', async () => {
 
 async function setup () {
   issuerPrivateKey = bsv.PrivateKey()
+  keyMap.set(issuerPrivateKey.publicKey, issuerPrivateKey)
   fundingPrivateKey = bsv.PrivateKey()
+  keyMap.set(fundingPrivateKey.publicKey, fundingPrivateKey)
   bobPrivateKey = bsv.PrivateKey()
+  keyMap.set(bobPrivateKey.publicKey, bobPrivateKey)
   alicePrivateKey = bsv.PrivateKey()
+  keyMap.set(alicePrivateKey.publicKey, alicePrivateKey)
   bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
   aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
   contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())

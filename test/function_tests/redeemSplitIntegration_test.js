@@ -7,7 +7,8 @@ const {
   contract,
   issue,
   redeemSplit,
-  redeemSplitWithCallback
+  redeemSplitWithCallback,
+  unsignedRedeemSplit
 } = require('../../index')
 
 const {
@@ -18,7 +19,7 @@ const {
 } = require('../../index').utils
 
 const { sighash } = require('../../lib/stas')
-const PublicKey = require('bsv/lib/publickey')
+const unsigneRedeem = require('../../lib/unsignedRedeem')
 
 let issuerPrivateKey
 let fundingPrivateKey
@@ -31,6 +32,7 @@ let fundingUtxos
 let publicKeyHash
 let issueTxid
 let issueTx
+const keyMap = new Map()
 
 const aliceSignatureCallback = async (tx, i, script, satoshis) => {
   return bsv.Transaction.sighash.sign(tx, alicePrivateKey, sighash, i, script, satoshis).toTxFormat().toString('hex')
@@ -203,6 +205,53 @@ it('Successful RedeemSplit With Callback & No fees', async () => {
   await utils.isTokenBalance(bobAddr, 4400)
 })
 
+it('Successful RedeemSplit Unsigned & Fee', async () => {
+  const amount = issueTx.vout[0].value / 5
+  const rSplitDestinations = []
+  rSplitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
+  rSplitDestinations[1] = { address: aliceAddr, amount: bitcoinToSatoshis(amount) }
+
+  const unsignedRedeemSplitReturn = await unsignedRedeemSplit(
+    alicePrivateKey.publickey,
+    issuerPrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 0),
+    rSplitDestinations,
+    utils.getUtxo(issueTxid, issueTx, 2),
+    fundingPrivateKey.publickey
+  )
+  const redeemSplitTx = bsv.Transaction(unsignedRedeemSplitReturn.hex)
+  utils.signScriptWithUnlocking(unsignedRedeemSplitReturn, redeemSplitTx, keyMap)
+  const redeemTxid = await broadcast(redeemSplitTx.serialize(true))
+  expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000042) // first utxo goes to redemption address
+  expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000014)
+  expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.000014)
+  await utils.isTokenBalance(aliceAddr, 1400)
+  await utils.isTokenBalance(bobAddr, 4400)
+})
+
+it('Successful RedeemSplit With Unsigned & No Fee', async () => {
+  const amount = issueTx.vout[0].value / 5
+  const rSplitDestinations = []
+  rSplitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
+  rSplitDestinations[1] = { address: aliceAddr, amount: bitcoinToSatoshis(amount) }
+
+  const unsignedRedeemSplitReturn = await unsignedRedeemSplit(
+    alicePrivateKey.publicKey,
+    issuerPrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 0),
+    rSplitDestinations,
+    null,
+    null
+  )
+  const redeemSplitTx = bsv.Transaction(unsignedRedeemSplitReturn.hex)
+  utils.signScriptWithUnlocking(unsignedRedeemSplitReturn, redeemSplitTx, keyMap)
+  const redeemTxid = await broadcast(redeemSplitTx.serialize(true))
+  expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000042) // first utxo goes to redemption address
+  expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000014)
+  expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.000014)
+  await utils.isTokenBalance(aliceAddr, 1400)
+  await utils.isTokenBalance(bobAddr, 4400)
+})
 it('RedeemSplit - Too Many Outputs Throws Error', async () => {
   const davePrivateKey = bsv.PrivateKey()
   const daveAddr = davePrivateKey.toAddress(process.env.NETWORK).toString()
@@ -476,9 +525,13 @@ it('RedeemSplit - Incorrect Public Key Throws Error', async () => {
 
 async function setup () {
   issuerPrivateKey = bsv.PrivateKey()
+  keyMap.set(issuerPrivateKey.publicKey, issuerPrivateKey)
   fundingPrivateKey = bsv.PrivateKey()
+  keyMap.set(fundingPrivateKey.publicKey, fundingPrivateKey)
   bobPrivateKey = bsv.PrivateKey()
+  keyMap.set(bobPrivateKey.publicKey, bobPrivateKey)
   alicePrivateKey = bsv.PrivateKey()
+  keyMap.set(alicePrivateKey.publicKey, alicePrivateKey)
   bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
   aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
   contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())

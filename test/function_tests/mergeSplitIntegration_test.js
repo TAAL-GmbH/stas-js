@@ -9,7 +9,8 @@ const {
   transfer,
   split,
   mergeSplit,
-  mergeSplitWithCallback
+  mergeSplitWithCallback,
+  unsignedMergeSplit
 } = require('../../index')
 
 const {
@@ -33,6 +34,7 @@ let aliceAddr
 let splitTxid
 let splitTx
 let splitTxObj
+const keyMap = new Map()
 
 const bobSignatureCallback = async (tx, i, script, satoshis) => {
   return bsv.Transaction.sighash.sign(tx, bobPrivateKey, sighash, i, script, satoshis).toTxFormat().toString('hex')
@@ -169,6 +171,59 @@ it('MergeSplit - Successful MergeSplit With Callback No Fees',
     await utils.isTokenBalance(bobAddr, 2250)
   }
 )
+it('MergeSplit - Successful MergeSplit unsigned With Fees', async () => {
+  await setup() // contract, issue, transfer then split
+
+  const issueOutFundingVout = splitTx.vout.length - 1
+
+  const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
+  const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
+
+  const unsignedMergeSplitReturn = await unsignedMergeSplit(
+    bobPrivateKey.publicKey,
+    utils.getMergeSplitUtxo(splitTxObj, splitTx),
+    aliceAddr,
+    aliceAmountSatoshis,
+    bobAddr,
+    bobAmountSatoshis,
+    utils.getUtxo(splitTxid, splitTx, issueOutFundingVout),
+    fundingPrivateKey.publicKey
+  )
+  const mergeSplitTx = bsv.Transaction(unsignedMergeSplitReturn.hex)
+  utils.signScriptWithUnlocking(unsignedMergeSplitReturn, mergeSplitTx, keyMap)
+  const mergeSplitTxid = await broadcast(mergeSplitTx.serialize(true))
+  expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075)
+  expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
+  await utils.isTokenBalance(aliceAddr, 7750)
+  await utils.isTokenBalance(bobAddr, 2250)
+})
+
+it('MergeSplit - Successful MergeSplit unsigned With No Fees', async () => {
+  await setup() // contract, issue, transfer then split
+
+  const issueOutFundingVout = splitTx.vout.length - 1
+
+  const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
+  const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
+
+  const unsignedMergeSplitReturn = await unsignedMergeSplit(
+    bobPrivateKey.publicKey,
+    utils.getMergeSplitUtxo(splitTxObj, splitTx),
+    aliceAddr,
+    aliceAmountSatoshis,
+    bobAddr,
+    bobAmountSatoshis,
+    null,
+    null
+  )
+  const mergeSplitTx = bsv.Transaction(unsignedMergeSplitReturn.hex)
+  utils.signScriptWithUnlocking(unsignedMergeSplitReturn, mergeSplitTx, keyMap)
+  const mergeSplitTxid = await broadcast(mergeSplitTx.serialize(true))
+  expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075)
+  expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
+  await utils.isTokenBalance(aliceAddr, 7750)
+  await utils.isTokenBalance(bobAddr, 2250)
+})
 
 it('MergeSplit - Incorrect Destination 1 Satoshi Amount', async () => {
   await setup() // contract, issue, transfer then split
@@ -280,9 +335,13 @@ it('MergeSplit - Incorrect Payments Private Key Throws Error',
 
 async function setup () {
   issuerPrivateKey = bsv.PrivateKey()
+  keyMap.set(issuerPrivateKey.publicKey, issuerPrivateKey)
   fundingPrivateKey = bsv.PrivateKey()
+  keyMap.set(fundingPrivateKey.publicKey, fundingPrivateKey)
   bobPrivateKey = bsv.PrivateKey()
+  keyMap.set(bobPrivateKey.publicKey, bobPrivateKey)
   alicePrivateKey = bsv.PrivateKey()
+  keyMap.set(alicePrivateKey.publicKey, alicePrivateKey)
   bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
   aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
   contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
