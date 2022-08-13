@@ -7,7 +7,8 @@ const {
   contract,
   issue,
   split,
-  splitWithCallback
+  splitWithCallback,
+  unsignedSplit
 } = require('../../index')
 
 const {
@@ -18,6 +19,7 @@ const {
 } = require('../../index').utils
 
 const { sighash } = require('../../lib/stas')
+const PrivateKey = require('bsv/lib/privatekey')
 
 let issuerPrivateKey
 let fundingPrivateKey
@@ -31,6 +33,7 @@ let aliceAddr
 let issueTxid
 let issueTx
 const wait = 10000
+const keyMap = new Map()
 
 const aliceSignatureCallback = async (tx, i, script, satoshis) => {
   return bsv.Transaction.sighash.sign(tx, alicePrivateKey, sighash, i, script, satoshis).toTxFormat().toString('hex')
@@ -238,6 +241,54 @@ it('Split - Successful Split With Callback and No Fee ', async () => {
   await utils.isTokenBalance(bobAddr, 6500)
 })
 
+it.only('Split - Successful Split With Unsigned & Fee', async () => {
+  const issueTxSats = issueTx.vout[0].value
+  const bobAmount1 = issueTxSats / 2
+  const bobAmount2 = issueTxSats - bobAmount1
+  const splitDestinations = []
+  splitDestinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(bobAmount1) } // 3500 tokens
+  splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) } // 3500 tokens
+
+  const unsignedSplitReturn = await unsignedSplit(
+    alicePrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 0),
+    splitDestinations,
+    utils.getUtxo(issueTxid, issueTx, 2),
+    fundingPrivateKey.publicKey
+  )
+  const splitTx = bsv.Transaction(unsignedSplitReturn.hex)
+  utils.signScriptWithUnlocking(unsignedSplitReturn, splitTx, keyMap)
+  const splitTxid = await broadcast(splitTx.serialize(true))
+  expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035)
+  expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000035)
+  await utils.isTokenBalance(aliceAddr, 3500)
+  await utils.isTokenBalance(bobAddr, 6500)
+})
+
+it.only('Split - Successful Split With Unsigned & No Fee', async () => {
+  const issueTxSats = issueTx.vout[0].value
+  const bobAmount1 = issueTxSats / 2
+  const bobAmount2 = issueTxSats - bobAmount1
+  const splitDestinations = []
+  splitDestinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(bobAmount1) } // 3500 tokens
+  splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) } // 3500 tokens
+
+  const unsignedSplitReturn = await unsignedSplit(
+    alicePrivateKey.public,
+    utils.getUtxo(issueTxid, issueTx, 0),
+    splitDestinations,
+    utils.getUtxo(issueTxid, issueTx, 2),
+    fundingPrivateKey.public
+  )
+  const splitTx = bsv.Transaction(unsignedSplitReturn.hex)
+  utils.signScriptWithUnlocking(unsignedSplitReturn, splitTx, keyMap)
+  const splitTxid = await broadcast(splitTx.serialize(true))
+  expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035)
+  expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000035)
+  await utils.isTokenBalance(aliceAddr, 3500)
+  await utils.isTokenBalance(bobAddr, 6500)
+})
+
 it('Split - Send to Issuer Address Throws Error', async () => {
   const bobAmount1 = issueTx.vout[0].value / 2
   const bobAmount2 = issueTx.vout[0].value - bobAmount1
@@ -313,12 +364,16 @@ it('Split - Incorrect Payments Private Key Throws Error', async () => {
 
 async function setup () {
   issuerPrivateKey = bsv.PrivateKey()
+  keyMap.set(issuerPrivateKey.publicKey, issuerPrivateKey)
   fundingPrivateKey = bsv.PrivateKey()
+  keyMap.set(fundingPrivateKey.publicKey, fundingPrivateKey)
+  bobPrivateKey = bsv.PrivateKey()
+  keyMap.set(bobPrivateKey.publicKey, bobPrivateKey)
+  alicePrivateKey = bsv.PrivateKey()
+  keyMap.set(alicePrivateKey.publicKey, alicePrivateKey)
   contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
   fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
   publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
-  bobPrivateKey = bsv.PrivateKey()
-  alicePrivateKey = bsv.PrivateKey()
   bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
   aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
 
