@@ -7,13 +7,15 @@ const {
   contract,
   issue,
   redeem,
-  redeemWithCallback
+  redeemWithCallback,
+  unsignedRedeem
 } = require('../../index')
 
 const {
   getTransaction,
   getFundsFromFaucet,
-  broadcast
+  broadcast,
+  finaliseSTASUnlockingScript
 } = require('../../index').utils
 
 const { sighash } = require('../../lib/stas')
@@ -29,6 +31,7 @@ let bobAddr
 let aliceAddr
 let issueTxid
 let issueTx
+const keyMap = new Map()
 
 const aliceSignatureCallback = async (tx, i, script, satoshis) => {
   return bsv.Transaction.sighash.sign(tx, alicePrivateKey, sighash, i, script, satoshis).toTxFormat().toString('hex')
@@ -110,6 +113,38 @@ it('Redeem - Successful Redeem With Callback and No Fee', async () => {
     null
   )
   const redeemTxid = await broadcast(redeemHex)
+  expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007)
+  await utils.isTokenBalance(aliceAddr, 0)
+  await utils.isTokenBalance(bobAddr, 3000)
+})
+
+it('Redeem - Successful Redeem With Unsigned & Fee', async () => {
+  const unsignedRedeemReturn = await unsignedRedeem(
+    alicePrivateKey.publicKey,
+    issuerPrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 0),
+    utils.getUtxo(issueTxid, issueTx, 2),
+    fundingPrivateKey.publicKey
+  )
+  const redeemTx = bsv.Transaction(unsignedRedeemReturn.hex)
+  utils.signScriptWithUnlocking(unsignedRedeemReturn, redeemTx, keyMap)
+  const redeemTxid = await broadcast(redeemTx.serialize(true))
+  expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007)
+  await utils.isTokenBalance(aliceAddr, 0)
+  await utils.isTokenBalance(bobAddr, 3000)
+})
+
+it('Redeem - Successful Redeem With Unsigned & No Fee', async () => {
+  const unsignedRedeemReturn = await unsignedRedeem(
+    alicePrivateKey.publicKey,
+    issuerPrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 0),
+    null,
+    null
+  )
+  const redeemTx = bsv.Transaction(unsignedRedeemReturn.hex)
+  utils.signScriptWithUnlocking(unsignedRedeemReturn, redeemTx, keyMap)
+  const redeemTxid = await broadcast(redeemTx.serialize(true))
   expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007)
   await utils.isTokenBalance(aliceAddr, 0)
   await utils.isTokenBalance(bobAddr, 3000)
@@ -237,9 +272,13 @@ it(
 
 async function setup () {
   issuerPrivateKey = bsv.PrivateKey()
+  keyMap.set(issuerPrivateKey.publicKey, issuerPrivateKey)
   fundingPrivateKey = bsv.PrivateKey()
+  keyMap.set(fundingPrivateKey.publicKey, fundingPrivateKey)
   bobPrivateKey = bsv.PrivateKey()
+  keyMap.set(bobPrivateKey.publicKey, bobPrivateKey)
   alicePrivateKey = bsv.PrivateKey()
+  keyMap.set(alicePrivateKey.publicKey, alicePrivateKey)
   contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
   fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
   publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')

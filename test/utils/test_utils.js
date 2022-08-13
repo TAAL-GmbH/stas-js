@@ -3,7 +3,7 @@ const expect = require('chai').expect
 const axiosRetry = require('axios-retry')
 const bsv = require('bsv')
 require('dotenv').config()
-const { bitcoinToSatoshis } = require('../../index').utils
+const { bitcoinToSatoshis, finaliseSTASUnlockingScript } = require('../../index').utils
 
 function schema (publicKeyHash, symbol, supply) {
   const schema = {
@@ -598,6 +598,42 @@ function calcuateFees (inputTx, outputTx) {
   return fees
 }
 
+function signScript (hex, tx, keyMap) {
+  let signingPrivateKey
+  for (let i = 0; i < hex.signingInfo.length; i++) {
+    const signingInfo = hex.signingInfo[i]
+    if (!keyMap.has(signingInfo.publicKey)) {
+      throw new Error('unknown public key: ' + signingInfo.publicKey)
+    }
+    signingPrivateKey = keyMap.get(signingInfo.publicKey)
+
+    const sig = bsv.Transaction.sighash.sign(tx, signingPrivateKey, signingInfo.sighash, signingInfo.inputIndex, signingInfo.script, new bsv.crypto.BN(signingInfo.satoshis)).toTxFormat().toString('hex')
+    const unlockingScript = bsv.Script.fromASM(sig + ' ' + signingInfo.publicKey.toString('hex'))
+    tx.inputs[signingInfo.inputIndex].setScript(unlockingScript)
+  }
+}
+
+function signScriptWithUnlocking (unsignedReturn, tx, keyMap) {
+  let signingPrivateKey
+  // now sign the tx
+  for (let i = 0; i < unsignedReturn.signingInfo.length; i++) {
+    const signingInfo = unsignedReturn.signingInfo[i]
+    if (!keyMap.has(signingInfo.publicKey)) {
+      throw new Error('unknown public key: ' + signingInfo.publicKey)
+    }
+    signingPrivateKey = keyMap.get(signingInfo.publicKey)
+
+    const sig = bsv.Transaction.sighash.sign(tx, signingPrivateKey, signingInfo.sighash, signingInfo.inputIndex, signingInfo.script, new bsv.crypto.BN(signingInfo.satoshis)).toTxFormat().toString('hex')
+    if (signingInfo.type === 'stas') {
+      const finalScript = finaliseSTASUnlockingScript(tx, signingInfo.inputIndex, signingInfo.publicKey.toString('hex'), sig)
+      tx.inputs[signingInfo.inputIndex].setScript(bsv.Script.fromASM(finalScript))
+    } else {
+      const unlockingScript = bsv.Script.fromASM(sig + ' ' + signingInfo.publicKey.toString('hex'))
+      tx.inputs[signingInfo.inputIndex].setScript(unlockingScript)
+    }
+  }
+}
+
 module.exports = {
   schema,
   getIssueInfo,
@@ -624,5 +660,7 @@ module.exports = {
   randomSymbol,
   isTokenBalance,
   calcuateFeesForContract,
-  calcuateFees
+  calcuateFees,
+  signScript,
+  signScriptWithUnlocking
 }

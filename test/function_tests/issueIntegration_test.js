@@ -6,7 +6,8 @@ require('dotenv').config()
 const {
   contract,
   issue,
-  issueWithCallback
+  issueWithCallback,
+  unsignedIssue
 } = require('../../index')
 
 const {
@@ -26,11 +27,11 @@ let fundingUtxos
 let publicKeyHash
 let contractTx
 let contractTxid
-let issueInfo
 let aliceAddr
 let bobAddr
 let fundingAddress
 let symbol
+const keyMap = new Map()
 const wait = 5000 // due to delay in token issuance
 
 const issuerSignatureCallback = async (tx, i, script, satoshis) => {
@@ -379,11 +380,61 @@ it('Issue - Successful Issue Token 10 Addresses', async () => {
   await utils.isTokenBalance(bobAddr, 1000)
 })
 
+it('Issue - Successful Issue Token With Unsigned & Fee', async () => {
+  const issueHex = await unsignedIssue(
+    issuerPrivateKey.publicKey,
+    utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+    utils.getUtxo(contractTxid, contractTx, 0),
+    utils.getUtxo(contractTxid, contractTx, 1),
+    fundingPrivateKey.publicKey,
+    true,
+    symbol
+  )
+  const issueTx = new bsv.Transaction(issueHex.hex)
+  utils.signScript(issueHex, issueTx, keyMap)
+  const issueTxid = await broadcast(issueTx.serialize(true))
+  const tokenId = await utils.getToken(issueTxid)
+  await new Promise(resolve => setTimeout(resolve, wait))
+  const response = await utils.getTokenResponse(tokenId)
+  expect(response.symbol).to.equal(symbol)
+  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
+  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
+  await utils.isTokenBalance(aliceAddr, 7000)
+  await utils.isTokenBalance(bobAddr, 3000)
+})
+
+it('Issue - Successful Issue Token With Unsigned & No', async () => {
+  const issueHex = await unsignedIssue(
+    issuerPrivateKey.publicKey,
+    utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+    utils.getUtxo(contractTxid, contractTx, 0),
+    null,
+    null,
+    true,
+    symbol
+  )
+  const issueTx = new bsv.Transaction(issueHex.hex)
+  utils.signScript(issueHex, issueTx, keyMap)
+  const issueTxid = await broadcast(issueTx.serialize(true))
+  const tokenId = await utils.getToken(issueTxid)
+  await new Promise(resolve => setTimeout(resolve, wait))
+  const response = await utils.getTokenResponse(tokenId)
+  expect(response.symbol).to.equal(symbol)
+  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007)
+  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003)
+  await utils.isTokenBalance(aliceAddr, 7000)
+  await utils.isTokenBalance(bobAddr, 3000)
+})
+
 async function setup () {
   issuerPrivateKey = bsv.PrivateKey()
+  keyMap.set(issuerPrivateKey.publicKey, issuerPrivateKey)
   fundingPrivateKey = bsv.PrivateKey()
+  keyMap.set(fundingPrivateKey.publicKey, fundingPrivateKey)
   bobPrivateKey = bsv.PrivateKey()
+  keyMap.set(bobPrivateKey.publicKey, bobPrivateKey)
   alicePrivateKey = bsv.PrivateKey()
+  keyMap.set(alicePrivateKey.publicKey, alicePrivateKey)
   contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
   fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
   publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
