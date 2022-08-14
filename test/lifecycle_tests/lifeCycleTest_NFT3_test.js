@@ -94,8 +94,6 @@ describe('regression, testnet', () => {
     await new Promise(resolve => setTimeout(resolve, wait))
     const response = await utils.getTokenResponse(tokenId)
     expect(response.symbol).to.equal(symbol)
-    expect(response.contract_txs).to.contain(contractTxid)
-    expect(response.issuance_txs).to.contain(issueTxid)
     expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00008)
     expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00004)
     expect(await utils.getVoutAmount(issueTxid, 2)).to.equal(0.00002)

@@ -20,7 +20,7 @@ const {
   broadcast
 } = require('../../index').utils
 
-// ongoing - need to merge funding utxos
+// ongoing - 10mb too large for data size
 it(
   'Full Life Cycle Test 9 - Issuance with 10mb of data',
   async () => {

@@ -274,11 +274,11 @@ it.only('Split - Successful Split With Unsigned & No Fee', async () => {
   splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) } // 3500 tokens
 
   const unsignedSplitReturn = await unsignedSplit(
-    alicePrivateKey.public,
+    alicePrivateKey.publicKey,
     utils.getUtxo(issueTxid, issueTx, 0),
     splitDestinations,
-    utils.getUtxo(issueTxid, issueTx, 2),
-    fundingPrivateKey.public
+    null,
+    null
   )
   const splitTx = bsv.Transaction(unsignedSplitReturn.hex)
   utils.signScriptWithUnlocking(unsignedSplitReturn, splitTx, keyMap)

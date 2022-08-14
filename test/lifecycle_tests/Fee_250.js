@@ -21,11 +21,11 @@ const {
 } = require('../../index').utils
 
 beforeEach(function () {
-  process.env.SATS = 250
+  feeSettings.Sats = 250
 })
 
 afterAll(function () {
-  process.env.SATS = 250
+  feeSettings.Sats = 250
 })
 it('Full Life Cycle Test With Fees 250 sats/byte', async () => {
   const issuerPrivateKey = bsv.PrivateKey()
@@ -197,7 +197,7 @@ it('Full Life Cycle Test With Fees 250 sats/byte', async () => {
   await utils.isTokenBalance(aliceAddr, 7750)
   await utils.isTokenBalance(bobAddr, 2250)
   const mergeSplitFees = utils.calcuateFees(splitTx2, mergeSplitTx)
-  expect(mergeSplitFees).to.be.above(2380).and.to.be.below(2384)
+  expect(mergeSplitFees).to.be.above(2375).and.to.be.below(2384)
 
   // Alice wants to redeem the money from bob...
   const redeemHex = await redeem(

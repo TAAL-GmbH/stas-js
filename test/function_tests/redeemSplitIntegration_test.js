@@ -172,7 +172,6 @@ it('Successful RedeemSplit With Callback & Fees', async () => {
     aliceSignatureCallback,
     paymentSignatureCallback
   )
-  console.log(redeemSplitHex)
   const redeemTxid = await broadcast(redeemSplitHex)
   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000042) // first utxo goes to redemption address
   expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000014)
