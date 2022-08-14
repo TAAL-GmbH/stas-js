@@ -211,12 +211,12 @@ it('Successful RedeemSplit Unsigned & Fee', async () => {
   rSplitDestinations[1] = { address: aliceAddr, amount: bitcoinToSatoshis(amount) }
 
   const unsignedRedeemSplitReturn = await unsignedRedeemSplit(
-    alicePrivateKey.publickey,
+    alicePrivateKey.publicKey,
     issuerPrivateKey.publicKey,
     utils.getUtxo(issueTxid, issueTx, 0),
     rSplitDestinations,
     utils.getUtxo(issueTxid, issueTx, 2),
-    fundingPrivateKey.publickey
+    fundingPrivateKey.publicKey
   )
   const redeemSplitTx = bsv.Transaction(unsignedRedeemSplitReturn.hex)
   utils.signScriptWithUnlocking(unsignedRedeemSplitReturn, redeemSplitTx, keyMap)

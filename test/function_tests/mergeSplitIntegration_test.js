@@ -201,8 +201,6 @@ it('MergeSplit - Successful MergeSplit unsigned With Fees', async () => {
 it('MergeSplit - Successful MergeSplit unsigned With No Fees', async () => {
   await setup() // contract, issue, transfer then split
 
-  const issueOutFundingVout = splitTx.vout.length - 1
-
   const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
   const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
 
