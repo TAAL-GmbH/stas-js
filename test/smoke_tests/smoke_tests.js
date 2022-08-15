@@ -368,7 +368,7 @@ it('MergeSplit - Successful MergeSplit With Callback And Fees',
     await utils.isTokenBalance(bobAddr, 8250)
   }
 )
-it.only('MergeSplit - Successful MergeSplit unsigned With Fees', async () => {
+it'MergeSplit - Successful MergeSplit unsigned With Fees', async () => {
   await setupMerge() // contract, issue, transfer then split
 
   const issueOutFundingVout = splitTx.vout.length - 1
