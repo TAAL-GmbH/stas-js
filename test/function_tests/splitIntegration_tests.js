@@ -241,7 +241,7 @@ it('Split - Successful Split With Callback and No Fee ', async () => {
   await utils.isTokenBalance(bobAddr, 6500)
 })
 
-it.only('Split - Successful Split With Unsigned & Fee', async () => {
+it('Split - Successful Split With Unsigned & Fee', async () => {
   const issueTxSats = issueTx.vout[0].value
   const bobAmount1 = issueTxSats / 2
   const bobAmount2 = issueTxSats - bobAmount1
@@ -265,7 +265,7 @@ it.only('Split - Successful Split With Unsigned & Fee', async () => {
   await utils.isTokenBalance(bobAddr, 6500)
 })
 
-it.only('Split - Successful Split With Unsigned & No Fee', async () => {
+it('Split - Successful Split With Unsigned & No Fee', async () => {
   const issueTxSats = issueTx.vout[0].value
   const bobAmount1 = issueTxSats / 2
   const bobAmount2 = issueTxSats - bobAmount1

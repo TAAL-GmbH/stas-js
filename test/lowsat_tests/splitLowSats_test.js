@@ -121,7 +121,7 @@ it('Split - Successful Split Into Two Tokens With Low Sats (1)', async () => {
   await utils.isTokenBalance(bobAddr, 1)
 })
 
-it.only('Split - Successful Split With Callback and Fee', async () => {
+it('Split - Successful Split With Callback and Fee', async () => {
   await setup(2)
   const issueTxSats = issueTx.vout[0].value
   const amount = issueTxSats / 2

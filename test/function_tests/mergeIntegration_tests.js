@@ -145,7 +145,7 @@ it('Merge - Successful Merge With Callback And No Fee', async () => {
   await utils.isTokenBalance(bobAddr, 3000)
 })
 
-it.only('Merge - Successful Merge unsigned & Fee', async () => {
+it('Merge - Successful Merge unsigned & Fee', async () => {
   const unsignedMergeReturn = await unsignedMerge(
     bobPrivateKey.publicKey,
     utils.getMergeUtxo(splitTxObj),
@@ -165,7 +165,7 @@ it.only('Merge - Successful Merge unsigned & Fee', async () => {
   await utils.isTokenBalance(bobAddr, 3000)
 })
 
-it.only('Merge - Successful Merge Unsigned & No Fee', async () => {
+it('Merge - Successful Merge Unsigned & No Fee', async () => {
   const unsignedMergeReturn = await unsignedMerge(
     bobPrivateKey.publicKey,
     utils.getMergeUtxo(splitTxObj),
