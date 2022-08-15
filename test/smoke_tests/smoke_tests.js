@@ -102,7 +102,7 @@ let tokenBSymbol
 const supply = 10000
 const symbol = 'TAALT'
 const wait = 5000 // due to delay in token issuance
-const keyMap = Map()
+const keyMap = new Map()
 
 it('Contract - Successful With Fees', async () => {
   await setupContract()
@@ -368,7 +368,7 @@ it('MergeSplit - Successful MergeSplit With Callback And Fees',
     await utils.isTokenBalance(bobAddr, 8250)
   }
 )
-it('MergeSplit - Successful MergeSplit unsigned With Fees', async () => {
+it.only('MergeSplit - Successful MergeSplit unsigned With Fees', async () => {
   await setupMerge() // contract, issue, transfer then split
 
   const issueOutFundingVout = splitTx.vout.length - 1
@@ -389,10 +389,10 @@ it('MergeSplit - Successful MergeSplit unsigned With Fees', async () => {
   const mergeSplitTx = bsv.Transaction(unsignedMergeSplitReturn.hex)
   utils.signScriptWithUnlocking(unsignedMergeSplitReturn, mergeSplitTx, keyMap)
   const mergeSplitTxid = await broadcast(mergeSplitTx.serialize(true))
-  expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075)
-  expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000225)
-  await utils.isTokenBalance(aliceAddr, 7750)
-  await utils.isTokenBalance(bobAddr, 2250)
+  expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000175)
+  expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000525)
+  await utils.isTokenBalance(aliceAddr, 1750)
+  await utils.isTokenBalance(bobAddr, 8250)
 })
 
 it('Redeem - Successful Redeem', async () => {
