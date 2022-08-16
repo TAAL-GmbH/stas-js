@@ -20,14 +20,16 @@ const {
   bitcoinToSatoshis
 } = require('../../index').utils
 
+const feeSettings = require('../../lib/constants')
+
 beforeEach(function () {
   feeSettings.Sats = 250
 })
 
 afterAll(function () {
-  feeSettings.Sats = 250
+  feeSettings.Sats = 50
 })
-it('Full Life Cycle Test With Fees 250 sats/byte', async () => {
+it('Full Life Cycle Test With Fees 250 sats/Kb', async () => {
   const issuerPrivateKey = bsv.PrivateKey()
   const fundingPrivateKey = bsv.PrivateKey()
 

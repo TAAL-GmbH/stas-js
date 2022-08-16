@@ -582,18 +582,25 @@ function calcuateFeesForContract (inputTx, utxo, fundingUtxo) {
   return fees
 }
 
-// calculates fees by taking all inputs and outputs and subtracting inputs by outputs
+/*
+  Fees are calucated by inputs - outputs.
+  To calculate input sats we get the vouts of the tx used for the input
+  then iterate over all outputs of tx used as input to retrieve sat amounts
+*/
 function calcuateFees (inputTx, outputTx) {
+  const vinIndexArray = []
+  for (let i = 0; i < outputTx.vin.length; i++) {
+    vinIndexArray.push(outputTx.vin[i].vout)
+  }
   let inputSats = 0
-  for (let i = 0; i < inputTx.vout.length; i++) {
-    inputSats += inputTx.vout[i].value
+  for (let i = 0; i < vinIndexArray.length; i++) {
+    inputSats += inputTx.vout[vinIndexArray[i]].value
   }
 
   let outputSats = 0
   for (let i = 0; i < outputTx.vout.length; i++) {
     outputSats += outputTx.vout[i].value
   }
-
   const fees = bitcoinToSatoshis(inputSats) - bitcoinToSatoshis(outputSats)
   return fees
 }
