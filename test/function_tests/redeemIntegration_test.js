@@ -14,11 +14,11 @@ const {
 const {
   getTransaction,
   getFundsFromFaucet,
-  broadcast,
-  finaliseSTASUnlockingScript
+  broadcast
 } = require('../../index').utils
 
 const { sighash } = require('../../lib/stas')
+const { bitcoinToSatoshis } = require('../../lib/utils')
 
 let issuerPrivateKey
 let fundingPrivateKey
@@ -158,13 +158,13 @@ it('Redeem - Incorrect Stas UTXO Amount Throws Error', async () => {
       txid: issueTxid,
       vout: 0,
       scriptPubKey: issueTx.vout[0].scriptPubKey.hex,
-      amount: 0.1
+      satoshis: 1000
     },
     {
       txid: issueTxid,
       vout: 2,
       scriptPubKey: issueTx.vout[2].scriptPubKey.hex,
-      amount: issueTx.vout[2].value
+      satoshis: bitcoinToSatoshis(issueTx.vout[2].value)
     },
     fundingPrivateKey
   )
@@ -185,13 +185,13 @@ it('Redeem - Incorrect Funding UTXO Amount Throws Error', async () => {
       txid: issueTxid,
       vout: 0,
       scriptPubKey: issueTx.vout[0].scriptPubKey.hex,
-      amount: issueTx.vout[0].value
+      satoshis: bitcoinToSatoshis(issueTx.vout[0].value)
     },
     {
       txid: issueTxid,
       vout: 2,
       scriptPubKey: issueTx.vout[2].scriptPubKey.hex,
-      amount: 0.1
+      amount: 1000
     },
     fundingPrivateKey
   )

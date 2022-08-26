@@ -8,6 +8,7 @@ const {
   contract,
   issue
 } = require('../../index')
+const { bitcoinToSatoshis } = require('../../lib/utils')
 
 const {
   getTransaction,
@@ -100,7 +101,7 @@ function contractUtxo () {
     txid: contractTxid,
     vout: 0,
     scriptPubKey: contractTx.vout[0].scriptPubKey.hex,
-    amount: contractTx.vout[0].value
+    satoshis: bitcoinToSatoshis(contractTx.vout[0].value)
   }
 }
 
@@ -109,7 +110,7 @@ function paymentUtxo () {
     txid: contractTxid,
     vout: 1,
     scriptPubKey: contractTx.vout[1].scriptPubKey.hex,
-    amount: contractTx.vout[1].value
+    satoshis: bitcoinToSatoshis(contractTx.vout[1].value)
   }
 }
 

@@ -104,7 +104,7 @@ it('Full Life Cycle Test With Fees 250 sats/Kb', async () => {
   await utils.isTokenBalance(bobAddr, 0)
   console.log(utils.calcuateFees(issueTx, transferTx))
   const transferFees = utils.calcuateFees(issueTx, transferTx)
-  expect(transferFees).to.equal(7876)
+  expect(transferFees).to.be.above(874).and.to.be.below(890)
 
   const bobAmount1 = transferTx.vout[0].value / 2
   const bobAmount2 = transferTx.vout[0].value - bobAmount1

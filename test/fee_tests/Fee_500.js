@@ -103,7 +103,7 @@ it('Full Life Cycle Test With Fees 500 sats/kb', async () => {
   await utils.isTokenBalance(aliceAddr, 10000)
   await utils.isTokenBalance(bobAddr, 0)
   const transferFees = utils.calcuateFees(issueTx, transferTx)
-  expect(transferFees).to.be.above(8745).and.to.be.below(8760)
+  expect(transferFees).to.be.above(1748).and.to.be.below(1758)
 
   const bobAmount1 = transferTx.vout[0].value / 2
   const bobAmount2 = transferTx.vout[0].value - bobAmount1
@@ -215,5 +215,5 @@ it('Full Life Cycle Test With Fees 500 sats/kb', async () => {
   await utils.isTokenBalance(aliceAddr, 7000)
   await utils.isTokenBalance(bobAddr, 2250)
   const redeemFees = utils.calcuateFees(mergeSplitTx, redeemTx)
-  expect(redeemFees).to.be.above(3285).and.to.be.below(3300)
+  expect(redeemFees).to.be.above(1038).and.to.be.below(1048)
 })
