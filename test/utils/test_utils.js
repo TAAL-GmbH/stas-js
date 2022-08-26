@@ -65,7 +65,7 @@ function getUtxo (txid, tx, vout) {
     txid: txid,
     vout: vout,
     scriptPubKey: tx.vout[vout].scriptPubKey.hex,
-    amount: tx.vout[vout].value
+    satoshis: bitcoinToSatoshis(tx.vout[vout].value)
   }
 }
 

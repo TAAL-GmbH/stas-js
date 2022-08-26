@@ -258,7 +258,6 @@ it('Issue - Successful Issue Token With Split No Fee', async () => {
     true,
     symbol
   )
-  console.log(issueHex)
   const issueTxid = await broadcast(issueHex)
   const tokenId = await utils.getToken(issueTxid)
   const response = await utils.getTokenResponse(tokenId)
@@ -324,7 +323,6 @@ it('Issue - Successful No Fee with callback', async () => {
     issuerSignatureCallback,
     null
   )
-  console.log(issueHex)
   let issueTxid
   try {
     issueTxid = await broadcast(issueHex)
