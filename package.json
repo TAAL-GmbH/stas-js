@@ -1,6 +1,6 @@
 {
   "name": "stas-js",
-  "version": "1.0.2",
+  "version": "2.0",
   "description": "This library will create various types of STAS token transactions that add token functionality to the BSV blockchain.",
   "main": "index.js",
   "module": "dist/index",
@@ -55,10 +55,13 @@
     "testPathIgnorePatterns": [
       "<rootDir>/test/mainnet_tests/",
       "<rootDir>/test/lifecycle_tests/lifecycleTest_1000Addresses_test.js",
-      "<rootDir>/test/function_tests/swap_fewerSatsThanOfferedUTXO_test.js"
+      "<rootDir>/test/function_tests/swap_fewerSatsThanOfferedUTXO_test.js",
+      "<rootDir>/test/lifecycle_tests/lifeCycletest9_test.js",
+      "<rootDir>test/function_tests/mergeInvalidStasToken_test.js",
+      "<rootDir>test/lifecycle_tests/lifeCycletest9_test.js"
     ],
     "verbose": true,
-    "testTimeout": 300000,
+    "testTimeout": 400000,
     "setupFilesAfterEnv": [
       "jest-allure/dist/setup"
     ],
