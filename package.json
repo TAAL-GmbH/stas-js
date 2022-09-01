@@ -61,7 +61,7 @@
       "<rootDir>test/lifecycle_tests/lifeCycletest9_test.js"
     ],
     "verbose": true,
-    "testTimeout": 400000,
+    "testTimeout": 500000,
     "setupFilesAfterEnv": [
       "jest-allure/dist/setup"
     ],
