@@ -85,8 +85,34 @@ const symbol = 'TAALT'
 const wait = 5000 // due to delay in token issuance
 const keyMap = new Map()
 
-describe('Smoke', () => {
-  it('MergeSplit - Successful MergeSplit With Fees', async () => {
+it('MergeSplit - Successful MergeSplit With Fees', async () => {
+  await setupMerge() // contract, issue, transfer then split
+
+  const issueOutFundingVout = splitTx.vout.length - 1
+
+  const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
+  const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
+
+  const mergeSplitHex = await mergeSplit(
+    bobPrivateKey,
+    utils.getMergeSplitUtxo(splitTxObj, splitTx),
+    aliceAddr,
+    aliceAmountSatoshis,
+    bobAddr,
+    bobAmountSatoshis,
+    utils.getUtxo(splitTxid, splitTx, issueOutFundingVout),
+    fundingPrivateKey
+  )
+  const mergeSplitTxid = await broadcast(mergeSplitHex)
+  await new Promise(resolve => setTimeout(resolve, wait))
+  expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000175)
+  expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000525)
+  await utils.isTokenBalance(aliceAddr, 1750)
+  await utils.isTokenBalance(bobAddr, 8250)
+})
+
+it('MergeSplit - Successful MergeSplit With Callback And Fees',
+  async () => {
     await setupMerge() // contract, issue, transfer then split
 
     const issueOutFundingVout = splitTx.vout.length - 1
@@ -94,15 +120,17 @@ describe('Smoke', () => {
     const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
     const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
 
-    const mergeSplitHex = await mergeSplit(
-      bobPrivateKey,
+    const mergeSplitHex = await mergeSplitWithCallback(
+      bobPrivateKey.publicKey,
       utils.getMergeSplitUtxo(splitTxObj, splitTx),
       aliceAddr,
       aliceAmountSatoshis,
       bobAddr,
       bobAmountSatoshis,
       utils.getUtxo(splitTxid, splitTx, issueOutFundingVout),
-      fundingPrivateKey
+      fundingPrivateKey.publicKey,
+      bobSignatureCallback,
+      paymentSignatureCallback
     )
     const mergeSplitTxid = await broadcast(mergeSplitHex)
     await new Promise(resolve => setTimeout(resolve, wait))
@@ -110,445 +138,416 @@ describe('Smoke', () => {
     expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000525)
     await utils.isTokenBalance(aliceAddr, 1750)
     await utils.isTokenBalance(bobAddr, 8250)
-  })
+  }
+)
+it('MergeSplit - Successful MergeSplit unsigned With Fees', async () => {
+  await setupMerge() // contract, issue, transfer then split
 
-  it('MergeSplit - Successful MergeSplit With Callback And Fees',
-    async () => {
-      await setupMerge() // contract, issue, transfer then split
+  const issueOutFundingVout = splitTx.vout.length - 1
 
-      const issueOutFundingVout = splitTx.vout.length - 1
+  const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
+  const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
 
-      const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
-      const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
-
-      const mergeSplitHex = await mergeSplitWithCallback(
-        bobPrivateKey.publicKey,
-        utils.getMergeSplitUtxo(splitTxObj, splitTx),
-        aliceAddr,
-        aliceAmountSatoshis,
-        bobAddr,
-        bobAmountSatoshis,
-        utils.getUtxo(splitTxid, splitTx, issueOutFundingVout),
-        fundingPrivateKey.publicKey,
-        bobSignatureCallback,
-        paymentSignatureCallback
-      )
-      const mergeSplitTxid = await broadcast(mergeSplitHex)
-      await new Promise(resolve => setTimeout(resolve, wait))
-      expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000175)
-      expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000525)
-      await utils.isTokenBalance(aliceAddr, 1750)
-      await utils.isTokenBalance(bobAddr, 8250)
-    }
+  const unsignedMergeSplitReturn = await unsignedMergeSplit(
+    bobPrivateKey.publicKey,
+    utils.getMergeSplitUtxo(splitTxObj, splitTx),
+    aliceAddr,
+    aliceAmountSatoshis,
+    bobAddr,
+    bobAmountSatoshis,
+    utils.getUtxo(splitTxid, splitTx, issueOutFundingVout),
+    fundingPrivateKey.publicKey
   )
-  it('MergeSplit - Successful MergeSplit unsigned With Fees', async () => {
-    await setupMerge() // contract, issue, transfer then split
-
-    const issueOutFundingVout = splitTx.vout.length - 1
-
-    const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
-    const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
-
-    const unsignedMergeSplitReturn = await unsignedMergeSplit(
-      bobPrivateKey.publicKey,
-      utils.getMergeSplitUtxo(splitTxObj, splitTx),
-      aliceAddr,
-      aliceAmountSatoshis,
-      bobAddr,
-      bobAmountSatoshis,
-      utils.getUtxo(splitTxid, splitTx, issueOutFundingVout),
-      fundingPrivateKey.publicKey
-    )
-    const mergeSplitTx = bsv.Transaction(unsignedMergeSplitReturn.hex)
-    utils.signScriptWithUnlocking(unsignedMergeSplitReturn, mergeSplitTx, keyMap)
-    const mergeSplitTxid = await broadcast(mergeSplitTx.serialize(true))
-    expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000175)
-    expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000525)
-    await utils.isTokenBalance(aliceAddr, 1750)
-    await utils.isTokenBalance(bobAddr, 8250)
-  })
-
-  it('Redeem - Successful Redeem', async () => {
-    await setupRedeem()
-    const redeemHex = await redeem(
-      alicePrivateKey,
-      issuerPrivateKey.publicKey,
-      utils.getUtxo(issueTxid, issueTx, 0),
-      utils.getUtxo(issueTxid, issueTx, 2),
-      fundingPrivateKey
-    )
-    const redeemTxid = await broadcast(redeemHex)
-    expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007)
-    await utils.isTokenBalance(aliceAddr, 0)
-    await utils.isTokenBalance(bobAddr, 3000)
-  })
-
-  it('Redeem - Successful Redeem With Callback and Fee', async () => {
-    await setupRedeem()
-    const redeemHex = await redeemWithCallback(
-      alicePrivateKey.publicKey,
-      issuerPrivateKey.publicKey,
-      utils.getUtxo(issueTxid, issueTx, 0),
-      utils.getUtxo(issueTxid, issueTx, 2),
-      fundingPrivateKey.publicKey,
-      aliceSignatureCallback,
-      paymentSignatureCallback
-    )
-    const redeemTxid = await broadcast(redeemHex)
-    expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007)
-    await utils.isTokenBalance(aliceAddr, 0)
-    await utils.isTokenBalance(bobAddr, 3000)
-  })
-
-  it('Redeem - Successful Redeem With Unsigned & Fee', async () => {
-    await setupRedeem()
-    const unsignedRedeemReturn = await unsignedRedeem(
-      alicePrivateKey.publicKey,
-      issuerPrivateKey.publicKey,
-      utils.getUtxo(issueTxid, issueTx, 0),
-      utils.getUtxo(issueTxid, issueTx, 2),
-      fundingPrivateKey.publicKey
-    )
-    const redeemTx = bsv.Transaction(unsignedRedeemReturn.hex)
-    utils.signScriptWithUnlocking(unsignedRedeemReturn, redeemTx, keyMap)
-    const redeemTxid = await broadcast(redeemTx.serialize(true))
-    expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007)
-    await utils.isTokenBalance(aliceAddr, 0)
-    await utils.isTokenBalance(bobAddr, 3000)
-  })
-
-  it('Successful RedeemSplit Unsigned & Fee', async () => {
-    await setupRedeem()
-    const amount = issueTx.vout[0].value / 5
-    const rSplitDestinations = []
-    rSplitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
-    rSplitDestinations[1] = { address: aliceAddr, amount: bitcoinToSatoshis(amount) }
-
-    const unsignedRedeemSplitReturn = await unsignedRedeemSplit(
-      alicePrivateKey.publicKey,
-      issuerPrivateKey.publicKey,
-      utils.getUtxo(issueTxid, issueTx, 0),
-      rSplitDestinations,
-      utils.getUtxo(issueTxid, issueTx, 2),
-      fundingPrivateKey.publicKey
-    )
-    const redeemSplitTx = bsv.Transaction(unsignedRedeemSplitReturn.hex)
-    utils.signScriptWithUnlocking(unsignedRedeemSplitReturn, redeemSplitTx, keyMap)
-    const redeemTxid = await broadcast(redeemSplitTx.serialize(true))
-    expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000042) // first utxo goes to redemption address
-    expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000014)
-    expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.000014)
-    await utils.isTokenBalance(aliceAddr, 1400)
-    await utils.isTokenBalance(bobAddr, 4400)
-  })
-
-  it('Split - Successful Split Into Two Tokens With Fee', async () => {
-    await setupRedeem()
-    const issueTxSats = issueTx.vout[0].value
-    const bobAmount1 = issueTxSats / 2
-    const bobAmount2 = issueTxSats - bobAmount1
-    const splitDestinations = []
-    splitDestinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(bobAmount1) } // 3500 tokens
-    splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) } // 3500 tokens
-
-    const splitHex = await split(
-      alicePrivateKey,
-      utils.getUtxo(issueTxid, issueTx, 0),
-      splitDestinations,
-      utils.getUtxo(issueTxid, issueTx, 2),
-      fundingPrivateKey
-    )
-    const splitTxid = await broadcast(splitHex)
-    expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035)
-    expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000035)
-    await utils.isTokenBalance(aliceAddr, 3500)
-    await utils.isTokenBalance(bobAddr, 6500)
-  })
-
-  it('Split - Successful Split With Callback and Fee', async () => {
-    await setupRedeem()
-    const issueTxSats = issueTx.vout[0].value
-    const bobAmount1 = issueTxSats / 2
-    const bobAmount2 = issueTxSats - bobAmount1
-    console.log(bobAmount1)
-    console.log(bobAmount2)
-    const splitDestinations = []
-    splitDestinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(bobAmount1) } // 3500 tokens
-    splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) } // 3500 tokens
-
-    const splitHex = await splitWithCallback(
-      alicePrivateKey.publicKey,
-      utils.getUtxo(issueTxid, issueTx, 0),
-      splitDestinations,
-      utils.getUtxo(issueTxid, issueTx, 2),
-      fundingPrivateKey.publicKey,
-      aliceSignatureCallback,
-      paymentSignatureCallback
-    )
-    const splitTxid = await broadcast(splitHex)
-    expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035)
-    expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000035)
-    await utils.isTokenBalance(aliceAddr, 3500)
-    await utils.isTokenBalance(bobAddr, 6500)
-  })
-
-  it('Split - Successful Split With Unsigned & Fee', async () => {
-    await setupRedeem()
-    const issueTxSats = issueTx.vout[0].value
-    const bobAmount1 = issueTxSats / 2
-    const bobAmount2 = issueTxSats - bobAmount1
-    const splitDestinations = []
-    splitDestinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(bobAmount1) } // 3500 tokens
-    splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) } // 3500 tokens
-
-    const unsignedSplitReturn = await unsignedSplit(
-      alicePrivateKey.publicKey,
-      utils.getUtxo(issueTxid, issueTx, 0),
-      splitDestinations,
-      utils.getUtxo(issueTxid, issueTx, 2),
-      fundingPrivateKey.publicKey
-    )
-    const splitTx = bsv.Transaction(unsignedSplitReturn.hex)
-    utils.signScriptWithUnlocking(unsignedSplitReturn, splitTx, keyMap)
-    const splitTxid = await broadcast(splitTx.serialize(true))
-    expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035)
-    expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000035)
-    await utils.isTokenBalance(aliceAddr, 3500)
-    await utils.isTokenBalance(bobAddr, 6500)
-  })
-
-  it('Transfer - Successful With Fee', async () => {
-    await setupRedeem()
-    const transferHex = await transfer(
-      bobPrivateKey,
-      utils.getUtxo(issueTxid, issueTx, 1),
-      aliceAddr,
-      utils.getUtxo(issueTxid, issueTx, 2),
-      fundingPrivateKey
-    )
-    const transferTxid = await broadcast(transferHex)
-    expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
-    await utils.isTokenBalance(aliceAddr, 10000)
-    await utils.isTokenBalance(bobAddr, 0)
-  })
-
-  it('Transfer - Successful Callback With Fee', async () => {
-    await setupRedeem()
-    const transferHex = await transferWithCallback(
-      bobPrivateKey.publicKey,
-      utils.getUtxo(issueTxid, issueTx, 1),
-      bobAddr,
-      utils.getUtxo(issueTxid, issueTx, 2),
-      fundingPrivateKey.publicKey,
-      bobSignatureCallback,
-      paymentSignatureCallback
-    )
-    const transferTxid = await broadcast(transferHex)
-    expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
-    await utils.isTokenBalance(bobAddr, 3000)
-    await utils.isTokenBalance(aliceAddr, 7000)
-  })
-
-  it('Transfer - Successful Unsigned & Fee', async () => {
-    await setupRedeem()
-    const unsignedTransferReturn = await unsignedTransfer(
-      bobPrivateKey.publicKey,
-      utils.getUtxo(issueTxid, issueTx, 1),
-      aliceAddr,
-      utils.getUtxo(issueTxid, issueTx, 2),
-      fundingPrivateKey.publicKey
-    )
-    const transferTx = bsv.Transaction(unsignedTransferReturn.hex)
-    utils.signScriptWithUnlocking(unsignedTransferReturn, transferTx, keyMap)
-    const transferTxid = await broadcast(transferTx.serialize(true))
-    expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
-    await utils.isTokenBalance(aliceAddr, 10000)
-    await utils.isTokenBalance(bobAddr, 0)
-  })
-
-  it('Successful RedeemSplit With 2 Split', async () => {
-    await setupRedeem()
-    const amount = issueTx.vout[0].value / 5
-    const rSplitDestinations = []
-    rSplitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
-    rSplitDestinations[1] = { address: aliceAddr, amount: bitcoinToSatoshis(amount) }
-
-    const redeemSplitHex = await redeemSplit(
-      alicePrivateKey,
-      issuerPrivateKey.publicKey,
-      utils.getUtxo(issueTxid, issueTx, 0),
-      rSplitDestinations,
-      utils.getUtxo(issueTxid, issueTx, 2),
-      fundingPrivateKey
-    )
-    const redeemTxid = await broadcast(redeemSplitHex)
-    expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000042)
-    expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000014)
-    expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.000014)
-    await utils.isTokenBalance(aliceAddr, 1400)
-    await utils.isTokenBalance(bobAddr, 4400)
-  })
-
-  it('Successful RedeemSplit With Callback & Fees', async () => {
-    await setupRedeem()
-    const amount = issueTx.vout[0].value / 5
-    const rSplitDestinations = []
-    rSplitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
-    rSplitDestinations[1] = { address: aliceAddr, amount: bitcoinToSatoshis(amount) }
-
-    const redeemSplitHex = await redeemSplitWithCallback(
-      alicePrivateKey.publicKey,
-      issuerPrivateKey.publicKey,
-      utils.getUtxo(issueTxid, issueTx, 0),
-      rSplitDestinations,
-      utils.getUtxo(issueTxid, issueTx, 2),
-      fundingPrivateKey.publicKey,
-      aliceSignatureCallback,
-      paymentSignatureCallback
-    )
-    const redeemTxid = await broadcast(redeemSplitHex)
-    expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000042) // first utxo goes to redemption address
-    expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000014)
-    expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.000014)
-    await utils.isTokenBalance(aliceAddr, 1400)
-    await utils.isTokenBalance(bobAddr, 4400)
-  })
-
-  it('Successful RedeemSplit With 3 Split', async () => {
-    await setupRedeem()
-    const davePrivateKey = bsv.PrivateKey()
-    const daveAddr = davePrivateKey.toAddress(process.env.NETWORK).toString()
-    const amount = issueTx.vout[0].value / 10
-    const rSplitDestinations = []
-    rSplitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
-    rSplitDestinations[1] = { address: aliceAddr, amount: bitcoinToSatoshis(amount) }
-    rSplitDestinations[2] = { address: daveAddr, amount: bitcoinToSatoshis(amount) }
-
-    const redeemSplitHex = await redeemSplit(
-      alicePrivateKey,
-      issuerPrivateKey.publicKey,
-      utils.getUtxo(issueTxid, issueTx, 0),
-      rSplitDestinations,
-      utils.getUtxo(issueTxid, issueTx, 2),
-      fundingPrivateKey
-    )
-    const redeemTxid = await broadcast(redeemSplitHex)
-    expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000049)
-    expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000007)
-    expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.000007)
-    expect(await utils.getVoutAmount(redeemTxid, 3)).to.equal(0.000007)
-    await utils.isTokenBalance(aliceAddr, 700)
-    await utils.isTokenBalance(bobAddr, 3700)
-    await utils.isTokenBalance(daveAddr, 700)
-  })
-
-  // the maker offers a token for sats
-  it('Swap - 2 step token-p2pkh swap', async function () {
-    await setupSwap()
-    const makerVout = 0
-    const takerVout = 0
-    const makerStasTx = bsv.Transaction(tokenBIssueHex)
-    const makerStasInputScript = makerStasTx.outputs[makerVout].script
-
-    // taker gets some funds
-    const bobUtxos = await getFundsFromFaucet(bobPrivateKey.toAddress(process.env.NETWORK).toString())
-    // get input transaction
-    const takerInputTxHex = await getRawTransaction(bobUtxos[0].txid)
-
-    const alicePublicKeyHash = bsv.crypto.Hash.sha256ripemd160(alicePrivateKey.publicKey.toBuffer()).toString('hex')
-
-    const makerInputSatoshis = tokenBObj.outputs[makerVout].satoshis
-    const takerOutputSatoshis = makerInputSatoshis
-    const makerOutputSatoshis = bobUtxos[0].amount
-    const takerInputSatoshis = makerOutputSatoshis
-
-    const makerInputUtxo = {
-      txId: tokenBIssueTxid,
-      outputIndex: takerVout,
-      script: makerStasInputScript,
-      satoshis: makerInputSatoshis
-    }
-
-    const wantedInfo = { type: 'native', satoshis: makerOutputSatoshis }
-
-    const swapOfferHex = await createSwapOffer(
-      alicePrivateKey,
-      makerInputUtxo,
-      wantedInfo
-    )
-    // now bob takes the offer
-    const fundingUTXO = {
-      txid: tokenBIssueTxid,
-      vout: 1,
-      scriptPubKey: tokenBIssueTx.vout[1].scriptPubKey.hex,
-      amount: bitcoinToSatoshis(tokenBIssueTx.vout[1].value)
-    }
-
-    const takerInputUTXO = {
-      txId: bobUtxos[0].txid,
-      outputIndex: bobUtxos[0].vout,
-      script: bsv.Script.fromHex(bobUtxos[0].scriptPubKey),
-      satoshis: takerInputSatoshis
-    }
-
-    const fullySignedSwapHex = await acceptSwapOffer(swapOfferHex, tokenBIssueHex,
-      bobPrivateKey, takerInputTxHex, takerInputUTXO, takerOutputSatoshis, alicePublicKeyHash,
-      fundingUTXO, fundingPrivateKey)
-
-    const swapTxid = await broadcast(fullySignedSwapHex)
-    console.log('swaptxid', swapTxid)
-
-    const tokenId = await utils.getToken(swapTxid, 1)
-    const response = await utils.getTokenResponse(tokenId, tokenBSymbol)
-    expect(response.symbol).to.equal(tokenBSymbol)
-    expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.01)
-    expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.00003)
-  })
-
-  // swap two STAS tokens
-  it('Swap - 3 step token-token swap', async function () {
-    await setupSwap()
-    const takerStasInputScriptHex = tokenAObj.outputs[0].script.toHex()
-    const makerStasInputScript = tokenBObj.outputs[0].script
-
-    const makerInputSatoshis = tokenBObj.outputs[0].satoshis
-    const takerOutputSatoshis = makerInputSatoshis
-    const makerOutputSatoshis = tokenAObj.outputs[0].satoshis
-    const takerInputSatoshis = makerOutputSatoshis
-    const makerInputUtxo = {
-      txId: tokenBIssueTxid,
-      outputIndex: 0,
-      script: makerStasInputScript,
-      satoshis: makerInputSatoshis
-    }
-
-    const wantedInfo = { scriptHex: takerStasInputScriptHex, satoshis: makerOutputSatoshis }
-
-    const unsignedSwapOfferHex = await createUnsignedSwapOffer(
-      alicePrivateKey,
-      makerInputUtxo,
-      wantedInfo
-    )
-
-    // now bob takes the offer
-    const takerSignedSwapHex = await acceptUnsignedSwapOffer(unsignedSwapOfferHex, tokenBIssueHex,
-      bobPrivateKey, tokenAIssueHex, 0, takerInputSatoshis, takerOutputSatoshis, alicePublicKeyHash,
-      fundingUTXO, fundingPrivateKey)
-
-    const fullySignedSwapHex = await makerSignSwapOffer(takerSignedSwapHex, tokenBIssueHex, tokenAIssueHex, alicePrivateKey, bobPublicKeyHash, paymentPublicKeyHash, fundingUTXO)
-    const swapTxid = await broadcast(fullySignedSwapHex)
-    console.log('swaptxid ', swapTxid)
-
-    const tokenId = await utils.getToken(swapTxid, 0)
-    const response = await utils.getTokenResponse(tokenId, tokenASymbol)
-    expect(response.symbol).to.equal(tokenASymbol)
-    const tokenId2 = await utils.getToken(swapTxid, 1)
-    const response2 = await utils.getTokenResponse(tokenId2, tokenBSymbol)
-    expect(response2.symbol).to.equal(tokenBSymbol)
-    expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.00006)
-    expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.00003)
-  })
+  const mergeSplitTx = bsv.Transaction(unsignedMergeSplitReturn.hex)
+  utils.signScriptWithUnlocking(unsignedMergeSplitReturn, mergeSplitTx, keyMap)
+  const mergeSplitTxid = await broadcast(mergeSplitTx.serialize(true))
+  expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000175)
+  expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000525)
+  await utils.isTokenBalance(aliceAddr, 1750)
+  await utils.isTokenBalance(bobAddr, 8250)
 })
+
+it('Redeem - Successful Redeem', async () => {
+  await setupRedeem()
+  const redeemHex = await redeem(
+    alicePrivateKey,
+    issuerPrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 0),
+    utils.getUtxo(issueTxid, issueTx, 2),
+    fundingPrivateKey
+  )
+  const redeemTxid = await broadcast(redeemHex)
+  expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007)
+  await utils.isTokenBalance(aliceAddr, 0)
+  await utils.isTokenBalance(bobAddr, 3000)
+})
+
+it('Redeem - Successful Redeem With Callback and Fee', async () => {
+  await setupRedeem()
+  const redeemHex = await redeemWithCallback(
+    alicePrivateKey.publicKey,
+    issuerPrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 0),
+    utils.getUtxo(issueTxid, issueTx, 2),
+    fundingPrivateKey.publicKey,
+    aliceSignatureCallback,
+    paymentSignatureCallback
+  )
+  const redeemTxid = await broadcast(redeemHex)
+  expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007)
+  await utils.isTokenBalance(aliceAddr, 0)
+  await utils.isTokenBalance(bobAddr, 3000)
+})
+
+it('Redeem - Successful Redeem With Unsigned & Fee', async () => {
+  await setupRedeem()
+  const unsignedRedeemReturn = await unsignedRedeem(
+    alicePrivateKey.publicKey,
+    issuerPrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 0),
+    utils.getUtxo(issueTxid, issueTx, 2),
+    fundingPrivateKey.publicKey
+  )
+  const redeemTx = bsv.Transaction(unsignedRedeemReturn.hex)
+  utils.signScriptWithUnlocking(unsignedRedeemReturn, redeemTx, keyMap)
+  const redeemTxid = await broadcast(redeemTx.serialize(true))
+  expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007)
+  await utils.isTokenBalance(aliceAddr, 0)
+  await utils.isTokenBalance(bobAddr, 3000)
+})
+
+it('Successful RedeemSplit Unsigned & Fee', async () => {
+  await setupRedeem()
+  const amount = issueTx.vout[0].value / 5
+  const rSplitDestinations = []
+  rSplitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
+  rSplitDestinations[1] = { address: aliceAddr, amount: bitcoinToSatoshis(amount) }
+
+  const unsignedRedeemSplitReturn = await unsignedRedeemSplit(
+    alicePrivateKey.publicKey,
+    issuerPrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 0),
+    rSplitDestinations,
+    utils.getUtxo(issueTxid, issueTx, 2),
+    fundingPrivateKey.publicKey
+  )
+  const redeemSplitTx = bsv.Transaction(unsignedRedeemSplitReturn.hex)
+  utils.signScriptWithUnlocking(unsignedRedeemSplitReturn, redeemSplitTx, keyMap)
+  const redeemTxid = await broadcast(redeemSplitTx.serialize(true))
+  expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000042) // first utxo goes to redemption address
+  expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000014)
+  expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.000014)
+  await utils.isTokenBalance(aliceAddr, 1400)
+  await utils.isTokenBalance(bobAddr, 4400)
+})
+
+it('Split - Successful Split Into Two Tokens With Fee', async () => {
+  await setupRedeem()
+  const issueTxSats = issueTx.vout[0].value
+  const bobAmount1 = issueTxSats / 2
+  const bobAmount2 = issueTxSats - bobAmount1
+  const splitDestinations = []
+  splitDestinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(bobAmount1) } // 3500 tokens
+  splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) } // 3500 tokens
+
+  const splitHex = await split(
+    alicePrivateKey,
+    utils.getUtxo(issueTxid, issueTx, 0),
+    splitDestinations,
+    utils.getUtxo(issueTxid, issueTx, 2),
+    fundingPrivateKey
+  )
+  const splitTxid = await broadcast(splitHex)
+  expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035)
+  expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000035)
+  await utils.isTokenBalance(aliceAddr, 3500)
+  await utils.isTokenBalance(bobAddr, 6500)
+})
+
+it('Split - Successful Split With Callback and Fee', async () => {
+  await setupRedeem()
+  const issueTxSats = issueTx.vout[0].value
+  const bobAmount1 = issueTxSats / 2
+  const bobAmount2 = issueTxSats - bobAmount1
+  console.log(bobAmount1)
+  console.log(bobAmount2)
+  const splitDestinations = []
+  splitDestinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(bobAmount1) } // 3500 tokens
+  splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) } // 3500 tokens
+
+  const splitHex = await splitWithCallback(
+    alicePrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 0),
+    splitDestinations,
+    utils.getUtxo(issueTxid, issueTx, 2),
+    fundingPrivateKey.publicKey,
+    aliceSignatureCallback,
+    paymentSignatureCallback
+  )
+  const splitTxid = await broadcast(splitHex)
+  expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035)
+  expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000035)
+  await utils.isTokenBalance(aliceAddr, 3500)
+  await utils.isTokenBalance(bobAddr, 6500)
+})
+
+it('Split - Successful Split With Unsigned & Fee', async () => {
+  await setupRedeem()
+  const issueTxSats = issueTx.vout[0].value
+  const bobAmount1 = issueTxSats / 2
+  const bobAmount2 = issueTxSats - bobAmount1
+  const splitDestinations = []
+  splitDestinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(bobAmount1) } // 3500 tokens
+  splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) } // 3500 tokens
+
+  const unsignedSplitReturn = await unsignedSplit(
+    alicePrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 0),
+    splitDestinations,
+    utils.getUtxo(issueTxid, issueTx, 2),
+    fundingPrivateKey.publicKey
+  )
+  const splitTx = bsv.Transaction(unsignedSplitReturn.hex)
+  utils.signScriptWithUnlocking(unsignedSplitReturn, splitTx, keyMap)
+  const splitTxid = await broadcast(splitTx.serialize(true))
+  expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035)
+  expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000035)
+  await utils.isTokenBalance(aliceAddr, 3500)
+  await utils.isTokenBalance(bobAddr, 6500)
+})
+
+it('Transfer - Successful With Fee', async () => {
+  await setupRedeem()
+  const transferHex = await transfer(
+    bobPrivateKey,
+    utils.getUtxo(issueTxid, issueTx, 1),
+    aliceAddr,
+    utils.getUtxo(issueTxid, issueTx, 2),
+    fundingPrivateKey
+  )
+  const transferTxid = await broadcast(transferHex)
+  expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
+  await utils.isTokenBalance(aliceAddr, 10000)
+  await utils.isTokenBalance(bobAddr, 0)
+})
+
+it('Transfer - Successful Callback With Fee', async () => {
+  await setupRedeem()
+  const transferHex = await transferWithCallback(
+    bobPrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 1),
+    bobAddr,
+    utils.getUtxo(issueTxid, issueTx, 2),
+    fundingPrivateKey.publicKey,
+    bobSignatureCallback,
+    paymentSignatureCallback
+  )
+  const transferTxid = await broadcast(transferHex)
+  expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
+  await utils.isTokenBalance(bobAddr, 3000)
+  await utils.isTokenBalance(aliceAddr, 7000)
+})
+
+it('Transfer - Successful Unsigned & Fee', async () => {
+  await setupRedeem()
+  const unsignedTransferReturn = await unsignedTransfer(
+    bobPrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 1),
+    aliceAddr,
+    utils.getUtxo(issueTxid, issueTx, 2),
+    fundingPrivateKey.publicKey
+  )
+  const transferTx = bsv.Transaction(unsignedTransferReturn.hex)
+  utils.signScriptWithUnlocking(unsignedTransferReturn, transferTx, keyMap)
+  const transferTxid = await broadcast(transferTx.serialize(true))
+  expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003)
+  await utils.isTokenBalance(aliceAddr, 10000)
+  await utils.isTokenBalance(bobAddr, 0)
+})
+
+it('Successful RedeemSplit With 2 Split', async () => {
+  await setupRedeem()
+  const amount = issueTx.vout[0].value / 5
+  const rSplitDestinations = []
+  rSplitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
+  rSplitDestinations[1] = { address: aliceAddr, amount: bitcoinToSatoshis(amount) }
+
+  const redeemSplitHex = await redeemSplit(
+    alicePrivateKey,
+    issuerPrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 0),
+    rSplitDestinations,
+    utils.getUtxo(issueTxid, issueTx, 2),
+    fundingPrivateKey
+  )
+  const redeemTxid = await broadcast(redeemSplitHex)
+  expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000042)
+  expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000014)
+  expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.000014)
+  await utils.isTokenBalance(aliceAddr, 1400)
+  await utils.isTokenBalance(bobAddr, 4400)
+})
+
+it('Successful RedeemSplit With Callback & Fees', async () => {
+  await setupRedeem()
+  const amount = issueTx.vout[0].value / 5
+  const rSplitDestinations = []
+  rSplitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
+  rSplitDestinations[1] = { address: aliceAddr, amount: bitcoinToSatoshis(amount) }
+
+  const redeemSplitHex = await redeemSplitWithCallback(
+    alicePrivateKey.publicKey,
+    issuerPrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 0),
+    rSplitDestinations,
+    utils.getUtxo(issueTxid, issueTx, 2),
+    fundingPrivateKey.publicKey,
+    aliceSignatureCallback,
+    paymentSignatureCallback
+  )
+  const redeemTxid = await broadcast(redeemSplitHex)
+  expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000042) // first utxo goes to redemption address
+  expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000014)
+  expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.000014)
+  await utils.isTokenBalance(aliceAddr, 1400)
+  await utils.isTokenBalance(bobAddr, 4400)
+})
+
+it('Successful RedeemSplit With 3 Split', async () => {
+  await setupRedeem()
+  const davePrivateKey = bsv.PrivateKey()
+  const daveAddr = davePrivateKey.toAddress(process.env.NETWORK).toString()
+  const amount = issueTx.vout[0].value / 10
+  const rSplitDestinations = []
+  rSplitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
+  rSplitDestinations[1] = { address: aliceAddr, amount: bitcoinToSatoshis(amount) }
+  rSplitDestinations[2] = { address: daveAddr, amount: bitcoinToSatoshis(amount) }
+
+  const redeemSplitHex = await redeemSplit(
+    alicePrivateKey,
+    issuerPrivateKey.publicKey,
+    utils.getUtxo(issueTxid, issueTx, 0),
+    rSplitDestinations,
+    utils.getUtxo(issueTxid, issueTx, 2),
+    fundingPrivateKey
+  )
+  const redeemTxid = await broadcast(redeemSplitHex)
+  expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000049)
+  expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000007)
+  expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.000007)
+  expect(await utils.getVoutAmount(redeemTxid, 3)).to.equal(0.000007)
+  await utils.isTokenBalance(aliceAddr, 700)
+  await utils.isTokenBalance(bobAddr, 3700)
+  await utils.isTokenBalance(daveAddr, 700)
+})
+
+// the maker offers a token for sats
+it('Swap - 2 step token-p2pkh swap', async function () {
+  await setupSwap()
+  const makerVout = 0
+  const takerVout = 0
+  const makerStasTx = bsv.Transaction(tokenBIssueHex)
+  const makerStasInputScript = makerStasTx.outputs[makerVout].script
+
+  // taker gets some funds
+  const bobUtxos = await getFundsFromFaucet(bobPrivateKey.toAddress(process.env.NETWORK).toString())
+  // get input transaction
+  const takerInputTxHex = await getRawTransaction(bobUtxos[0].txid)
+
+  const alicePublicKeyHash = bsv.crypto.Hash.sha256ripemd160(alicePrivateKey.publicKey.toBuffer()).toString('hex')
+
+  const makerInputSatoshis = tokenBObj.outputs[makerVout].satoshis
+  const takerOutputSatoshis = makerInputSatoshis
+  const makerOutputSatoshis = bobUtxos[0].amount
+  const takerInputSatoshis = makerOutputSatoshis
+
+  const makerInputUtxo = {
+    txId: tokenBIssueTxid,
+    outputIndex: takerVout,
+    script: makerStasInputScript,
+    satoshis: makerInputSatoshis
+  }
+
+  const wantedInfo = { type: 'native', satoshis: makerOutputSatoshis }
+
+  const swapOfferHex = await createSwapOffer(
+    alicePrivateKey,
+    makerInputUtxo,
+    wantedInfo
+  )
+  // now bob takes the offer
+  const fundingUTXO = {
+    txid: tokenBIssueTxid,
+    vout: 1,
+    scriptPubKey: tokenBIssueTx.vout[1].scriptPubKey.hex,
+    amount: bitcoinToSatoshis(tokenBIssueTx.vout[1].value)
+  }
+
+  const takerInputUTXO = {
+    txId: bobUtxos[0].txid,
+    outputIndex: bobUtxos[0].vout,
+    script: bsv.Script.fromHex(bobUtxos[0].scriptPubKey),
+    satoshis: takerInputSatoshis
+  }
+
+  const fullySignedSwapHex = await acceptSwapOffer(swapOfferHex, tokenBIssueHex,
+    bobPrivateKey, takerInputTxHex, takerInputUTXO, takerOutputSatoshis, alicePublicKeyHash,
+    fundingUTXO, fundingPrivateKey)
+
+  const swapTxid = await broadcast(fullySignedSwapHex)
+  console.log('swaptxid', swapTxid)
+
+  const tokenId = await utils.getToken(swapTxid, 1)
+  const response = await utils.getTokenResponse(tokenId, tokenBSymbol)
+  expect(response.symbol).to.equal(tokenBSymbol)
+  expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.01)
+  expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.00003)
+})
+
+// swap two STAS tokens
+it('Swap - 3 step token-token swap', async function () {
+  await setupSwap()
+  const takerStasInputScriptHex = tokenAObj.outputs[0].script.toHex()
+  const makerStasInputScript = tokenBObj.outputs[0].script
+
+  const makerInputSatoshis = tokenBObj.outputs[0].satoshis
+  const takerOutputSatoshis = makerInputSatoshis
+  const makerOutputSatoshis = tokenAObj.outputs[0].satoshis
+  const takerInputSatoshis = makerOutputSatoshis
+  const makerInputUtxo = {
+    txId: tokenBIssueTxid,
+    outputIndex: 0,
+    script: makerStasInputScript,
+    satoshis: makerInputSatoshis
+  }
+
+  const wantedInfo = { scriptHex: takerStasInputScriptHex, satoshis: makerOutputSatoshis }
+
+  const unsignedSwapOfferHex = await createUnsignedSwapOffer(
+    alicePrivateKey,
+    makerInputUtxo,
+    wantedInfo
+  )
+
+  // now bob takes the offer
+  const takerSignedSwapHex = await acceptUnsignedSwapOffer(unsignedSwapOfferHex, tokenBIssueHex,
+    bobPrivateKey, tokenAIssueHex, 0, takerInputSatoshis, takerOutputSatoshis, alicePublicKeyHash,
+    fundingUTXO, fundingPrivateKey)
+
+  const fullySignedSwapHex = await makerSignSwapOffer(takerSignedSwapHex, tokenBIssueHex, tokenAIssueHex, alicePrivateKey, bobPublicKeyHash, paymentPublicKeyHash, fundingUTXO)
+  const swapTxid = await broadcast(fullySignedSwapHex)
+  console.log('swaptxid ', swapTxid)
+
+  const tokenId = await utils.getToken(swapTxid, 0)
+  const response = await utils.getTokenResponse(tokenId, tokenASymbol)
+  expect(response.symbol).to.equal(tokenASymbol)
+  const tokenId2 = await utils.getToken(swapTxid, 1)
+  const response2 = await utils.getTokenResponse(tokenId2, tokenBSymbol)
+  expect(response2.symbol).to.equal(tokenBSymbol)
+  expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.00006)
+  expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.00003)
+})
+
 async function setupMerge () {
   issuerPrivateKey = bsv.PrivateKey()
   keyMap.set(issuerPrivateKey.publicKey, issuerPrivateKey)
