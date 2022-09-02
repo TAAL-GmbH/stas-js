@@ -326,7 +326,7 @@ async function setupMerge () {
     utils.getUtxo(contractTxid, contractTx, 0),
     utils.getUtxo(contractTxid, contractTx, 1),
     fundingPrivateKey,
-    false,
+    true,
     symbol,
     2
   )
