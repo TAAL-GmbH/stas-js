@@ -110,7 +110,7 @@ it('Contract - Successful With Callback No Fee', async () => {
 
 it('Contract - Successful With Unsigned & Fee', async () => {
   const contractHex = await unsignedContract(
-    issuerPrivateKey,
+    issuerPrivateKey.publicKey,
     contractUtxos,
     fundingUtxos,
     fundingPrivateKey,
@@ -128,7 +128,7 @@ it('Contract - Successful With Unsigned & Fee', async () => {
 
 it('Contract - Successful With Unsigned No Fee', async () => {
   const contractHex = await unsignedContract(
-    issuerPrivateKey,
+    issuerPrivateKey.publicKey,
     contractUtxos,
     null,
     null,
@@ -150,25 +150,6 @@ it('Contract - Wrong Funding Private Key Throws Error', async () => {
     contractUtxos,
     fundingUtxos,
     incorrectPrivateKey,
-    schema,
-    supply
-  )
-  try {
-    await broadcast(contractHex)
-    expect(false).toBeTruthy()
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.response.data).to.contain('mandatory-script-verify-flag-failed')
-  }
-})
-
-it('Contract - Wrong Contract Private Key Throws Error', async () => {
-  const incorrectPrivateKey = bsv.PrivateKey()
-  const contractHex = await contract(
-    incorrectPrivateKey,
-    contractUtxos,
-    fundingUtxos,
-    fundingPrivateKey,
     schema,
     supply
   )
