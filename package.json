@@ -6,7 +6,7 @@
   "module": "dist/index",
   "scripts": {
     "test": "jest",
-    "test:smoke:ci": "jest --testPathPattern=test/smoke_tests --runInBand",
+    "test:smoke:ci": "jest --testPathPattern=test/smoke_tests",
     "watch": "npm-watch",
     "build": "rollup -c",
     "lint": "standard"
