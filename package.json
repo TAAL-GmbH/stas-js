@@ -5,8 +5,7 @@
   "main": "index.js",
   "module": "dist/index",
   "scripts": {
-    "test": "jest",
-    "test:smoke:ci": "jest --testPathPattern=test/smoke_tests",
+    "test:smoke:ci": "jest -t 'Smoke'",
     "watch": "npm-watch",
     "build": "rollup -c",
     "lint": "standard"

@@ -19,7 +19,7 @@ const {
   broadcast
 } = require('../../index').utils
 
-describe('regression, testnet', () => {
+describe('Smoke', () => {
   it('Full Life Cycle Test NFT 1', async () => {
     const issuerPrivateKey = bsv.PrivateKey()
     const fundingPrivateKey = bsv.PrivateKey()
@@ -100,20 +100,18 @@ describe('regression, testnet', () => {
     splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount1) }
     splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
 
-    const splitHex = await split(
-      alicePrivateKey,
-      utils.getUtxo(transferTxid, transferTx, 0),
-      splitDestinations,
-      utils.getUtxo(transferTxid, transferTx, 1),
-      fundingPrivateKey
-    )
-
     try {
-      await broadcast(splitHex)
+      await split(
+        alicePrivateKey,
+        utils.getUtxo(transferTxid, transferTx, 0),
+        splitDestinations,
+        utils.getUtxo(transferTxid, transferTx, 1),
+        fundingPrivateKey
+      )
       assert(false)
     } catch (e) {
       expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.eql('Request failed with status code 400')
+      expect(e.message).to.eql('Cannot Split an NFT')
     }
 
     const redeemHex = await redeem(
