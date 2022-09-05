@@ -20,7 +20,7 @@ const {
   broadcast
 } = require('../../index').utils
 
-it('Full Life Cycle Test 9 - Issuance with 1mb of data', async () => {
+it('Full Life Cycle Test 8 - Issuance with 1mb of data', async () => {
   const issuerPrivateKey = bsv.PrivateKey()
   const fundingPrivateKey = bsv.PrivateKey()
 
