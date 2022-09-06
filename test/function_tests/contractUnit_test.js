@@ -16,7 +16,7 @@ let fundingPrivateKey
 let contractUtxos
 let fundingUtxos
 let publicKeyHash
-const supply = 10000
+let supply = 10000
 const symbol = 'TAALT'
 let schema
 
@@ -26,6 +26,28 @@ beforeAll(async () => {
 
 afterEach(async () => {
   schema.symbol = symbol
+  schema.satsPerToken = 1
+  supply = 10000
+})
+
+it('Contract - Supply > Contract UTXO amount', async () => {
+  try {
+    supply = 200000000
+
+    await contract(
+      issuerPrivateKey,
+      contractUtxos,
+      fundingUtxos,
+      fundingPrivateKey,
+      schema,
+      supply
+    )
+    expect(false).toBeTruthy()
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Token Supply of 200000000 with satsPerToken of 1 is greater than input amount of 1000000')
+  }
 })
 
 it('Contract - Null Issuer Private Key Throws Error', async () => {
@@ -346,7 +368,7 @@ it('Contract - Null Symbol In Schema Throws Error', async () => {
   }
 })
 
-it('Contract - Empty Symbol In Schema Throws Error', async () => {
+it('Contract - Undefined Schema Throws Error', async () => {
   try {
     await contract(
       issuerPrivateKey,
@@ -360,7 +382,7 @@ it('Contract - Empty Symbol In Schema Throws Error', async () => {
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Invalid Symbol. Must be between 1 and 128 long and contain alpahnumeric, \'-\', \'_\' chars.')
+    expect(e.message).to.eql('Token id is required')
   }
 })
 
