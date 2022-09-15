@@ -107,8 +107,8 @@ it('Full Life Cycle Test With 10 Issuance Addresses', async () => {
 
   const amount = bitcoinToSatoshis(transferTx.vout[0].value / 2)
   const splitDestinations = []
-  splitDestinations[0] = { address: addr4, amount: amount }
-  splitDestinations[1] = { address: addr4, amount: amount }
+  splitDestinations[0] = { address: addr4, satoshis: amount }
+  splitDestinations[1] = { address: addr4, satoshis: amount }
 
   const splitHex = await split(
     pk3,
@@ -146,8 +146,8 @@ it('Full Life Cycle Test With 10 Issuance Addresses', async () => {
   const aliceAmount2 = mergeTx.vout[0].value - aliceAmount1
 
   const split2Destinations = []
-  split2Destinations[0] = { address: addr5, amount: bitcoinToSatoshis(aliceAmount1) }
-  split2Destinations[1] = { address: addr5, amount: bitcoinToSatoshis(aliceAmount2) }
+  split2Destinations[0] = { address: addr5, satoshis: bitcoinToSatoshis(aliceAmount1) }
+  split2Destinations[1] = { address: addr5, satoshis: bitcoinToSatoshis(aliceAmount2) }
 
   const splitHex2 = await split(
     pk3,
@@ -207,7 +207,7 @@ it('Full Life Cycle Test With 10 Issuance Addresses', async () => {
   await utils.isTokenBalance(addr7, 1750)
 })
 
-function get10IssueAddresses () {
+function get10IssueAddresses() {
   const issueInfo = [
     {
       addr: addr1,

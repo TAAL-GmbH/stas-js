@@ -93,8 +93,8 @@ it('Full Life Cycle Test 1', async () => {
   const bobAmount1 = transferTx.vout[0].value / 2
   const bobAmount2 = transferTx.vout[0].value - bobAmount1
   const splitDestinations = []
-  splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount1) }
-  splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
+  splitDestinations[0] = { address: bobAddr, satoshis: bitcoinToSatoshis(bobAmount1) }
+  splitDestinations[1] = { address: bobAddr, satoshis: bitcoinToSatoshis(bobAmount2) }
 
   const splitHex = await split(
     alicePrivateKey,
@@ -135,8 +135,8 @@ it('Full Life Cycle Test 1', async () => {
   const amount = bitcoinToSatoshis(mergeTx.vout[0].value / 2)
 
   const split2Destinations = []
-  split2Destinations[0] = { address: bobAddr, amount: amount }
-  split2Destinations[1] = { address: bobAddr, amount: amount }
+  split2Destinations[0] = { address: bobAddr, satoshis: amount }
+  split2Destinations[1] = { address: bobAddr, satoshis: amount }
 
   const splitHex2 = await split(
     alicePrivateKey,

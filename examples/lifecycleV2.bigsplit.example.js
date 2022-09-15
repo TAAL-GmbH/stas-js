@@ -160,10 +160,10 @@ const {
     const bobAmount4 = txOutSats - (bobAmount1 + bobAmount2 + bobAmount3)
 
     const splitDestinations = []
-    splitDestinations[0] = { address: bobAddr, amount: bobAmount1 }
-    splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
-    splitDestinations[2] = { address: bobAddr, amount: bobAmount3 }
-    splitDestinations[3] = { address: bobAddr, amount: bobAmount4 }
+    splitDestinations[0] = { address: bobAddr, satoshis: bobAmount1 }
+    splitDestinations[1] = { address: bobAddr, satoshis: bobAmount2 }
+    splitDestinations[2] = { address: bobAddr, satoshis: bobAmount3 }
+    splitDestinations[3] = { address: bobAddr, satoshis: bobAmount4 }
 
     const splitHex = await split(
       alicePrivateKey,
@@ -244,8 +244,8 @@ const {
     const aliceAmount2 = mergeTx.vout[0].value - aliceAmount1
 
     const split2Destinations = []
-    split2Destinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(aliceAmount1) }
-    split2Destinations[1] = { address: aliceAddr, amount: bitcoinToSatoshis(aliceAmount2) }
+    split2Destinations[0] = { address: aliceAddr, satoshis: bitcoinToSatoshis(aliceAmount1) }
+    split2Destinations[1] = { address: aliceAddr, satoshis: bitcoinToSatoshis(aliceAmount2) }
 
     const splitHex2 = await split(
       alicePrivateKey,

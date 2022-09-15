@@ -56,7 +56,7 @@ describe('atomic swap', function () {
 
     const makerInputSatoshis = tokenBObj.outputs[0].satoshis
     const takerOutputSatoshis = makerInputSatoshis
-    const makerOutputSatoshis = bobUtxos[0].amount
+    const makerOutputSatoshis = bobUtxos[0].satoshis
     const takerInputSatoshis = makerOutputSatoshis
 
     const makerInputUtxo = {
@@ -97,7 +97,7 @@ describe('atomic swap', function () {
     // get input transaction
     const makerInputTx = await getRawTransaction(aliceUtxos[0].txid)
 
-    const makerInputSatoshis = aliceUtxos[0].amount
+    const makerInputSatoshis = aliceUtxos[0].satoshis
     const takerOutputSatoshis = makerInputSatoshis
     const makerOutputSatoshis = tokenAObj.outputs[0].satoshis
     const takerInputSatoshis = makerOutputSatoshis
@@ -126,7 +126,7 @@ describe('atomic swap', function () {
   })
 })
 
-async function setup () {
+async function setup() {
   const tokenAIssuerPrivateKey = bsv.PrivateKey()
   const tokenBIssuerPrivateKey = bsv.PrivateKey()
   fundingPrivateKey = bsv.PrivateKey()
@@ -214,6 +214,6 @@ async function setup () {
     txid: tokenBIssueTxid,
     vout: 1,
     scriptPubKey: tokenBIssueTx.vout[1].scriptPubKey.hex,
-    amount: bitcoinToSatoshis(tokenBIssueTx.vout[1].value)
+    satoshis: bitcoinToSatoshis(tokenBIssueTx.vout[1].value)
   }
 }

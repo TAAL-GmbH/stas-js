@@ -251,7 +251,7 @@ it('Merge - Successful Merge With Callback And Fee', async () => {
   await utils.isTokenBalance(bobAddr, 3000)
 })
 
-async function setupContract () {
+async function setupContract() {
   issuerPrivateKey = bsv.PrivateKey()
   keyMap.set(issuerPrivateKey.publicKey, issuerPrivateKey)
   fundingPrivateKey = bsv.PrivateKey()
@@ -262,7 +262,7 @@ async function setupContract () {
   schema = utils.schema(publicKeyHash, symbol, supply)
 }
 
-async function setupIssue () {
+async function setupIssue() {
   issuerPrivateKey = bsv.PrivateKey()
   keyMap.set(issuerPrivateKey.publicKey, issuerPrivateKey)
   fundingPrivateKey = bsv.PrivateKey()
@@ -291,7 +291,7 @@ async function setupIssue () {
   contractTx = await getTransaction(contractTxid)
 }
 
-async function setupMerge () {
+async function setupMerge() {
   issuerPrivateKey = bsv.PrivateKey()
   keyMap.set(issuerPrivateKey.publicKey, issuerPrivateKey)
   fundingPrivateKey = bsv.PrivateKey()
@@ -338,8 +338,8 @@ async function setupMerge () {
   const bobAmount1 = issueTx.vout[0].value / 2
   const bobAmount2 = issueTx.vout[0].value - bobAmount1
   const splitDestinations = []
-  splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount1) }
-  splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
+  splitDestinations[0] = { address: bobAddr, satoshis: bitcoinToSatoshis(bobAmount1) }
+  splitDestinations[1] = { address: bobAddr, satoshis: bitcoinToSatoshis(bobAmount2) }
 
   const splitHex = await split(
     alicePrivateKey,

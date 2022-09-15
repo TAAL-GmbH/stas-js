@@ -59,7 +59,7 @@
 //         txid: inputTxid,
 //         vout: inputUtxoIdVoutIndex,
 //         scriptPubKey: inputTx.vout[inputUtxoIdVoutIndex].scriptPubKey.hex,
-//         amount: inputTx.vout[inputUtxoIdVoutIndex].value
+//         satoshis: inputTx.vout[inputUtxoIdVoutIndex].value
 //       }],
 //       null,
 //       null,
@@ -118,8 +118,8 @@
 //     const bobAmount1 = transferTx.vout[0].value / 2
 
 //     const splitDestinations = []
-//     splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount1) }
-//     splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount1) }
+//     splitDestinations[0] = { address: bobAddr, satoshis: bitcoinToSatoshis(bobAmount1) }
+//     splitDestinations[1] = { address: bobAddr, satoshis: bitcoinToSatoshis(bobAmount1) }
 
 //     const splitHex = split(
 //       alicePrivateKey,
@@ -159,8 +159,8 @@
 //     const amount = bitcoinToSatoshis(mergeTx.vout[0].value / 2)
 
 //     const split2Destinations = []
-//     split2Destinations[0] = { address: bobAddr, amount: amount }
-//     split2Destinations[1] = { address: bobAddr, amount: amount }
+//     split2Destinations[0] = { address: bobAddr, satoshis: amount }
+//     split2Destinations[1] = { address: bobAddr, satoshis: amount }
 
 //     const splitHex2 = split(
 //       alicePrivateKey,

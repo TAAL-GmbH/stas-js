@@ -67,7 +67,7 @@ describe('atomic swap', function () {
       makerInputUtxo,
       wantedInfo
     )
-    console.log('funding ' + fundingUTXO.amount)
+    console.log('funding ' + fundingUTXO.satoshis)
 
     // now bob takes the offer
     const takerSignedSwapHex = await acceptUnsignedSwapOffer(unsignedSwapOfferHex, tokenBIssueHex,
@@ -90,7 +90,7 @@ describe('atomic swap', function () {
   })
 })
 
-async function setup () {
+async function setup() {
   const tokenAIssuerPrivateKey = bsv.PrivateKey()
   const tokenBIssuerPrivateKey = bsv.PrivateKey()
   fundingPrivateKey = bsv.PrivateKey()
@@ -218,6 +218,6 @@ async function setup () {
     txid: tokenBIssueTxid,
     vout: 5,
     scriptPubKey: tokenBIssueTx.vout[5].scriptPubKey.hex,
-    amount: bitcoinToSatoshis(tokenBIssueTx.vout[5].value)
+    satoshis: bitcoinToSatoshis(tokenBIssueTx.vout[5].value)
   }
 }

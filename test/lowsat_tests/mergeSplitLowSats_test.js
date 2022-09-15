@@ -157,7 +157,7 @@ it('MergeSplit - Successful MergeSplit With Callback and low fees', async () => 
 }
 )
 
-async function setup (satSupply) {
+async function setup(satSupply) {
   issuerPrivateKey = bsv.PrivateKey()
   fundingPrivateKey = bsv.PrivateKey()
   alicePrivateKey = bsv.PrivateKey()
@@ -202,8 +202,8 @@ async function setup (satSupply) {
 
   const amount = issueTx.vout[0].value / 2
   const splitDestinations = []
-  splitDestinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(amount) }
-  splitDestinations[1] = { address: aliceAddr, amount: bitcoinToSatoshis(amount) }
+  splitDestinations[0] = { address: aliceAddr, satoshis: bitcoinToSatoshis(amount) }
+  splitDestinations[1] = { address: aliceAddr, satoshis: bitcoinToSatoshis(amount) }
 
   const splitHex = await split(
     alicePrivateKey,

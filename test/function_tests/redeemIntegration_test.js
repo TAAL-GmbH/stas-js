@@ -191,7 +191,7 @@ it('Redeem - Incorrect Funding UTXO Amount Throws Error', async () => {
       txid: issueTxid,
       vout: 2,
       scriptPubKey: issueTx.vout[2].scriptPubKey.hex,
-      amount: 1000
+      satoshis: 1000
     },
     fundingPrivateKey
   )
@@ -270,7 +270,7 @@ it(
   }
 )
 
-async function setup () {
+async function setup() {
   issuerPrivateKey = bsv.PrivateKey()
   keyMap.set(issuerPrivateKey.publicKey, issuerPrivateKey)
   fundingPrivateKey = bsv.PrivateKey()

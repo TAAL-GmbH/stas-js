@@ -39,10 +39,10 @@ it('RedeemSplit - Too Many Outputs Throws Error', async () => {
   const emmaAddr = emmaPrivateKey.toAddress(process.env.NETWORK).toString()
   const amount = bitcoinToSatoshis(issueTx.vout[0].value / 5)
   const rSplitDestinations = []
-  rSplitDestinations[0] = { address: bobAddr, amount: amount }
-  rSplitDestinations[1] = { address: aliceAddr, amount: amount }
-  rSplitDestinations[2] = { address: daveAddr, amount: amount }
-  rSplitDestinations[3] = { address: emmaAddr, amount: amount }
+  rSplitDestinations[0] = { address: bobAddr, satoshis: amount }
+  rSplitDestinations[1] = { address: aliceAddr, satoshis: amount }
+  rSplitDestinations[2] = { address: daveAddr, satoshis: amount }
+  rSplitDestinations[3] = { address: emmaAddr, satoshis: amount }
   try {
     await redeemSplit(
       alicePrivateKey,
@@ -63,7 +63,7 @@ it('RedeemSplit - Too Many Outputs Throws Error', async () => {
 it('RedeemSplit - Add Too Much To Split Throws Error', async () => {
   const bobAmount = issueTx.vout[0].value * 2
   const splitDestinations = []
-  splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount) }
+  splitDestinations[0] = { address: bobAddr, satoshis: bitcoinToSatoshis(bobAmount) }
   const issueOutFundingVout = issueTx.vout.length - 1
   try {
     await redeemSplit(
@@ -86,8 +86,8 @@ it('RedeemSplit - Address Too Short Throws Error', async () => {
   const bobAmount1 = issueTx.vout[0].value / 2
   const bobAmount2 = issueTx.vout[0].value - bobAmount1
   const splitDestinations = []
-  splitDestinations[0] = { address: '1LF2wNCBT9dp5jN7fa6xSAaU', amount: bitcoinToSatoshis(bobAmount1) }
-  splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
+  splitDestinations[0] = { address: '1LF2wNCBT9dp5jN7fa6xSAaU', satoshis: bitcoinToSatoshis(bobAmount1) }
+  splitDestinations[1] = { address: bobAddr, satoshis: bitcoinToSatoshis(bobAmount2) }
   const issueOutFundingVout = issueTx.vout.length - 1
   try {
     await redeemSplit(
@@ -111,8 +111,8 @@ it('RedeemSplit - Address Too Long Throws Error', async () => {
   const bobAmount2 = issueTx.vout[0].value - bobAmount1
   console.log(bobAddr)
   const splitDestinations = []
-  splitDestinations[0] = { address: '1LF2wNCBT9dp5jN7fa6xSAaUGjJ5Pyz5VGaUG', amount: bitcoinToSatoshis(bobAmount1) }
-  splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
+  splitDestinations[0] = { address: '1LF2wNCBT9dp5jN7fa6xSAaUGjJ5Pyz5VGaUG', satoshis: bitcoinToSatoshis(bobAmount1) }
+  splitDestinations[1] = { address: bobAddr, satoshis: bitcoinToSatoshis(bobAmount2) }
   const issueOutFundingVout = issueTx.vout.length - 1
   try {
     await redeemSplit(
@@ -136,11 +136,11 @@ it(
   async () => {
     const bobAmount = bitcoinToSatoshis(issueTx.vout[0].value / 10)
     const splitDestinations = []
-    splitDestinations[0] = { address: bobAddr, amount: bobAmount }
-    splitDestinations[1] = { address: bobAddr, amount: bobAmount }
-    splitDestinations[2] = { address: bobAddr, amount: bobAmount }
-    splitDestinations[3] = { address: bobAddr, amount: bobAmount }
-    splitDestinations[4] = { address: bobAddr, amount: bobAmount }
+    splitDestinations[0] = { address: bobAddr, satoshis: bobAmount }
+    splitDestinations[1] = { address: bobAddr, satoshis: bobAmount }
+    splitDestinations[2] = { address: bobAddr, satoshis: bobAmount }
+    splitDestinations[3] = { address: bobAddr, satoshis: bobAmount }
+    splitDestinations[4] = { address: bobAddr, satoshis: bobAmount }
     const issueOutFundingVout = issueTx.vout.length - 1
     try {
       await redeemSplit(
@@ -165,8 +165,8 @@ it(
   async () => {
     const bobAmount = bitcoinToSatoshis(issueTx.vout[0].value / 2)
     const splitDestinations = []
-    splitDestinations[0] = { address: bobAddr, amount: bobAmount }
-    splitDestinations[1] = { address: bobAddr, amount: bobAmount }
+    splitDestinations[0] = { address: bobAddr, satoshis: bobAmount }
+    splitDestinations[1] = { address: bobAddr, satoshis: bobAmount }
 
     const issueOutFundingVout = issueTx.vout.length - 1
     try {
@@ -190,8 +190,8 @@ it(
 it('RedeemSplit - Null STAS UTXO Throws Error', async () => {
   const bobAmount = bitcoinToSatoshis(issueTx.vout[0].value / 2)
   const splitDestinations = []
-  splitDestinations[0] = { address: bobAddr, amount: bobAmount }
-  splitDestinations[1] = { address: bobAddr, amount: bobAmount }
+  splitDestinations[0] = { address: bobAddr, satoshis: bobAmount }
+  splitDestinations[1] = { address: bobAddr, satoshis: bobAmount }
 
   const issueOutFundingVout = issueTx.vout.length - 1
   try {
@@ -253,8 +253,8 @@ it('RedeemSplit - Empty Split Destinations Throws Error', async () => {
 it('RedeemSplit - Null Funding Private Key Throws Error', async () => {
   const bobAmount = bitcoinToSatoshis(issueTx.vout[0].value / 2)
   const splitDestinations = []
-  splitDestinations[0] = { address: bobAddr, amount: bobAmount }
-  splitDestinations[1] = { address: bobAddr, amount: bobAmount }
+  splitDestinations[0] = { address: bobAddr, satoshis: bobAmount }
+  splitDestinations[1] = { address: bobAddr, satoshis: bobAmount }
 
   const issueOutFundingVout = issueTx.vout.length - 1
   try {
@@ -277,8 +277,8 @@ it('RedeemSplit - Null Funding Private Key Throws Error', async () => {
 it('RedeemSplit - Null Contract Public Key Throws Error', async () => {
   const bobAmount = bitcoinToSatoshis(issueTx.vout[0].value / 2)
   const splitDestinations = []
-  splitDestinations[0] = { address: bobAddr, amount: bobAmount }
-  splitDestinations[1] = { address: bobAddr, amount: bobAmount }
+  splitDestinations[0] = { address: bobAddr, satoshis: bobAmount }
+  splitDestinations[1] = { address: bobAddr, satoshis: bobAmount }
 
   const issueOutFundingVout = issueTx.vout.length - 1
   try {
@@ -298,7 +298,7 @@ it('RedeemSplit - Null Contract Public Key Throws Error', async () => {
   }
 })
 
-async function setup () {
+async function setup() {
   issuerPrivateKey = bsv.PrivateKey()
   fundingPrivateKey = bsv.PrivateKey()
   bobPrivateKey = bsv.PrivateKey()

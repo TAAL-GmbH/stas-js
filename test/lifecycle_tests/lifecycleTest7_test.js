@@ -105,8 +105,8 @@ it('Full Life Cycle Test 7 - Issuance with 32kb of data', async () => {
   const bobAmount1 = transferTx.vout[0].value / 2
   const bobAmount2 = transferTx.vout[0].value - bobAmount1
   const splitDestinations = []
-  splitDestinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(bobAmount1) }
-  splitDestinations[1] = { address: aliceAddr, amount: bitcoinToSatoshis(bobAmount2) }
+  splitDestinations[0] = { address: aliceAddr, satoshis: bitcoinToSatoshis(bobAmount1) }
+  splitDestinations[1] = { address: aliceAddr, satoshis: bitcoinToSatoshis(bobAmount2) }
 
   const splitHex = await split(
     bobPrivateKey,
@@ -149,8 +149,8 @@ it('Full Life Cycle Test 7 - Issuance with 32kb of data', async () => {
   const amount = mergeTx.vout[0].value / 2
 
   const split2Destinations = []
-  split2Destinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(amount) }
-  split2Destinations[1] = { address: aliceAddr, amount: bitcoinToSatoshis(amount) }
+  split2Destinations[0] = { address: aliceAddr, satoshis: bitcoinToSatoshis(amount) }
+  split2Destinations[1] = { address: aliceAddr, satoshis: bitcoinToSatoshis(amount) }
 
   const splitHex2 = await split(
     bobPrivateKey,

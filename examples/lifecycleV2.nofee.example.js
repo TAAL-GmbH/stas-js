@@ -152,8 +152,8 @@ const {
     const bobAmount1 = transferTx.vout[0].value / 2
     const bobAmount2 = transferTx.vout[0].value - bobAmount1
     const splitDestinations = []
-    splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount1) }
-    splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
+    splitDestinations[0] = { address: bobAddr, satoshis: bitcoinToSatoshis(bobAmount1) }
+    splitDestinations[1] = { address: bobAddr, satoshis: bitcoinToSatoshis(bobAmount2) }
 
     const splitHex = await split(
       alicePrivateKey,
@@ -198,8 +198,8 @@ const {
     const aliceAmount2 = mergeTxSats - aliceAmount1
 
     const split2Destinations = []
-    split2Destinations[0] = { address: aliceAddr, amount: aliceAmount1 }
-    split2Destinations[1] = { address: aliceAddr, amount: aliceAmount2 }
+    split2Destinations[0] = { address: aliceAddr, satoshis: aliceAmount1 }
+    split2Destinations[1] = { address: aliceAddr, satoshis: aliceAmount2 }
 
     const splitHex2 = await split(
       alicePrivateKey,
@@ -271,8 +271,8 @@ const {
     const rsBobAmount = mergeSplitTx.vout[1].value / 3
     const rsAliceAmount1 = mergeSplitTx.vout[1].value / 3
     const rSplitDestinations = []
-    rSplitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(rsBobAmount) }
-    rSplitDestinations[1] = { address: aliceAddr, amount: bitcoinToSatoshis(rsAliceAmount1) }
+    rSplitDestinations[0] = { address: bobAddr, satoshis: bitcoinToSatoshis(rsBobAmount) }
+    rSplitDestinations[1] = { address: aliceAddr, satoshis: bitcoinToSatoshis(rsAliceAmount1) }
 
     // bob want's to redeem his tokens
     const redeemSplitHex = await redeemSplit(

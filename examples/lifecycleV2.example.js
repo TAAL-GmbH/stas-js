@@ -31,7 +31,7 @@ const {
     const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
     const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
 
-    const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(bobPrivateKey.publicKey.toBuffer()).toString('hex')
+    const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
     const supply = 10000
     const symbol = 'TAALT'
     console.log('alice address ' + aliceAddr)
@@ -156,8 +156,8 @@ const {
     const bobAmount1 = transferTx.vout[0].value / 2
     const bobAmount2 = transferTx.vout[0].value - bobAmount1
     const splitDestinations = []
-    splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount1) }
-    splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
+    splitDestinations[0] = { address: bobAddr, satoshis: bitcoinToSatoshis(bobAmount1) }
+    splitDestinations[1] = { address: bobAddr, satoshis: bitcoinToSatoshis(bobAmount2) }
 
     const splitHex = await split(
       alicePrivateKey,
@@ -212,8 +212,8 @@ const {
     const aliceAmount2 = mergeTx.vout[0].value - aliceAmount1
 
     const split2Destinations = []
-    split2Destinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(aliceAmount1) }
-    split2Destinations[1] = { address: aliceAddr, amount: bitcoinToSatoshis(aliceAmount2) }
+    split2Destinations[0] = { address: aliceAddr, satoshis: bitcoinToSatoshis(aliceAmount1) }
+    split2Destinations[1] = { address: aliceAddr, satoshis: bitcoinToSatoshis(aliceAmount2) }
 
     const splitHex2 = await split(
       alicePrivateKey,

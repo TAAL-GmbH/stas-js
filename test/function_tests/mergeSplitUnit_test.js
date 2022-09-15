@@ -47,20 +47,20 @@ it('MergeSplit - Attempt to MergeSplit More Than Two Tokens Throws Error',
           tx: splitTxObj,
           scriptPubKey: splitTx.vout[0].scriptPubKey.hex,
           vout: 0,
-          amount: splitTx.vout[0].value
+          satoshis: splitTx.vout[0].value
         },
         {
           tx: splitTxObj,
           scriptPubKey: splitTx.vout[1].scriptPubKey.hex,
           vout: 1,
-          amount: splitTx.vout[1].value
+          satoshis: splitTx.vout[1].value
 
         },
         {
           tx: splitTxObj,
           scriptPubKey: splitTx.vout[2].scriptPubKey.hex,
           vout: 2,
-          amount: splitTx.vout[2].value
+          satoshis: splitTx.vout[2].value
 
         }],
         aliceAddr,
@@ -91,7 +91,7 @@ it('MergeSplit - Attempt to MergeSplit Less Than Two Tokens Throws Error',
           tx: splitTxObj,
           scriptPubKey: splitTx.vout[0].scriptPubKey.hex,
           vout: 0,
-          amount: splitTx.vout[0].value
+          satoshis: splitTx.vout[0].value
         }],
         aliceAddr,
         aliceAmountSatoshis,
@@ -377,7 +377,7 @@ it('MergeSplit - Null Funding Private Key Throws Error', async () => {
   }
 })
 
-async function setup () {
+async function setup() {
   issuerPrivateKey = bsv.PrivateKey()
   fundingPrivateKey = bsv.PrivateKey()
   bobPrivateKey = bsv.PrivateKey()
@@ -429,8 +429,8 @@ async function setup () {
   const bobAmount1 = transferTx.vout[0].value / 2
   const bobAmount2 = transferTx.vout[0].value - bobAmount1
   const splitDestinations = []
-  splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount1) }
-  splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
+  splitDestinations[0] = { address: bobAddr, satoshis: bitcoinToSatoshis(bobAmount1) }
+  splitDestinations[1] = { address: bobAddr, satoshis: bitcoinToSatoshis(bobAmount2) }
 
   const splitHex = await split(
     alicePrivateKey,

@@ -51,8 +51,8 @@ it('Split - Successful Split Into Two Tokens With Fee', async () => {
   const bobAmount1 = issueTxSats / 2
   const bobAmount2 = issueTxSats - bobAmount1
   const splitDestinations = []
-  splitDestinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(bobAmount1) } // 3500 tokens
-  splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) } // 3500 tokens
+  splitDestinations[0] = { address: aliceAddr, satoshis: bitcoinToSatoshis(bobAmount1) } // 3500 tokens
+  splitDestinations[1] = { address: bobAddr, satoshis: bitcoinToSatoshis(bobAmount2) } // 3500 tokens
 
   const splitHex = await split(
     alicePrivateKey,
@@ -74,9 +74,9 @@ it('Split - Successful Split Into Three Tokens', async () => {
   const bobAmount2 = bobAmount / 2
   const bobAmount3 = issueTxSats - bobAmount - bobAmount2
   const splitDestinations = []
-  splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount) }
-  splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
-  splitDestinations[2] = { address: aliceAddr, amount: bitcoinToSatoshis(bobAmount3) }
+  splitDestinations[0] = { address: bobAddr, satoshis: bitcoinToSatoshis(bobAmount) }
+  splitDestinations[1] = { address: bobAddr, satoshis: bitcoinToSatoshis(bobAmount2) }
+  splitDestinations[2] = { address: aliceAddr, satoshis: bitcoinToSatoshis(bobAmount3) }
 
   const splitHex = await split(
     alicePrivateKey,
@@ -97,10 +97,10 @@ it('Split - Successful Split Into Four Tokens 1', async () => {
   const issueTxSats = issueTx.vout[0].value
   const amount = issueTxSats / 4
   const splitDestinations = []
-  splitDestinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(amount) }
-  splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
-  splitDestinations[2] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
-  splitDestinations[3] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
+  splitDestinations[0] = { address: aliceAddr, satoshis: bitcoinToSatoshis(amount) }
+  splitDestinations[1] = { address: bobAddr, satoshis: bitcoinToSatoshis(amount) }
+  splitDestinations[2] = { address: bobAddr, satoshis: bitcoinToSatoshis(amount) }
+  splitDestinations[3] = { address: bobAddr, satoshis: bitcoinToSatoshis(amount) }
 
   const splitHex = await split(
     alicePrivateKey,
@@ -126,10 +126,10 @@ it('Split - Successful Split Into Four Tokens 2', async () => {
   const issueTxSats = issueTx.vout[0].value
   const amount = issueTxSats / 4
   const splitDestinations = []
-  splitDestinations[0] = { address: daveAddr, amount: bitcoinToSatoshis(amount) }
-  splitDestinations[1] = { address: emmaAddr, amount: bitcoinToSatoshis(amount) }
-  splitDestinations[2] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
-  splitDestinations[3] = { address: aliceAddr, amount: bitcoinToSatoshis(amount) }
+  splitDestinations[0] = { address: daveAddr, satoshis: bitcoinToSatoshis(amount) }
+  splitDestinations[1] = { address: emmaAddr, satoshis: bitcoinToSatoshis(amount) }
+  splitDestinations[2] = { address: bobAddr, satoshis: bitcoinToSatoshis(amount) }
+  splitDestinations[3] = { address: aliceAddr, satoshis: bitcoinToSatoshis(amount) }
 
   const splitHex = await split(
     alicePrivateKey,
@@ -153,7 +153,7 @@ it('Split - Successful Split Into Four Tokens 2', async () => {
 it('Split - No Split Completes Successfully', async () => {
   const bobAmount = issueTx.vout[0].value
   const splitDestinations = []
-  splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount) }
+  splitDestinations[0] = { address: bobAddr, satoshis: bitcoinToSatoshis(bobAmount) }
 
   const splitHex = await split(
     alicePrivateKey,
@@ -173,8 +173,8 @@ it('Split - Successful Split Into Two Tokens With No Fee',
     const bobAmount1 = issueTxSats / 2
     const bobAmount2 = issueTxSats - bobAmount1
     const splitDestinations = []
-    splitDestinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(bobAmount1) } // 3500 tokens
-    splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) } // 3500 tokens
+    splitDestinations[0] = { address: aliceAddr, satoshis: bitcoinToSatoshis(bobAmount1) } // 3500 tokens
+    splitDestinations[1] = { address: bobAddr, satoshis: bitcoinToSatoshis(bobAmount2) } // 3500 tokens
 
     const splitHex = await split(
       alicePrivateKey,
@@ -198,8 +198,8 @@ it('Split - Successful Split With Callback and Fee', async () => {
   console.log(bobAmount1)
   console.log(bobAmount2)
   const splitDestinations = []
-  splitDestinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(bobAmount1) } // 3500 tokens
-  splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) } // 3500 tokens
+  splitDestinations[0] = { address: aliceAddr, satoshis: bitcoinToSatoshis(bobAmount1) } // 3500 tokens
+  splitDestinations[1] = { address: bobAddr, satoshis: bitcoinToSatoshis(bobAmount2) } // 3500 tokens
 
   const splitHex = await splitWithCallback(
     alicePrivateKey.publicKey,
@@ -222,8 +222,8 @@ it('Split - Successful Split With Callback and No Fee ', async () => {
   const bobAmount1 = issueTxSats / 2
   const bobAmount2 = issueTxSats - bobAmount1
   const splitDestinations = []
-  splitDestinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(bobAmount1) }
-  splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
+  splitDestinations[0] = { address: aliceAddr, satoshis: bitcoinToSatoshis(bobAmount1) }
+  splitDestinations[1] = { address: bobAddr, satoshis: bitcoinToSatoshis(bobAmount2) }
 
   const splitHex = await splitWithCallback(
     alicePrivateKey.publicKey,
@@ -246,8 +246,8 @@ it('Split - Successful Split With Unsigned & Fee', async () => {
   const bobAmount1 = issueTxSats / 2
   const bobAmount2 = issueTxSats - bobAmount1
   const splitDestinations = []
-  splitDestinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(bobAmount1) } // 3500 tokens
-  splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) } // 3500 tokens
+  splitDestinations[0] = { address: aliceAddr, satoshis: bitcoinToSatoshis(bobAmount1) } // 3500 tokens
+  splitDestinations[1] = { address: bobAddr, satoshis: bitcoinToSatoshis(bobAmount2) } // 3500 tokens
 
   const unsignedSplitReturn = await unsignedSplit(
     alicePrivateKey.publicKey,
@@ -270,8 +270,8 @@ it('Split - Successful Split With Unsigned & No Fee', async () => {
   const bobAmount1 = issueTxSats / 2
   const bobAmount2 = issueTxSats - bobAmount1
   const splitDestinations = []
-  splitDestinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(bobAmount1) } // 3500 tokens
-  splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) } // 3500 tokens
+  splitDestinations[0] = { address: aliceAddr, satoshis: bitcoinToSatoshis(bobAmount1) } // 3500 tokens
+  splitDestinations[1] = { address: bobAddr, satoshis: bitcoinToSatoshis(bobAmount2) } // 3500 tokens
 
   const unsignedSplitReturn = await unsignedSplit(
     alicePrivateKey.publicKey,
@@ -294,8 +294,8 @@ it('Split - Send to Issuer Address Throws Error', async () => {
   const bobAmount2 = issueTx.vout[0].value - bobAmount1
   const issuerAddr = issuerPrivateKey.toAddress(process.env.NETWORK).toString()
   const splitDestinations = []
-  splitDestinations[0] = { address: issuerAddr, amount: bitcoinToSatoshis(bobAmount1) }
-  splitDestinations[1] = { address: issuerAddr, amount: bitcoinToSatoshis(bobAmount2) }
+  splitDestinations[0] = { address: issuerAddr, satoshis: bitcoinToSatoshis(bobAmount1) }
+  splitDestinations[1] = { address: issuerAddr, satoshis: bitcoinToSatoshis(bobAmount2) }
   try {
     await split(
       alicePrivateKey,
@@ -316,8 +316,8 @@ it('Split - Incorrect Owner Private Key Throws Error', async () => {
   const bobAmount1 = issueTx.vout[0].value / 2
   const bobAmount2 = issueTx.vout[0].value - bobAmount1
   const splitDestinations = []
-  splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount1) }
-  splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
+  splitDestinations[0] = { address: bobAddr, satoshis: bitcoinToSatoshis(bobAmount1) }
+  splitDestinations[1] = { address: bobAddr, satoshis: bitcoinToSatoshis(bobAmount2) }
   const incorrectPrivateKey = bsv.PrivateKey()
 
   const splitHex = await split(
@@ -341,8 +341,8 @@ it('Split - Incorrect Payments Private Key Throws Error', async () => {
   const bobAmount1 = issueTx.vout[0].value / 2
   const bobAmount2 = issueTx.vout[0].value - bobAmount1
   const splitDestinations = []
-  splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount1) }
-  splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
+  splitDestinations[0] = { address: bobAddr, satoshis: bitcoinToSatoshis(bobAmount1) }
+  splitDestinations[1] = { address: bobAddr, satoshis: bitcoinToSatoshis(bobAmount2) }
   const incorrectPrivateKey = bsv.PrivateKey()
 
   const splitHex = await split(
@@ -362,7 +362,7 @@ it('Split - Incorrect Payments Private Key Throws Error', async () => {
   }
 })
 
-async function setup () {
+async function setup() {
   issuerPrivateKey = bsv.PrivateKey()
   keyMap.set(issuerPrivateKey.publicKey, issuerPrivateKey)
   fundingPrivateKey = bsv.PrivateKey()

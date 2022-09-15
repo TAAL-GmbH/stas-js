@@ -169,8 +169,8 @@ it(
     const bobAmount1 = transferTx.vout[0].value / 2
     const bobAmount2 = transferTx.vout[0].value - bobAmount1
     const splitDestinations = []
-    splitDestinations[0] = { address: daveAddr, amount: bitcoinToSatoshis(bobAmount1) }
-    splitDestinations[1] = { address: daveAddr, amount: bitcoinToSatoshis(bobAmount2) }
+    splitDestinations[0] = { address: daveAddr, satoshis: bitcoinToSatoshis(bobAmount1) }
+    splitDestinations[1] = { address: daveAddr, satoshis: bitcoinToSatoshis(bobAmount2) }
 
     const splitHex = await split(
       bobPrivateKey,
@@ -211,8 +211,8 @@ it(
     const aliceAmount2 = mergeTx.vout[0].value - aliceAmount1
 
     const split2Destinations = []
-    split2Destinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(aliceAmount1) }
-    split2Destinations[1] = { address: aliceAddr, amount: bitcoinToSatoshis(aliceAmount2) }
+    split2Destinations[0] = { address: aliceAddr, satoshis: bitcoinToSatoshis(aliceAmount1) }
+    split2Destinations[1] = { address: aliceAddr, satoshis: bitcoinToSatoshis(aliceAmount2) }
 
     const splitHex2 = await split(
       alicePrivateKey,

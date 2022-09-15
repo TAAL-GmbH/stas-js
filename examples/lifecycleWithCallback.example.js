@@ -201,8 +201,8 @@ const {
     const bobAmount1 = transferTxSats / 2
     const bobAmount2 = transferTxSats - bobAmount1
     const splitDestinations = []
-    splitDestinations[0] = { address: bobAddr, amount: bobAmount1 }
-    splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
+    splitDestinations[0] = { address: bobAddr, satoshis: bobAmount1 }
+    splitDestinations[1] = { address: bobAddr, satoshis: bobAmount2 }
 
     const splitHex = await splitWithCallback(
       alicePublicKey,
@@ -262,8 +262,8 @@ const {
     const aliceAmount2 = mergeTxSats - aliceAmount1
 
     const split2Destinations = []
-    split2Destinations[0] = { address: aliceAddr, amount: aliceAmount1 }
-    split2Destinations[1] = { address: aliceAddr, amount: aliceAmount2 }
+    split2Destinations[0] = { address: aliceAddr, satoshis: aliceAmount1 }
+    split2Destinations[1] = { address: aliceAddr, satoshis: aliceAmount2 }
 
     const splitHex2 = await splitWithCallback(
       alicePublicKey,
@@ -318,7 +318,7 @@ const {
         txid: splitTxid2,
         vout: 2,
         scriptPubKey: splitTx2.vout[2].scriptPubKey.hex,
-        amount: splitTx2.vout[2].value
+        satoshis: splitTx2.vout[2].value
       },
       fundingPublicKey,
       aliceSignatureCallback,

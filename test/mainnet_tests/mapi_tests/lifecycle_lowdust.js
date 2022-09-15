@@ -67,13 +67,13 @@ it('Mainnet LifeCycle Test With Low Dust', async () => {
       txid: inputUtxoid,
       vout: inputUtxoIdVoutIndex,
       scriptPubKey: inputUtxo.vout[inputUtxoIdVoutIndex].scriptPubKey.hex,
-      amount: bitcoinToSatoshis(inputUtxo.vout[inputUtxoIdVoutIndex].value)
+      satoshis: bitcoinToSatoshis(inputUtxo.vout[inputUtxoIdVoutIndex].value)
     }],
     [{
       txid: inputUtxoidFee,
       vout: inputUtxoIdFeeVoutIndex,
       scriptPubKey: inputUtxoFee.vout[inputUtxoIdFeeVoutIndex].scriptPubKey.hex,
-      amount: bitcoinToSatoshis(inputUtxoFee.vout[inputUtxoIdFeeVoutIndex].value)
+      satoshis: bitcoinToSatoshis(inputUtxoFee.vout[inputUtxoIdFeeVoutIndex].value)
     }],
     issuerPrivateKey,
     schema,
@@ -132,8 +132,8 @@ it('Mainnet LifeCycle Test With Low Dust', async () => {
   const bobAmount1 = transferTx.vout[0].value / 2
 
   const splitDestinations = []
-  splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount1) }
-  splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount1) }
+  splitDestinations[0] = { address: bobAddr, satoshis: bitcoinToSatoshis(bobAmount1) }
+  splitDestinations[1] = { address: bobAddr, satoshis: bitcoinToSatoshis(bobAmount1) }
 
   const splitHex = split(
     alicePrivateKey,
@@ -174,8 +174,8 @@ it('Mainnet LifeCycle Test With Low Dust', async () => {
   const amount = mergeTx.vout[0].value / 2
 
   const split2Destinations = []
-  split2Destinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
-  split2Destinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
+  split2Destinations[0] = { address: bobAddr, satoshis: bitcoinToSatoshis(amount) }
+  split2Destinations[1] = { address: bobAddr, satoshis: bitcoinToSatoshis(amount) }
 
   const splitHex2 = split(
     alicePrivateKey,

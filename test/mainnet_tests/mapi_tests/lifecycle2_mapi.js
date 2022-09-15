@@ -65,13 +65,13 @@
 //         txid: inputUtxoid,
 //         vout: inputUtxoIdVoutIndex,
 //         scriptPubKey: inputUtxo.vout[inputUtxoIdVoutIndex].scriptPubKey.hex,
-//         amount: inputUtxo.vout[inputUtxoIdVoutIndex].value
+//         satoshis: inputUtxo.vout[inputUtxoIdVoutIndex].value
 //       }],
 //       [{
 //         txid: inputUtxoidFee,
 //         vout: inputUtxoIdFeeVoutIndex,
 //         scriptPubKey: inputUtxoFee.vout[inputUtxoIdFeeVoutIndex].scriptPubKey.hex,
-//         amount: inputUtxoFee.vout[inputUtxoIdFeeVoutIndex].value
+//         satoshis: inputUtxoFee.vout[inputUtxoIdFeeVoutIndex].value
 //       }],
 //       issuerPrivateKey,
 //       schema,
@@ -159,8 +159,8 @@
 //     const bobAmount1 = transferTx.vout[0].value / 2
 
 //     const splitDestinations = []
-//     splitDestinations[0] = { address: bobAddr, amount: bobAmount1 }
-//     splitDestinations[1] = { address: bobAddr, amount: bobAmount1 }
+//     splitDestinations[0] = { address: bobAddr, satoshis: bobAmount1 }
+//     splitDestinations[1] = { address: bobAddr, satoshis: bobAmount1 }
 
 //     const splitHex = split(
 //       alicePrivateKey,
@@ -211,8 +211,8 @@
 //     const amount = mergeTx.vout[0].value / 2
 
 //     const split2Destinations = []
-//     split2Destinations[0] = { address: bobAddr, amount: amount }
-//     split2Destinations[1] = { address: bobAddr, amount: amount }
+//     split2Destinations[0] = { address: bobAddr, satoshis: amount }
+//     split2Destinations[1] = { address: bobAddr, satoshis: amount }
 
 //     const splitHex2 = split(
 //       alicePrivateKey,

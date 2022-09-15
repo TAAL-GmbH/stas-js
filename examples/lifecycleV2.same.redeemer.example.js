@@ -156,8 +156,8 @@ const {
     const bobAmount1 = transferTxSats / 2
     const bobAmount2 = transferTxSats - bobAmount1
     const splitDestinations = []
-    splitDestinations[0] = { address: bobAddr, amount: bobAmount1 }
-    splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
+    splitDestinations[0] = { address: bobAddr, satoshis: bobAmount1 }
+    splitDestinations[1] = { address: bobAddr, satoshis: bobAmount2 }
 
     const splitHex = await split(
       alicePrivateKey,
@@ -201,7 +201,7 @@ const {
     //     txid: splitTxid,
     //     vout: 2,
     //     scriptPubKey: splitTx.vout[2].scriptPubKey.hex,
-    //     amount: splitTx.vout[2].value
+    //     satoshis: splitTx.vout[2].value
     //   },
     //   fundingPrivateKey
     // )
@@ -215,8 +215,8 @@ const {
     // const aliceAmount2 = mergeTx.vout[0].value - aliceAmount1
 
     // const split2Destinations = []
-    // split2Destinations[0] = { address: aliceAddr, amount: aliceAmount1 }
-    // split2Destinations[1] = { address: aliceAddr, amount: aliceAmount2 }
+    // split2Destinations[0] = { address: aliceAddr, satoshis: aliceAmount1 }
+    // split2Destinations[1] = { address: aliceAddr, satoshis: aliceAmount2 }
 
     // const splitHex2 = split(
     //   alicePrivateKey,
@@ -225,14 +225,14 @@ const {
     //     txid: mergeTxid,
     //     vout: 0,
     //     scriptPubKey: mergeTx.vout[0].scriptPubKey.hex,
-    //     amount: mergeTx.vout[0].value
+    //     satoshis: mergeTx.vout[0].value
     //   },
     //   split2Destinations,
     //   [{
     //     txid: mergeTxid,
     //     vout: 1,
     //     scriptPubKey: mergeTx.vout[1].scriptPubKey.hex,
-    //     amount: mergeTx.vout[1].value
+    //     satoshis: mergeTx.vout[1].value
     //   }],
     //   fundingPrivateKey
     // )
@@ -253,13 +253,13 @@ const {
     //     tx: splitTxObj2,
     //     scriptPubKey: splitTx2.vout[0].scriptPubKey.hex,
     //     vout: 0,
-    //     amount: splitTx2.vout[0].value
+    //     satoshis: splitTx2.vout[0].value
     //   },
     //   {
     //     tx: splitTxObj2,
     //     scriptPubKey: splitTx2.vout[1].scriptPubKey.hex,
     //     vout: 1,
-    //     amount: splitTx2.vout[1].value
+    //     satoshis: splitTx2.vout[1].value
 
     //   }],
     //   aliceAddr,
@@ -270,7 +270,7 @@ const {
     //     txid: splitTxid2,
     //     vout: 2,
     //     scriptPubKey: splitTx2.vout[2].scriptPubKey.hex,
-    //     amount: splitTx2.vout[2].value
+    //     satoshis: splitTx2.vout[2].value
     //   },
     //   fundingPrivateKey
     // )
@@ -287,13 +287,13 @@ const {
     //     txid: mergeSplitTxid,
     //     vout: 0,
     //     scriptPubKey: mergeSplitTx.vout[0].scriptPubKey.hex,
-    //     amount: mergeSplitTx.vout[0].value
+    //     satoshis: mergeSplitTx.vout[0].value
     //   },
     //   [{
     //     txid: mergeSplitTxid,
     //     vout: 2,
     //     scriptPubKey: mergeSplitTx.vout[2].scriptPubKey.hex,
-    //     amount: mergeSplitTx.vout[2].value
+    //     satoshis: mergeSplitTx.vout[2].value
     //   }],
     //   fundingPrivateKey
     // )

@@ -43,8 +43,8 @@ it('Successful RedeemSplit With Low Sats (20)', async () => {
   await setup(21)
 
   const rSplitDestinations = []
-  rSplitDestinations[0] = { address: aliceAddr, amount: 10 }
-  rSplitDestinations[1] = { address: aliceAddr, amount: 10 }
+  rSplitDestinations[0] = { address: aliceAddr, satoshis: 10 }
+  rSplitDestinations[1] = { address: aliceAddr, satoshis: 10 }
 
   const redeemSplitHex = await redeemSplit(
     alicePrivateKey,
@@ -66,8 +66,8 @@ it('Successful RedeemSplit With Low Sats (10)', async () => {
   await setup(11)
 
   const rSplitDestinations = []
-  rSplitDestinations[0] = { address: aliceAddr, amount: 5 }
-  rSplitDestinations[1] = { address: aliceAddr, amount: 5 }
+  rSplitDestinations[0] = { address: aliceAddr, satoshis: 5 }
+  rSplitDestinations[1] = { address: aliceAddr, satoshis: 5 }
 
   const redeemSplitHex = await redeemSplit(
     alicePrivateKey,
@@ -89,8 +89,8 @@ it('Successful RedeemSplit With Low Sats (5)', async () => {
   await setup(6)
 
   const rSplitDestinations = []
-  rSplitDestinations[0] = { address: aliceAddr, amount: 2 }
-  rSplitDestinations[1] = { address: aliceAddr, amount: 3 }
+  rSplitDestinations[0] = { address: aliceAddr, satoshis: 2 }
+  rSplitDestinations[1] = { address: aliceAddr, satoshis: 3 }
 
   const redeemSplitHex = await redeemSplit(
     alicePrivateKey,
@@ -112,8 +112,8 @@ it('Successful RedeemSplit With Low Sats (1)', async () => {
   await setup(3)
 
   const rSplitDestinations = []
-  rSplitDestinations[0] = { address: aliceAddr, amount: 1 }
-  rSplitDestinations[1] = { address: aliceAddr, amount: 1 }
+  rSplitDestinations[0] = { address: aliceAddr, satoshis: 1 }
+  rSplitDestinations[1] = { address: aliceAddr, satoshis: 1 }
 
   const redeemSplitHex = await redeemSplit(
     alicePrivateKey,
@@ -135,8 +135,8 @@ it('Successful RedeemSplit With Callback & Fees', async () => {
   await setup(3)
   const amount = issueTx.vout[0].value / 5
   const rSplitDestinations = []
-  rSplitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
-  rSplitDestinations[1] = { address: aliceAddr, amount: bitcoinToSatoshis(amount) }
+  rSplitDestinations[0] = { address: bobAddr, satoshis: bitcoinToSatoshis(amount) }
+  rSplitDestinations[1] = { address: aliceAddr, satoshis: bitcoinToSatoshis(amount) }
 
   const redeemSplitHex = await redeemSplitWithCallback(
     alicePrivateKey.publicKey,
@@ -156,7 +156,7 @@ it('Successful RedeemSplit With Callback & Fees', async () => {
   await utils.isTokenBalance(aliceAddr, 2)
 })
 
-async function setup (satSupply) {
+async function setup(satSupply) {
   issuerPrivateKey = bsv.PrivateKey()
   fundingPrivateKey = bsv.PrivateKey()
   alicePrivateKey = bsv.PrivateKey()

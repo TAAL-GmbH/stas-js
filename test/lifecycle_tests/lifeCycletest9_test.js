@@ -81,7 +81,7 @@ it(
         txid: fundingUtxos2[0].txid,
         vout: 0,
         scriptPubKey: fundingUtxos2[0].scriptPubKey,
-        amount: fundingUtxos2[0].amount
+        satoshis: fundingUtxos2[0].satoshis
       },
       fundingPrivateKey,
       true,
@@ -121,8 +121,8 @@ it(
     const bobAmount1 = transferTx.vout[0].value / 2
     const bobAmount2 = transferTx.vout[0].value - bobAmount1
     const splitDestinations = []
-    splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount1) }
-    splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
+    splitDestinations[0] = { address: bobAddr, satoshis: bitcoinToSatoshis(bobAmount1) }
+    splitDestinations[1] = { address: bobAddr, satoshis: bitcoinToSatoshis(bobAmount2) }
 
     const splitHex = await split(
       alicePrivateKey,
@@ -150,7 +150,7 @@ it(
         txid: fundingUtxos2[0].txid,
         vout: 1,
         scriptPubKey: fundingUtxos2[0].scriptPubKey,
-        amount: fundingUtxos2[0].amount
+        satoshis: fundingUtxos2[0].satoshis
       },
       fundingPrivateKey
     )
@@ -169,8 +169,8 @@ it(
     const amount = bitcoinToSatoshis(mergeTx.vout[0].value / 2)
 
     const split2Destinations = []
-    split2Destinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
-    split2Destinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
+    split2Destinations[0] = { address: bobAddr, satoshis: bitcoinToSatoshis(amount) }
+    split2Destinations[1] = { address: bobAddr, satoshis: bitcoinToSatoshis(amount) }
 
     const splitHex2 = await split(
       alicePrivateKey,

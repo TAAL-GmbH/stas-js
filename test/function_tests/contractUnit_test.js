@@ -94,7 +94,7 @@ it('Contract - Non Array Contract UTXO Throws Error', async () => {
         txid: '562c4afa4c14a1f01f960f9d79d1e90d0ffa4eac6e9d42c272454e93b8fad8e6',
         vout: 0,
         scriptPubKey: '76a914ddfa3b4a86af8e0dce6644db696114b585675eff88ac',
-        amount: 0.01
+        satoshis: 0.01
       },
       fundingUtxos,
       fundingPrivateKey,
@@ -210,7 +210,7 @@ it('Contract - Invalid Contract UTXO Throw Error', async () => {
         {
           txid: '71ea4669224ce874ce79f71d609a48ce1cc7a32fcd22afee52b09a326ad22eff',
           vout: 0,
-          amount: 10000
+          satoshis: 10000
         }
       ],
       fundingUtxos,
@@ -235,7 +235,7 @@ it('Contract - Invalid Payment UTXO Throw Error', async () => {
         {
           vout: 0,
           scriptPubKey: '76a914173a320ffd763627107b3274f7eb571df8114b9288ac',
-          amount: 0.01
+          satoshis: 0.01
         }
       ],
       fundingPrivateKey,
@@ -450,7 +450,7 @@ it('Contract - satsPerToken > Supply Throws Error', async () => {
   }
 })
 
-async function setup () {
+async function setup() {
   issuerPrivateKey = bsv.PrivateKey()
   fundingPrivateKey = bsv.PrivateKey()
   contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())

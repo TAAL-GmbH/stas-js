@@ -64,7 +64,7 @@ it('Merge - Attempt To Merge With Different Symbol', async () => {
   }
 })
 
-async function setup () {
+async function setup() {
   issuerPrivateKey = bsv.PrivateKey()
   fundingPrivateKey = bsv.PrivateKey()
   bobPrivateKey = bsv.PrivateKey()
@@ -118,8 +118,8 @@ async function setup () {
   const bobAmount1 = issueTx.vout[0].value / 2
   const bobAmount2 = issueTx.vout[0].value - bobAmount1
   const splitDestinations = []
-  splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount1) }
-  splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
+  splitDestinations[0] = { address: bobAddr, satoshis: bitcoinToSatoshis(bobAmount1) }
+  splitDestinations[1] = { address: bobAddr, satoshis: bitcoinToSatoshis(bobAmount2) }
 
   const splitHex = await split(
     alicePrivateKey,
@@ -158,8 +158,8 @@ async function setup () {
 
   const amount = issueTx.vout[0].value / 2
   const splitDestinations2 = []
-  splitDestinations2[0] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
-  splitDestinations2[1] = { address: bobAddr, amount: bitcoinToSatoshis(amount) }
+  splitDestinations2[0] = { address: bobAddr, satoshis: bitcoinToSatoshis(amount) }
+  splitDestinations2[1] = { address: bobAddr, satoshis: bitcoinToSatoshis(amount) }
 
   const splitHex2 = await split(
     alicePrivateKey,

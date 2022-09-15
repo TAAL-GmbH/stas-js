@@ -83,7 +83,7 @@ describe('atomic swap failing - when token B sats are set to > 2k the broadcast 
   })
 })
 
-async function setup () {
+async function setup() {
   const tokenAIssuerPrivateKey = bsv.PrivateKey()
   const tokenBIssuerPrivateKey = bsv.PrivateKey()
   fundingPrivateKey = bsv.PrivateKey()
@@ -171,6 +171,6 @@ async function setup () {
     txid: tokenBIssueTxid,
     vout: 1,
     scriptPubKey: tokenBIssueTx.vout[1].scriptPubKey.hex,
-    amount: bitcoinToSatoshis(tokenBIssueTx.vout[1].value)
+    satoshis: bitcoinToSatoshis(tokenBIssueTx.vout[1].value)
   }
 }

@@ -76,13 +76,13 @@ it('Merge Invalid Token Invalidates both token utxos', async () => {
         txid: contractTxid,
         vout: 0,
         scriptPubKey: contractTx.vout[0].scriptPubKey.hex,
-        amount: contractTx.vout[0].value
+        satoshis: contractTx.vout[0].value
       },
       {
         txid: contractTxid,
         vout: 1,
         scriptPubKey: contractTx.vout[1].scriptPubKey.hex,
-        amount: contractTx.vout[1].value
+        satoshis: contractTx.vout[1].value
       },
       fundingPrivateKey,
       true,
@@ -119,7 +119,7 @@ it('Merge Invalid Token Invalidates both token utxos', async () => {
   const stasScript = util.getStasScript(attackerPublicKeyHash, issuerPrivateKey.publicKey, null, true, hexSymbol)
   tx.addOutput(new bsv.Transaction.Output({
     script: transfertx.vout[0].scriptPubKey.hex,
-    satoshis: attackerFundsUtxo.amount
+    satoshis: attackerFundsUtxo.satoshis
   }))
   tx.sign(attackerPrivateKey)
   console.log(tx.serialize(true))

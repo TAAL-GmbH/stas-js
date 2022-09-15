@@ -100,8 +100,8 @@ it('Attempting Merge With A Fee UTXO Index > 16 Throws Error', async () => {
   const bobAmount1 = transferTx.vout[0].value / 2
   const bobAmount2 = transferTx.vout[0].value - bobAmount1
   const splitDestinations = []
-  splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount1) }
-  splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
+  splitDestinations[0] = { address: bobAddr, satoshis: bitcoinToSatoshis(bobAmount1) }
+  splitDestinations[1] = { address: bobAddr, satoshis: bitcoinToSatoshis(bobAmount2) }
 
   const splitHex = await split(
     alicePrivateKey,
@@ -129,21 +129,21 @@ it('Attempting Merge With A Fee UTXO Index > 16 Throws Error', async () => {
   const mergeTxid = await broadcast(mergeHex)
   console.log(`Merge TX:        ${mergeTxid}`)
 
-//   const mergeSplitHex = await mergeSplit(
-//     bobPrivateKey,
-//     utils.getMergeSplitUtxo(splitTxObj, splitTx),
-//     aliceAddr,
-//     250,
-//     bobAddr,
-//     250,
-//     utils.getUtxo(issueTxid, issueTx, 17),
-//     // utils.getUtxo(splitTxid2, splitTx2, 2),
-//     fundingPrivateKey
-//   )
-//   console.log(mergeSplitHex)
+  //   const mergeSplitHex = await mergeSplit(
+  //     bobPrivateKey,
+  //     utils.getMergeSplitUtxo(splitTxObj, splitTx),
+  //     aliceAddr,
+  //     250,
+  //     bobAddr,
+  //     250,
+  //     utils.getUtxo(issueTxid, issueTx, 17),
+  //     // utils.getUtxo(splitTxid2, splitTx2, 2),
+  //     fundingPrivateKey
+  //   )
+  //   console.log(mergeSplitHex)
 })
 
-function issue17 (addr1, sat1, addr2, sat2) {
+function issue17(addr1, sat1, addr2, sat2) {
   return [
     {
       addr: addr1,

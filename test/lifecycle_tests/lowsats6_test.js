@@ -83,7 +83,7 @@ it('Full Life Cycle Test Low Sats 10', async () => {
     utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
     fundingPrivateKey
   )
-  console.log("kemi1"+ transferHex)
+  console.log("kemi1" + transferHex)
   const transferTxid = await broadcast(transferHex)
   console.log(`Transfer TX1:     ${transferTxid}`)
   const transferTx = await getTransaction(transferTxid)
@@ -92,12 +92,12 @@ it('Full Life Cycle Test Low Sats 10', async () => {
   await utils.isTokenBalance(bobAddr, 0)
 
   //Split tokens into 2 - both payable to Bob...
-  const bobAmount1 = transferTx.vout[0].value- 2e-8
+  const bobAmount1 = transferTx.vout[0].value - 2e-8
   const bobAmount2 = transferTx.vout[0].value - bobAmount1
- 
+
   const splitDestinations = []
-  splitDestinations[0] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount1) }
-  splitDestinations[1] = { address: bobAddr, amount: bitcoinToSatoshis(bobAmount2) }
+  splitDestinations[0] = { address: bobAddr, satoshis: bitcoinToSatoshis(bobAmount1) }
+  splitDestinations[1] = { address: bobAddr, satoshis: bitcoinToSatoshis(bobAmount2) }
   console.log("splitAmount1" + splitDestinations[0]);
   console.log("splitAmount2" + splitDestinations[1]);
   const splitHex = await split(
@@ -138,8 +138,8 @@ it('Full Life Cycle Test Low Sats 10', async () => {
   const aliceAmount2 = mergeTx.vout[0].value - aliceAmount1
 
   const split2Destinations = []
-  split2Destinations[0] = { address: aliceAddr, amount: bitcoinToSatoshis(aliceAmount1) }
-  split2Destinations[1] = { address: aliceAddr, amount: bitcoinToSatoshis(aliceAmount2) }
+  split2Destinations[0] = { address: aliceAddr, satoshis: bitcoinToSatoshis(aliceAmount1) }
+  split2Destinations[1] = { address: aliceAddr, satoshis: bitcoinToSatoshis(aliceAmount2) }
 
   const splitHex2 = await split(
     alicePrivateKey,

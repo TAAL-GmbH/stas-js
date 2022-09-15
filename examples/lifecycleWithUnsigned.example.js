@@ -224,8 +224,8 @@ const {
     const bobAmount1 = transferTxSats / 2
     const bobAmount2 = transferTxSats - bobAmount1
     const splitDestinations = []
-    splitDestinations[0] = { address: bobAddr, amount: bobAmount1 }
-    splitDestinations[1] = { address: bobAddr, amount: bobAmount2 }
+    splitDestinations[0] = { address: bobAddr, satoshis: bobAmount1 }
+    splitDestinations[1] = { address: bobAddr, satoshis: bobAmount2 }
 
     const unsignedSplitRes = await unsignedSplit(
       alicePublicKey,
@@ -324,8 +324,8 @@ const {
     const aliceAmount2 = mergeTxSats - aliceAmount1
 
     const split2Destinations = []
-    split2Destinations[0] = { address: aliceAddr, amount: aliceAmount1 }
-    split2Destinations[1] = { address: aliceAddr, amount: aliceAmount2 }
+    split2Destinations[0] = { address: aliceAddr, satoshis: aliceAmount1 }
+    split2Destinations[1] = { address: aliceAddr, satoshis: aliceAmount2 }
 
     const unsignedSplitRes2 = await unsignedSplit(
       alicePublicKey,
@@ -478,8 +478,8 @@ const {
     const bobAmountRs1 = redeemSplitTxSats / 3
     const bobAmountRs2 = bobAmountRs1
     const redeemSplitDestinations = []
-    redeemSplitDestinations[0] = { address: bobAddr, amount: bobAmountRs1 }
-    redeemSplitDestinations[1] = { address: bobAddr, amount: bobAmountRs2 }
+    redeemSplitDestinations[0] = { address: bobAddr, satoshis: bobAmountRs1 }
+    redeemSplitDestinations[1] = { address: bobAddr, satoshis: bobAmountRs2 }
 
     // Bob wants to redeem the 50 of his tokens
     const unsignedRedeemSplitRes = await unsignedRedeemSplit(

@@ -49,13 +49,13 @@
 //       txid: inputTxID,
 //       vout: 1,
 //       scriptPubKey: inputUtxo.vout[1].scriptPubKey.hex,
-//       amount: bitcoinToSatoshis(inputUtxo.vout[1].value)
+//       satoshis: bitcoinToSatoshis(inputUtxo.vout[1].value)
 //     },
 //     {
 //       txid: inputTxID,
 //       vout: 2,
 //       scriptPubKey: inputUtxo.vout[2].scriptPubKey.hex,
-//       amount: bitcoinToSatoshis(inputUtxo.vout[2].value)
+//       satoshis: bitcoinToSatoshis(inputUtxo.vout[2].value)
 //     },
 //     leonardPrivateKey
 //   )
