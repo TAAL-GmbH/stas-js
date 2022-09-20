@@ -19,7 +19,6 @@ const {
 } = require('../../index').utils
 
 const { sighash } = require('../../lib/stas')
-const unsigneRedeem = require('../../lib/unsignedRedeem')
 
 let issuerPrivateKey
 let fundingPrivateKey
@@ -522,7 +521,7 @@ it('RedeemSplit - Incorrect Public Key Throws Error', async () => {
   }
 })
 
-async function setup() {
+async function setup () {
   issuerPrivateKey = bsv.PrivateKey()
   keyMap.set(issuerPrivateKey.publicKey, issuerPrivateKey)
   fundingPrivateKey = bsv.PrivateKey()

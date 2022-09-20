@@ -8,8 +8,7 @@ const {
   issue,
   transfer,
   split,
-  merge,
-  mergeSplit
+  merge
 
 } = require('../../index')
 
@@ -143,7 +142,7 @@ it('Attempting Merge With A Fee UTXO Index > 16 Throws Error', async () => {
   //   console.log(mergeSplitHex)
 })
 
-function issue17(addr1, sat1, addr2, sat2) {
+function issue17 (addr1, sat1, addr2, sat2) {
   return [
     {
       addr: addr1,

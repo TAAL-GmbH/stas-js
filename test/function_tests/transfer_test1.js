@@ -18,7 +18,6 @@ const {
 } = require('../../index').utils
 
 const { sighash } = require('../../lib/stas')
-const unsigneRedeem = require('../../lib/unsignedRedeem')
 
 let issuerPrivateKey
 let fundingPrivateKey

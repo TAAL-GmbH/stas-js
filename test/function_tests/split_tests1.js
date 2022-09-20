@@ -19,7 +19,6 @@ const {
 } = require('../../index').utils
 
 const { sighash } = require('../../lib/stas')
-const PrivateKey = require('bsv/lib/privatekey')
 
 let issuerPrivateKey
 let fundingPrivateKey
@@ -362,7 +361,7 @@ it('Split - Incorrect Payments Private Key Throws Error', async () => {
   }
 })
 
-async function setup() {
+async function setup () {
   issuerPrivateKey = bsv.PrivateKey()
   keyMap.set(issuerPrivateKey.publicKey, issuerPrivateKey)
   fundingPrivateKey = bsv.PrivateKey()

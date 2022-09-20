@@ -4,9 +4,10 @@ const bsv = require('bsv')
 require('dotenv').config()
 
 const {
-  contract, contractWithCallback
+  contract,
+  contractWithCallback,
+  unsignedContract
 } = require('../../index')
-const unsignedContract = require('../../lib/unsignedContract')
 
 const {
   getFundsFromFaucet,
