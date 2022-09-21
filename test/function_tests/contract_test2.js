@@ -30,7 +30,7 @@ afterEach(async () => {
   supply = 10000
 })
 
-it('Contract - Supply > Contract UTXO amount', async () => {
+it('Contract - Supply > Contract UTXO amount 1', async () => {
   try {
     supply = 200000000
 
@@ -47,6 +47,26 @@ it('Contract - Supply > Contract UTXO amount', async () => {
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
     expect(e.message).to.eql('Token Supply of 200000000 with satsPerToken of 1 is greater than input amount of 1000000')
+  }
+})
+
+it('Contract - Supply > Contract UTXO amount 2', async () => {
+  try {
+    schema.satsPerToken = 5000
+
+    await contract(
+      issuerPrivateKey,
+      contractUtxos,
+      fundingUtxos,
+      fundingPrivateKey,
+      schema,
+      supply
+    )
+    expect(false).toBeTruthy()
+    return
+  } catch (e) {
+    expect(e).to.be.instanceOf(Error)
+    expect(e.message).to.eql('Token Supply of 10000 with satsPerToken of 5000 is greater than input amount of 1000000')
   }
 })
 
