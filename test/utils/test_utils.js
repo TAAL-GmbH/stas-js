@@ -575,8 +575,13 @@ function calcuateFeesForContract(inputTx, utxo, fundingUtxo) {
   for (let i = 0; i < inputTx.vout.length; i++) {
     outputSats += inputTx.vout[i].value
   }
-
-  const inputSats = (bitcoinToSatoshis(utxo[0].satoshis) + bitcoinToSatoshis(fundingUtxo[0].satoshis))
+  let inputSats= 0
+  if (fundingUtxo == null) {
+    inputSats = utxo[0].satoshis
+  } else {
+     inputSats = (utxo[0].satoshis + fundingUtxo[0].satoshis)
+  }
+ 
   const fees = inputSats - bitcoinToSatoshis(outputSats)
   console.log(fees)
   return fees
