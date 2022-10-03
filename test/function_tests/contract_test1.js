@@ -109,7 +109,7 @@ it('Contract - Successful With Callback No Fee', async () => {
   expect(amount).to.equal(supply / 100000000)
 })
 
-it('Contract - Successful With Unsigned & Fee', async () => {
+it.only('Contract - Successful With Unsigned & Fee', async () => {
   const contractHex = await unsignedContract(
     issuerPrivateKey.publicKey,
     contractUtxos,

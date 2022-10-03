@@ -183,7 +183,7 @@ it('Split - Null  STAS UTXO Throws Error', async () => {
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Invalid Argument: Must provide an object from where to extract data')
+    expect(e.message).to.eql('stasUTxo is null')
   }
 })
 

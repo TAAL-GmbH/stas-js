@@ -32,7 +32,7 @@ afterEach(async () => {
 
 it('Contract - Supply > Contract UTXO amount 1', async () => {
   try {
-    supply = 200000000
+    supply = 2000000
 
     await contract(
       issuerPrivateKey,
@@ -46,7 +46,7 @@ it('Contract - Supply > Contract UTXO amount 1', async () => {
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Token Supply of 200000000 with satsPerToken of 1 is greater than input amount of 1000000')
+    expect(e.message).to.eql('Token Supply of 2000000 with satsPerToken of 1 is greater than input amount of 1000000')
   }
 })
 

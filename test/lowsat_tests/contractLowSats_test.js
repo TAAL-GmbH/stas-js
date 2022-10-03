@@ -34,6 +34,7 @@ beforeEach(async () => {
 
 it('Contract - Successful With Low Sats (20)', async () => {
   const supply = 20
+  await setup(supply)
   const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
@@ -49,6 +50,7 @@ it('Contract - Successful With Low Sats (20)', async () => {
 
 it('Contract - Successful With Low Sats (10)', async () => {
   const supply = 10
+  await setup(supply)
   const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
@@ -64,6 +66,7 @@ it('Contract - Successful With Low Sats (10)', async () => {
 
 it('Contract - Successful With Low Sats (5)', async () => {
   const supply = 5
+  await setup(supply)
   const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
@@ -79,6 +82,7 @@ it('Contract - Successful With Low Sats (5)', async () => {
 
 it('Contract - Successful With Low Sats (1)', async () => {
   const supply = 1
+  await setup(supply)
   const contractHex = await contract(
     issuerPrivateKey,
     contractUtxos,
@@ -94,7 +98,7 @@ it('Contract - Successful With Low Sats (1)', async () => {
 
 it('Contract - Successful With Callback and Low Sats', async () => {
   const supply = 1
-  await setup(1)
+  await setup(supply)
   const contractHex = await contractWithCallback(
     issuerPrivateKey.publicKey,
     contractUtxos,

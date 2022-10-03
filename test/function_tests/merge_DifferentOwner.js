@@ -29,7 +29,7 @@ const symbol = 'TAALT'
 let splitTxid
 let splitTx
 
-it('Attempt To Merge Token with Different Owners Via SDK Throws Error',
+it.only('Attempt To Merge Token with Different Owners Via SDK Throws Error',
   async () => {
     const validSplitTxObj = await validToken()
     const invalidSplitTxObj = await invalidToken()
