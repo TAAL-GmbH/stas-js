@@ -290,7 +290,7 @@ async function getTokenWithSymbol(txid, symbol, vout) {
 
 async function isTokenBalance(address, expectedBalance) {
   let response
-  for (let i = 0; i < 1; i++) {
+  for (let i = 0; i < 90; i++) {
     const url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/address/${address}/tokens`
     response = await axios({
       method: 'get',
