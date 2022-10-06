@@ -1,3 +1,4 @@
+
 pipeline {
     agent any
 
@@ -22,4 +23,10 @@ pipeline {
             }
         }
     }
+    post {
+            always {
+                    cleanWs()
+                }
+
+        }
 }
