@@ -1,4 +1,4 @@
-#!/bin/bash
+Jenkinsfile (Declarative Pipeline)
 pipeline {
     agent any
 
