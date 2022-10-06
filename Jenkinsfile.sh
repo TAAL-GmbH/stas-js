@@ -3,13 +3,6 @@ pipeline {
     agent any
 
     stages {
-
-        stage('Clone Repo') {
-            steps {
-                echo 'Cloning Repo'
-                sh 'git clone git@github.com:TAAL-GmbH/stas-js.git'
-            }
-        }
         stage('Install Dependencies') {
             steps {
                 echo 'Installing Dependencies..'
