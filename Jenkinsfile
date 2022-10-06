@@ -20,6 +20,7 @@ pipeline {
             steps {
                 echo 'Functional Tests'
                 sh 'API_USERNAME=taal_private API_PASSWORD=dotheT@@l007 npm run test'
+                allure includeProperties: false, jdk: '', results: [[path: 'allure-results']]
             }
         }
     }
