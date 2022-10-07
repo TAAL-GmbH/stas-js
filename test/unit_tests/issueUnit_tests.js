@@ -3,10 +3,8 @@ const utils = require('../utils/test_utils')
 const {
   issue
 } = require('../../index')
-const issuerPrivateKetStr = 'Ky5XHRQvYEcEbtGoQQQETbctAgAQKvb3PocfJSnkyHuEj5Nzj1pb'
-const fundingPrivateKetStr = 'Ky5XHRQvYEcEbtGoQQQETbctAgAQKvb3PocfJSnkyHuEj5Nzj1pb'
-const issuerPrivateKey = new bsv.PrivateKey(issuerPrivateKetStr)
-const fundingPrivateKey = new bsv.PrivateKey(fundingPrivateKetStr)
+const privateKeyStr = 'Ky5XHRQvYEcEbtGoQQQETbctAgAQKvb3PocfJSnkyHuEj5Nzj1pb'
+const privateKey = new bsv.PrivateKey(privateKeyStr)
 let symbol = 'TAALT'
 let issueInfo = [{
     addr: 'mq7psuJ7Z9h1w4H3YtcCoHx7cPmhVM9UsV',
@@ -35,11 +33,11 @@ describe('Issue Unit Tests', () => {
   
     it('should create issue', async () => {
         const hex = await issue(
-            issuerPrivateKey,
+            privateKey,
             issueInfo,
             utxo,
             utxo,
-            fundingPrivateKey,
+            privateKey,
             true,
             symbol
         )
@@ -52,7 +50,7 @@ describe('Issue Unit Tests', () => {
             issueInfo,
             utxo,
             utxo,
-            fundingPrivateKey,
+            privateKey,
             true,
             symbol
           )).rejects.toThrow('Issuer private key is null')
@@ -60,11 +58,11 @@ describe('Issue Unit Tests', () => {
     
     it('should fail with null issueInfo', async () => {
         await expect(() => issue(
-            issuerPrivateKey,
+          privateKey,
             null,
             utxo,
             utxo,
-            fundingPrivateKey,
+            privateKey,
             true,
             symbol
           )).rejects.toThrow('issueInfo is invalid')
@@ -72,11 +70,11 @@ describe('Issue Unit Tests', () => {
     
     it('should fail with null contract utxo', async () => {
         await expect(() => issue(
-            issuerPrivateKey,
+          privateKey,
             issueInfo,
             null,
             utxo,
-            fundingPrivateKey,
+            privateKey,
             true,
             symbol
           )).rejects.toThrow('contractUtxo is invalid')
@@ -84,7 +82,7 @@ describe('Issue Unit Tests', () => {
     
     it('should fail with null funding privatekey', async () => {
         await expect(() => issue(
-            issuerPrivateKey,
+          privateKey,
             issueInfo,
             utxo,
             utxo,
@@ -96,11 +94,11 @@ describe('Issue Unit Tests', () => {
     
     it('should fail with null isSplittable', async () => {
         await expect(() => issue(
-            issuerPrivateKey,
+          privateKey,
             issueInfo,
             utxo,
             utxo,
-            utxo,
+            privateKey,
             null,
             symbol
           )).rejects.toThrow('isSplittable must be a boolean value')
@@ -112,11 +110,11 @@ describe('Issue Unit Tests', () => {
         { invalidCharsSymbol: null },
       ])('should fail with null symbol', async ({invalidCharsSymbol}) => {
         await expect(() => issue(
-            issuerPrivateKey,
+            privateKey,
             issueInfo,
             utxo,
             utxo,
-            utxo,
+            privateKey,
             true,
             invalidCharsSymbol
           )).rejects.toThrow('Invalid Symbol. Must be between 1 and 128 long and contain alpahnumeric, \'-\', \'_\' chars.')
@@ -125,11 +123,11 @@ describe('Issue Unit Tests', () => {
     it('should fail with invalid issue amount', async () => {
         issueInfo[0].satoshis = -1
         await expect(() => issue(
-            issuerPrivateKey,
+          privateKey,
             issueInfo,
             utxo,
             utxo,
-            fundingPrivateKey,
+            privateKey,
             true,
             symbol
           )).rejects.toThrow('issueInfo Satoshis must be a natural number')
@@ -138,11 +136,11 @@ describe('Issue Unit Tests', () => {
     it('should fail with zero issue amount', async () => {
         issueInfo[0].satoshis = 0
         await expect(() => issue(
-            issuerPrivateKey,
+          privateKey,
             issueInfo,
             utxo,
             utxo,
-            fundingPrivateKey,
+            privateKey,
             true,
             symbol
           )).rejects.toThrow('issueInfo satoshis < 1')
@@ -151,11 +149,11 @@ describe('Issue Unit Tests', () => {
     it('should fail with too few sats issue amount', async () => {
         issueInfo[0].satoshis = 2000
         await expect(() => issue(
-            issuerPrivateKey,
+          privateKey,
             issueInfo,
             utxo,
             utxo,
-            fundingPrivateKey,
+            privateKey,
             true,
             symbol
           )).rejects.toThrow('total out amount 6000 must equal total in amount 10000')
@@ -164,11 +162,11 @@ describe('Issue Unit Tests', () => {
     it('should fail with too many sats issue amount', async () => {
         issueInfo[0].satoshis = 10000
         await expect(() => issue(
-            issuerPrivateKey,
+          privateKey,
             issueInfo,
             utxo,
             utxo,
-            fundingPrivateKey,
+            privateKey,
             true,
             symbol
           )).rejects.toThrow('total out amount 14000 must equal total in amount 10000')
@@ -178,11 +176,11 @@ describe('Issue Unit Tests', () => {
     it('should fail with decimal issue amount', async () => {
         issueInfo[0].satoshis = 6000.5
         await expect(() => issue(
-            issuerPrivateKey,
+          privateKey,
             issueInfo,
             utxo,
             utxo,
-            fundingPrivateKey,
+            privateKey,
             true,
             symbol
           )).rejects.toThrow('issueInfo Satoshis must be a natural number')
@@ -190,11 +188,11 @@ describe('Issue Unit Tests', () => {
 
     it('should fail with empty issueInfo', async () => {
         await expect(() => issue(
-            issuerPrivateKey,
+          privateKey,
             [],
             utxo,
             utxo,
-            fundingPrivateKey,
+            privateKey,
             true,
             symbol
           )).rejects.toThrow('issueInfo is invalid')
@@ -203,11 +201,11 @@ describe('Issue Unit Tests', () => {
     it('should fail with issuer address too short', async () => {
         issueInfo[0].addr = '1bc1qxy2kgdygjrsqtzq2'
         await expect(() => issue(
-            issuerPrivateKey,
+          privateKey,
             issueInfo,
             utxo,
             utxo,
-            fundingPrivateKey,
+            privateKey,
             true,
             symbol
           )).rejects.toThrow('issueInfo address must be between 26 and 35')
@@ -216,11 +214,11 @@ describe('Issue Unit Tests', () => {
     it('should fail with issuer address too long', async () => {
         issueInfo[0].addr = '1zP1eP5QGefi2DMPTfTL5SLmv7DivfNabc1qxymv7'
         await expect(() => issue(
-            issuerPrivateKey,
+          privateKey,
             issueInfo,
             utxo,
             utxo,
-            fundingPrivateKey,
+            privateKey,
             true,
             symbol
           )).rejects.toThrow('issueInfo address must be between 26 and 35')
@@ -232,11 +230,11 @@ describe('Issue Unit Tests', () => {
             satoshis: 10000
         }
         await expect(() => issue(
-            issuerPrivateKey,
+          privateKey,
             invalidIssueInfo,
             utxo,
             utxo,
-            fundingPrivateKey,
+            privateKey,
             true,
             symbol
           )).rejects.toThrow('issueInfo is invalid')
@@ -244,11 +242,11 @@ describe('Issue Unit Tests', () => {
 
     it('should fail with empty contract utxo', async () => {
         await expect(() => issue(
-            issuerPrivateKey,
+          privateKey,
             issueInfo,
             [],
             utxo,
-            fundingPrivateKey,
+            privateKey,
             true,
             symbol
           )).rejects.toThrow('contractUtxo is invalid')

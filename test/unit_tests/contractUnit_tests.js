@@ -3,11 +3,9 @@ const utils = require('../utils/test_utils')
 const {
   contract
 } = require('../../index')
-const issuerPrivateKetStr = 'Ky5XHRQvYEcEbtGoQQQETbctAgAQKvb3PocfJSnkyHuEj5Nzj1pb'
-const fundingPrivateKetStr = 'Ky5XHRQvYEcEbtGoQQQETbctAgAQKvb3PocfJSnkyHuEj5Nzj1pb'
-const issuerPrivateKey = new bsv.PrivateKey(issuerPrivateKetStr)
-const fundingPrivateKey = new bsv.PrivateKey(fundingPrivateKetStr)
-const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
+const privateKeyStr = 'Ky5XHRQvYEcEbtGoQQQETbctAgAQKvb3PocfJSnkyHuEj5Nzj1pb'
+const privateKey = new bsv.PrivateKey(privateKeyStr)
+const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(privateKey.publicKey.toBuffer()).toString('hex')
 let symbol = 'taalt'
 let supply = 10000
 let schema = utils.schema(publicKeyHash, symbol, supply)
@@ -22,10 +20,10 @@ describe('Contract Unit Tests', () => {
   
   it('should create contract', async () => {
     const hex =  await contract(
-      issuerPrivateKey,
+      privateKey,
       getUtxo(),
       getUtxo(),
-      fundingPrivateKey,
+      privateKey,
       schema,
       supply
    ) 
@@ -34,10 +32,10 @@ describe('Contract Unit Tests', () => {
   
   it('should fail with null schema', async () => {
     await expect(() => contract(
-        issuerPrivateKey,
+        privateKey,
         getUtxo(),
         getUtxo(),
-        fundingPrivateKey,
+        privateKey,
         null,
         supply
       )).rejects.toThrow('Schema is null')
@@ -48,7 +46,7 @@ describe('Contract Unit Tests', () => {
         null,
         getUtxo(),
         getUtxo(),
-        fundingPrivateKey,
+        privateKey,
         schema,
         supply
       )).rejects.toThrow('Issuer private key is null')
@@ -56,7 +54,7 @@ describe('Contract Unit Tests', () => {
   
   it('should fail with null funding privatekey', async () => {
       await expect(() => contract(
-          issuerPrivateKey,
+          privateKey,
           getUtxo(),
           getUtxo(),
           null,
@@ -67,10 +65,10 @@ describe('Contract Unit Tests', () => {
   
     it('should fail with null contract utxo', async () => {
       await expect(() => contract(
-          issuerPrivateKey,
+          privateKey,
           null,
           getUtxo(),
-          fundingPrivateKey,
+          privateKey,
           schema,
           supply
         )).rejects.toThrow('inputUtxos is invalid')
@@ -79,10 +77,10 @@ describe('Contract Unit Tests', () => {
   it('should fail with supply > contract amount', async () => {
       supply = 2000000
       await expect(() => contract(
-          issuerPrivateKey,
+          privateKey,
           getUtxo(),
           getUtxo(),
-          fundingPrivateKey,
+          privateKey,
           schema,
           supply
         )).rejects.toThrow('Token Supply of 2000000 with satsPerToken of 1 is greater than input amount of 1000000')
@@ -92,10 +90,10 @@ describe('Contract Unit Tests', () => {
     supply = 33
     schema.satsPerToken = 5
     await expect(() => contract(
-        issuerPrivateKey,
+        privateKey,
         getUtxo(),
         getUtxo(),
-        fundingPrivateKey,
+        privateKey,
         schema,
         supply
       )).rejects.toThrow('Token amount 33 must be divisible by satsPerToken 5')
@@ -105,10 +103,10 @@ describe('Contract Unit Tests', () => {
     supply = 50
     schema.satsPerToken = 100
     await expect(() => contract(
-        issuerPrivateKey,
+        privateKey,
         getUtxo(),
         getUtxo(),
-        fundingPrivateKey,
+        privateKey,
         schema,
         supply
       )).rejects.toThrow('Token amount 50 is less than satsPerToken 100')
@@ -117,10 +115,10 @@ describe('Contract Unit Tests', () => {
   it('should fail with satsPertoken * supply > contract amount', async () => {
     schema.satsPerToken = 5000
     await expect(() => contract(
-        issuerPrivateKey,
+        privateKey,
         getUtxo(),
         getUtxo(),
-        fundingPrivateKey,
+        privateKey,
         schema,
         supply
       )).rejects.toThrow('Token Supply of 10000 with satsPerToken of 5000 is greater than input amount of 1000000')
@@ -128,7 +126,7 @@ describe('Contract Unit Tests', () => {
 
   it('should fail with non array contract utxo', async () => {
     await expect(() => contract(
-        issuerPrivateKey,
+        privateKey,
         {      
           txid: 'df440e79d244b041e99b835fc150004303a2bd1c48ccc0092434ca8a8ef75b56',
           vout: 1,
@@ -136,7 +134,7 @@ describe('Contract Unit Tests', () => {
           satoshis: 1000000
         },
         getUtxo(),
-        fundingPrivateKey,
+        privateKey,
         schema,
         supply
       )).rejects.toThrow('inputUtxos is invalid')
@@ -144,10 +142,10 @@ describe('Contract Unit Tests', () => {
 
   it('should fail with empty array contract utxo', async () => {
     await expect(() => contract(
-        issuerPrivateKey,
+        privateKey,
         [],
         getUtxo(),
-        fundingPrivateKey,
+        privateKey,
         schema,
         supply
       )).rejects.toThrow('inputUtxos is invalid')
@@ -159,10 +157,10 @@ describe('Contract Unit Tests', () => {
     { supply: 0, error: 'Token satoshis is zero' },
   ])('should fail invalid supply of "$supply"', async ({ supply, error }) => {
     await expect(() => contract(
-        issuerPrivateKey,
+        privateKey,
         getUtxo(),
         getUtxo(),
-        fundingPrivateKey,
+        privateKey,
         schema,
         supply
       )).rejects.toThrow(error)
@@ -175,10 +173,10 @@ describe('Contract Unit Tests', () => {
   ])('should fail with invalid symbol "$invalidCharsSymbol}"', async ({ invalidCharsSymbol }) => {
     schema.symbol = invalidCharsSymbol
     await expect(() => contract(
-        issuerPrivateKey,
+        privateKey,
         getUtxo(),
         getUtxo(),
-        fundingPrivateKey,
+        privateKey,
         schema,
         supply
       )).rejects.toThrow('Invalid Symbol. Must be between 1 and 128 long and contain alpahnumeric, \'-\', \'_\' chars.')
