@@ -6,13 +6,14 @@ const privatekeyStr = 'Ky5XHRQvYEcEbtGoQQQETbctAgAQKvb3PocfJSnkyHuEj5Nzj1pb'
 const privateKey = new bsv.PrivateKey(privatekeyStr)
 let addr = 'mq7psuJ7Z9h1w4H3YtcCoHx7cPmhVM9UsV'
 let splitTxObj
-let fundingUtxo =      {
+let fundingUtxo = {
     txid: '148c762dca1aa6e6c55fbd7fe0b3cdc00e3f21d7f1304b2349365cfb91bfe5f9',
     vout: 1,
     scriptPubKey: '76a914d1b44a79bbfd9bbcdae85f042ffcb5bc042363f188ac',
     satoshis: 1989930
   }
 
+  // to do merge different owners
 describe('Merge Unit Tests', () => {
 
     beforeAll(async () => {
