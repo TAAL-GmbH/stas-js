@@ -12,13 +12,13 @@ pipeline {
         stage('Unit Tests') {
             steps {
                 echo 'Unit Test'
-                sh 'API_USERNAME=taal_private API_PASSWORD=dotheT@@l007 npm run test contractUnit'  
+                sh 'API_USERNAME=taal_private API_PASSWORD=dotheT@@l007 npm run test:unit:ci'  
             }
         }
           stage('Functional Tests') {
             steps {
                 echo 'Functional Tests'
-                sh 'API_USERNAME=taal_private API_PASSWORD=dotheT@@l007 npm run test'        
+                sh 'API_USERNAME=taal_private API_PASSWORD=dotheT@@l007 npm run test:functional:ci'        
             }
         }
     }

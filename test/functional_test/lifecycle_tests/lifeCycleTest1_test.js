@@ -1,5 +1,5 @@
 const expect = require('chai').expect
-const utils = require(('../utils/test_utils'))
+const utils = require(('../../utils/test_utils'))
 const bsv = require('bsv')
 require('dotenv').config()
 
@@ -11,14 +11,14 @@ const {
   merge,
   mergeSplit,
   redeem
-} = require('../../index')
+} = require('../../../index')
 
 const {
   getTransaction,
   getFundsFromFaucet,
   broadcast,
   bitcoinToSatoshis
-} = require('../../index').utils
+} = require('../../../index').utils
 
 it('Full Life Cycle Test 1', async () => {
   const issuerPrivateKey = bsv.PrivateKey()
@@ -50,7 +50,8 @@ it('Full Life Cycle Test 1', async () => {
   const contractTxid = await broadcast(contractHex)
   console.log(`Contract TX:     ${contractTxid}`)
   const contractTx = await getTransaction(contractTxid)
-
+  console.log(utils.getUtxo(contractTxid, contractTx, 1))
+  return
   const issueHex = await issue(
     issuerPrivateKey,
     utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
@@ -75,7 +76,6 @@ it('Full Life Cycle Test 1', async () => {
   await utils.isTokenBalance(bobAddr, 3000)
 
   const issueOutFundingVout = issueTx.vout.length - 1
-
   const transferHex = await transfer(
     bobPrivateKey,
     utils.getUtxo(issueTxid, issueTx, 1),

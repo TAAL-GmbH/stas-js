@@ -1,5 +1,4 @@
 const bsv = require('bsv')
-const utils = require('../utils/test_utils')
 const {
   issue
 } = require('../../index')

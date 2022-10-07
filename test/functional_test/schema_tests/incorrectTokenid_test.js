@@ -1,6 +1,5 @@
 const expect = require('chai').expect
 const utils = require(('../../utils/test_utils'))
-
 const bsv = require('bsv')
 require('dotenv').config()
 
@@ -16,7 +15,7 @@ const {
 } = require('../../../index').utils
 
 describe('regression, testnet', () => {
-  it('Changed Symbol in issue functions', async () => {
+  it('Incorrect Token Id Does Not Issue A Token', async () => {
     const issuerPrivateKey = bsv.PrivateKey()
     const fundingPrivateKey = bsv.PrivateKey()
 
@@ -29,7 +28,8 @@ describe('regression, testnet', () => {
     const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
     const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
 
-    const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
+    // wrong private key supplied to hash for token id and redemption address
+    const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(bobPrivateKey.publicKey.toBuffer()).toString('hex')
     const supply = 10000
     const symbol = 'TAALT'
     const schema = utils.schema(publicKeyHash, symbol, supply)
@@ -45,22 +45,24 @@ describe('regression, testnet', () => {
     const contractTxid = await broadcast(contractHex)
     console.log(`Contract TX:     ${contractTxid}`)
     const contractTx = await getTransaction(contractTxid)
-    try {
-      await issue(
-        issuerPrivateKey,
-        utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
-        utils.getUtxo(contractTxid, contractTx, 0),
-        utils.getUtxo(contractTxid, contractTx, 1),
-        fundingPrivateKey,
-        true,
-        'wrong_symbol', // symbol changed
-        2
-      )
-      assert(false)
-      return
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.equal('The symbol in the contract must equal symbol passed to issue')
-    }
+
+    const issueHex = await issue(
+      issuerPrivateKey,
+      utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+      utils.getUtxo(contractTxid, contractTx, 0),
+      utils.getUtxo(contractTxid, contractTx, 1),
+      fundingPrivateKey,
+      true,
+      symbol,
+      2
+    )
+    console.log('alice address ' + aliceAddr)
+    console.log('bob address ' + bobAddr)
+    const issueTxid = await broadcast(issueHex)
+    console.log(`Issue TX:     ${issueTxid}`)
+    const tokenId = await utils.getToken(issueTxid)
+    console.log(`Token ID:        ${tokenId}`)
+    const response = await utils.getTokenResponse(tokenId)
+    expect(response).to.equal('Token Not Found')
   })
 })

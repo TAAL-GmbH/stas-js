@@ -6,6 +6,7 @@
   "module": "dist/index",
   "scripts": {
     "test": "jest",
+    "test:functional:ci": "jest --testPathPattern=test/functional_test --runInBand",
     "test:smoke:ci": "jest --testPathPattern=test/smoke_tests --runInBand",
     "test:unit:ci": "jest --testPathPattern=test/unit_tests --runInBand",
     "watch": "npm-watch",

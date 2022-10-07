@@ -1,6 +1,5 @@
 const expect = require('chai').expect
 const utils = require(('../../utils/test_utils'))
-
 const bsv = require('bsv')
 require('dotenv').config()
 
@@ -16,7 +15,7 @@ const {
 } = require('../../../index').utils
 
 describe('regression, testnet', () => {
-  it('Changed Symbol in issue functions', async () => {
+  it('Full Life Cycle Test With 1000 Issuance Addresses', async () => {
     const issuerPrivateKey = bsv.PrivateKey()
     const fundingPrivateKey = bsv.PrivateKey()
 
@@ -26,11 +25,14 @@ describe('regression, testnet', () => {
     const bobPrivateKey = bsv.PrivateKey()
     const bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
 
+    const davePrivateKey = bsv.PrivateKey()
+    const daveAddr = davePrivateKey.toAddress(process.env.NETWORK).toString()
+
     const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
     const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
 
     const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
-    const supply = 10000
+    const supply = 100000
     const symbol = 'TAALT'
     const schema = utils.schema(publicKeyHash, symbol, supply)
 
@@ -45,22 +47,39 @@ describe('regression, testnet', () => {
     const contractTxid = await broadcast(contractHex)
     console.log(`Contract TX:     ${contractTxid}`)
     const contractTx = await getTransaction(contractTxid)
-    try {
-      await issue(
-        issuerPrivateKey,
-        utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
-        utils.getUtxo(contractTxid, contractTx, 0),
-        utils.getUtxo(contractTxid, contractTx, 1),
-        fundingPrivateKey,
-        true,
-        'wrong_symbol', // symbol changed
-        2
-      )
-      assert(false)
-      return
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error)
-      expect(e.message).to.equal('The symbol in the contract must equal symbol passed to issue')
-    }
+
+    const issueInfo = add1000Addresses()
+    const issueHex = await issue(
+      issuerPrivateKey,
+      issueInfo,
+      utils.getUtxo(contractTxid, contractTx, 0),
+      utils.getUtxo(contractTxid, contractTx, 1),
+      fundingPrivateKey,
+      true,
+      symbol,
+      2
+    )
+    const issueTxid = await broadcast(issueHex)
+    const issueTx = await getTransaction(issueTxid)
+    const tokenId = await utils.getToken(issueTxid)
+    console.log(`issueTxid:        ${issueTxid}`)
+    console.log(`Token ID:        ${tokenId}`)
+    await new Promise(r => setTimeout(r, 15000))
+    const response = await utils.getTokenResponse(tokenId)
+    expect(response.symbol).to.equal(symbol)
   })
 })
+
+function add1000Addresses () {
+  const issueInfo = []
+  for (i = 0; i < 1000; i++) {
+    const privateKey = bsv.PrivateKey()
+    const addr = privateKey.toAddress(process.env.NETWORK).toString()
+    issueInfo.push({
+      addr: addr,
+      satoshis: 100,
+      data: 'data ' + i
+    })
+  };
+  return issueInfo
+}
