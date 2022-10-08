@@ -31,18 +31,18 @@ let splitTx
 
 it.only('Attempt To Merge Token with Different Owners Via SDK Throws Error',
   async () => {
-    const validSplitTxObj = await validToken()
-    const invalidSplitTxObj = await invalidToken()
+    const firstSplitTxObj = await firstToken()
+    const secondSplitTxObj = await secondToken()
 
     try {
-      await merge(
+     let mergeHex =  await merge(
         bobPrivateKey,
         [{
-          tx: validSplitTxObj,
+          tx: firstSplitTxObj,
           vout: 0
         },
         {
-          tx: invalidSplitTxObj,
+          tx: secondSplitTxObj,
           vout: 1
         }],
         aliceAddr,
@@ -54,6 +54,7 @@ it.only('Attempt To Merge Token with Different Owners Via SDK Throws Error',
         },
         fundingPrivateKey
       )
+      console.log(mergeHex)
     } catch (e) {
       expect(e).to.be.instanceOf(Error)
       expect(e.message).to.eql('This function only merges STAS tokens with the same owner')
@@ -61,7 +62,7 @@ it.only('Attempt To Merge Token with Different Owners Via SDK Throws Error',
   }
 )
 
-async function validToken() {
+async function firstToken() {
   const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
   const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
   const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
@@ -102,13 +103,13 @@ async function validToken() {
         txid: contractTxid,
         vout: 0,
         scriptPubKey: contractTx.vout[0].scriptPubKey.hex,
-        satoshis: contractTx.vout[0].value
+        satoshis: bitcoinToSatoshis(contractTx.vout[0].value)
       },
       {
         txid: contractTxid,
         vout: 1,
         scriptPubKey: contractTx.vout[1].scriptPubKey.hex,
-        satoshis: contractTx.vout[1].value
+        satoshis: bitcoinToSatoshis(contractTx.vout[1].value)
       },
       fundingPrivateKey,
       true, // isSplittable
@@ -131,14 +132,14 @@ async function validToken() {
       txid: issueTxid,
       vout: 1,
       scriptPubKey: issueTx.vout[1].scriptPubKey.hex,
-      satoshis: issueTx.vout[1].value
+      satoshis: bitcoinToSatoshis(issueTx.vout[1].value)
     },
     aliceAddr,
     {
       txid: issueTxid,
       vout: issueOutFundingVout,
       scriptPubKey: issueTx.vout[issueOutFundingVout].scriptPubKey.hex,
-      satoshis: issueTx.vout[issueOutFundingVout].value
+      satoshis: bitcoinToSatoshis(issueTx.vout[issueOutFundingVout].value)
     },
     fundingPrivateKey
   )
@@ -159,14 +160,14 @@ async function validToken() {
       txid: transferTxid,
       vout: 0,
       scriptPubKey: transferTx.vout[0].scriptPubKey.hex,
-      satoshis: transferTx.vout[0].value
+      satoshis: bitcoinToSatoshis(transferTx.vout[0].value)
     },
     splitDestinations,
     {
       txid: transferTxid,
       vout: 1,
       scriptPubKey: transferTx.vout[1].scriptPubKey.hex,
-      satoshis: transferTx.vout[1].value
+      satoshis: bitcoinToSatoshis(transferTx.vout[1].value)
     },
     fundingPrivateKey
   )
@@ -179,14 +180,13 @@ async function validToken() {
   return splitTxObj
 }
 
-async function invalidToken() {
+async function secondToken() {
   const issuerPrivateKey = bsv.PrivateKey()
-  const newPk = bsv.PrivateKey()
 
   const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
   const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
 
-  const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(newPk.publicKey.toBuffer()).toString('hex')
+  const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
 
   const schema = utils.schema(publicKeyHash, symbol, supply)
 
@@ -224,13 +224,13 @@ async function invalidToken() {
         txid: contractTxid,
         vout: 0,
         scriptPubKey: contractTx.vout[0].scriptPubKey.hex,
-        satoshis: contractTx.vout[0].value
+        satoshis: bitcoinToSatoshis(contractTx.vout[0].value)
       },
       {
         txid: contractTxid,
         vout: 1,
         scriptPubKey: contractTx.vout[1].scriptPubKey.hex,
-        satoshis: contractTx.vout[1].value
+        satoshis: bitcoinToSatoshis(contractTx.vout[1].value)
       },
       fundingPrivateKey,
       true, // isSplittable
@@ -253,14 +253,14 @@ async function invalidToken() {
       txid: issueTxid,
       vout: 1,
       scriptPubKey: issueTx.vout[1].scriptPubKey.hex,
-      satoshis: issueTx.vout[1].value
+      satoshis: bitcoinToSatoshis(issueTx.vout[1].value)
     },
     aliceAddr,
     {
       txid: issueTxid,
       vout: issueOutFundingVout,
       scriptPubKey: issueTx.vout[issueOutFundingVout].scriptPubKey.hex,
-      satoshis: issueTx.vout[issueOutFundingVout].value
+      satoshis: bitcoinToSatoshis(issueTx.vout[issueOutFundingVout].value)
     },
     fundingPrivateKey
   )
@@ -281,14 +281,14 @@ async function invalidToken() {
       txid: transferTxid,
       vout: 0,
       scriptPubKey: transferTx.vout[0].scriptPubKey.hex,
-      satoshis: transferTx.vout[0].value
+      satoshis: bitcoinToSatoshis(transferTx.vout[0].value)
     },
     splitDestinations,
     {
       txid: transferTxid,
       vout: 1,
       scriptPubKey: transferTx.vout[1].scriptPubKey.hex,
-      satoshis: transferTx.vout[1].value
+      satoshis: bitcoinToSatoshis(transferTx.vout[1].value)
     },
     fundingPrivateKey
   )

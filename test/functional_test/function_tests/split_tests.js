@@ -307,7 +307,8 @@ it('Split - Send to Issuer Address Throws Error', async () => {
     return
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
-    expect(e.response.data).to.contain('Token UTXO cannot be sent to issuer address')
+    console.log(e)
+    expect(e.toString()).to.contain('Token UTXO cannot be sent to issuer address')
   }
 })
 
