@@ -3,6 +3,13 @@ pipeline {
     agent any
 
     stages {
+
+        stage('Waiting for smoke test to finish') {
+            steps {
+                echo 'Sleeping...'
+                sh 'sleep 10m'
+            }
+        }
         stage('Install Dependencies') {
             steps {
                 echo 'Installing Dependencies..'
