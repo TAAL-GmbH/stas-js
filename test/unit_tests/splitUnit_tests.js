@@ -70,7 +70,7 @@ describe('Split Unit Tests', () => {
             splitDestinations,
             utxo,
             privateKey,
-          )).rejects.toThrow('Invalid ammount in split destination')
+          )).rejects.toThrow('Invalid amount in split destination')
     });
 
     it('should fail with negative sats', async () => {
@@ -81,7 +81,7 @@ describe('Split Unit Tests', () => {
             splitDestinations,
             utxo,
             privateKey,
-          )).rejects.toThrow('Invalid ammount in split destination')
+          )).rejects.toThrow('Invalid amount in split destination')
     });
 
     it('should fail with address too Long', async () => {
@@ -92,7 +92,7 @@ describe('Split Unit Tests', () => {
             splitDestinations,
             utxo,
             privateKey,
-          )).rejects.toThrow('Invalid Address in split destination')
+          )).rejects.toThrow('Invalid address in split destination')
     });
 
 
@@ -104,7 +104,7 @@ describe('Split Unit Tests', () => {
             splitDestinations,
             utxo,
             privateKey,
-          )).rejects.toThrow('Invalid Address in split destination')
+          )).rejects.toThrow('Invalid address in split destination')
     });
 
 

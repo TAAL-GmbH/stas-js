@@ -86,7 +86,7 @@ describe('RedeemSplit Unit Tests', () => {
             splitDestinations,
             utxo,
             privateKey
-          )).rejects.toThrow('Invalid Address in split destination')
+          )).rejects.toThrow('Invalid address in split destination')
     });
 
     it('should fail with address too long', async () => {
@@ -98,7 +98,7 @@ describe('RedeemSplit Unit Tests', () => {
             splitDestinations,
             utxo,
             privateKey
-          )).rejects.toThrow('Invalid Address in split destination')
+          )).rejects.toThrow('Invalid address in split destination')
     });
 
 
