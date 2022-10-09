@@ -1,5 +1,5 @@
 const expect = require('chai').expect
-const utils = require(('../../utils/test_utils'))
+const utils = require('../../utils/test_utils'
 const bsv = require('bsv')
 require('dotenv').config()
 
