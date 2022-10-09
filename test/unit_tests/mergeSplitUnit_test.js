@@ -1,7 +1,8 @@
 const bsv = require('bsv')
-const { add } = require('bsv/lib/networks')
+const { sighash } = require('../../lib/stas')
 const {
-  mergeSplit
+  mergeSplit,
+  mergeSplitWithCallback
 } = require('../../index')
 const privatekeyStr = 'Ky5XHRQvYEcEbtGoQQQETbctAgAQKvb3PocfJSnkyHuEj5Nzj1pb'
 const privateKey = new bsv.PrivateKey(privatekeyStr)
@@ -17,18 +18,17 @@ let fundingUtxo = {
     satoshis: 100000
 }
 
-  // to do merge different owners
+const ownerSignatureCallback = async (tx, i, script, satoshis) => {
+  return bsv.Transaction.sighash.sign(tx, privateKey, sighash, i, script, satoshis).toTxFormat().toString('hex')
+}
+
 describe('mergeSplit Unit Tests', () => {
 
-  beforeAll(async () => {
+  beforeEach(() => {
     setup()
   })
-  
-  afterEach(() => {
-    setup()
-  })
-       
-  it('should create mergeSplit', async () => {
+
+  it('should create mergeSplit hex', async () => {
     const hex = await mergeSplit(
       privateKey,
       getMergeSplitUtxo(splitTxObj),
@@ -42,98 +42,7 @@ describe('mergeSplit Unit Tests', () => {
     expect(hex).toBe(expectedHex)
   })
 
-  it('should fail when merging more than two utxos', async () => {
-    let mergeSplitUtxo = getMergeSplitUtxo(splitTxObj)
-    mergeSplitUtxo.push({
-      tx: splitTxObj,
-      scriptPubKey: scriptPubKey,
-      vout: 3
-    })
-
-    await expect(() => mergeSplit(
-      privateKey,
-      mergeSplitUtxo,
-      addr,
-      amount1,
-      addr,
-      amount2,
-      fundingUtxo,
-      privateKey
-    )).rejects.toThrow('This function can only merge exactly 2 STAS tokens')
-  });
-  
-  it('should fail when merging less than two utxos', async () => {
-    let mergeSplitUtxo = [{
-      tx: splitTxObj,
-      scriptPubKey: scriptPubKey,
-      vout: 0
-    }]
-    await expect(() => mergeSplit(
-      privateKey,
-      mergeSplitUtxo,
-      addr,
-      amount1,
-      addr,
-      amount2,
-      fundingUtxo,
-      privateKey
-    )).rejects.toThrow('This function can only merge exactly 2 STAS tokens')
-  });
-  
-  it('should fail when address 1 is invalid', async () => {
-    await expect(() => mergeSplit(
-      privateKey,
-      getMergeSplitUtxo(splitTxObj),
-      invalidAddr,
-      amount1,
-      addr,
-      amount2,
-      fundingUtxo,
-      privateKey
-    )).rejects.toThrow('Invalid Address string provided')
-  });
-  
-  it('should fail when address 2 is invalid', async () => {
-    await expect(() => mergeSplit(
-      privateKey,
-      getMergeSplitUtxo(splitTxObj),
-      addr,
-      amount1,
-      invalidAddr,
-      amount2,
-      fundingUtxo,
-      privateKey
-    )).rejects.toThrow('Invalid Address string provided')
-  });
-  
-    
-  it('should fail when token owner private key is null', async () => {
-    await expect(() => mergeSplit(
-      null,
-      getMergeSplitUtxo(splitTxObj),
-      addr,
-      amount1,
-      addr,
-      amount2,
-      fundingUtxo,
-      privateKey
-    )).rejects.toThrow('Token owner private key is null')
-  });
-  
-  it('should fail when mergeUtxo is null', async () => {
-    await expect(() => mergeSplit(
-      privateKey,
-      null,
-      addr,
-      amount1,
-      addr,
-      amount2,
-      fundingUtxo,
-      privateKey
-    )).rejects.toThrow('MergeUtxos is invalid')
-  });
-  
-  it('should fail when address 1 is null', async () => {
+    it('should fail when address 1 is null', async () => {
     await expect(() => mergeSplit(
       privateKey,
       getMergeSplitUtxo(splitTxObj),
@@ -159,7 +68,6 @@ describe('mergeSplit Unit Tests', () => {
     )).rejects.toThrow('Destination address is null')
   });
   
-    
   it('should fail when amount 1 is null', async () => {
     await expect(() => mergeSplit(
       privateKey,
@@ -172,8 +80,7 @@ describe('mergeSplit Unit Tests', () => {
       privateKey
     )).rejects.toThrow('Satoshi value suppled is null')
   });
-  
-      
+   
   it('should fail when amount 2 is null', async () => {
     await expect(() => mergeSplit(
       privateKey,
@@ -185,19 +92,178 @@ describe('mergeSplit Unit Tests', () => {
       fundingUtxo,
       privateKey
     )).rejects.toThrow('Satoshi value suppled is null')
-  });
+  }); 
+})
+
+  // to do merge different owners
+describe('mergeSplitWithCallBack Unit Tests', () => {
+
+  beforeEach(() => {
+    setup()
+  })
   
-  it('should fail when funding private key is null', async () => {
-    await expect(() => mergeSplit(
-      privateKey,
+  it('should return hex mergeSplitWithCallBack', async () => {
+    const hex = await mergeSplitWithCallback(
+      privateKey.publicKey,
       getMergeSplitUtxo(splitTxObj),
       addr,
       amount1,
       addr,
       amount2,
       fundingUtxo,
-      null
+      privateKey.publicKey,
+      ownerSignatureCallback,
+      ownerSignatureCallback
+    )
+    expect(hex).toBe(expectedHex)
+  })
+       
+  it('should fail when merging more than two utxos', async () => {
+    let mergeSplitUtxo = getMergeSplitUtxo(splitTxObj)
+    mergeSplitUtxo.push({
+      tx: splitTxObj,
+      scriptPubKey: scriptPubKey,
+      vout: 3
+    })
+
+    await expect(() => mergeSplitWithCallback(
+      privateKey.publicKey,
+      mergeSplitUtxo,
+      addr,
+      amount1,
+      addr,
+      amount2,
+      fundingUtxo,
+      privateKey.publicKey,
+      ownerSignatureCallback,
+      ownerSignatureCallback
+    )).rejects.toThrow('This function can only merge exactly 2 STAS tokens')
+  });
+  
+  it('should fail when merging less than two utxos', async () => {
+    let mergeSplitUtxo = [{
+      tx: splitTxObj,
+      scriptPubKey: scriptPubKey,
+      vout: 0
+    }]
+    await expect(() => mergeSplitWithCallback(
+      privateKey.publicKey,
+      mergeSplitUtxo,
+      addr,
+      amount1,
+      addr,
+      amount2,
+      fundingUtxo,
+      privateKey.publicKey,
+      ownerSignatureCallback,
+      ownerSignatureCallback
+    )).rejects.toThrow('This function can only merge exactly 2 STAS tokens')
+  });
+  
+  it('should fail when address 1 is invalid', async () => {
+    await expect(() => mergeSplitWithCallback(
+      privateKey.publicKey,
+      getMergeSplitUtxo(splitTxObj),
+      invalidAddr,
+      amount1,
+      addr,
+      amount2,
+      fundingUtxo,
+      privateKey.publicKey,
+      ownerSignatureCallback,
+      ownerSignatureCallback
+    )).rejects.toThrow('Invalid Address string provided')
+  });
+  
+  it('should fail when address 2 is invalid', async () => {
+    await expect(() => mergeSplitWithCallback(
+      privateKey.publicKey,
+      getMergeSplitUtxo(splitTxObj),
+      addr,
+      amount1,
+      invalidAddr,
+      amount2,
+      fundingUtxo,
+      privateKey.publicKey,
+      ownerSignatureCallback,
+      ownerSignatureCallback
+    )).rejects.toThrow('Invalid Address string provided')
+  });
+  
+    
+  it('should fail when token owner private key is null', async () => {
+    await expect(() => mergeSplitWithCallback(
+      null,
+      getMergeSplitUtxo(splitTxObj),
+      addr,
+      amount1,
+      addr,
+      amount2,
+      fundingUtxo,
+      privateKey.publicKey,
+      ownerSignatureCallback,
+      ownerSignatureCallback
+    )).rejects.toThrow('Token owner public key is null')
+  });
+  
+  it('should fail when mergeUtxo is null', async () => {
+    await expect(() => mergeSplitWithCallback(
+      privateKey.publicKey,
+      null,
+      addr,
+      amount1,
+      addr,
+      amount2,
+      fundingUtxo,
+      privateKey.publicKey,
+      ownerSignatureCallback,
+      ownerSignatureCallback
+    )).rejects.toThrow('MergeUtxos is invalid')
+  });
+  
+  it('should fail when funding private key is null', async () => {
+    await expect(() => mergeSplitWithCallback(
+      privateKey.publicKey,
+      getMergeSplitUtxo(splitTxObj),
+      addr,
+      amount1,
+      addr,
+      amount2,
+      fundingUtxo,
+      null,
+      ownerSignatureCallback,
+      ownerSignatureCallback
     )).rejects.toThrow('Payment UTXO provided but payment key is null')
+  });
+
+  it('should fail when address 1 is null', async () => {
+    await expect(() => mergeSplitWithCallback(
+      privateKey.publicKey,
+      getMergeSplitUtxo(splitTxObj),
+      null,
+      amount1,
+      addr,
+      amount2,
+      fundingUtxo,
+      privateKey.publicKey,
+      ownerSignatureCallback,
+      ownerSignatureCallback
+    )).rejects.toThrow('First destination address is null')
+  });
+  
+  it('should fail when address 2 is null', async () => {
+    await expect(() => mergeSplitWithCallback(
+      privateKey.publicKey,
+      getMergeSplitUtxo(splitTxObj),
+      addr,
+      amount1,
+      null,
+      amount2,
+      fundingUtxo,
+      privateKey.publicKey,
+      ownerSignatureCallback,
+      ownerSignatureCallback
+    )).rejects.toThrow('Second destination address is null')
   });
 })
 

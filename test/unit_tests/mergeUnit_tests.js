@@ -1,6 +1,8 @@
 const bsv = require('bsv')
+const { sighash } = require('../../lib/stas')
 const {
-    merge
+  merge,
+  mergeWithCallback
 } = require('../../index')
 const privatekeyStr = 'Ky5XHRQvYEcEbtGoQQQETbctAgAQKvb3PocfJSnkyHuEj5Nzj1pb'
 const privateKey = new bsv.PrivateKey(privatekeyStr)
@@ -11,25 +13,60 @@ let fundingUtxo = {
     vout: 1,
     scriptPubKey: '76a914d1b44a79bbfd9bbcdae85f042ffcb5bc042363f188ac',
     satoshis: 100000
-  }
+}
+  
+const ownerSignatureCallback = async (tx, i, script, satoshis) => {
+  return bsv.Transaction.sighash.sign(tx, privateKey, sighash, i, script, satoshis).toTxFormat().toString('hex')
+}
+
+describe('Merge Unit Tests', () => {
+
+  beforeAll(async () => {
+    setup()
+  })
+
+    it('should create merge', async () => {
+      const hex = await merge(
+        privateKey,
+        getMergeUtxo(splitTxObj),
+        addr,
+        fundingUtxo,
+        privateKey
+      )
+      expect(hex).toBe(getHex())
+    })
+
+    it('should fail with null token owner public key', async () => {
+      await expect(() => merge(
+        null,
+        getMergeUtxo(splitTxObj),
+        addr,
+        fundingUtxo,
+        privateKey.publicKey
+      )).toThrow('Token owner private key is null')
+    });
+})
 
   // to do merge different owners
-describe('Merge Unit Tests', () => {
+describe('MergeWithCallBack Unit Tests', () => {
 
     beforeAll(async () => {
         setup()
     })
-       
-    it('should create merge', async () => {
-        const hex = await merge(
-            privateKey,
-            getMergeUtxo(splitTxObj),
-            addr,
-            fundingUtxo,
-            privateKey
-            )
-            expect(hex).toBe(getHex())
-    })
+
+    it('should create hex mergeWithCallback', async () => {
+      const hex = await mergeWithCallback(
+          privateKey.publicKey,
+          getMergeUtxo(splitTxObj),
+          addr,
+          fundingUtxo,
+          privateKey.publicKey,
+          ownerSignatureCallback,
+          ownerSignatureCallback       
+          )
+          expect(hex).toBe(getHex())
+  })
+
 
     it('should fail with more than two merge utxos', async () => {
         let mergeUtxo = getMergeUtxo(splitTxObj)
@@ -37,12 +74,14 @@ describe('Merge Unit Tests', () => {
             tx: splitTxObj,
             vout: 2
           })
-        await expect(() => merge(
-            privateKey,
+        await expect(() => mergeWithCallback(
+          privateKey.publicKey,
             mergeUtxo,
             addr,
             fundingUtxo,
-            privateKey
+            privateKey.publicKey,
+          ownerSignatureCallback,
+          ownerSignatureCallback,
           )).rejects.toThrow('This function can only merge exactly 2 STAS tokens')
     });
 
@@ -51,33 +90,50 @@ describe('Merge Unit Tests', () => {
             tx: splitTxObj,
             vout: 0
           }]
-        await expect(() => merge(
-            privateKey,
+        await expect(() => mergeWithCallback(
+           privateKey.publicKey,
             mergeUtxo,
             addr,
             fundingUtxo,
-            privateKey
+            privateKey.publicKey,
+          ownerSignatureCallback,
+          ownerSignatureCallback,
           )).rejects.toThrow('This function can only merge exactly 2 STAS tokens')
     });
-
-    // failing?
-    // it.only('should fail with null token owner private key', async () => {
-    //     await expect(() => merge(
-    //         null,
-    //         getMergeUtxo(splitTxObj),
-    //         addr,
-    //         fundingUtxo,
-    //         privateKey
-    //       )).rejects.toThrow('Token owner private key is null')
-    // });
+  
+  
+    it('should fail with null token owner public key', async () => {
+      await expect(() => mergeWithCallback(
+          null,
+          getMergeUtxo(splitTxObj),
+          addr,
+          fundingUtxo,
+          privateKey.publicKey,
+        ownerSignatureCallback,
+        ownerSignatureCallback,
+        )).rejects.toThrow('Token owner public key is null')
+    });
+  
+    it('should fail with null funding public key', async () => {
+      await expect(() => mergeWithCallback(
+          privateKey,
+          getMergeUtxo(splitTxObj),
+          addr,
+          fundingUtxo,
+          null,
+        ownerSignatureCallback,
+        ownerSignatureCallback,
+        )).rejects.toThrow('Payment UTXO provided but payment key is null')
+  });
 
     it('should fail with null merge utxos', async () => {
-        await expect(() => merge(
-            privateKey,
+        await expect(() => mergeWithCallback(
+            privateKey.publicKey,
             null,
             addr,
             fundingUtxo,
-            privateKey
+            privateKey.publicKey,
+            ownerSignatureCallback,
           )).rejects.toThrow('MergeUtxos is invalid')
     });
 
@@ -86,12 +142,13 @@ describe('Merge Unit Tests', () => {
         { addr: '1MSCReQT9E4GpxuK1K7uyD5q', error: 'Invalid Address string provided'  },
         { addr: '1MSCReQT9E4GpxuK1K7uyD5qF1EmznXjkrmoFCgGtkmhyaL2frwff84p2bwTf3F', error: 'Checksum mismatch' },
     ])('should fail with invalid destination address', async ({ addr, error }) => {
-        await expect(() => merge(
-            privateKey,
+        await expect(() => mergeWithCallback(
+          privateKey.publicKey,
             getMergeUtxo(splitTxObj),
             addr,
             fundingUtxo,
-            privateKey
+            privateKey.publicKey,
+            ownerSignatureCallback,
           )).rejects.toThrow(error)
     });
 

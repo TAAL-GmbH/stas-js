@@ -1,6 +1,8 @@
 const bsv = require('bsv')
+const { sighash } = require('../../lib/stas')
 const {
-  redeemSplit
+    redeemSplit,
+    redeemSplitWithCallback
 } = require('../../index')
 const privateKeyStr = 'Ky5XHRQvYEcEbtGoQQQETbctAgAQKvb3PocfJSnkyHuEj5Nzj1pb'
 const privateKey = new bsv.PrivateKey(privateKeyStr)
@@ -12,19 +14,16 @@ let utxo =   {
   }
 let addr = 'mq7psuJ7Z9h1w4H3YtcCoHx7cPmhVM9UsV'
   let splitDestinations = []
-  splitDestinations[0] = { address: addr, satoshis: 3000 }
-  splitDestinations[1] = { address: addr, satoshis: 3000 }
+    splitDestinations[0] = { address: addr, satoshis: 3000 }
+    splitDestinations[1] = { address: addr, satoshis: 3000 }
+  
+const ownerSignatureCallback = async (tx, i, script, satoshis) => {
+    return bsv.Transaction.sighash.sign(tx, privateKey, sighash, i, script, satoshis).toTxFormat().toString('hex')
+}
+  
 
 describe('RedeemSplit Unit Tests', () => {
-
-    afterEach(async () => {
-        splitDestinations = [
-            { address: addr, satoshis: 3000 },
-            { address: addr, satoshis: 3000 }
-        ]
-    })
-      
-
+    
     it('should create RedeemSplit', async () => {
         const hex = await redeemSplit(
             privateKey,
@@ -37,71 +36,6 @@ describe('RedeemSplit Unit Tests', () => {
         expect(hex).toBe(getHex())
     })
 
-
-    it('should fail with too many outputs', async () => {
-        splitDestinations[2] = { address: addr, satoshis: 100 }
-        splitDestinations[3] = { address: addr, satoshis: 100 }
-        splitDestinations[4] = { address: addr, satoshis: 100 }
-
-        await expect(() => redeemSplit(
-            privateKey,
-            privateKey.publicKey,
-            utxo,
-            splitDestinations,
-            utxo,
-            privateKey
-          )).rejects.toThrow('Must have less than 5 segments')
-    });
-
-    it('should fail with too many sats output', async () => {
-        splitDestinations[0].satoshis = 100000
-        await expect(() => redeemSplit(
-            privateKey,
-            privateKey.publicKey,
-            utxo,
-            splitDestinations,
-            utxo,
-            privateKey
-          )).rejects.toThrow('Not enough input Satoshis to cover output. Trying to redeem -96000 sats')
-    });
-
-    it('should fail with empty splitDestinations', async () => {
-        splitDestinations = []
-        await expect(() => redeemSplit(
-            privateKey,
-            privateKey.publicKey,
-            utxo,
-            splitDestinations,
-            utxo,
-            privateKey
-          )).rejects.toThrow('split destinations array is null or empty')
-    });
-
-    it('should fail with address too short', async () => {
-        splitDestinations[0].address = '1LF2wNCBT9dp5jN7fa6xSAaU'
-        await expect(() => redeemSplit(
-            privateKey,
-            privateKey.publicKey,
-            utxo,
-            splitDestinations,
-            utxo,
-            privateKey
-          )).rejects.toThrow('Invalid address in split destination')
-    });
-
-    it('should fail with address too long', async () => {
-        splitDestinations[0].address = '1LF2wNCBT9dp5jN7fa6xSAaUGjJ5Pyz5VGaUG5Pyz5VGaUG'
-        await expect(() => redeemSplit(
-            privateKey,
-            privateKey.publicKey,
-            utxo,
-            splitDestinations,
-            utxo,
-            privateKey
-          )).rejects.toThrow('Invalid address in split destination')
-    });
-
-
     it('should fail with null token owner private key', async () => {
         await expect(() => redeemSplit(
             null,
@@ -113,8 +47,7 @@ describe('RedeemSplit Unit Tests', () => {
           )).rejects.toThrow('Token owner private key is null')
     });
 
-
-    it('should fail with null issuer public key', async () => {
+    it('should fail with null contract private key', async () => {
         await expect(() => redeemSplit(
             privateKey,
             null,
@@ -124,39 +57,172 @@ describe('RedeemSplit Unit Tests', () => {
             privateKey
           )).rejects.toThrow('contract public key is null')
     });
+})
+
+describe('RedeemSplitWithCallBack Unit Tests', () => {
+
+    afterEach(async () => {
+        splitDestinations = [
+            { address: addr, satoshis: 3000 },
+            { address: addr, satoshis: 3000 }
+        ]
+    })
+      
+    it('should create hex redeemSplitWithCallback', async () => {
+        const hex = await redeemSplitWithCallback(
+            privateKey.publicKey,
+            privateKey.publicKey,
+            utxo,
+            splitDestinations,
+            utxo,
+            privateKey.publicKey,
+            ownerSignatureCallback,
+            ownerSignatureCallback
+        )
+        expect(hex).toBe(getHex())
+    })
+
+
+
+    it('should fail with too many outputs', async () => {
+        splitDestinations[2] = { address: addr, satoshis: 100 }
+        splitDestinations[3] = { address: addr, satoshis: 100 }
+        splitDestinations[4] = { address: addr, satoshis: 100 }
+
+        await expect(() => redeemSplitWithCallback(
+            privateKey.publicKey,
+            privateKey.publicKey,
+            utxo,
+            splitDestinations,
+            utxo,
+            privateKey.publicKey,
+            ownerSignatureCallback,
+            ownerSignatureCallback
+          )).rejects.toThrow('Must have less than 5 segments')
+    });
+
+    it('should fail with too many sats output', async () => {
+        splitDestinations[0].satoshis = 100000
+        await expect(() => redeemSplitWithCallback(
+            privateKey.publicKey,
+            privateKey.publicKey,
+            utxo,
+            splitDestinations,
+            utxo,
+            privateKey.publicKey,
+            ownerSignatureCallback,
+            ownerSignatureCallback
+          )).rejects.toThrow('Not enough input Satoshis to cover output. Trying to redeem -96000 sats')
+    });
+
+    it('should fail with empty splitDestinations', async () => {
+        splitDestinations = []
+        await expect(() => redeemSplitWithCallback(
+            privateKey.publicKey,
+            privateKey.publicKey,
+            utxo,
+            splitDestinations,
+            utxo,
+            privateKey.publicKey,
+            ownerSignatureCallback,
+            ownerSignatureCallback
+          )).rejects.toThrow('split destinations array is null or empty')
+    });
+
+    it('should fail with address too short', async () => {
+        splitDestinations[0].address = '1LF2wNCBT9dp5jN7fa6xSAaU'
+        await expect(() => redeemSplitWithCallback(
+            privateKey.publicKey,
+            privateKey.publicKey,
+            utxo,
+            splitDestinations,
+            utxo,
+            privateKey.publicKey,
+            ownerSignatureCallback,
+            ownerSignatureCallback
+          )).rejects.toThrow('Invalid address in split destination')
+    });
+
+    it('should fail with address too long', async () => {
+        splitDestinations[0].address = '1LF2wNCBT9dp5jN7fa6xSAaUGjJ5Pyz5VGaUG5Pyz5VGaUG'
+        await expect(() => redeemSplitWithCallback(
+            privateKey.publicKey,
+            privateKey.publicKey,
+            utxo,
+            splitDestinations,
+            utxo,
+            privateKey.publicKey,
+            ownerSignatureCallback,
+            ownerSignatureCallback
+          )).rejects.toThrow('Invalid address in split destination')
+    });
+
+
+    it('should fail with null token owner public key', async () => {
+        await expect(() => redeemSplitWithCallback(
+            null,
+            privateKey.publicKey,
+            utxo,
+            splitDestinations,
+            utxo,
+            privateKey.publicKey,
+            ownerSignatureCallback,
+            ownerSignatureCallback
+          )).rejects.toThrow('token owner public key is null')
+    });
+
+
+    it('should fail with null issuer public key', async () => {
+        await expect(() => redeemSplitWithCallback(
+            privateKey.publicKey,
+            null,
+            utxo,
+            splitDestinations,
+            utxo,
+            privateKey.publicKey,
+            ownerSignatureCallback,
+            ownerSignatureCallback
+          )).rejects.toThrow('contract public key is null')
+    });
 
 
     it('should fail with stas utxo', async () => {
-        await expect(() => redeemSplit(
-            privateKey,
+        await expect(() => redeemSplitWithCallback(
+            privateKey.publicKey,
             privateKey.publicKey,
             null,
             splitDestinations,
             utxo,
-            privateKey
+            privateKey.publicKey,
+            ownerSignatureCallback,
+            ownerSignatureCallback
           )).rejects.toThrow('stasUtxo is null')
     });
 
     
     it('should fail with null split destinations', async () => {
-        await expect(() => redeemSplit(
-            privateKey,
+        await expect(() => redeemSplitWithCallback(
+            privateKey.publicKey,
             privateKey.publicKey,
             utxo,
             null,
             utxo,
-            privateKey
+            privateKey.publicKey,
+            ownerSignatureCallback,
+            ownerSignatureCallback
           )).rejects.toThrow('split destinations array is null or empty')
     });
 
     it('should fail with null split destinations', async () => {
-        await expect(() => redeemSplit(
-            privateKey,
+        await expect(() => redeemSplitWithCallback(
+            privateKey.publicKey,
             privateKey.publicKey,
             utxo,
             splitDestinations,
             utxo,
-            null
+            null,
+            ownerSignatureCallback,
+            ownerSignatureCallback
           )).rejects.toThrow('Payment UTXO provided but payment public key is null')
     });
 
