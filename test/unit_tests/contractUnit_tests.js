@@ -1,5 +1,5 @@
 const bsv = require('bsv')
-const utils = require(('../utils/test_utils'))
+const utils = require('../utils/test_utils')
 const {
   contract
 } = require('../../index')
