@@ -3,7 +3,6 @@ const { sighash } = require('../../lib/stas')
 const {
     swap
 } = require('../../index')
-const { integerAsBuffer } = require('bsv/lib/util/js')
 const {
     createSwapOffer,
     acceptSwapOffer,
