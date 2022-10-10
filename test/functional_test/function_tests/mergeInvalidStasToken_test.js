@@ -1,5 +1,5 @@
 const bsv = require('bsv')
-const util = require('../../lib/stas')
+const util = require('../../../lib/stas')
 const utils = require('../../utils/test_utils')
 const expect = require('chai').expect
 require('dotenv').config()

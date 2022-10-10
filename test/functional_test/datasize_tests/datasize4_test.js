@@ -7,14 +7,14 @@ const {
   contract,
   issue,
   redeem
-} = require('../../../../index')
+} = require('../../../index')
 
 const {
   getTransaction,
   getFundsFromFaucet,
   broadcast
 
-} = require('../../../../index').utils
+} = require('../../../index').utils
 
 // Symbol size of 1 byte
 const symbol = 'A'

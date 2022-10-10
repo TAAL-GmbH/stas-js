@@ -20,7 +20,7 @@ const {
   bitcoinToSatoshis
 } = require('../../../index').utils
 
-const feeSettings = require('../../lib/constants')
+const feeSettings = require('../../../lib/constants')
 
 beforeEach(function () {
   feeSettings.Sats = 500

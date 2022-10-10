@@ -5,11 +5,11 @@ require('dotenv').config()
 
 const {
   contract
-} = require('../../index')
+} = require('../../../index')
 
 const {
   getFundsFromFaucet
-} = require('../../index').utils
+} = require('../../../index').utils
 
 const issuerPrivateKey = bsv.PrivateKey()
 const fundingPrivateKey = bsv.PrivateKey()

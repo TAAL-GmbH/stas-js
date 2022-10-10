@@ -15,7 +15,7 @@ const {
   broadcast
 } = require('../../../index').utils
 
-const { sighash } = require('../../lib/stas')
+const { sighash } = require('../../../lib/stas')
 
 let issuerPrivateKey
 let fundingPrivateKey

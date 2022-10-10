@@ -68,7 +68,6 @@ it('Symbol Size 40 Data Size Zero Bytes', async () => {
     utils.getUtxo(issueTxid, issueTx, 1),
     fundingPrivateKey
   )
-  console.log('redeem hex ' + redeemHex)
   const redeemTxid = await broadcast(redeemHex)
   console.log(`Redeem TX:       ${redeemTxid}`)
   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00010000)

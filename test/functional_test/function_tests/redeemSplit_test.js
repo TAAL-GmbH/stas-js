@@ -250,33 +250,6 @@ it('Successful RedeemSplit With Unsigned & No Fee', async () => {
   await utils.isTokenBalance(aliceAddr, 1400)
   await utils.isTokenBalance(bobAddr, 4400)
 })
-it('RedeemSplit - Too Many Outputs Throws Error', async () => {
-  const davePrivateKey = bsv.PrivateKey()
-  const daveAddr = davePrivateKey.toAddress(process.env.NETWORK).toString()
-  const emmaPrivateKey = bsv.PrivateKey()
-  const emmaAddr = emmaPrivateKey.toAddress(process.env.NETWORK).toString()
-  const amount = bitcoinToSatoshis(issueTx.vout[0].value / 5)
-  const rSplitDestinations = []
-  rSplitDestinations[0] = { address: bobAddr, satoshis: amount }
-  rSplitDestinations[1] = { address: aliceAddr, satoshis: amount }
-  rSplitDestinations[2] = { address: daveAddr, satoshis: amount }
-  rSplitDestinations[3] = { address: emmaAddr, satoshis: amount }
-  try {
-    await redeemSplit(
-      alicePrivateKey,
-      issuerPrivateKey.publicKey,
-      utils.getUtxo(issueTxid, issueTx, 0),
-      rSplitDestinations,
-      utils.getUtxo(issueTxid, issueTx, 2),
-      fundingPrivateKey
-    )
-    expect(false).toBeTruthy()
-    return
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Must have less than 5 segments')
-  }
-})
 
 it('RedeemSplit - Add Too Much To Split Throws Error', async () => {
   const bobAmount = issueTx.vout[0].value * 2
@@ -297,55 +270,6 @@ it('RedeemSplit - Add Too Much To Split Throws Error', async () => {
   } catch (e) {
     expect(e).to.be.instanceOf(Error)
     expect(e.message).to.eql('Not enough input Satoshis to cover output. Trying to redeem -7000 sats')
-  }
-})
-
-it('RedeemSplit - Address Too Short Throws Error', async () => {
-  const bobAmount1 = issueTx.vout[0].value / 2
-  const bobAmount2 = issueTx.vout[0].value - bobAmount1
-  const splitDestinations = []
-  splitDestinations[0] = { address: '1LF2wNCBT9dp5jN7fa6xSAaU', satoshis: bitcoinToSatoshis(bobAmount1) }
-  splitDestinations[1] = { address: bobAddr, satoshis: bitcoinToSatoshis(bobAmount2) }
-  const issueOutFundingVout = issueTx.vout.length - 1
-  try {
-    await redeemSplit(
-      alicePrivateKey,
-      issuerPrivateKey.publicKey,
-      utils.getUtxo(issueTxid, issueTx, 0),
-      splitDestinations,
-      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-      fundingPrivateKey
-    )
-    expect(false).toBeTruthy()
-    return
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Invalid Address in split destination')
-  }
-})
-
-it('RedeemSplit - Address Too Long Throws Error', async () => {
-  const bobAmount1 = issueTx.vout[0].value / 2
-  const bobAmount2 = issueTx.vout[0].value - bobAmount1
-  console.log(bobAddr)
-  const splitDestinations = []
-  splitDestinations[0] = { address: '1LF2wNCBT9dp5jN7fa6xSAaUGjJ5Pyz5VGaUG', satoshis: bitcoinToSatoshis(bobAmount1) }
-  splitDestinations[1] = { address: bobAddr, satoshis: bitcoinToSatoshis(bobAmount2) }
-  const issueOutFundingVout = issueTx.vout.length - 1
-  try {
-    await redeemSplit(
-      alicePrivateKey,
-      issuerPrivateKey.publicKey,
-      utils.getUtxo(issueTxid, issueTx, 0),
-      splitDestinations,
-      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-      fundingPrivateKey
-    )
-    expect(false).toBeTruthy()
-    return
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error)
-    expect(e.message).to.eql('Invalid Address in split destination')
   }
 })
 

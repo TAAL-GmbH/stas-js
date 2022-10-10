@@ -13,7 +13,7 @@ const {
   getTransaction,
   getFundsFromFaucet,
   broadcast
-} = require('../../index').utils
+} = require('../../../index').utils
 
 it('Symbol Special Char Test 1', async () => {
   const issuerPrivateKey = bsv.PrivateKey()

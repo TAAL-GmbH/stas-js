@@ -23,16 +23,11 @@ const {
 
 it('Full Life Cycle Test With Zero Fees', async () => {
   const issuerPrivateKey = bsv.PrivateKey()
-  const fundingPrivateKey = bsv.PrivateKey()
-
   const alicePrivateKey = bsv.PrivateKey()
   const aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
-
   const bobPrivateKey = bsv.PrivateKey()
   const bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
-
   const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
-
   const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
   const supply = 10000
   const symbol = 'TAALT'
