@@ -240,7 +240,7 @@ it('Split - Successful Split With Callback and No Fee ', async () => {
   await utils.isTokenBalance(bobAddr, 6500)
 })
 
-it('Split - Successful Split With Unsigned & Fee', async () => {
+it.only('Split - Successful Split With Unsigned & Fee', async () => {
   const issueTxSats = issueTx.vout[0].value
   const bobAmount1 = issueTxSats / 2
   const bobAmount2 = issueTxSats - bobAmount1
@@ -255,6 +255,7 @@ it('Split - Successful Split With Unsigned & Fee', async () => {
     utils.getUtxo(issueTxid, issueTx, 2),
     fundingPrivateKey.publicKey
   )
+  console.log(unsignedSplitReturn.hex)
   const splitTx = bsv.Transaction(unsignedSplitReturn.hex)
   utils.signScriptWithUnlocking(unsignedSplitReturn, splitTx, keyMap)
   const splitTxid = await broadcast(splitTx.serialize(true))
