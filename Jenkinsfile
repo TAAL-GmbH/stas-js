@@ -18,7 +18,7 @@ pipeline {
           stage('Functional Tests') {
             steps {
                 echo 'Functional Tests'
-                sh 'API_USERNAME=taal_private API_PASSWORD=dotheT@@l007 npm run test:functional:ci'        
+                sh 'API_USERNAME=taal_private API_PASSWORD=dotheT@@l007 npm run test:functional:ci --detectOpenHandles'        
             }
         }
     }
