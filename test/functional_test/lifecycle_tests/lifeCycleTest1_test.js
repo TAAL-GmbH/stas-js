@@ -51,7 +51,6 @@ it('Full Life Cycle Test 1', async () => {
   console.log(`Contract TX:     ${contractTxid}`)
   const contractTx = await getTransaction(contractTxid)
   console.log(utils.getUtxo(contractTxid, contractTx, 1))
-  return
   const issueHex = await issue(
     issuerPrivateKey,
     utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),

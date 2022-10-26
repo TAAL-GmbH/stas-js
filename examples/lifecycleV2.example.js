@@ -90,7 +90,7 @@ const {
 
     const issueInfo = [
       {
-        addr: aliceAddr,
+        addr: 'msB2SXvm9YKz9BiZiEfDvWmnvw14R1sBL8',
         satoshis: 7000,
         data: 'one'
       },
@@ -139,7 +139,7 @@ const {
         scriptPubKey: issueTx.vout[1].scriptPubKey.hex,
         satoshis: bitcoinToSatoshis(issueTx.vout[1].value)
       },
-      aliceAddr,
+      "myWC2LjqoiJFUDfear9Ejmvuj1n15Y4YGD",
       {
         txid: issueTxid,
         vout: issueOutFundingVout,
@@ -151,7 +151,6 @@ const {
     const transferTxid = await broadcast(transferHex)
     console.log(`Transfer TX:     ${transferTxid}`)
     const transferTx = await getTransaction(transferTxid)
-
     // Split tokens into 2 - both payable to Bob...
     const bobAmount1 = transferTx.vout[0].value / 2
     const bobAmount2 = transferTx.vout[0].value - bobAmount1
@@ -294,5 +293,4 @@ const {
     )
     const redeemTxid = await broadcast(redeemHex)
     console.log(`Redeem TX:       ${redeemTxid}`)
-    // const redeem1Tx = await getTransaction(redeem1Txid)
   })()

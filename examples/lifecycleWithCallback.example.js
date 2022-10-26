@@ -88,15 +88,9 @@ const {
       tx.sign(issuerPrivateKey)
     }
 
-    // console.log('------------')
-    // console.log(ownerSignCallback.toString())
-    // console.log('------------')
-
     const paymentSignCallback = async (tx) => {
       tx.sign(fundingPrivateKey)
     }
-
-    // return contractWithCallback(privateKey.publicKey, inputUtxos, paymentUtxos, paymentPrivateKey ? paymentPrivateKey.publicKey : null, schema, tokenSatoshis, ownerSignCallback, paymentSignCallback)
 
     // change goes back to the fundingPrivateKey
     const contractHex = await contractWithCallback(
@@ -351,5 +345,4 @@ const {
     )
     const redeemTxid = await broadcast(redeemHex)
     console.log(`Redeem TX:       ${redeemTxid}`)
-    // const redeem1Tx = await getTransaction(redeem1Txid)
   })()

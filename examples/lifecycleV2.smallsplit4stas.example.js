@@ -295,6 +295,5 @@ const {
     )
     const redeemTxid = await broadcast(redeemHex)
     console.log(`Redeem TX:       ${redeemTxid}`)
-    // const redeem1Tx = await getTransaction(redeem1Txid)
   })()
 

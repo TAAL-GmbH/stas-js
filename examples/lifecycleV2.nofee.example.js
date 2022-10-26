@@ -266,7 +266,6 @@ const {
     )
     const redeemTxid = await broadcast(redeemHex)
     console.log(`Redeem TX:       ${redeemTxid}`)
-    // const redeem1Tx = await getTransaction(redeem1Txid)
 
     const rsBobAmount = mergeSplitTx.vout[1].value / 3
     const rsAliceAmount1 = mergeSplitTx.vout[1].value / 3

@@ -1,5 +1,4 @@
 const bsv = require('bsv')
-// const { map } = require('bsv/lib/util/_')
 require('dotenv').config()
 
 const {
@@ -102,8 +101,9 @@ const {
   )
   const contratTxJson = JSON.parse(unsignedContractRes.json)
   const contractTx = new bsv.Transaction(contratTxJson)
-
-  let signedContract = contractTx.sign(issuerPrivateKey)
+    
+  let signedContract
+  signedContract = contractTx.sign(issuerPrivateKey)
   signedContract = contractTx.sign(fundingPrivateKey)
 
   const contractTxid = await broadcast(signedContract.serialize(true))
@@ -152,10 +152,8 @@ const {
   const issueTx = new bsv.Transaction(unsignedIssueRes.hex)
 
   // now sign the tx
-  let signingPrivateKey
-
-  for (let i = 0; i < unsignedIssueRes.signingInfo.length; i++) {
-    const signingInfo = unsignedIssueRes.signingInfo[i]
+    let signingPrivateKey
+    for (let signingInfo of unsignedIssueRes.signingInfo){
     if (!keyMap.has(signingInfo.publicKey)) {
       throw new Error('unknown public key: ' + signingInfo.publicKey)
     }
@@ -168,8 +166,6 @@ const {
 
   const issueTxid = await broadcast(issueTx.serialize(true))
   console.log(`Issue TX:        ${issueTxid}`)
-  // alice: 7000
-  // bob: 3000
   const newIssueTx = await getTransaction(issueTxid)
   const issueOutFundingVout = newIssueTx.vout.length - 1
 
@@ -191,12 +187,10 @@ const {
     },
     fundingPublicKey
   )
-
   const transferTx = new bsv.Transaction(unsignedTransferRes.hex)
 
   // now sign the tx
-  for (let i = 0; i < unsignedTransferRes.signingInfo.length; i++) {
-    const signingInfo = unsignedTransferRes.signingInfo[i]
+    for (let signingInfo of unsignedTransferRes.signingInfo){
     if (!keyMap.has(signingInfo.publicKey)) {
       throw new Error('unknown public key: ' + signingInfo.publicKey)
     }
@@ -214,9 +208,6 @@ const {
 
   const transferTxid = await broadcast(transferTx.serialize(true))
   console.log(`Transfer TX:     ${transferTxid}`)
-
-  // alice: 7000, 3000
-  // bob: 0
   const newTransferTx = await getTransaction(transferTxid)
 
   // Split tokens into 2 - both payable to Bob...
@@ -248,8 +239,7 @@ const {
   const splitTx = new bsv.Transaction(unsignedSplitRes.hex)
 
   // now sign the tx
-  for (let i = 0; i < unsignedSplitRes.signingInfo.length; i++) {
-    const signingInfo = unsignedSplitRes.signingInfo[i]
+    for (let signingInfo of unsignedSplitRes.signingInfo){
     if (!keyMap.has(signingInfo.publicKey)) {
       throw new Error('unknown public key: ' + signingInfo.publicKey)
     }
@@ -267,8 +257,6 @@ const {
 
   const splitTxid = await broadcast(splitTx.serialize(true))
   console.log(`Split TX:        ${splitTxid}`)
-  // alice: 7000
-  // bob: 1500, 1500
   const newSplitTx = await getTransaction(splitTxid)
 
   // Now let's merge the last split back together and send to alice
@@ -295,8 +283,7 @@ const {
   const mergeTx = new bsv.Transaction(unsignedMergeRes.hex)
 
   // now sign the tx
-  for (let i = 0; i < unsignedMergeRes.signingInfo.length; i++) {
-    const signingInfo = unsignedMergeRes.signingInfo[i]
+  for (let signingInfo of unsignedMergeRes.signingInfo){
     if (!keyMap.has(signingInfo.publicKey)) {
       throw new Error('unknown public key: ' + signingInfo.publicKey)
     }
@@ -314,8 +301,6 @@ const {
 
   const mergeTxid = await broadcast(mergeTx.serialize(true))
   console.log(`Merge TX:        ${mergeTxid}`)
-  // alice: 7000, 3000
-  // bob: 0
   const newMergeTx = await getTransaction(mergeTxid)
 
   // Split again - both payable to Alice...
@@ -348,8 +333,7 @@ const {
   const splitTx2 = new bsv.Transaction(unsignedSplitRes2.hex)
 
   // now sign the tx
-  for (let i = 0; i < unsignedSplitRes2.signingInfo.length; i++) {
-    const signingInfo = unsignedSplitRes2.signingInfo[i]
+  for (let signingInfo of unsignedSplitRes2.signingInfo){
     if (!keyMap.has(signingInfo.publicKey)) {
       throw new Error('unknown public key: ' + signingInfo.publicKey)
     }
@@ -367,8 +351,6 @@ const {
 
   const splitTxid2 = await broadcast(splitTx2.serialize(true))
   console.log(`Split TX2:       ${splitTxid2}`)
-  // alice: 7000, 1500, 1500
-  // bob: 0
   const newSplitTx2 = await getTransaction(splitTxid2)
 
   // Now mergeSplit
@@ -406,8 +388,7 @@ const {
   const mergeSplitTx = new bsv.Transaction(unsignedMergeSplitRes.hex)
 
   // now sign the tx
-  for (let i = 0; i < unsignedMergeSplitRes.signingInfo.length; i++) {
-    const signingInfo = unsignedMergeSplitRes.signingInfo[i]
+  for (let signingInfo of unsignedMergeSplitRes.signingInfo){
     if (!keyMap.has(signingInfo.publicKey)) {
       throw new Error('unknown public key: ' + signingInfo.publicKey)
     }
@@ -425,8 +406,6 @@ const {
 
   const mergeSplitTxid = await broadcast(mergeSplitTx.serialize(true))
   console.log(`MergeSplit TX:   ${mergeSplitTxid}`)
-  // alice: 7000, 750
-  // bob: 2250
   const newMergeSplitTx = await getTransaction(mergeSplitTxid)
 
   // Alice wants to redeem the 750 tokens she just received
@@ -447,12 +426,10 @@ const {
     },
     fundingPublicKey
   )
-
   const redeemTx = new bsv.Transaction(unsignedRedeemRes.hex)
 
   // now sign the tx
-  for (let i = 0; i < unsignedRedeemRes.signingInfo.length; i++) {
-    const signingInfo = unsignedRedeemRes.signingInfo[i]
+  for (let signingInfo of unsignedRedeemRes.signingInfo){
     if (!keyMap.has(signingInfo.publicKey)) {
       throw new Error('unknown public key: ' + signingInfo.publicKey)
     }
@@ -470,8 +447,6 @@ const {
 
   const redeemTxid = await broadcast(redeemTx.serialize(true))
   console.log(`Redeem TX:       ${redeemTxid}`)
-  // alice: 7000
-  // bob: 2250
   const newRedeemTx = await getTransaction(redeemTxid)
 
   const redeemSplitTxSats = bitcoinToSatoshis(newMergeSplitTx.vout[1].value)
@@ -504,8 +479,7 @@ const {
   const redeemSplitTx = new bsv.Transaction(unsignedRedeemSplitRes.hex)
 
   // now sign the tx
-  for (let i = 0; i < unsignedRedeemSplitRes.signingInfo.length; i++) {
-    const signingInfo = unsignedRedeemSplitRes.signingInfo[i]
+  for (let signingInfo of unsignedRedeemSplitRes.signingInfo){
     if (!keyMap.has(signingInfo.publicKey)) {
       throw new Error('unknown public key: ' + signingInfo.publicKey)
     }

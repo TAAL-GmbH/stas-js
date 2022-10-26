@@ -177,5 +177,4 @@ const {
   console.log(mergeHex)
   const mergeTxid = await broadcast(mergeHex)
   console.log(`Merge TX:        ${mergeTxid}`)
-  const mergeTx = await getTransaction(mergeTxid)
 })()
