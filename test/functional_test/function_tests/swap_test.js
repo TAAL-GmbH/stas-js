@@ -125,7 +125,7 @@ describe('atomic swap', function () {
     }
 
     const fullySignedSwapHex = await acceptSwapOffer(swapOfferHex, tokenBIssueHex,
-      bobPrivateKey, takerInputTxHex, takerInputUTXO, takerOutputSatoshis, alicePublicKeyHash,
+      bobPrivateKey, takerInputTxHex, takerInputUTXO, 0, alicePublicKeyHash,
       fundingUTXO, fundingPrivateKey)
 
     const swapTxid = await broadcast(fullySignedSwapHex)
