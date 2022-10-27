@@ -8,7 +8,7 @@ const {
   issue,
   transfer,
   split,
-  merge
+  mergeSplit
 
 } = require('../../../index')
 
@@ -115,12 +115,18 @@ it('Attempting Merge With A Fee UTXO Index > 16 Throws Error', async () => {
 
   // Now let's merge the last split back together
   const splitTxObj = new bsv.Transaction(splitHex)
-  console.log(issueTx)
+    console.log(issueTx)
+    
+    const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
+    const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
 
-  const mergeHex = await merge(
+  const mergeHex = await mergeSplit(
     bobPrivateKey,
-    utils.getMergeUtxo(splitTxObj),
+    utils.getMergeSplitUtxo(splitTxObj, splitTx),
     aliceAddr,
+    aliceAmountSatoshis,
+    bobAddr,
+    bobAmountSatoshis,
     utils.getUtxo(issueTxid, issueTx, 17),
     fundingPrivateKey
   )
