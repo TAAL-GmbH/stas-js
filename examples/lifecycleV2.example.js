@@ -127,6 +127,7 @@ const {
     }
 
     const issueTxid = await broadcast(issueHex)
+    console.log(`Issue TX:     ${issueTxid}`)
     const issueTx = await getTransaction(issueTxid)
 
     const issueOutFundingVout = issueTx.vout.length - 1
@@ -139,7 +140,7 @@ const {
         scriptPubKey: issueTx.vout[1].scriptPubKey.hex,
         satoshis: bitcoinToSatoshis(issueTx.vout[1].value)
       },
-      "myWC2LjqoiJFUDfear9Ejmvuj1n15Y4YGD",
+      aliceAddr,
       {
         txid: issueTxid,
         vout: issueOutFundingVout,
