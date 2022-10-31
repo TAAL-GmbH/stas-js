@@ -90,7 +90,7 @@ const {
 
     const issueInfo = [
       {
-        addr: 'msB2SXvm9YKz9BiZiEfDvWmnvw14R1sBL8',
+        addr: aliceAddr,
         satoshis: 7000,
         data: 'one'
       },
