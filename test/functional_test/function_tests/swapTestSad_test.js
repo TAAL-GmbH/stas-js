@@ -7,7 +7,6 @@ require("dotenv").config();
 const {
   createSwapOffer,
   acceptSwapOffer,
-  allInOneSwap,
   createUnsignedSwapOffer,
   acceptUnsignedSwapOffer,
   acceptUnsignedNativeSwapOffer,
@@ -22,7 +21,7 @@ const {
   broadcast,
 } = require("../../../index").utils;
 
-const { contract, issue, transfer } = require("../../../index");
+const { contract, issue } = require("../../../index");
 
 let fundingPrivateKey;
 let bobPrivateKey;
