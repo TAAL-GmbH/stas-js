@@ -509,7 +509,7 @@ it("Full Life Cycle Test Low Sats 2 supply", async () => {
   await utils.isTokenBalance(bobAddr, 0);
 });
 
-it.only("Full Life Cycle Test Low Sats 3 supply", async () => {
+it("Full Life Cycle Test Low Sats 3 supply", async () => {
   const issuerPrivateKey = bsv.PrivateKey();
   const fundingPrivateKey = bsv.PrivateKey();
 
