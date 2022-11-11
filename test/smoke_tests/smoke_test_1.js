@@ -68,192 +68,194 @@ const symbol = "TAALT";
 const wait = 5000; // due to delay in token issuance
 const keyMap = new Map();
 
-it("Contract - Successful With Fees", async () => {
-  await setupContract();
-  const contractHex = await contract(
-    issuerPrivateKey,
-    contractUtxos,
-    fundingUtxos,
-    fundingPrivateKey,
-    schema,
-    supply
-  );
-  const contractTxid = await broadcast(contractHex);
-  const amount = await utils.getVoutAmount(contractTxid, 0);
-  expect(amount).to.equal(supply / 100000000);
-});
+describe("Smoke Test 1", () => {
+  it("Contract - Successful With Fees", async () => {
+    await setupContract();
+    const contractHex = await contract(
+      issuerPrivateKey,
+      contractUtxos,
+      fundingUtxos,
+      fundingPrivateKey,
+      schema,
+      supply
+    );
+    const contractTxid = await broadcast(contractHex);
+    const amount = await utils.getVoutAmount(contractTxid, 0);
+    expect(amount).to.equal(supply / 100000000);
+  });
 
-it("Contract - Successful With Callback Fee", async () => {
-  await setupContract();
-  const contractHex = await contractWithCallback(
-    issuerPrivateKey.publicKey,
-    contractUtxos,
-    fundingUtxos,
-    fundingPrivateKey.publicKey,
-    schema,
-    supply,
-    ownerSignCallback,
-    paymentSignCallback
-  );
-  const contractTxid = await broadcast(contractHex);
-  const amount = await utils.getVoutAmount(contractTxid, 0);
-  expect(amount).to.equal(supply / 100000000);
-});
+  it("Contract - Successful With Callback Fee", async () => {
+    await setupContract();
+    const contractHex = await contractWithCallback(
+      issuerPrivateKey.publicKey,
+      contractUtxos,
+      fundingUtxos,
+      fundingPrivateKey.publicKey,
+      schema,
+      supply,
+      ownerSignCallback,
+      paymentSignCallback
+    );
+    const contractTxid = await broadcast(contractHex);
+    const amount = await utils.getVoutAmount(contractTxid, 0);
+    expect(amount).to.equal(supply / 100000000);
+  });
 
-it("Contract - Successful With Unsigned & Fee", async () => {
-  await setupContract();
-  const unsignedContractReturn = await unsignedContract(
-    issuerPrivateKey.publicKey,
-    contractUtxos,
-    fundingUtxos,
-    fundingPrivateKey.publicKey,
-    schema,
-    supply
-  );
-  const contractTxJson = JSON.parse(unsignedContractReturn.json);
-  const contractTx = new bsv.Transaction(contractTxJson);
-  let signedContract = contractTx.sign(issuerPrivateKey);
-  signedContract = contractTx.sign(fundingPrivateKey);
-  const contractTxid = await broadcast(signedContract.serialize(true));
-  const amount = await utils.getVoutAmount(contractTxid, 0);
-  expect(amount).to.equal(supply / 100000000);
-});
+  it("Contract - Successful With Unsigned & Fee", async () => {
+    await setupContract();
+    const unsignedContractReturn = await unsignedContract(
+      issuerPrivateKey.publicKey,
+      contractUtxos,
+      fundingUtxos,
+      fundingPrivateKey.publicKey,
+      schema,
+      supply
+    );
+    const contractTxJson = JSON.parse(unsignedContractReturn.json);
+    const contractTx = new bsv.Transaction(contractTxJson);
+    let signedContract = contractTx.sign(issuerPrivateKey);
+    signedContract = contractTx.sign(fundingPrivateKey);
+    const contractTxid = await broadcast(signedContract.serialize(true));
+    const amount = await utils.getVoutAmount(contractTxid, 0);
+    expect(amount).to.equal(supply / 100000000);
+  });
 
-it("Issue - Successful Issue Token With Split And Fee 1", async () => {
-  await setupIssue();
-  const issueHex = await issue(
-    issuerPrivateKey,
-    utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
-    utils.getUtxo(contractTxid, contractTx, 0),
-    utils.getUtxo(contractTxid, contractTx, 1),
-    fundingPrivateKey,
-    true,
-    symbol
-  );
-  const issueTxid = await broadcast(issueHex);
-  const tokenId = await utils.getToken(issueTxid);
-  await new Promise((resolve) => setTimeout(resolve, wait));
-  const response = await utils.getTokenResponse(tokenId);
-  expect(response.symbol).to.equal(symbol);
-  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007);
-  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003);
-  await utils.isTokenBalance(aliceAddr, 7000);
-  await utils.isTokenBalance(bobAddr, 3000);
-});
+  it("Issue - Successful Issue Token With Split And Fee 1", async () => {
+    await setupIssue();
+    const issueHex = await issue(
+      issuerPrivateKey,
+      utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+      utils.getUtxo(contractTxid, contractTx, 0),
+      utils.getUtxo(contractTxid, contractTx, 1),
+      fundingPrivateKey,
+      true,
+      symbol
+    );
+    const issueTxid = await broadcast(issueHex);
+    const tokenId = await utils.getToken(issueTxid);
+    await new Promise((resolve) => setTimeout(resolve, wait));
+    const response = await utils.getTokenResponse(tokenId);
+    expect(response.symbol).to.equal(symbol);
+    expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007);
+    expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003);
+    await utils.isTokenBalance(aliceAddr, 7000);
+    await utils.isTokenBalance(bobAddr, 3000);
+  });
 
-it("Issue - Successful Issue Token With Split And Fee 2", async () => {
-  await setupIssue();
-  const issueInfo = [
-    {
-      addr: aliceAddr,
-      satoshis: 10000,
-      data: "one",
-    },
-  ];
-  const issueHex = await issue(
-    issuerPrivateKey,
-    issueInfo,
-    utils.getUtxo(contractTxid, contractTx, 0),
-    utils.getUtxo(contractTxid, contractTx, 1),
-    fundingPrivateKey,
-    true,
-    symbol
-  );
-  const issueTxid = await broadcast(issueHex);
-  const tokenId = await utils.getToken(issueTxid);
-  await new Promise((resolve) => setTimeout(resolve, wait));
-  const response = await utils.getTokenResponse(tokenId);
-  expect(response.symbol).to.equal(symbol);
-  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.0001);
-  await utils.isTokenBalance(aliceAddr, 10000);
-});
+  it("Issue - Successful Issue Token With Split And Fee 2", async () => {
+    await setupIssue();
+    const issueInfo = [
+      {
+        addr: aliceAddr,
+        satoshis: 10000,
+        data: "one",
+      },
+    ];
+    const issueHex = await issue(
+      issuerPrivateKey,
+      issueInfo,
+      utils.getUtxo(contractTxid, contractTx, 0),
+      utils.getUtxo(contractTxid, contractTx, 1),
+      fundingPrivateKey,
+      true,
+      symbol
+    );
+    const issueTxid = await broadcast(issueHex);
+    const tokenId = await utils.getToken(issueTxid);
+    await new Promise((resolve) => setTimeout(resolve, wait));
+    const response = await utils.getTokenResponse(tokenId);
+    expect(response.symbol).to.equal(symbol);
+    expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.0001);
+    await utils.isTokenBalance(aliceAddr, 10000);
+  });
 
-it("Issue - Successful Callback with Fee", async () => {
-  await setupIssue();
-  const issueHex = await issueWithCallback(
-    issuerPrivateKey.publicKey,
-    utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
-    utils.getUtxo(contractTxid, contractTx, 0),
-    utils.getUtxo(contractTxid, contractTx, 1),
-    fundingPrivateKey.publicKey,
-    true,
-    symbol,
-    issuerSignatureCallback,
-    paymentSignatureCallback
-  );
-  const issueTxid = await broadcast(issueHex);
-  const tokenId = await utils.getToken(issueTxid);
-  await new Promise((resolve) => setTimeout(resolve, wait));
-  const response = await utils.getTokenResponse(tokenId);
-  expect(response.symbol).to.equal(symbol);
-  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007);
-  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003);
-  await utils.isTokenBalance(aliceAddr, 7000);
-  await utils.isTokenBalance(bobAddr, 3000);
-});
+  it("Issue - Successful Callback with Fee", async () => {
+    await setupIssue();
+    const issueHex = await issueWithCallback(
+      issuerPrivateKey.publicKey,
+      utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+      utils.getUtxo(contractTxid, contractTx, 0),
+      utils.getUtxo(contractTxid, contractTx, 1),
+      fundingPrivateKey.publicKey,
+      true,
+      symbol,
+      issuerSignatureCallback,
+      paymentSignatureCallback
+    );
+    const issueTxid = await broadcast(issueHex);
+    const tokenId = await utils.getToken(issueTxid);
+    await new Promise((resolve) => setTimeout(resolve, wait));
+    const response = await utils.getTokenResponse(tokenId);
+    expect(response.symbol).to.equal(symbol);
+    expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007);
+    expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003);
+    await utils.isTokenBalance(aliceAddr, 7000);
+    await utils.isTokenBalance(bobAddr, 3000);
+  });
 
-it("Issue - Successful Issue Token With Unsigned & Fee", async () => {
-  await setupIssue();
-  const issueHex = await unsignedIssue(
-    issuerPrivateKey.publicKey,
-    utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
-    utils.getUtxo(contractTxid, contractTx, 0),
-    utils.getUtxo(contractTxid, contractTx, 1),
-    fundingPrivateKey.publicKey,
-    true,
-    symbol
-  );
-  const issueTx = new bsv.Transaction(issueHex.hex);
-  utils.signScript(issueHex, issueTx, keyMap);
-  const issueTxid = await broadcast(issueTx.serialize(true));
-  const tokenId = await utils.getToken(issueTxid);
-  await new Promise((resolve) => setTimeout(resolve, wait));
-  const response = await utils.getTokenResponse(tokenId);
-  expect(response.symbol).to.equal(symbol);
-  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007);
-  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003);
-  await utils.isTokenBalance(aliceAddr, 7000);
-  await utils.isTokenBalance(bobAddr, 3000);
-});
+  it("Issue - Successful Issue Token With Unsigned & Fee", async () => {
+    await setupIssue();
+    const issueHex = await unsignedIssue(
+      issuerPrivateKey.publicKey,
+      utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+      utils.getUtxo(contractTxid, contractTx, 0),
+      utils.getUtxo(contractTxid, contractTx, 1),
+      fundingPrivateKey.publicKey,
+      true,
+      symbol
+    );
+    const issueTx = new bsv.Transaction(issueHex.hex);
+    utils.signScript(issueHex, issueTx, keyMap);
+    const issueTxid = await broadcast(issueTx.serialize(true));
+    const tokenId = await utils.getToken(issueTxid);
+    await new Promise((resolve) => setTimeout(resolve, wait));
+    const response = await utils.getTokenResponse(tokenId);
+    expect(response.symbol).to.equal(symbol);
+    expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007);
+    expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003);
+    await utils.isTokenBalance(aliceAddr, 7000);
+    await utils.isTokenBalance(bobAddr, 3000);
+  });
 
-it("Merge - Successful Merge With Fee", async () => {
-  await setupMerge();
-  const mergeHex = await merge(
-    bobPrivateKey,
-    utils.getMergeUtxo(splitTxObj),
-    aliceAddr,
-    utils.getUtxo(splitTxid, splitTx, 2),
-    fundingPrivateKey
-  );
-  const mergeTxid = await broadcast(mergeHex);
-  await new Promise((resolve) => setTimeout(resolve, wait));
-  const tokenIdMerge = await utils.getToken(mergeTxid);
-  const response = await utils.getTokenResponse(tokenIdMerge);
-  expect(response.symbol).to.equal("TAALT");
-  expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007);
-  await utils.isTokenBalance(aliceAddr, 7000);
-  await utils.isTokenBalance(bobAddr, 3000);
-});
+  it("Merge - Successful Merge With Fee", async () => {
+    await setupMerge();
+    const mergeHex = await merge(
+      bobPrivateKey,
+      utils.getMergeUtxo(splitTxObj),
+      aliceAddr,
+      utils.getUtxo(splitTxid, splitTx, 2),
+      fundingPrivateKey
+    );
+    const mergeTxid = await broadcast(mergeHex);
+    await new Promise((resolve) => setTimeout(resolve, wait));
+    const tokenIdMerge = await utils.getToken(mergeTxid);
+    const response = await utils.getTokenResponse(tokenIdMerge);
+    expect(response.symbol).to.equal("TAALT");
+    expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007);
+    await utils.isTokenBalance(aliceAddr, 7000);
+    await utils.isTokenBalance(bobAddr, 3000);
+  });
 
-it("Merge - Successful Merge With Callback And Fee", async () => {
-  await setupMerge();
-  const mergeHex = await mergeWithCallback(
-    bobPrivateKey.publicKey,
-    utils.getMergeUtxo(splitTxObj),
-    aliceAddr,
-    utils.getUtxo(splitTxid, splitTx, 2),
-    fundingPrivateKey.publicKey,
-    bobSignatureCallback,
-    paymentSignatureCallback
-  );
-  const mergeTxid = await broadcast(mergeHex);
-  await new Promise((resolve) => setTimeout(resolve, wait));
-  const tokenIdMerge = await utils.getToken(mergeTxid);
-  const response = await utils.getTokenResponse(tokenIdMerge);
-  expect(response.symbol).to.equal("TAALT");
-  expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007);
-  await utils.isTokenBalance(aliceAddr, 7000);
-  await utils.isTokenBalance(bobAddr, 3000);
+  it("Merge - Successful Merge With Callback And Fee", async () => {
+    await setupMerge();
+    const mergeHex = await mergeWithCallback(
+      bobPrivateKey.publicKey,
+      utils.getMergeUtxo(splitTxObj),
+      aliceAddr,
+      utils.getUtxo(splitTxid, splitTx, 2),
+      fundingPrivateKey.publicKey,
+      bobSignatureCallback,
+      paymentSignatureCallback
+    );
+    const mergeTxid = await broadcast(mergeHex);
+    await new Promise((resolve) => setTimeout(resolve, wait));
+    const tokenIdMerge = await utils.getToken(mergeTxid);
+    const response = await utils.getTokenResponse(tokenIdMerge);
+    expect(response.symbol).to.equal("TAALT");
+    expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007);
+    await utils.isTokenBalance(aliceAddr, 7000);
+    await utils.isTokenBalance(bobAddr, 3000);
+  });
 });
 
 async function setupContract() {
