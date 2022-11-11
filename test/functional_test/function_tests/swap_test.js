@@ -47,7 +47,7 @@ beforeEach(async function () {
   await setup();
 });
 
-describe("atomic swap", function () {
+describe("atomic swap functional Tests", function () {
   // this swap function won't be used but is here as a sanity check
   it("Swap - All in one swap", async function () {
     const takerStasInputScriptHex = tokenAObj.outputs[0].script.toHex();

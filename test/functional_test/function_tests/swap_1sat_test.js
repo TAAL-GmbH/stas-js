@@ -5,6 +5,9 @@ const expect = require("chai").expect;
 require("dotenv").config();
 
 const {
+  createSwapOffer,
+  acceptSwapOffer,
+  allInOneSwap,
   createUnsignedSwapOffer,
   acceptUnsignedSwapOffer,
   acceptUnsignedNativeSwapOffer,
@@ -31,6 +34,7 @@ let tokenAIssueHex;
 let tokenBIssueHex;
 let tokenAObj;
 let tokenBObj;
+let tokenAIssueTxid;
 let tokenBIssueTx;
 let tokenBIssueTxid;
 let fundingUTXO;
@@ -44,6 +48,164 @@ beforeEach(async function () {
 });
 
 describe("atomic swap with 1 token", function () {
+  // this swap function won't be used but is here as a sanity check
+  it("Swap - All in one swap", async function () {
+    const takerStasInputScriptHex = tokenAObj.outputs[0].script.toHex();
+    const makerStasInputScript = tokenBObj.outputs[0].script;
+
+    const makerInputUtxo = {
+      txId: tokenBIssueTxid,
+      outputIndex: 0,
+      script: makerStasInputScript,
+      satoshis: tokenBObj.outputs[0].satoshis,
+    };
+
+    const wantedInfo = {
+      scriptHex: takerStasInputScriptHex,
+      satoshis: tokenAObj.outputs[0].satoshis,
+    };
+
+    const allInOneSwapHex = await allInOneSwap(
+      alicePrivateKey,
+      makerInputUtxo,
+      wantedInfo,
+      tokenBIssueHex,
+      0,
+      bobPrivateKey,
+      tokenAIssueHex,
+      0,
+      tokenAObj.outputs[0].satoshis,
+      tokenBObj.outputs[0].satoshis,
+      fundingUTXO,
+      fundingPrivateKey
+    );
+
+    const swapTxid = await broadcast(allInOneSwapHex);
+    console.log("swaptxid", swapTxid);
+    expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.00000001);
+    expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.00000001);
+    await utils.isTokenBalance(aliceAddr, 1);
+    await utils.isTokenBalance(bobAddr, 1);
+  });
+
+  it("Swap - 2 step p2pkh-token swap qith 1 sat", async function () {
+    const takerStasInputScriptHex = tokenAObj.outputs[0].script.toHex();
+    // first get some funds
+    const aliceUtxos = await getFundsFromFaucet(
+      alicePrivateKey.toAddress(process.env.NETWORK).toString()
+    );
+    // get input transaction
+    const makerInputHex = await getRawTransaction(aliceUtxos[0].txid);
+
+    const makerInputSatoshis = aliceUtxos[0].satoshis;
+    const takerOutputSatoshis = makerInputSatoshis;
+    const makerOutputSatoshis = tokenAObj.outputs[0].satoshis;
+    const takerInputSatoshis = makerOutputSatoshis;
+
+    const wantedInfo = {
+      scriptHex: takerStasInputScriptHex,
+      satoshis: makerOutputSatoshis,
+    };
+
+    const makerUtxo = {
+      txId: aliceUtxos[0].txid,
+      outputIndex: aliceUtxos[0].vout,
+      script: bsv.Script.fromHex(aliceUtxos[0].scriptPubKey), // makerStasInputScript,
+      satoshis: makerInputSatoshis,
+    };
+    const swapOfferHex = await createSwapOffer(
+      alicePrivateKey,
+      makerUtxo,
+      wantedInfo
+    );
+
+    // console.log('swapOfferHex', swapOfferHex)
+
+    const takerInputUTXO = {
+      txId: tokenAIssueTxid,
+      outputIndex: 0,
+      script: tokenAObj.outputs[0].script, // makerStasInputScript,
+      satoshis: takerInputSatoshis,
+    };
+    // now bob takes the offer
+    const fullySignedSwapHex = await acceptSwapOffer(
+      swapOfferHex,
+      makerInputHex,
+      bobPrivateKey,
+      tokenAIssueHex,
+      takerInputUTXO,
+      takerOutputSatoshis,
+      alicePublicKeyHash,
+      fundingUTXO,
+      fundingPrivateKey
+    );
+
+    // console.log('fullySignedSwapHex', fullySignedSwapHex)
+
+    const swapTxid = await broadcast(fullySignedSwapHex);
+    console.log("swaptxid: ", swapTxid);
+    expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.00000001);
+    expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.01);
+    await utils.isTokenBalanceTwoTokens(aliceAddr, 2);
+    await utils.isTokenBalance(bobAddr, 0);
+  });
+
+  it("Swap 3 step Token-Token with 1 sat", async function () {
+    const takerStasInputScriptHex = tokenAObj.outputs[0].script.toHex();
+    const makerStasInputScript = tokenBObj.outputs[0].script;
+
+    const makerInputSatoshis = tokenBObj.outputs[0].satoshis;
+    const takerOutputSatoshis = makerInputSatoshis;
+    const makerOutputSatoshis = tokenAObj.outputs[0].satoshis;
+    const takerInputSatoshis = makerOutputSatoshis;
+    const makerInputUtxo = {
+      txId: tokenBIssueTxid,
+      outputIndex: 0,
+      script: makerStasInputScript,
+      satoshis: makerInputSatoshis,
+    };
+
+    const wantedInfo = {
+      scriptHex: takerStasInputScriptHex,
+      satoshis: makerOutputSatoshis,
+    };
+
+    const unsignedSwapOfferHex = await createUnsignedSwapOffer(
+      alicePrivateKey,
+      makerInputUtxo,
+      wantedInfo
+    );
+
+    // now bob takes the offer
+    const takerSignedSwapHex = await acceptUnsignedSwapOffer(
+      unsignedSwapOfferHex,
+      tokenBIssueHex,
+      bobPrivateKey,
+      tokenAIssueHex,
+      0,
+      takerInputSatoshis,
+      takerOutputSatoshis,
+      alicePublicKeyHash,
+      fundingUTXO,
+      fundingPrivateKey
+    );
+
+    const fullySignedSwapHex = await makerSignSwapOffer(
+      takerSignedSwapHex,
+      tokenBIssueHex,
+      tokenAIssueHex,
+      alicePrivateKey,
+      bobPublicKeyHash,
+      paymentPublicKeyHash,
+      fundingUTXO
+    );
+    const swapTxid = await broadcast(fullySignedSwapHex);
+    expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.00000001);
+    expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.00000001);
+    await utils.isTokenBalance(aliceAddr, 1);
+    await utils.isTokenBalance(bobAddr, 1);
+  });
+
   it("Swap - 3 step token-p2pkh swap  with 1 token", async function () {
     // first get some funds
     const bobUtxos = await getFundsFromFaucet(
@@ -106,6 +268,8 @@ describe("atomic swap with 1 token", function () {
     expect(response.symbol).to.equal(tokenBSymbol);
     expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.01);
     expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.00000001);
+    await utils.isTokenBalanceTwoTokens(bobAddr, 2);
+    await utils.isTokenBalance(aliceAddr, 0);
   });
 
   // the maker offers sats for a token
@@ -164,6 +328,8 @@ describe("atomic swap with 1 token", function () {
     expect(response.symbol).to.equal(tokenASymbol);
     expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.00000001);
     expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.01);
+    await utils.isTokenBalanceTwoTokens(aliceAddr, 2);
+    await utils.isTokenBalance(bobAddr, 0);
   });
 });
 

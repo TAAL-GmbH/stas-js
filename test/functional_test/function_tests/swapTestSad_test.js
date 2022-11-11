@@ -47,7 +47,7 @@ beforeAll(async function () {
 });
 
 // todo refactor
-describe("atomic swap sad tests", function () {
+describe("atomic swap functional sad tests", function () {
   it("Swap - 2 step token-p2pkh swap with incorrect swap offer privatekey", async function () {
     const incorrectPrivateKey = bsv.PrivateKey();
     const makerVout = 0;
