@@ -48,440 +48,442 @@ beforeEach(async () => {
   await setup(); // set up contract
 });
 
-it("Issue - Successful Issue Token With Split And Fee 1", async () => {
-  const issueHex = await issue(
-    issuerPrivateKey,
-    utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
-    utils.getUtxo(contractTxid, contractTx, 0),
-    utils.getUtxo(contractTxid, contractTx, 1),
-    fundingPrivateKey,
-    true,
-    symbol
-  );
-  const issueTxid = await broadcast(issueHex);
-  const tokenId = await utils.getToken(issueTxid);
-  await new Promise((resolve) => setTimeout(resolve, wait));
-  const response = await utils.getTokenResponse(tokenId);
-  expect(response.symbol).to.equal(symbol);
-  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007);
-  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003);
-  await utils.isTokenBalance(aliceAddr, 7000);
-  await utils.isTokenBalance(bobAddr, 3000);
-});
-
-it("Issue - Successful Issue Token With Split And Fee 2", async () => {
-  const issueInfo = [
-    {
-      addr: aliceAddr,
-      satoshis: 10000,
-      data: "one",
-    },
-  ];
-  const issueHex = await issue(
-    issuerPrivateKey,
-    issueInfo,
-    utils.getUtxo(contractTxid, contractTx, 0),
-    utils.getUtxo(contractTxid, contractTx, 1),
-    fundingPrivateKey,
-    true,
-    symbol
-  );
-  const issueTxid = await broadcast(issueHex);
-  const tokenId = await utils.getToken(issueTxid);
-  await new Promise((resolve) => setTimeout(resolve, wait));
-  const response = await utils.getTokenResponse(tokenId);
-  expect(response.symbol).to.equal(symbol);
-  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.0001);
-  await utils.isTokenBalance(aliceAddr, 10000);
-});
-
-it("Issue - Successful Issue Token With Split And Fee 3", async () => {
-  const davePrivateKey = bsv.PrivateKey();
-  const daveAddr = davePrivateKey.toAddress(process.env.NETWORK).toString();
-
-  const issueInfo = [
-    {
-      addr: aliceAddr,
-      satoshis: 6000,
-      data: "one",
-    },
-    {
-      addr: bobAddr,
-      satoshis: 2000,
-      data: "two",
-    },
-    {
-      addr: daveAddr,
-      satoshis: 2000,
-      data: "three",
-    },
-  ];
-  const issueHex = await issue(
-    issuerPrivateKey,
-    issueInfo,
-    utils.getUtxo(contractTxid, contractTx, 0),
-    utils.getUtxo(contractTxid, contractTx, 1),
-    fundingPrivateKey,
-    true,
-    symbol
-  );
-  const issueTxid = await broadcast(issueHex);
-  const tokenId = await utils.getToken(issueTxid);
-  console.log("token  " + tokenId);
-  await new Promise((resolve) => setTimeout(resolve, wait));
-  const response = await utils.getTokenResponse(tokenId);
-  expect(response.symbol).to.equal(symbol);
-  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00006);
-  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00002);
-  expect(await utils.getVoutAmount(issueTxid, 2)).to.equal(0.00002);
-  await utils.isTokenBalance(aliceAddr, 6000);
-  await utils.isTokenBalance(bobAddr, 2000);
-  await utils.isTokenBalance(daveAddr, 2000);
-});
-
-it("Issue - Successful Issue Token With Split And Fee 4", async () => {
-  const davePrivateKey = bsv.PrivateKey();
-  const daveAddr = davePrivateKey.toAddress(process.env.NETWORK).toString();
-  const emmaPrivateKey = bsv.PrivateKey();
-  const emmaAddr = emmaPrivateKey.toAddress(process.env.NETWORK).toString();
-  const issueInfo = [
-    {
-      addr: aliceAddr,
-      satoshis: 4000,
-      data: "one",
-    },
-    {
-      addr: bobAddr,
-      satoshis: 3000,
-      data: "two",
-    },
-    {
-      addr: daveAddr,
-      satoshis: 2000,
-      data: "three",
-    },
-    {
-      addr: emmaAddr,
-      satoshis: 1000,
-      data: "three",
-    },
-  ];
-  const issueHex = await issue(
-    issuerPrivateKey,
-    issueInfo,
-    utils.getUtxo(contractTxid, contractTx, 0),
-    utils.getUtxo(contractTxid, contractTx, 1),
-    fundingPrivateKey,
-    true,
-    symbol
-  );
-  const issueTxid = await broadcast(issueHex);
-  const tokenId = await utils.getToken(issueTxid);
-  await new Promise((resolve) => setTimeout(resolve, wait));
-  const response = await utils.getTokenResponse(tokenId);
-  expect(response.symbol).to.equal(symbol);
-  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00004);
-  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003);
-  expect(await utils.getVoutAmount(issueTxid, 2)).to.equal(0.00002);
-  expect(await utils.getVoutAmount(issueTxid, 3)).to.equal(0.00001);
-  await utils.isTokenBalance(aliceAddr, 4000);
-  await utils.isTokenBalance(bobAddr, 3000);
-  await utils.isTokenBalance(daveAddr, 2000);
-  await utils.isTokenBalance(emmaAddr, 1000);
-});
-
-it("Issue - Successful Issue Token To Same Address", async () => {
-  const issueHex = await issue(
-    issuerPrivateKey,
-    utils.getIssueInfo(aliceAddr, 7000, aliceAddr, 3000),
-    utils.getUtxo(contractTxid, contractTx, 0),
-    utils.getUtxo(contractTxid, contractTx, 1),
-    fundingPrivateKey,
-    true,
-    symbol
-  );
-  const issueTxid = await broadcast(issueHex);
-  const tokenId = await utils.getToken(issueTxid);
-  await new Promise((resolve) => setTimeout(resolve, wait));
-  const response = await utils.getTokenResponse(tokenId);
-  expect(response.symbol).to.equal(symbol);
-  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007);
-  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003);
-  await utils.isTokenBalance(aliceAddr, 10000);
-});
-
-it("Issue - Successful Issue Token To Funding Address", async () => {
-  const issueHex = await issue(
-    issuerPrivateKey,
-    utils.getIssueInfo(aliceAddr, 7000, fundingAddress, 3000),
-    utils.getUtxo(contractTxid, contractTx, 0),
-    utils.getUtxo(contractTxid, contractTx, 1),
-    fundingPrivateKey,
-    true,
-    symbol
-  );
-  const issueTxid = await broadcast(issueHex);
-  const tokenId = await utils.getToken(issueTxid);
-  const response = await utils.getTokenResponse(tokenId);
-  await new Promise((resolve) => setTimeout(resolve, wait));
-  expect(response.symbol).to.equal(symbol);
-  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007);
-  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003);
-  await utils.isTokenBalance(aliceAddr, 7000);
-  await utils.isTokenBalance(fundingAddress, 3000);
-});
-
-it("Issue - Successful Issue Token Non Split", async () => {
-  const issueHex = await issue(
-    issuerPrivateKey,
-    utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
-    utils.getUtxo(contractTxid, contractTx, 0),
-    utils.getUtxo(contractTxid, contractTx, 1),
-    fundingPrivateKey,
-    false,
-    symbol
-  );
-  const issueTxid = await broadcast(issueHex);
-  const tokenId = await utils.getToken(issueTxid);
-  const response = await utils.getTokenResponse(tokenId);
-  expect(response.symbol).to.equal(symbol);
-  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007);
-  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003);
-  await utils.isTokenBalance(aliceAddr, 7000);
-  await utils.isTokenBalance(bobAddr, 3000);
-});
-
-it("Issue - Successful Issue Token With Split No Fee", async () => {
-  const issueHex = await issue(
-    issuerPrivateKey,
-    utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
-    utils.getUtxo(contractTxid, contractTx, 0),
-    null,
-    null,
-    true,
-    symbol
-  );
-  const issueTxid = await broadcast(issueHex);
-  const tokenId = await utils.getToken(issueTxid);
-  const response = await utils.getTokenResponse(tokenId);
-  expect(response.symbol).to.equal(symbol);
-  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007);
-  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003);
-  await utils.isTokenBalance(aliceAddr, 7000);
-  await utils.isTokenBalance(bobAddr, 3000);
-});
-
-it("Issue - Succesful Empty Funding UTXO", async () => {
-  const issueHex = await issue(
-    issuerPrivateKey,
-    utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
-    utils.getUtxo(contractTxid, contractTx, 0),
-    null,
-    null,
-    true,
-    symbol
-  );
-  const issueTxid = await broadcast(issueHex);
-  const tokenId = await utils.getToken(issueTxid);
-  const response = await utils.getTokenResponse(tokenId);
-  expect(response.symbol).to.equal(symbol);
-  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007);
-  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003);
-  await utils.isTokenBalance(aliceAddr, 7000);
-  await utils.isTokenBalance(bobAddr, 3000);
-});
-
-it("Issue - Successful Callback with Fee", async () => {
-  const issueHex = await issueWithCallback(
-    issuerPrivateKey.publicKey,
-    utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
-    utils.getUtxo(contractTxid, contractTx, 0),
-    utils.getUtxo(contractTxid, contractTx, 1),
-    fundingPrivateKey.publicKey,
-    true,
-    symbol,
-    issuerSignatureCallback,
-    paymentSignatureCallback
-  );
-  const issueTxid = await broadcast(issueHex);
-  const tokenId = await utils.getToken(issueTxid);
-  await new Promise((resolve) => setTimeout(resolve, wait));
-  const response = await utils.getTokenResponse(tokenId);
-  expect(response.symbol).to.equal(symbol);
-  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007);
-  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003);
-  await utils.isTokenBalance(aliceAddr, 7000);
-  await utils.isTokenBalance(bobAddr, 3000);
-});
-
-it("Issue - Successful No Fee with callback", async () => {
-  const issueHex = await issueWithCallback(
-    issuerPrivateKey.publicKey,
-    utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
-    utils.getUtxo(contractTxid, contractTx, 0),
-    null,
-    null,
-    true,
-    symbol,
-    issuerSignatureCallback,
-    null
-  );
-  let issueTxid;
-  try {
-    issueTxid = await broadcast(issueHex);
-  } catch (e) {
-    console.log(e);
-  }
-  const tokenId = await utils.getToken(issueTxid);
-  const response = await utils.getTokenResponse(tokenId);
-  expect(response.symbol).to.equal(symbol);
-  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007);
-  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003);
-  await utils.isTokenBalance(aliceAddr, 7000);
-  await utils.isTokenBalance(bobAddr, 3000);
-});
-
-it("Issue - Successful Issue Token 10 Addresses", async () => {
-  const pk1 = bsv.PrivateKey();
-  const add1 = pk1.toAddress(process.env.NETWORK).toString();
-  const pk2 = bsv.PrivateKey();
-  const add2 = pk2.toAddress(process.env.NETWORK).toString();
-  const pk3 = bsv.PrivateKey();
-  const add3 = pk3.toAddress(process.env.NETWORK).toString();
-  const pk4 = bsv.PrivateKey();
-  const add4 = pk4.toAddress(process.env.NETWORK).toString();
-  const pk5 = bsv.PrivateKey();
-  const add5 = pk5.toAddress(process.env.NETWORK).toString();
-  const pk6 = bsv.PrivateKey();
-  const add6 = pk6.toAddress(process.env.NETWORK).toString();
-  const pk7 = bsv.PrivateKey();
-  const add7 = pk7.toAddress(process.env.NETWORK).toString();
-  const pk8 = bsv.PrivateKey();
-  const add8 = pk8.toAddress(process.env.NETWORK).toString();
-
-  const issueHex = await issue(
-    issuerPrivateKey,
-    utils.getTenIssueInfo(
-      add1,
-      add2,
-      add3,
-      add4,
-      add5,
-      add6,
-      add7,
-      add8,
-      aliceAddr,
-      bobAddr
-    ),
-    utils.getUtxo(contractTxid, contractTx, 0),
-    utils.getUtxo(contractTxid, contractTx, 1),
-    fundingPrivateKey,
-    true,
-    "TAALT"
-  );
-  const issueTxid = await broadcast(issueHex);
-  const tokenId = await utils.getToken(issueTxid);
-  await new Promise((resolve) => setTimeout(resolve, 10000));
-  const response = await utils.getTokenResponse(tokenId);
-  expect(response.symbol).to.equal(symbol);
-
-  for (let i = 1; i < 10; i++) {
-    expect(await utils.getVoutAmount(issueTxid, i)).to.equal(0.00001);
-  }
-  await utils.isTokenBalance(aliceAddr, 1000);
-  await utils.isTokenBalance(bobAddr, 1000);
-});
-
-it("Issue - Successful Issue Token With Unsigned & Fee", async () => {
-  const issueHex = await unsignedIssue(
-    issuerPrivateKey.publicKey,
-    utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
-    utils.getUtxo(contractTxid, contractTx, 0),
-    utils.getUtxo(contractTxid, contractTx, 1),
-    fundingPrivateKey.publicKey,
-    true,
-    symbol
-  );
-  const issueTx = new bsv.Transaction(issueHex.hex);
-  utils.signScript(issueHex, issueTx, keyMap);
-  const issueTxid = await broadcast(issueTx.serialize(true));
-  const tokenId = await utils.getToken(issueTxid);
-  await new Promise((resolve) => setTimeout(resolve, wait));
-  const response = await utils.getTokenResponse(tokenId);
-  expect(response.symbol).to.equal(symbol);
-  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007);
-  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003);
-  await utils.isTokenBalance(aliceAddr, 7000);
-  await utils.isTokenBalance(bobAddr, 3000);
-});
-
-it("Issue - Successful Issue Token With Unsigned & No", async () => {
-  const issueHex = await unsignedIssue(
-    issuerPrivateKey.publicKey,
-    utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
-    utils.getUtxo(contractTxid, contractTx, 0),
-    null,
-    null,
-    true,
-    symbol
-  );
-  const issueTx = new bsv.Transaction(issueHex.hex);
-  utils.signScript(issueHex, issueTx, keyMap);
-  const issueTxid = await broadcast(issueTx.serialize(true));
-  const tokenId = await utils.getToken(issueTxid);
-  await new Promise((resolve) => setTimeout(resolve, wait));
-  const response = await utils.getTokenResponse(tokenId);
-  expect(response.symbol).to.equal(symbol);
-  expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007);
-  expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003);
-  await utils.isTokenBalance(aliceAddr, 7000);
-  await utils.isTokenBalance(bobAddr, 3000);
-});
-
-it("Issue - Issue With Incorrect issuer private key", async () => {
-  const incorrectPrivateKey = bsv.PrivateKey();
-  const issueHex = await issue(
-    incorrectPrivateKey,
-    utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
-    utils.getUtxo(contractTxid, contractTx, 0),
-    utils.getUtxo(contractTxid, contractTx, 1),
-    fundingPrivateKey,
-    true,
-    symbol
-  );
-  try {
-    await broadcast(issueHex);
-    expect(false).toBeTruthy();
-    return;
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error);
-    expect(e.response.data).to.contain(
-      "mandatory-script-verify-flag-failed (Script failed an OP_EQUALVERIFY operation)"
+describe("Issue Functional Tests", () => {
+  it("Issue - Successful Issue Token With Split And Fee 1", async () => {
+    const issueHex = await issue(
+      issuerPrivateKey,
+      utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+      utils.getUtxo(contractTxid, contractTx, 0),
+      utils.getUtxo(contractTxid, contractTx, 1),
+      fundingPrivateKey,
+      true,
+      symbol
     );
-  }
-});
+    const issueTxid = await broadcast(issueHex);
+    const tokenId = await utils.getToken(issueTxid);
+    await new Promise((resolve) => setTimeout(resolve, wait));
+    const response = await utils.getTokenResponse(tokenId);
+    expect(response.symbol).to.equal(symbol);
+    expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007);
+    expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003);
+    await utils.isTokenBalance(aliceAddr, 7000);
+    await utils.isTokenBalance(bobAddr, 3000);
+  });
 
-it("Issue - Issue With Incorrect funding private key", async () => {
-  const incorrectPrivateKey = bsv.PrivateKey();
-  const issueHex = await issue(
-    issuerPrivateKey,
-    utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
-    utils.getUtxo(contractTxid, contractTx, 0),
-    utils.getUtxo(contractTxid, contractTx, 1),
-    incorrectPrivateKey,
-    true,
-    symbol
-  );
-  try {
-    await broadcast(issueHex);
-    expect(false).toBeTruthy();
-    return;
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error);
-    expect(e.response.data).to.contain(
-      "mandatory-script-verify-flag-failed (Script failed an OP_EQUALVERIFY operation)"
+  it("Issue - Successful Issue Token With Split And Fee 2", async () => {
+    const issueInfo = [
+      {
+        addr: aliceAddr,
+        satoshis: 10000,
+        data: "one",
+      },
+    ];
+    const issueHex = await issue(
+      issuerPrivateKey,
+      issueInfo,
+      utils.getUtxo(contractTxid, contractTx, 0),
+      utils.getUtxo(contractTxid, contractTx, 1),
+      fundingPrivateKey,
+      true,
+      symbol
     );
-  }
+    const issueTxid = await broadcast(issueHex);
+    const tokenId = await utils.getToken(issueTxid);
+    await new Promise((resolve) => setTimeout(resolve, wait));
+    const response = await utils.getTokenResponse(tokenId);
+    expect(response.symbol).to.equal(symbol);
+    expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.0001);
+    await utils.isTokenBalance(aliceAddr, 10000);
+  });
+
+  it("Issue - Successful Issue Token With Split And Fee 3", async () => {
+    const davePrivateKey = bsv.PrivateKey();
+    const daveAddr = davePrivateKey.toAddress(process.env.NETWORK).toString();
+
+    const issueInfo = [
+      {
+        addr: aliceAddr,
+        satoshis: 6000,
+        data: "one",
+      },
+      {
+        addr: bobAddr,
+        satoshis: 2000,
+        data: "two",
+      },
+      {
+        addr: daveAddr,
+        satoshis: 2000,
+        data: "three",
+      },
+    ];
+    const issueHex = await issue(
+      issuerPrivateKey,
+      issueInfo,
+      utils.getUtxo(contractTxid, contractTx, 0),
+      utils.getUtxo(contractTxid, contractTx, 1),
+      fundingPrivateKey,
+      true,
+      symbol
+    );
+    const issueTxid = await broadcast(issueHex);
+    const tokenId = await utils.getToken(issueTxid);
+    console.log("token  " + tokenId);
+    await new Promise((resolve) => setTimeout(resolve, wait));
+    const response = await utils.getTokenResponse(tokenId);
+    expect(response.symbol).to.equal(symbol);
+    expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00006);
+    expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00002);
+    expect(await utils.getVoutAmount(issueTxid, 2)).to.equal(0.00002);
+    await utils.isTokenBalance(aliceAddr, 6000);
+    await utils.isTokenBalance(bobAddr, 2000);
+    await utils.isTokenBalance(daveAddr, 2000);
+  });
+
+  it("Issue - Successful Issue Token With Split And Fee 4", async () => {
+    const davePrivateKey = bsv.PrivateKey();
+    const daveAddr = davePrivateKey.toAddress(process.env.NETWORK).toString();
+    const emmaPrivateKey = bsv.PrivateKey();
+    const emmaAddr = emmaPrivateKey.toAddress(process.env.NETWORK).toString();
+    const issueInfo = [
+      {
+        addr: aliceAddr,
+        satoshis: 4000,
+        data: "one",
+      },
+      {
+        addr: bobAddr,
+        satoshis: 3000,
+        data: "two",
+      },
+      {
+        addr: daveAddr,
+        satoshis: 2000,
+        data: "three",
+      },
+      {
+        addr: emmaAddr,
+        satoshis: 1000,
+        data: "three",
+      },
+    ];
+    const issueHex = await issue(
+      issuerPrivateKey,
+      issueInfo,
+      utils.getUtxo(contractTxid, contractTx, 0),
+      utils.getUtxo(contractTxid, contractTx, 1),
+      fundingPrivateKey,
+      true,
+      symbol
+    );
+    const issueTxid = await broadcast(issueHex);
+    const tokenId = await utils.getToken(issueTxid);
+    await new Promise((resolve) => setTimeout(resolve, wait));
+    const response = await utils.getTokenResponse(tokenId);
+    expect(response.symbol).to.equal(symbol);
+    expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00004);
+    expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003);
+    expect(await utils.getVoutAmount(issueTxid, 2)).to.equal(0.00002);
+    expect(await utils.getVoutAmount(issueTxid, 3)).to.equal(0.00001);
+    await utils.isTokenBalance(aliceAddr, 4000);
+    await utils.isTokenBalance(bobAddr, 3000);
+    await utils.isTokenBalance(daveAddr, 2000);
+    await utils.isTokenBalance(emmaAddr, 1000);
+  });
+
+  it("Issue - Successful Issue Token To Same Address", async () => {
+    const issueHex = await issue(
+      issuerPrivateKey,
+      utils.getIssueInfo(aliceAddr, 7000, aliceAddr, 3000),
+      utils.getUtxo(contractTxid, contractTx, 0),
+      utils.getUtxo(contractTxid, contractTx, 1),
+      fundingPrivateKey,
+      true,
+      symbol
+    );
+    const issueTxid = await broadcast(issueHex);
+    const tokenId = await utils.getToken(issueTxid);
+    await new Promise((resolve) => setTimeout(resolve, wait));
+    const response = await utils.getTokenResponse(tokenId);
+    expect(response.symbol).to.equal(symbol);
+    expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007);
+    expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003);
+    await utils.isTokenBalance(aliceAddr, 10000);
+  });
+
+  it("Issue - Successful Issue Token To Funding Address", async () => {
+    const issueHex = await issue(
+      issuerPrivateKey,
+      utils.getIssueInfo(aliceAddr, 7000, fundingAddress, 3000),
+      utils.getUtxo(contractTxid, contractTx, 0),
+      utils.getUtxo(contractTxid, contractTx, 1),
+      fundingPrivateKey,
+      true,
+      symbol
+    );
+    const issueTxid = await broadcast(issueHex);
+    const tokenId = await utils.getToken(issueTxid);
+    const response = await utils.getTokenResponse(tokenId);
+    await new Promise((resolve) => setTimeout(resolve, wait));
+    expect(response.symbol).to.equal(symbol);
+    expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007);
+    expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003);
+    await utils.isTokenBalance(aliceAddr, 7000);
+    await utils.isTokenBalance(fundingAddress, 3000);
+  });
+
+  it("Issue - Successful Issue Token Non Split", async () => {
+    const issueHex = await issue(
+      issuerPrivateKey,
+      utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+      utils.getUtxo(contractTxid, contractTx, 0),
+      utils.getUtxo(contractTxid, contractTx, 1),
+      fundingPrivateKey,
+      false,
+      symbol
+    );
+    const issueTxid = await broadcast(issueHex);
+    const tokenId = await utils.getToken(issueTxid);
+    const response = await utils.getTokenResponse(tokenId);
+    expect(response.symbol).to.equal(symbol);
+    expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007);
+    expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003);
+    await utils.isTokenBalance(aliceAddr, 7000);
+    await utils.isTokenBalance(bobAddr, 3000);
+  });
+
+  it("Issue - Successful Issue Token With Split No Fee", async () => {
+    const issueHex = await issue(
+      issuerPrivateKey,
+      utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+      utils.getUtxo(contractTxid, contractTx, 0),
+      null,
+      null,
+      true,
+      symbol
+    );
+    const issueTxid = await broadcast(issueHex);
+    const tokenId = await utils.getToken(issueTxid);
+    const response = await utils.getTokenResponse(tokenId);
+    expect(response.symbol).to.equal(symbol);
+    expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007);
+    expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003);
+    await utils.isTokenBalance(aliceAddr, 7000);
+    await utils.isTokenBalance(bobAddr, 3000);
+  });
+
+  it("Issue - Succesful Empty Funding UTXO", async () => {
+    const issueHex = await issue(
+      issuerPrivateKey,
+      utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+      utils.getUtxo(contractTxid, contractTx, 0),
+      null,
+      null,
+      true,
+      symbol
+    );
+    const issueTxid = await broadcast(issueHex);
+    const tokenId = await utils.getToken(issueTxid);
+    const response = await utils.getTokenResponse(tokenId);
+    expect(response.symbol).to.equal(symbol);
+    expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007);
+    expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003);
+    await utils.isTokenBalance(aliceAddr, 7000);
+    await utils.isTokenBalance(bobAddr, 3000);
+  });
+
+  it("Issue - Successful Callback with Fee", async () => {
+    const issueHex = await issueWithCallback(
+      issuerPrivateKey.publicKey,
+      utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+      utils.getUtxo(contractTxid, contractTx, 0),
+      utils.getUtxo(contractTxid, contractTx, 1),
+      fundingPrivateKey.publicKey,
+      true,
+      symbol,
+      issuerSignatureCallback,
+      paymentSignatureCallback
+    );
+    const issueTxid = await broadcast(issueHex);
+    const tokenId = await utils.getToken(issueTxid);
+    await new Promise((resolve) => setTimeout(resolve, wait));
+    const response = await utils.getTokenResponse(tokenId);
+    expect(response.symbol).to.equal(symbol);
+    expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007);
+    expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003);
+    await utils.isTokenBalance(aliceAddr, 7000);
+    await utils.isTokenBalance(bobAddr, 3000);
+  });
+
+  it("Issue - Successful No Fee with callback", async () => {
+    const issueHex = await issueWithCallback(
+      issuerPrivateKey.publicKey,
+      utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+      utils.getUtxo(contractTxid, contractTx, 0),
+      null,
+      null,
+      true,
+      symbol,
+      issuerSignatureCallback,
+      null
+    );
+    let issueTxid;
+    try {
+      issueTxid = await broadcast(issueHex);
+    } catch (e) {
+      console.log(e);
+    }
+    const tokenId = await utils.getToken(issueTxid);
+    const response = await utils.getTokenResponse(tokenId);
+    expect(response.symbol).to.equal(symbol);
+    expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007);
+    expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003);
+    await utils.isTokenBalance(aliceAddr, 7000);
+    await utils.isTokenBalance(bobAddr, 3000);
+  });
+
+  it("Issue - Successful Issue Token 10 Addresses", async () => {
+    const pk1 = bsv.PrivateKey();
+    const add1 = pk1.toAddress(process.env.NETWORK).toString();
+    const pk2 = bsv.PrivateKey();
+    const add2 = pk2.toAddress(process.env.NETWORK).toString();
+    const pk3 = bsv.PrivateKey();
+    const add3 = pk3.toAddress(process.env.NETWORK).toString();
+    const pk4 = bsv.PrivateKey();
+    const add4 = pk4.toAddress(process.env.NETWORK).toString();
+    const pk5 = bsv.PrivateKey();
+    const add5 = pk5.toAddress(process.env.NETWORK).toString();
+    const pk6 = bsv.PrivateKey();
+    const add6 = pk6.toAddress(process.env.NETWORK).toString();
+    const pk7 = bsv.PrivateKey();
+    const add7 = pk7.toAddress(process.env.NETWORK).toString();
+    const pk8 = bsv.PrivateKey();
+    const add8 = pk8.toAddress(process.env.NETWORK).toString();
+
+    const issueHex = await issue(
+      issuerPrivateKey,
+      utils.getTenIssueInfo(
+        add1,
+        add2,
+        add3,
+        add4,
+        add5,
+        add6,
+        add7,
+        add8,
+        aliceAddr,
+        bobAddr
+      ),
+      utils.getUtxo(contractTxid, contractTx, 0),
+      utils.getUtxo(contractTxid, contractTx, 1),
+      fundingPrivateKey,
+      true,
+      "TAALT"
+    );
+    const issueTxid = await broadcast(issueHex);
+    const tokenId = await utils.getToken(issueTxid);
+    await new Promise((resolve) => setTimeout(resolve, 10000));
+    const response = await utils.getTokenResponse(tokenId);
+    expect(response.symbol).to.equal(symbol);
+
+    for (let i = 1; i < 10; i++) {
+      expect(await utils.getVoutAmount(issueTxid, i)).to.equal(0.00001);
+    }
+    await utils.isTokenBalance(aliceAddr, 1000);
+    await utils.isTokenBalance(bobAddr, 1000);
+  });
+
+  it("Issue - Successful Issue Token With Unsigned & Fee", async () => {
+    const issueHex = await unsignedIssue(
+      issuerPrivateKey.publicKey,
+      utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+      utils.getUtxo(contractTxid, contractTx, 0),
+      utils.getUtxo(contractTxid, contractTx, 1),
+      fundingPrivateKey.publicKey,
+      true,
+      symbol
+    );
+    const issueTx = new bsv.Transaction(issueHex.hex);
+    utils.signScript(issueHex, issueTx, keyMap);
+    const issueTxid = await broadcast(issueTx.serialize(true));
+    const tokenId = await utils.getToken(issueTxid);
+    await new Promise((resolve) => setTimeout(resolve, wait));
+    const response = await utils.getTokenResponse(tokenId);
+    expect(response.symbol).to.equal(symbol);
+    expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007);
+    expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003);
+    await utils.isTokenBalance(aliceAddr, 7000);
+    await utils.isTokenBalance(bobAddr, 3000);
+  });
+
+  it("Issue - Successful Issue Token With Unsigned & No", async () => {
+    const issueHex = await unsignedIssue(
+      issuerPrivateKey.publicKey,
+      utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+      utils.getUtxo(contractTxid, contractTx, 0),
+      null,
+      null,
+      true,
+      symbol
+    );
+    const issueTx = new bsv.Transaction(issueHex.hex);
+    utils.signScript(issueHex, issueTx, keyMap);
+    const issueTxid = await broadcast(issueTx.serialize(true));
+    const tokenId = await utils.getToken(issueTxid);
+    await new Promise((resolve) => setTimeout(resolve, wait));
+    const response = await utils.getTokenResponse(tokenId);
+    expect(response.symbol).to.equal(symbol);
+    expect(await utils.getVoutAmount(issueTxid, 0)).to.equal(0.00007);
+    expect(await utils.getVoutAmount(issueTxid, 1)).to.equal(0.00003);
+    await utils.isTokenBalance(aliceAddr, 7000);
+    await utils.isTokenBalance(bobAddr, 3000);
+  });
+
+  it("Issue - Issue With Incorrect issuer private key", async () => {
+    const incorrectPrivateKey = bsv.PrivateKey();
+    const issueHex = await issue(
+      incorrectPrivateKey,
+      utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+      utils.getUtxo(contractTxid, contractTx, 0),
+      utils.getUtxo(contractTxid, contractTx, 1),
+      fundingPrivateKey,
+      true,
+      symbol
+    );
+    try {
+      await broadcast(issueHex);
+      expect(false).toBeTruthy();
+      return;
+    } catch (e) {
+      expect(e).to.be.instanceOf(Error);
+      expect(e.response.data).to.contain(
+        "mandatory-script-verify-flag-failed (Script failed an OP_EQUALVERIFY operation)"
+      );
+    }
+  });
+
+  it("Issue - Issue With Incorrect funding private key", async () => {
+    const incorrectPrivateKey = bsv.PrivateKey();
+    const issueHex = await issue(
+      issuerPrivateKey,
+      utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+      utils.getUtxo(contractTxid, contractTx, 0),
+      utils.getUtxo(contractTxid, contractTx, 1),
+      incorrectPrivateKey,
+      true,
+      symbol
+    );
+    try {
+      await broadcast(issueHex);
+      expect(false).toBeTruthy();
+      return;
+    } catch (e) {
+      expect(e).to.be.instanceOf(Error);
+      expect(e.response.data).to.contain(
+        "mandatory-script-verify-flag-failed (Script failed an OP_EQUALVERIFY operation)"
+      );
+    }
+  });
 });
 
 async function setup() {

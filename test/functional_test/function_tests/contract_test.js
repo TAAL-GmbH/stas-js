@@ -32,134 +32,137 @@ const keymap = new Map();
 beforeEach(async () => {
   await setup();
 });
-it("Contract - Successful With Fees", async () => {
-  const contractHex = await contract(
-    issuerPrivateKey,
-    contractUtxos,
-    fundingUtxos,
-    fundingPrivateKey,
-    schema,
-    supply
-  );
-  const contractTxid = await broadcast(contractHex);
-  const amount = await utils.getVoutAmount(contractTxid, 0);
-  expect(amount).to.equal(supply / 100000000);
-});
 
-it("Contract - Successful No Fees", async () => {
-  const contractHex = await contract(
-    issuerPrivateKey,
-    contractUtxos,
-    null,
-    null,
-    schema,
-    supply
-  );
-  const contractTxid = await broadcast(contractHex);
-  const amount = await utils.getVoutAmount(contractTxid, 0);
-  expect(amount).to.equal(supply / 100000000);
-});
-
-it("Contract - Successful No Fees Empty Array", async () => {
-  const contractHex = await contract(
-    issuerPrivateKey,
-    contractUtxos,
-    [],
-    fundingPrivateKey,
-    schema,
-    supply
-  );
-  const contractTxid = await broadcast(contractHex);
-  const amount = await utils.getVoutAmount(contractTxid, 0);
-  expect(amount).to.equal(supply / 100000000);
-});
-
-it("Contract - Successful With Callback Fee", async () => {
-  const contractHex = await contractWithCallback(
-    issuerPrivateKey.publicKey,
-    contractUtxos,
-    fundingUtxos,
-    fundingPrivateKey.publicKey,
-    schema,
-    supply,
-    ownerSignCallback,
-    paymentSignCallback
-  );
-  const contractTxid = await broadcast(contractHex);
-  const amount = await utils.getVoutAmount(contractTxid, 0);
-  expect(amount).to.equal(supply / 100000000);
-});
-
-it("Contract - Successful With Callback No Fee", async () => {
-  const contractHex = await contractWithCallback(
-    issuerPrivateKey.publicKey,
-    contractUtxos,
-    null,
-    null,
-    schema,
-    supply,
-    ownerSignCallback,
-    null
-  );
-  const contractTxid = await broadcast(contractHex);
-  const amount = await utils.getVoutAmount(contractTxid, 0);
-  expect(amount).to.equal(supply / 100000000);
-});
-
-it("Contract - Successful With Unsigned & Fee", async () => {
-  const contractHex = await unsignedContract(
-    issuerPrivateKey.publicKey,
-    contractUtxos,
-    fundingUtxos,
-    fundingPrivateKey,
-    schema,
-    supply
-  );
-  const contractTxJson = JSON.parse(contractHex.json);
-  const contractTx = new bsv.Transaction(contractTxJson);
-  let signedContract = contractTx.sign(issuerPrivateKey);
-  signedContract = contractTx.sign(fundingPrivateKey);
-  const contractTxid = await broadcast(signedContract.serialize(true));
-  const amount = await utils.getVoutAmount(contractTxid, 0);
-  expect(amount).to.equal(supply / 100000000);
-});
-
-it("Contract - Successful With Unsigned No Fee", async () => {
-  const contractHex = await unsignedContract(
-    issuerPrivateKey.publicKey,
-    contractUtxos,
-    null,
-    null,
-    schema,
-    supply
-  );
-  const contractTxJson = JSON.parse(contractHex.json);
-  const contractTx = new bsv.Transaction(contractTxJson);
-  const signedContract = contractTx.sign(issuerPrivateKey);
-  const contractTxid = await broadcast(signedContract.serialize(true));
-  const amount = await utils.getVoutAmount(contractTxid, 0);
-  expect(amount).to.equal(supply / 100000000);
-});
-
-it("Contract - Wrong Funding Private Key Throws Error", async () => {
-  const incorrectPrivateKey = bsv.PrivateKey();
-  const contractHex = await contract(
-    issuerPrivateKey,
-    contractUtxos,
-    fundingUtxos,
-    incorrectPrivateKey,
-    schema,
-    supply
-  );
-  try {
-    await broadcast(contractHex);
-    expect(false).toBeTruthy();
-  } catch (e) {
-    expect(e).to.be.instanceOf(Error);
-    expect(e.response.data).to.contain(
-      "mandatory-script-verify-flag-failed (Operation not valid with the current stack size)"
+describe("Contract Functional Tests", () => {
+  it("Contract - Successful With Fees", async () => {
+    const contractHex = await contract(
+      issuerPrivateKey,
+      contractUtxos,
+      fundingUtxos,
+      fundingPrivateKey,
+      schema,
+      supply
     );
-  }
+    const contractTxid = await broadcast(contractHex);
+    const amount = await utils.getVoutAmount(contractTxid, 0);
+    expect(amount).to.equal(supply / 100000000);
+  });
+
+  it("Contract - Successful No Fees", async () => {
+    const contractHex = await contract(
+      issuerPrivateKey,
+      contractUtxos,
+      null,
+      null,
+      schema,
+      supply
+    );
+    const contractTxid = await broadcast(contractHex);
+    const amount = await utils.getVoutAmount(contractTxid, 0);
+    expect(amount).to.equal(supply / 100000000);
+  });
+
+  it("Contract - Successful No Fees Empty Array", async () => {
+    const contractHex = await contract(
+      issuerPrivateKey,
+      contractUtxos,
+      [],
+      fundingPrivateKey,
+      schema,
+      supply
+    );
+    const contractTxid = await broadcast(contractHex);
+    const amount = await utils.getVoutAmount(contractTxid, 0);
+    expect(amount).to.equal(supply / 100000000);
+  });
+
+  it("Contract - Successful With Callback Fee", async () => {
+    const contractHex = await contractWithCallback(
+      issuerPrivateKey.publicKey,
+      contractUtxos,
+      fundingUtxos,
+      fundingPrivateKey.publicKey,
+      schema,
+      supply,
+      ownerSignCallback,
+      paymentSignCallback
+    );
+    const contractTxid = await broadcast(contractHex);
+    const amount = await utils.getVoutAmount(contractTxid, 0);
+    expect(amount).to.equal(supply / 100000000);
+  });
+
+  it("Contract - Successful With Callback No Fee", async () => {
+    const contractHex = await contractWithCallback(
+      issuerPrivateKey.publicKey,
+      contractUtxos,
+      null,
+      null,
+      schema,
+      supply,
+      ownerSignCallback,
+      null
+    );
+    const contractTxid = await broadcast(contractHex);
+    const amount = await utils.getVoutAmount(contractTxid, 0);
+    expect(amount).to.equal(supply / 100000000);
+  });
+
+  it("Contract - Successful With Unsigned & Fee", async () => {
+    const contractHex = await unsignedContract(
+      issuerPrivateKey.publicKey,
+      contractUtxos,
+      fundingUtxos,
+      fundingPrivateKey,
+      schema,
+      supply
+    );
+    const contractTxJson = JSON.parse(contractHex.json);
+    const contractTx = new bsv.Transaction(contractTxJson);
+    let signedContract = contractTx.sign(issuerPrivateKey);
+    signedContract = contractTx.sign(fundingPrivateKey);
+    const contractTxid = await broadcast(signedContract.serialize(true));
+    const amount = await utils.getVoutAmount(contractTxid, 0);
+    expect(amount).to.equal(supply / 100000000);
+  });
+
+  it("Contract - Successful With Unsigned No Fee", async () => {
+    const contractHex = await unsignedContract(
+      issuerPrivateKey.publicKey,
+      contractUtxos,
+      null,
+      null,
+      schema,
+      supply
+    );
+    const contractTxJson = JSON.parse(contractHex.json);
+    const contractTx = new bsv.Transaction(contractTxJson);
+    const signedContract = contractTx.sign(issuerPrivateKey);
+    const contractTxid = await broadcast(signedContract.serialize(true));
+    const amount = await utils.getVoutAmount(contractTxid, 0);
+    expect(amount).to.equal(supply / 100000000);
+  });
+
+  it("Contract - Wrong Funding Private Key Throws Error", async () => {
+    const incorrectPrivateKey = bsv.PrivateKey();
+    const contractHex = await contract(
+      issuerPrivateKey,
+      contractUtxos,
+      fundingUtxos,
+      incorrectPrivateKey,
+      schema,
+      supply
+    );
+    try {
+      await broadcast(contractHex);
+      expect(false).toBeTruthy();
+    } catch (e) {
+      expect(e).to.be.instanceOf(Error);
+      expect(e.response.data).to.contain(
+        "mandatory-script-verify-flag-failed (Operation not valid with the current stack size)"
+      );
+    }
+  });
 });
 
 async function setup() {
