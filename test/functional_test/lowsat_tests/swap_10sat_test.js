@@ -47,9 +47,9 @@ beforeEach(async function () {
   await setup();
 });
 
-describe("atomic swap with 1 token", function () {
+describe("atomic swap with 10 tokens", function () {
   // this swap function won't be used but is here as a sanity check
-  it("Swap - All in one swap", async function () {
+  it("Swap - All in one swap with 10 sat", async function () {
     const takerStasInputScriptHex = tokenAObj.outputs[0].script.toHex();
     const makerStasInputScript = tokenBObj.outputs[0].script;
 
@@ -82,13 +82,88 @@ describe("atomic swap with 1 token", function () {
 
     const swapTxid = await broadcast(allInOneSwapHex);
     console.log("swaptxid", swapTxid);
-    expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.00000001);
-    expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.00000001);
-    await utils.isTokenBalance(aliceAddr, 1);
-    await utils.isTokenBalance(bobAddr, 1);
+    expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.0000001);
+    expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.0000001);
+    await utils.isTokenBalance(aliceAddr, 10);
+    await utils.isTokenBalance(bobAddr, 10);
   });
 
-  it("Swap - 2 step p2pkh-token swap qith 1 sat", async function () {
+  it("Swap - 2 step token-p2pkh swap with 10 sat", async function () {
+    const makerVout = 0;
+    const takerVout = 0;
+    const makerStasTx = bsv.Transaction(tokenBIssueHex);
+    const makerStasInputScript = makerStasTx.outputs[makerVout].script;
+
+    // taker gets some funds
+    const bobUtxos = await getFundsFromFaucet(
+      bobPrivateKey.toAddress(process.env.NETWORK).toString()
+    );
+    // get input transaction
+    const takerInputTxHex = await getRawTransaction(bobUtxos[0].txid);
+
+    const alicePublicKeyHash = bsv.crypto.Hash.sha256ripemd160(
+      alicePrivateKey.publicKey.toBuffer()
+    ).toString("hex");
+
+    const makerInputSatoshis = tokenBObj.outputs[makerVout].satoshis;
+    const takerOutputSatoshis = makerInputSatoshis;
+    const makerOutputSatoshis = bobUtxos[0].satoshis;
+    const takerInputSatoshis = makerOutputSatoshis;
+
+    const makerInputUtxo = {
+      txId: tokenBIssueTxid,
+      outputIndex: takerVout,
+      script: makerStasInputScript,
+      satoshis: makerInputSatoshis,
+    };
+
+    const wantedInfo = { type: "native", satoshis: makerOutputSatoshis };
+
+    const swapOfferHex = await createSwapOffer(
+      alicePrivateKey,
+      makerInputUtxo,
+      wantedInfo
+    );
+    // now bob takes the offer
+    const fundingUTXO = {
+      txid: tokenBIssueTxid,
+      vout: 1,
+      scriptPubKey: tokenBIssueTx.vout[1].scriptPubKey.hex,
+      satoshis: bitcoinToSatoshis(tokenBIssueTx.vout[1].value),
+    };
+
+    const takerInputUTXO = {
+      txId: bobUtxos[0].txid,
+      outputIndex: bobUtxos[0].vout,
+      script: bsv.Script.fromHex(bobUtxos[0].scriptPubKey),
+      satoshis: takerInputSatoshis,
+    };
+
+    const fullySignedSwapHex = await acceptSwapOffer(
+      swapOfferHex,
+      tokenBIssueHex,
+      bobPrivateKey,
+      takerInputTxHex,
+      takerInputUTXO,
+      takerOutputSatoshis,
+      alicePublicKeyHash,
+      fundingUTXO,
+      fundingPrivateKey
+    );
+
+    const swapTxid = await broadcast(fullySignedSwapHex);
+    console.log("swaptxid", swapTxid);
+
+    const tokenId = await utils.getToken(swapTxid, 1);
+    const response = await utils.getTokenResponse(tokenId, tokenBSymbol);
+    expect(response.symbol).to.equal(tokenBSymbol);
+    expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.01);
+    expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.0000001);
+    await utils.isTokenBalanceTwoTokens(bobAddr, 20);
+    await utils.isTokenBalance(aliceAddr, 0);
+  });
+
+  it("Swap - 2 step p2pkh-token swap with 10 sat", async function () {
     const takerStasInputScriptHex = tokenAObj.outputs[0].script.toHex();
     // first get some funds
     const aliceUtxos = await getFundsFromFaucet(
@@ -144,13 +219,13 @@ describe("atomic swap with 1 token", function () {
 
     const swapTxid = await broadcast(fullySignedSwapHex);
     console.log("swaptxid: ", swapTxid);
-    expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.00000001);
+    expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.0000001);
     expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.01);
-    await utils.isTokenBalanceTwoTokens(aliceAddr, 2);
+    await utils.isTokenBalanceTwoTokens(aliceAddr, 20);
     await utils.isTokenBalance(bobAddr, 0);
   });
 
-  it("Swap 3 step Token-Token with 1 sat", async function () {
+  it("Swap 3 step Token-Token with 10 sat", async function () {
     const takerStasInputScriptHex = tokenAObj.outputs[0].script.toHex();
     const makerStasInputScript = tokenBObj.outputs[0].script;
 
@@ -200,13 +275,13 @@ describe("atomic swap with 1 token", function () {
       fundingUTXO
     );
     const swapTxid = await broadcast(fullySignedSwapHex);
-    expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.00000001);
-    expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.00000001);
-    await utils.isTokenBalance(aliceAddr, 1);
-    await utils.isTokenBalance(bobAddr, 1);
+    expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.0000001);
+    expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.0000001);
+    await utils.isTokenBalance(aliceAddr, 10);
+    await utils.isTokenBalance(bobAddr, 10);
   });
 
-  it("Swap - 3 step token-p2pkh swap  with 1 token", async function () {
+  it("Swap - 3 step token-p2pkh swap  with 10 token", async function () {
     // first get some funds
     const bobUtxos = await getFundsFromFaucet(
       bobPrivateKey.toAddress(process.env.NETWORK).toString()
@@ -267,13 +342,13 @@ describe("atomic swap with 1 token", function () {
     const response = await utils.getTokenResponse(tokenId, tokenBSymbol);
     expect(response.symbol).to.equal(tokenBSymbol);
     expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.01);
-    expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.00000001);
-    await utils.isTokenBalanceTwoTokens(bobAddr, 2);
+    expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.0000001);
+    await utils.isTokenBalanceTwoTokens(bobAddr, 20);
     await utils.isTokenBalance(aliceAddr, 0);
   });
 
   // the maker offers sats for a token
-  it("Swap - 3 step p2pkh-token swap with 1 token", async function () {
+  it("Swap - 3 step p2pkh-token swap with 10 token", async function () {
     const takerStasInputScriptHex = tokenAObj.outputs[0].script.toHex();
     // first get some funds
     const aliceUtxos = await getFundsFromFaucet(
@@ -326,9 +401,9 @@ describe("atomic swap with 1 token", function () {
     const tokenId = await utils.getToken(swapTxid, 0);
     const response = await utils.getTokenResponse(tokenId, tokenASymbol);
     expect(response.symbol).to.equal(tokenASymbol);
-    expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.00000001);
+    expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.0000001);
     expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.01);
-    await utils.isTokenBalanceTwoTokens(aliceAddr, 2);
+    await utils.isTokenBalanceTwoTokens(aliceAddr, 20);
     await utils.isTokenBalance(bobAddr, 0);
   });
 });
@@ -373,7 +448,7 @@ async function setup() {
 
   // Token A
   tokenASymbol = "TOKENA";
-  const tokenASupply = 1;
+  const tokenASupply = 10;
   const tokenASchema = utils.schema(
     tokenAIssuerPublicKeyHash,
     tokenASymbol,
@@ -395,7 +470,7 @@ async function setup() {
     [
       {
         addr: bobAddr,
-        satoshis: 1,
+        satoshis: 10,
         data: "one",
       },
     ],
@@ -411,7 +486,7 @@ async function setup() {
 
   // Token B
   tokenBSymbol = "TOKENB";
-  const tokenBSupply = 1;
+  const tokenBSupply = 10;
   const tokenBSchema = utils.schema(
     tokenBIssuerPublicKeyHash,
     tokenBSymbol,
@@ -433,7 +508,7 @@ async function setup() {
     [
       {
         addr: aliceAddr,
-        satoshis: 1,
+        satoshis: 10,
         data: "one",
       },
     ],
