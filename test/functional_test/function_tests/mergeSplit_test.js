@@ -27,9 +27,6 @@ let bobPrivateKey;
 let alicePrivateKey;
 let bobAddr;
 let aliceAddr;
-let splitTxid;
-let splitTx;
-let splitTxObj;
 let issueTxid;
 let issueTx;
 let issueOutFundingVout;
@@ -53,7 +50,7 @@ describe("MergeSplit Functional Tests", () => {
     await setup();
   });
 
-  it("MergeSplit - Successful MergeSplit With Fees 1", async () => {
+  it.only("MergeSplit - Successful MergeSplit With Fees 1", async () => {
     const aliceAmountSatoshis = bitcoinToSatoshis(issueTx.vout[0].value) / 2;
     const bobAmountSatoshis =
       bitcoinToSatoshis(issueTx.vout[0].value) +
@@ -390,20 +387,22 @@ async function setup() {
     [
       {
         addr: aliceAddr,
-        satoshis: 3000,
+        satoshis: 7000,
+        data: "one",
       },
       {
         addr: aliceAddr,
-        satoshis: 2000,
-      },
-      {
-        addr: bobAddr,
         satoshis: 3000,
+        data: "two",
       },
-      {
-        addr: bobAddr,
-        satoshis: 2000,
-      },
+      // {
+      //   addr: bobAddr,
+      //   satoshis: 3000,
+      // },
+      // {
+      //   addr: bobAddr,
+      //   satoshis: 2000,
+      // },
     ],
     utils.getUtxo(contractTxid, contractTx, 0),
     utils.getUtxo(contractTxid, contractTx, 1),
@@ -412,6 +411,7 @@ async function setup() {
     symbol,
     2
   );
+  console.log(issueHex);
   issueTxid = await broadcast(issueHex);
   issueTx = await getTransaction(issueTxid);
   issueOutFundingVout = issueTx.vout.length - 1;
