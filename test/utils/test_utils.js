@@ -85,6 +85,19 @@ function getMergeUtxo(mergeObj) {
   ];
 }
 
+function getMergeUtxoTemp(mergeObj, vout1, vout2) {
+  return [
+    {
+      tx: mergeObj,
+      vout: vout1,
+    },
+    {
+      tx: mergeObj,
+      vout: vout2,
+    },
+  ];
+}
+
 function getMergeSplitUtxo(splitTxObj, splitTx) {
   return [
     {
@@ -735,6 +748,7 @@ module.exports = {
   getTokenResponse,
   getTenIssueInfo,
   getTokenWithSymbol,
+  getMergeUtxoTemp,
   addData,
   byteCount,
   getAmount,

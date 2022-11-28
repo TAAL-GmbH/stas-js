@@ -26,15 +26,14 @@ let aliceAddr;
 let contractUtxos;
 let fundingUtxos;
 let publicKeyHash;
-let splitTxid;
-let splitTx;
-let splitTxObj;
 let contractTxid;
 let contractTx;
 let issueTx;
 let issueTxid;
+let mergeObj;
 const wait = 5000;
 const keyMap = new Map();
+let issueOutFundingVout;
 
 const bobSignatureCallback = async (tx, i, script, satoshis) => {
   return bsv.Transaction.sighash
@@ -55,10 +54,10 @@ beforeEach(async () => {
 describe("Merge Funcional Tests", () => {
   it("Merge - Successful Merge With Fee", async () => {
     const mergeHex = await merge(
-      bobPrivateKey,
-      utils.getMergeUtxo(splitTxObj),
-      aliceAddr,
-      utils.getUtxo(splitTxid, splitTx, 2),
+      alicePrivateKey,
+      utils.getMergeUtxoTemp(mergeObj, 0, 1),
+      bobAddr,
+      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
       fundingPrivateKey
     );
     const mergeTxid = await broadcast(mergeHex);
@@ -66,17 +65,17 @@ describe("Merge Funcional Tests", () => {
     const tokenIdMerge = await utils.getToken(mergeTxid);
     const response = await utils.getTokenResponse(tokenIdMerge);
     expect(response.symbol).to.equal("TAALT");
-    expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007);
-    await utils.isTokenBalance(aliceAddr, 7000);
-    await utils.isTokenBalance(bobAddr, 3000);
+    expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00005);
+    await utils.isTokenBalance(aliceAddr, 0);
+    await utils.isTokenBalance(bobAddr, 10000);
   });
 
   it("Merge - Successful Merge With Fee 2", async () => {
     const mergeHex = await merge(
       bobPrivateKey,
-      utils.getMergeUtxo(splitTxObj),
-      bobAddr,
-      utils.getUtxo(splitTxid, splitTx, 2),
+      utils.getMergeUtxoTemp(mergeObj, 2, 3),
+      aliceAddr,
+      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
       fundingPrivateKey
     );
     const mergeTxid = await broadcast(mergeHex);
@@ -84,15 +83,15 @@ describe("Merge Funcional Tests", () => {
     const tokenIdMerge = await utils.getToken(mergeTxid);
     const response = await utils.getTokenResponse(tokenIdMerge);
     expect(response.symbol).to.equal("TAALT");
-    expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007);
-    await utils.isTokenBalance(aliceAddr, 0);
-    await utils.isTokenBalance(bobAddr, 10000);
+    expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00005);
+    await utils.isTokenBalance(aliceAddr, 10000);
+    await utils.isTokenBalance(bobAddr, 0);
   });
 
   it("Merge - Merge With No Fee", async () => {
     const mergeHex = await merge(
       bobPrivateKey,
-      utils.getMergeUtxo(splitTxObj),
+      utils.getMergeUtxoTemp(mergeObj, 2, 3),
       aliceAddr,
       null,
       null
@@ -102,17 +101,17 @@ describe("Merge Funcional Tests", () => {
     await new Promise((resolve) => setTimeout(resolve, wait));
     const response = await utils.getTokenResponse(tokenIdMerge);
     expect(response.symbol).to.equal("TAALT");
-    expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007);
-    await utils.isTokenBalance(aliceAddr, 7000);
-    await utils.isTokenBalance(bobAddr, 3000);
+    expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00005);
+    await utils.isTokenBalance(aliceAddr, 10000);
+    await utils.isTokenBalance(bobAddr, 0);
   });
 
   it("Merge - Successful Merge With Callback And Fee", async () => {
     const mergeHex = await mergeWithCallback(
       bobPrivateKey.publicKey,
-      utils.getMergeUtxo(splitTxObj),
+      utils.getMergeUtxoTemp(mergeObj, 2, 3),
       aliceAddr,
-      utils.getUtxo(splitTxid, splitTx, 2),
+      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
       fundingPrivateKey.publicKey,
       bobSignatureCallback,
       paymentSignatureCallback
@@ -122,15 +121,15 @@ describe("Merge Funcional Tests", () => {
     const tokenIdMerge = await utils.getToken(mergeTxid);
     const response = await utils.getTokenResponse(tokenIdMerge);
     expect(response.symbol).to.equal("TAALT");
-    expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007);
-    await utils.isTokenBalance(aliceAddr, 7000);
-    await utils.isTokenBalance(bobAddr, 3000);
+    expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00005);
+    await utils.isTokenBalance(aliceAddr, 10000);
+    await utils.isTokenBalance(bobAddr, 0);
   });
 
   it("Merge - Successful Merge With Callback And No Fee", async () => {
     const mergeHex = await mergeWithCallback(
       bobPrivateKey.publicKey,
-      utils.getMergeUtxo(splitTxObj),
+      utils.getMergeUtxoTemp(mergeObj, 2, 3),
       aliceAddr,
       null,
       null,
@@ -142,17 +141,17 @@ describe("Merge Funcional Tests", () => {
     await new Promise((resolve) => setTimeout(resolve, wait));
     const response = await utils.getTokenResponse(tokenIdMerge);
     expect(response.symbol).to.equal("TAALT");
-    expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007);
-    await utils.isTokenBalance(aliceAddr, 7000);
-    await utils.isTokenBalance(bobAddr, 3000);
+    expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00005);
+    await utils.isTokenBalance(aliceAddr, 10000);
+    await utils.isTokenBalance(bobAddr, 0);
   });
 
   it("Merge - Successful Merge unsigned & Fee", async () => {
     const unsignedMergeReturn = await unsignedMerge(
       bobPrivateKey.publicKey,
-      utils.getMergeUtxo(splitTxObj),
+      utils.getMergeUtxoTemp(mergeObj, 2, 3),
       aliceAddr,
-      utils.getUtxo(splitTxid, splitTx, 2),
+      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
       fundingPrivateKey.publicKey
     );
     const mergeTx = bsv.Transaction(unsignedMergeReturn.hex);
@@ -162,15 +161,15 @@ describe("Merge Funcional Tests", () => {
     const tokenIdMerge = await utils.getToken(mergeTxid);
     const response = await utils.getTokenResponse(tokenIdMerge);
     expect(response.symbol).to.equal("TAALT");
-    expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007);
-    await utils.isTokenBalance(aliceAddr, 7000);
-    await utils.isTokenBalance(bobAddr, 3000);
+    expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00005);
+    await utils.isTokenBalance(aliceAddr, 10000);
+    await utils.isTokenBalance(bobAddr, 0);
   });
 
   it("Merge - Successful Merge Unsigned & No Fee", async () => {
     const unsignedMergeReturn = await unsignedMerge(
       bobPrivateKey.publicKey,
-      utils.getMergeUtxo(splitTxObj),
+      utils.getMergeUtxoTemp(mergeObj, 2, 3),
       aliceAddr,
       null,
       null
@@ -182,18 +181,18 @@ describe("Merge Funcional Tests", () => {
     const tokenIdMerge = await utils.getToken(mergeTxid);
     const response = await utils.getTokenResponse(tokenIdMerge);
     expect(response.symbol).to.equal("TAALT");
-    expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00007);
-    await utils.isTokenBalance(aliceAddr, 7000);
-    await utils.isTokenBalance(bobAddr, 3000);
+    expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00005);
+    await utils.isTokenBalance(aliceAddr, 10000);
+    await utils.isTokenBalance(bobAddr, 0);
   });
 
   it("Merge - Incorrect Owner Private Key Throws Error", async () => {
     const incorrectPrivateKey = bsv.PrivateKey();
     const mergeHex = await merge(
       incorrectPrivateKey,
-      utils.getMergeUtxo(splitTxObj),
+      utils.getMergeUtxoTemp(mergeObj, 2, 3),
       aliceAddr,
-      utils.getUtxo(splitTxid, splitTx, 2),
+      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
       fundingPrivateKey
     );
     try {
@@ -212,9 +211,9 @@ describe("Merge Funcional Tests", () => {
     const incorrectPrivateKey = bsv.PrivateKey();
     const mergeHex = await merge(
       bobPrivateKey,
-      utils.getMergeUtxo(splitTxObj),
+      utils.getMergeUtxoTemp(mergeObj, 2, 3),
       aliceAddr,
-      utils.getUtxo(splitTxid, splitTx, 2),
+      utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
       incorrectPrivateKey
     );
     try {
@@ -267,7 +266,24 @@ async function setup() {
 
   const issueHex = await issue(
     issuerPrivateKey,
-    utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
+    [
+      {
+        addr: aliceAddr,
+        satoshis: 2000,
+      },
+      {
+        addr: aliceAddr,
+        satoshis: 3000,
+      },
+      {
+        addr: bobAddr,
+        satoshis: 2000,
+      },
+      {
+        addr: bobAddr,
+        satoshis: 3000,
+      },
+    ],
     utils.getUtxo(contractTxid, contractTx, 0),
     utils.getUtxo(contractTxid, contractTx, 1),
     fundingPrivateKey,
@@ -277,29 +293,6 @@ async function setup() {
   );
   issueTxid = await broadcast(issueHex);
   issueTx = await getTransaction(issueTxid);
-
-  const issueOutFundingVout = issueTx.vout.length - 1;
-
-  const bobAmount1 = issueTx.vout[0].value / 2;
-  const bobAmount2 = issueTx.vout[0].value - bobAmount1;
-  const splitDestinations = [];
-  splitDestinations[0] = {
-    address: bobAddr,
-    satoshis: bitcoinToSatoshis(bobAmount1),
-  };
-  splitDestinations[1] = {
-    address: bobAddr,
-    satoshis: bitcoinToSatoshis(bobAmount2),
-  };
-
-  const splitHex = await split(
-    alicePrivateKey,
-    utils.getUtxo(issueTxid, issueTx, 0),
-    splitDestinations,
-    utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-    fundingPrivateKey
-  );
-  splitTxid = await broadcast(splitHex);
-  splitTx = await getTransaction(splitTxid);
-  splitTxObj = new bsv.Transaction(splitHex);
+  mergeObj = bsv.Transaction(issueHex);
+  issueOutFundingVout = issueTx.vout.length - 1;
 }
