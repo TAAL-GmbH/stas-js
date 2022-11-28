@@ -50,7 +50,7 @@ describe("MergeSplit Functional Tests", () => {
     await setup();
   });
 
-  it.only("MergeSplit - Successful MergeSplit With Fees 1", async () => {
+  it("MergeSplit - Successful MergeSplit With Fees 1", async () => {
     const aliceAmountSatoshis = bitcoinToSatoshis(issueTx.vout[0].value) / 2;
     const bobAmountSatoshis =
       bitcoinToSatoshis(issueTx.vout[0].value) +
@@ -395,14 +395,14 @@ async function setup() {
         satoshis: 3000,
         data: "two",
       },
-      // {
-      //   addr: bobAddr,
-      //   satoshis: 3000,
-      // },
-      // {
-      //   addr: bobAddr,
-      //   satoshis: 2000,
-      // },
+      {
+        addr: bobAddr,
+        satoshis: 3000,
+      },
+      {
+        addr: bobAddr,
+        satoshis: 2000,
+      },
     ],
     utils.getUtxo(contractTxid, contractTx, 0),
     utils.getUtxo(contractTxid, contractTx, 1),
