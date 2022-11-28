@@ -9,7 +9,7 @@ const { getFundsFromFaucet, broadcast, bitcoinToSatoshis } =
 
 //todo - share setup
 describe("Contract Multiple UTXO tests", () => {
-  it("Multiple Contract UTXOs", async () => {
+  it.only("Multiple Contract UTXOs", async () => {
     const issuerPrivateKey = bsv.PrivateKey();
     const fundingPrivateKey = bsv.PrivateKey();
     const contractUtxo = await getFundsFromFaucet(
@@ -43,7 +43,6 @@ describe("Contract Multiple UTXO tests", () => {
     const supply = 2000000;
     const symbol = "TAALT";
     const schema = utils.schema(publicKeyHash, symbol, supply);
-
     const contractHex = await contract(
       issuerPrivateKey,
       contractUtxo,
