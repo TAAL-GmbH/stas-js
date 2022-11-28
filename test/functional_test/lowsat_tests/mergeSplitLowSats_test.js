@@ -104,7 +104,6 @@ describe("MergeSplit Low Sat Tests", () => {
       utils.getUtxo(splitTxid, splitTx, issueOutFundingVout),
       fundingPrivateKey
     );
-    console.log(mergeSplitHex);
     const mergeSplitTxid = await broadcast(mergeSplitHex);
     expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.00000005);
     expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.00000005);

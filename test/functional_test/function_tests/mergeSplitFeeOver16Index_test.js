@@ -1,44 +1,49 @@
-const expect = require('chai').expect
-const utils = require('../../utils/test_utils')
-const bsv = require('bsv')
-require('dotenv').config()
+const expect = require("chai").expect;
+const utils = require("../../utils/test_utils");
+const bsv = require("bsv");
+require("dotenv").config();
 
 const {
   contract,
   issue,
   transfer,
   split,
-  mergeSplit
+  mergeSplit,
+} = require("../../../index");
 
-} = require('../../../index')
+const { getTransaction, getFundsFromFaucet, broadcast, bitcoinToSatoshis } =
+  require("../../../index").utils;
 
-const {
-  getTransaction,
-  getFundsFromFaucet,
-  broadcast,
-  bitcoinToSatoshis
-} = require('../../../index').utils
+it("Attempting Merge With A Fee UTXO Index > 16 Throws Error", async () => {
+  const issuerPrivateKey = bsv.PrivateKey();
+  const fundingPrivateKey = bsv.PrivateKey();
 
-it('Attempting Merge With A Fee UTXO Index > 16 Throws Error', async () => {
-  const issuerPrivateKey = bsv.PrivateKey()
-  const fundingPrivateKey = bsv.PrivateKey()
+  const alicePrivateKey = bsv.PrivateKey();
+  const aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString();
 
-  const alicePrivateKey = bsv.PrivateKey()
-  const aliceAddr = alicePrivateKey.toAddress(process.env.NETWORK).toString()
+  const bobPrivateKey = bsv.PrivateKey();
+  const bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString();
 
-  const bobPrivateKey = bsv.PrivateKey()
-  const bobAddr = bobPrivateKey.toAddress(process.env.NETWORK).toString()
+  const contractUtxos = await getFundsFromFaucet(
+    issuerPrivateKey.toAddress(process.env.NETWORK).toString()
+  );
+  const contractUtxos2 = await getFundsFromFaucet(
+    issuerPrivateKey.toAddress(process.env.NETWORK).toString()
+  );
+  const fundingUtxos = await getFundsFromFaucet(
+    fundingPrivateKey.toAddress(process.env.NETWORK).toString()
+  );
+  const fundingUtxos2 = await getFundsFromFaucet(
+    fundingPrivateKey.toAddress(process.env.NETWORK).toString()
+  );
 
-  const contractUtxos = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
-  const contractUtxos2 = await getFundsFromFaucet(issuerPrivateKey.toAddress(process.env.NETWORK).toString())
-  const fundingUtxos = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
-  const fundingUtxos2 = await getFundsFromFaucet(fundingPrivateKey.toAddress(process.env.NETWORK).toString())
-
-  const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(issuerPrivateKey.publicKey.toBuffer()).toString('hex')
-  const supply = 8500
-  const symbol = 'TAALT'
-  const schema = utils.schema(publicKeyHash, symbol, supply)
-  const wait = 5000 // set wait before token balance check
+  const publicKeyHash = bsv.crypto.Hash.sha256ripemd160(
+    issuerPrivateKey.publicKey.toBuffer()
+  ).toString("hex");
+  const supply = 8500;
+  const symbol = "TAALT";
+  const schema = utils.schema(publicKeyHash, symbol, supply);
+  const wait = 5000; // set wait before token balance check
 
   const contractHex = await contract(
     issuerPrivateKey,
@@ -47,10 +52,10 @@ it('Attempting Merge With A Fee UTXO Index > 16 Throws Error', async () => {
     fundingPrivateKey,
     schema,
     supply
-  )
-  const contractTxid = await broadcast(contractHex)
-  console.log(`Contract TX:     ${contractTxid}`)
-  const contractTx = await getTransaction(contractTxid)
+  );
+  const contractTxid = await broadcast(contractHex);
+  console.log(`Contract TX:     ${contractTxid}`);
+  const contractTx = await getTransaction(contractTxid);
 
   const contractHex2 = await contract(
     issuerPrivateKey,
@@ -59,10 +64,10 @@ it('Attempting Merge With A Fee UTXO Index > 16 Throws Error', async () => {
     fundingPrivateKey,
     schema,
     supply
-  )
-  const contractTxid2 = await broadcast(contractHex2)
-  console.log(`Contract TX2:     ${contractTxid2}`)
-  const contractTx2 = await getTransaction(contractTxid2)
+  );
+  const contractTxid2 = await broadcast(contractHex2);
+  console.log(`Contract TX2:     ${contractTxid2}`);
+  const contractTx2 = await getTransaction(contractTxid2);
 
   const issueHex = await issue(
     issuerPrivateKey,
@@ -73,17 +78,17 @@ it('Attempting Merge With A Fee UTXO Index > 16 Throws Error', async () => {
     true,
     symbol,
     2
-  )
-  const issueTxid = await broadcast(issueHex)
-  console.log(`Issue TX:     ${issueTxid}`)
-  const issueTx = await getTransaction(issueTxid)
-  console.log(issueTx)
+  );
+  const issueTxid = await broadcast(issueHex);
+  console.log(`Issue TX:     ${issueTxid}`);
+  const issueTx = await getTransaction(issueTxid);
+  console.log(issueTx);
 
-  const tokenId = await utils.getToken(issueTxid)
-  console.log(`Token ID:        ${tokenId}`)
-  const response = await utils.getTokenResponse(tokenId)
-  await new Promise(resolve => setTimeout(resolve, wait))
-  expect(response.symbol).to.equal(symbol)
+  const tokenId = await utils.getToken(issueTxid);
+  console.log(`Token ID:        ${tokenId}`);
+  const response = await utils.getTokenResponse(tokenId);
+  await new Promise((resolve) => setTimeout(resolve, wait));
+  expect(response.symbol).to.equal(symbol);
 
   const transferHex = await transfer(
     bobPrivateKey,
@@ -91,16 +96,22 @@ it('Attempting Merge With A Fee UTXO Index > 16 Throws Error', async () => {
     aliceAddr,
     utils.getUtxo(contractTxid2, contractTx2, 1),
     fundingPrivateKey
-  )
-  const transferTxid = await broadcast(transferHex)
-  console.log(`Transfer TX:     ${transferTxid}`)
-  const transferTx = await getTransaction(transferTxid)
+  );
+  const transferTxid = await broadcast(transferHex);
+  console.log(`Transfer TX:     ${transferTxid}`);
+  const transferTx = await getTransaction(transferTxid);
 
-  const bobAmount1 = transferTx.vout[0].value / 2
-  const bobAmount2 = transferTx.vout[0].value - bobAmount1
-  const splitDestinations = []
-  splitDestinations[0] = { address: bobAddr, satoshis: bitcoinToSatoshis(bobAmount1) }
-  splitDestinations[1] = { address: bobAddr, satoshis: bitcoinToSatoshis(bobAmount2) }
+  const bobAmount1 = transferTx.vout[0].value / 2;
+  const bobAmount2 = transferTx.vout[0].value - bobAmount1;
+  const splitDestinations = [];
+  splitDestinations[0] = {
+    address: bobAddr,
+    satoshis: bitcoinToSatoshis(bobAmount1),
+  };
+  splitDestinations[1] = {
+    address: bobAddr,
+    satoshis: bitcoinToSatoshis(bobAmount2),
+  };
 
   const splitHex = await split(
     alicePrivateKey,
@@ -108,17 +119,19 @@ it('Attempting Merge With A Fee UTXO Index > 16 Throws Error', async () => {
     splitDestinations,
     utils.getUtxo(transferTxid, transferTx, 1),
     fundingPrivateKey
-  )
-  const splitTxid = await broadcast(splitHex)
-  console.log(`Split TX:        ${splitTxid}`)
-  const splitTx = await getTransaction(splitTxid)
+  );
+  const splitTxid = await broadcast(splitHex);
+  console.log(`Split TX:        ${splitTxid}`);
+  const splitTx = await getTransaction(splitTxid);
 
   // Now let's merge the last split back together
-  const splitTxObj = new bsv.Transaction(splitHex)
-    console.log(issueTx)
-    
-    const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2
-    const bobAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) + bitcoinToSatoshis(splitTx.vout[1].value) - aliceAmountSatoshis
+  const splitTxObj = new bsv.Transaction(splitHex);
+
+  const aliceAmountSatoshis = bitcoinToSatoshis(splitTx.vout[0].value) / 2;
+  const bobAmountSatoshis =
+    bitcoinToSatoshis(splitTx.vout[0].value) +
+    bitcoinToSatoshis(splitTx.vout[1].value) -
+    aliceAmountSatoshis;
 
   const mergeHex = await mergeSplit(
     bobPrivateKey,
@@ -129,78 +142,81 @@ it('Attempting Merge With A Fee UTXO Index > 16 Throws Error', async () => {
     bobAmountSatoshis,
     utils.getUtxo(issueTxid, issueTx, 17),
     fundingPrivateKey
-  )
-  const mergeTxid = await broadcast(mergeHex)
-  console.log(`Merge TX:        ${mergeTxid}`)
+  );
+  const mergeTxid = await broadcast(mergeHex);
+  console.log(`Merge TX:        ${mergeTxid}`);
+});
 
-})
-
-function issue17 (addr1, sat1, addr2, sat2) {
+function issue17(addr1, sat1, addr2, sat2) {
   return [
     {
       addr: addr1,
-      satoshis: sat1
+      satoshis: sat1,
     },
     {
       addr: addr2,
-      satoshis: sat2
+      satoshis: sat2,
     },
     {
       addr: addr1,
-      satoshis: sat1
+      satoshis: sat1,
     },
     {
       addr: addr2,
-      satoshis: sat2
-    }, {
+      satoshis: sat2,
+    },
+    {
       addr: addr1,
-      satoshis: sat1
+      satoshis: sat1,
     },
     {
       addr: addr2,
-      satoshis: sat2
-    }, {
+      satoshis: sat2,
+    },
+    {
       addr: addr1,
-      satoshis: sat1
+      satoshis: sat1,
     },
     {
       addr: addr2,
-      satoshis: sat2
-    }, {
+      satoshis: sat2,
+    },
+    {
       addr: addr1,
-      satoshis: sat1
+      satoshis: sat1,
     },
     {
       addr: addr2,
-      satoshis: sat2
+      satoshis: sat2,
     },
     {
       addr: addr1,
-      satoshis: sat1
+      satoshis: sat1,
     },
     {
       addr: addr2,
-      satoshis: sat2
-    }, {
+      satoshis: sat2,
+    },
+    {
       addr: addr1,
-      satoshis: sat1
+      satoshis: sat1,
     },
     {
       addr: addr2,
-      satoshis: sat2
+      satoshis: sat2,
     },
     {
       addr: addr1,
-      satoshis: sat1
+      satoshis: sat1,
     },
     {
       addr: addr2,
-      satoshis: sat2
+      satoshis: sat2,
     },
     {
       addr: addr1,
-      satoshis: sat1
-    }
+      satoshis: sat1,
+    },
     // {
     //   addr: addr2,
     //   satoshis: sat2
@@ -212,5 +228,5 @@ function issue17 (addr1, sat1, addr2, sat2) {
     //   addr: addr2,
     //   satoshis: sat2
     // }
-  ]
+  ];
 }
