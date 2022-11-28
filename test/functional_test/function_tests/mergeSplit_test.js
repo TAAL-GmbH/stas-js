@@ -388,12 +388,10 @@ async function setup() {
       {
         addr: aliceAddr,
         satoshis: 7000,
-        data: "one",
       },
       {
         addr: aliceAddr,
         satoshis: 3000,
-        data: "two",
       },
       {
         addr: bobAddr,
@@ -417,37 +415,4 @@ async function setup() {
   issueOutFundingVout = issueTx.vout.length - 1;
 
   mergeObj = new bsv.Transaction(issueHex);
-
-  // const transferHex = await transfer(
-  //   bobPrivateKey,
-  //   utils.getUtxo(issueTxid, issueTx, 1),
-  //   aliceAddr,
-  //   utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
-  //   fundingPrivateKey
-  // );
-  // const transferTxid = await broadcast(transferHex);
-  // const transferTx = await getTransaction(transferTxid);
-
-  // const bobAmount1 = transferTx.vout[0].value / 2;
-  // const bobAmount2 = transferTx.vout[0].value - bobAmount1;
-  // const splitDestinations = [];
-  // splitDestinations[0] = {
-  //   address: bobAddr,
-  //   satoshis: bitcoinToSatoshis(bobAmount1),
-  // };
-  // splitDestinations[1] = {
-  //   address: bobAddr,
-  //   satoshis: bitcoinToSatoshis(bobAmount2),
-  // };
-
-  // const splitHex = await split(
-  //   alicePrivateKey,
-  //   utils.getUtxo(transferTxid, transferTx, 0),
-  //   splitDestinations,
-  //   utils.getUtxo(transferTxid, transferTx, 1),
-  //   fundingPrivateKey
-  // );
-  // splitTxid = await broadcast(splitHex);
-  // splitTx = await getTransaction(splitTxid);
-  // splitTxObj = new bsv.Transaction(splitHex);
 }
