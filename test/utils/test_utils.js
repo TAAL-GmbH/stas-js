@@ -12,7 +12,7 @@ function schema(publicKeyHash, symbol, supply) {
     tokenId: `${publicKeyHash}`,
     protocolId: "To be decided",
     symbol: `${symbol}`,
-    description: "Example token on private Taalnet",
+    description: "Example token on testnet",
     image:
       "https://www.taal.com/wp-content/themes/taal_v2/img/favicon/favicon-96x96.png",
     totalSupply: supply,
@@ -195,14 +195,10 @@ function getTenIssueInfo(
 }
 
 async function getVoutAmount(txid, vout) {
-  const url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/tx/hash/${txid}`;
+  const url = `https://api.whatsonchain.com/v1/bsv/test/tx/hash/${txid}`;
   const response = await axios({
     method: "get",
-    url,
-    auth: {
-      username: process.env.API_USERNAME,
-      password: process.env.API_PASSWORD,
-    },
+    url
   });
   return response.data.vout[vout].value;
 }
@@ -210,14 +206,10 @@ async function getVoutAmount(txid, vout) {
 async function getBsvBalance(address, expectedBalance) {
   let response;
   for (let i = 0; i < 30; i++) {
-    const url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/address/${address}/balance`;
+    const url = `https://api.whatsonchain.com/v1/bsv/test/address/${address}/balance`;
     response = await axios({
       method: "get",
-      url,
-      auth: {
-        username: process.env.API_USERNAME,
-        password: process.env.API_PASSWORD,
-      },
+      url
     });
     let balance;
     try {
@@ -248,14 +240,10 @@ async function getToken(txid, vout) {
   if (vout === undefined) {
     vout = 0;
   }
-  const url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/tx/hash/${txid}`;
+  const url = `https://api.whatsonchain.com/v1/bsv/test/tx/hash/${txid}`;
   const response = await axios({
     method: "get",
-    url,
-    auth: {
-      username: process.env.API_USERNAME,
-      password: process.env.API_PASSWORD,
-    },
+    url
   });
 
   const temp = response.data.vout[vout].scriptPubKey.asm;
@@ -283,14 +271,10 @@ async function getTokenResponse(tokenId, symbol) {
   let response;
   let url;
   try {
-    url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/token/${tokenId}/${symbol}`;
+    url = `https://api.whatsonchain.com/v1/bsv/test/token/${tokenId}/${symbol}`;
     response = await axios({
-      method: "get",
-      url,
-      auth: {
-        username: process.env.API_USERNAME,
-        password: process.env.API_PASSWORD,
-      },
+      method: 'get',
+      url
     });
   } catch (e) {
     console.log("Token Not Found: " + e, " ", url);
@@ -300,17 +284,13 @@ async function getTokenResponse(tokenId, symbol) {
 }
 
 async function getTokenWithSymbol(txid, symbol, vout) {
-  const url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/token/${txid}/${symbol}`;
+  const url = `https://api.whatsonchain.com/v1/bsv/test/token/${txid}/${symbol}`;
   console.log(url);
   let response;
   try {
     response = await axios({
       method: "get",
-      url,
-      auth: {
-        username: process.env.API_USERNAME,
-        password: process.env.API_PASSWORD,
-      },
+      url
     });
   } catch (e) {
     console.log("Token Not Found: " + e);
@@ -326,14 +306,10 @@ async function getTokenWithSymbol(txid, symbol, vout) {
 async function isTokenBalance(address, expectedBalance) {
   let response;
   for (let i = 0; i < 30; i++) {
-    const url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/address/${address}/tokens`;
+    const url = `https://api.whatsonchain.com/v1/bsv/test/address/${address}/tokens`;
     response = await axios({
       method: "get",
-      url,
-      auth: {
-        username: process.env.API_USERNAME,
-        password: process.env.API_PASSWORD,
-      },
+      url
     });
     let balance;
     try {
@@ -356,14 +332,10 @@ async function isTokenBalanceTwoTokens(address, expectedBalance) {
   await new Promise((resolve) => setTimeout(resolve, 3000));
   let response;
   for (let i = 0; i < 30; i++) {
-    const url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/address/${address}/tokens`;
+    const url = `https://api.whatsonchain.com/v1/bsv/test/address/${address}/tokens`;
     response = await axios({
       method: "get",
-      url,
-      auth: {
-        username: process.env.API_USERNAME,
-        password: process.env.API_PASSWORD,
-      },
+      url
     });
     let balance;
     try {
@@ -379,21 +351,17 @@ async function isTokenBalanceTwoTokens(address, expectedBalance) {
   }
   console.log(
     "Incorrect balance, actual balance is " +
-      response.data.tokens[0].balance +
-      response.data.tokens[1].balance
+    response.data.tokens[0].balance +
+    response.data.tokens[1].balance
   );
   expect(false).to.true();
 }
 
 async function getAmount(txid, vout) {
-  const url = `https://${process.env.API_NETWORK}.whatsonchain.com/v1/bsv/${process.env.API_NETWORK}/tx/hash/${txid}`;
+  const url = `https://api.whatsonchain.com/v1/bsv/test/tx/hash/${txid}`;
   const response = await axios({
     method: "get",
-    url,
-    auth: {
-      username: process.env.API_USERNAME,
-      password: process.env.API_PASSWORD,
-    },
+    url
   });
   console.log(response.data.vout[vout].value);
   const amount = response.data.vout[vout].value;

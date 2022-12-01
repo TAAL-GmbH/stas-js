@@ -140,7 +140,7 @@ async function setup() {
 function invalidSchemaNullSymbol() {
   const schema = {
     tokenId: `${publicKeyHash}`,
-    description: "Example token on private Taalnet",
+    description: "Example token on testnet",
     image:
       "https://www.taal.com/wp-content/themes/taal_v2/img/favicon/favicon-96x96.png",
     totalSupply: supply,
@@ -153,7 +153,7 @@ function invalidSchemaNullTotalSupply() {
   const schema = {
     tokenId: `${publicKeyHash}`,
     symbol: `${symbol}`,
-    description: "Example token on private Taalnet",
+    description: "Example token on testnet",
     image:
       "https://www.taal.com/wp-content/themes/taal_v2/img/favicon/favicon-96x96.png",
     satsPerToken: 1,
@@ -165,7 +165,7 @@ function invalidSchemaNullTokenId(publicKeyHash, symbol, supply) {
   const schema = {
     protocolId: "To be decided",
     symbol: `${symbol}`,
-    description: "Example token on private Taalnet",
+    description: "Example token on testnet",
     image:
       "https://www.taal.com/wp-content/themes/taal_v2/img/favicon/favicon-96x96.png",
     totalSupply: supply,
@@ -178,7 +178,7 @@ function invalidSchemaNullSatsPertoken() {
   const schema = {
     tokenId: `${publicKeyHash}`,
     symbol: `${symbol}`,
-    description: "Example token on private Taalnet",
+    description: "Example token on testnet",
     image:
       "https://www.taal.com/wp-content/themes/taal_v2/img/favicon/favicon-96x96.png",
     totalSupply: supply,

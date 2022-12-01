@@ -21,14 +21,18 @@ The mining fee is set in the config.js file. The default is currently 500 sats p
 
 ## Example Code
 
-We include examples that run on the private Taalnet. They contain no real error handling and are not meant to be used in production.
+We include examples that run on testnet. They contain no real error handling and are not meant to be used in production.
 
 ## Env Vars
 
 To use the examples the following environment variables must be set inside the .env file
-API_USERNAME= The API username
-API_PASSWORD= The API password
-NETWORK= The network that the tests will run on. 'livenet' is the main network
+
+Network that tests run on - This is only used for creating addresses from keys 
+NETWORK=testnet
+
+mining fee settings - 500 sats / 1000 bytes = 0.5 sats / byte.
+SATS=250
+PERBYTE=1000
 
 ## Testing
 
@@ -56,7 +60,7 @@ npm run test:unit:ci // run unit tests, please run before every commit
 npm run test  -- datasize1  // run specific file
 ```
 
-All transactions are submitted to Taalnet, a private BSV blockchain that is maintained for testing STAS tokens. All tokens created can be viewed at https://taalnet.whatsonchain.com/tokens
+All transactions are submitted to testnet. All tokens created can be viewed at https://test.whatsonchain.com/tokens
 
 ## Using in a browser
 
@@ -115,7 +119,7 @@ function App() {
         schemaId: "Schema STAS Coupon",
         tokenName: "TAALT",
         tokenId: publicKeyHash,
-        tokenDescription: "Example token on private Taalnet",
+        tokenDescription: "Example token on testnet",
         issuerName: "Taal Technologies SEZC",
         issuerCountry: "CYM",
         issuerLegalForm: "Limited Liability Public Company",

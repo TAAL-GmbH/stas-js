@@ -42,7 +42,7 @@ const {
       tokenId: `${publicKeyHash}`,
       protocolId: 'To be decided',
       symbol: symbol,
-      description: 'Example token on private Taalnet',
+      description: 'Example token on testnet',
       image: 'https://www.taal.com/wp-content/themes/taal_v2/img/favicon/favicon-96x96.png',
       totalSupply: supply,
       decimals: 0,
