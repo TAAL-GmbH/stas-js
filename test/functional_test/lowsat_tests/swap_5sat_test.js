@@ -79,9 +79,7 @@ describe("atomic swap with 5 token", function () {
       fundingPrivateKey
     );
 
-    const swapTxid = await utils.utils.broadcastWithRetryWithRetry(
-      allInOneSwapHex
-    );
+    const swapTxid = await utils.utils.broadcastWithRetry(allInOneSwapHex);
     console.log("swaptxid", swapTxid);
     expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.00000005);
     expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.00000005);
@@ -152,9 +150,7 @@ describe("atomic swap with 5 token", function () {
       fundingPrivateKey
     );
 
-    const swapTxid = await utils.utils.broadcastWithRetryWithRetry(
-      fullySignedSwapHex
-    );
+    const swapTxid = await utils.utils.broadcastWithRetry(fullySignedSwapHex);
     console.log("swaptxid", swapTxid);
 
     const tokenId = await utils.getToken(swapTxid, 1);
@@ -220,9 +216,7 @@ describe("atomic swap with 5 token", function () {
 
     // console.log('fullySignedSwapHex', fullySignedSwapHex)
 
-    const swapTxid = await utils.utils.broadcastWithRetryWithRetry(
-      fullySignedSwapHex
-    );
+    const swapTxid = await utils.utils.broadcastWithRetry(fullySignedSwapHex);
     console.log("swaptxid: ", swapTxid);
     expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.00000005);
     expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.01);
@@ -279,9 +273,7 @@ describe("atomic swap with 5 token", function () {
       paymentPublicKeyHash,
       fundingUTXO
     );
-    const swapTxid = await utils.utils.broadcastWithRetryWithRetry(
-      fullySignedSwapHex
-    );
+    const swapTxid = await utils.utils.broadcastWithRetry(fullySignedSwapHex);
     expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.00000005);
     expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.00000005);
     await utils.isTokenBalance(aliceAddr, 5);
@@ -343,9 +335,7 @@ describe("atomic swap with 5 token", function () {
       paymentPublicKeyHash,
       fundingUTXO
     );
-    const swapTxid = await utils.utils.broadcastWithRetryWithRetry(
-      fullySignedSwapHex
-    );
+    const swapTxid = await utils.utils.broadcastWithRetry(fullySignedSwapHex);
     console.log("swaptxid", swapTxid);
     const tokenId = await utils.getToken(swapTxid, 1);
     const response = await utils.getTokenResponse(tokenId, tokenBSymbol);
@@ -405,9 +395,7 @@ describe("atomic swap with 5 token", function () {
       paymentPublicKeyHash,
       fundingUTXO
     );
-    const swapTxid = await utils.utils.broadcastWithRetryWithRetry(
-      fullySignedSwapHex
-    );
+    const swapTxid = await utils.utils.broadcastWithRetry(fullySignedSwapHex);
     console.log("swaptxid ", swapTxid);
     const tokenId = await utils.getToken(swapTxid, 0);
     const response = await utils.getTokenResponse(tokenId, tokenASymbol);
@@ -473,7 +461,7 @@ async function setup() {
     tokenASchema,
     tokenASupply
   );
-  const tokenAContractTxid = await utils.utils.broadcastWithRetryWithRetry(
+  const tokenAContractTxid = await utils.utils.broadcastWithRetry(
     tokenAContractHex
   );
   const tokenAContractTx = await getTransaction(tokenAContractTxid);
@@ -494,7 +482,7 @@ async function setup() {
     tokenASymbol,
     2
   );
-  await utils.utils.broadcastWithRetryWithRetry(tokenAIssueHex);
+  await utils.utils.broadcastWithRetry(tokenAIssueHex);
   tokenAObj = new bsv.Transaction(tokenAIssueHex);
 
   // Token B
@@ -513,7 +501,7 @@ async function setup() {
     tokenBSchema,
     tokenBSupply
   );
-  const tokenBContractTxid = await utils.utils.broadcastWithRetryWithRetry(
+  const tokenBContractTxid = await utils.utils.broadcastWithRetry(
     tokenBContractHex
   );
   const tokenBContractTx = await getTransaction(tokenBContractTxid);
@@ -534,9 +522,7 @@ async function setup() {
     tokenBSymbol,
     2
   );
-  tokenBIssueTxid = await utils.utils.broadcastWithRetryWithRetry(
-    tokenBIssueHex
-  );
+  tokenBIssueTxid = await utils.utils.broadcastWithRetry(tokenBIssueHex);
   tokenBIssueTx = await getTransaction(tokenBIssueTxid);
   tokenBObj = new bsv.Transaction(tokenBIssueHex);
   fundingUTXO = {

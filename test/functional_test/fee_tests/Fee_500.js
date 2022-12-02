@@ -66,7 +66,7 @@ it("Full Life Cycle Test With Fees 500 sats/kb", async () => {
     contractUtxos,
     fundingUtxos
   );
-  expect(contractFees).to.be.above(690).and.to.be.below(695);
+  expect(contractFees).to.be.above(685).and.to.be.below(695);
 
   const issueHex = await issue(
     issuerPrivateKey,

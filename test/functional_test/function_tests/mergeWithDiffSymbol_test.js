@@ -31,7 +31,6 @@ beforeEach(async () => {
   await setup();
 });
 
-// can we handle symbol check in sdk?
 it("Merge - Attempt To Merge With Different Symbol", async () => {
   const mergeHex = await merge(
     bobPrivateKey,
@@ -59,6 +58,7 @@ it("Merge - Attempt To Merge With Different Symbol", async () => {
   }
 });
 
+// needs fixed
 it("MergeSplit - Attempt To Merge With Different Symbol", async () => {
   const aliceAmountSatoshis = bitcoinToSatoshis(splitTx2.vout[0].value) / 2;
   const bobAmountSatoshis =

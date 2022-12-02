@@ -713,7 +713,7 @@ describe("LifeCycle Low Sat Tests", () => {
     await utils.isTokenBalance(bobAddr, 1);
   });
 
-  it("Full Life Cycle Test Low Sats 20 supply", async () => {
+  it.only("Full Life Cycle Test Low Sats 20 supply", async () => {
     const issuerPrivateKey = bsv.PrivateKey();
     const fundingPrivateKey = bsv.PrivateKey();
 
@@ -785,7 +785,7 @@ describe("LifeCycle Low Sat Tests", () => {
     console.log(`Transfer TX:     ${transferTxid}`);
     const transferTx = await getTransaction(transferTxid);
     expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.0000001);
-    await utils.isTokenBalance(aliceAddr, 10);
+    await utils.isTokenBalance(aliceAddr, 20);
     await utils.isTokenBalance(bobAddr, 0);
 
     // Split tokens into 2 - both payable to Bob...
@@ -831,7 +831,7 @@ describe("LifeCycle Low Sat Tests", () => {
     console.log(`Merge TX:        ${mergeTxid}`);
     const mergeTx = await getTransaction(mergeTxid);
     expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.0000001);
-    await utils.isTokenBalance(aliceAddr, 10);
+    await utils.isTokenBalance(aliceAddr, 20);
     await utils.isTokenBalance(bobAddr, 0);
 
     // Split again - both payable to Alice...
@@ -898,7 +898,7 @@ describe("LifeCycle Low Sat Tests", () => {
     console.log(`Redeem TX:       ${redeemTxid}`);
     const redeemTx = await getTransaction(redeemTxid);
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00000005);
-    await utils.isTokenBalance(aliceAddr, 15);
+    await utils.isTokenBalance(aliceAddr, 10);
     await utils.isTokenBalance(bobAddr, 5);
 
     const redeemHex2 = await redeem(
@@ -911,8 +911,8 @@ describe("LifeCycle Low Sat Tests", () => {
     const redeemTxid2 = await utils.broadcastWithRetry(redeemHex2);
     console.log(`Redeem TX2:       ${redeemTxid2}`);
     expect(await utils.getVoutAmount(redeemTxid2, 0)).to.equal(0.00000005);
-    await utils.isTokenBalance(aliceAddr, 10);
-    await utils.isTokenBalance(bobAddr, 0);
+    await utils.isTokenBalance(aliceAddr, 5);
+    await utils.isTokenBalance(bobAddr, 5);
   });
 
   it("Full Life Cycle Test Low Sats 10 supply", async () => {

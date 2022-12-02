@@ -60,8 +60,9 @@ it("Full Life Cycle Test 9 - Issuance with 10mb of data", async () => {
     schema,
     supply
   );
-  const contractTxid =
-    await utils.utils.utils.broadcastWithRetryWithRetryWithRetry(contractHex);
+  const contractTxid = await utils.utils.utils.broadcastWithRetryWithRetry(
+    contractHex
+  );
   console.log(`Contract TX:     ${contractTxid}`);
   const contractTx = await getTransaction(contractTxid);
 
@@ -93,8 +94,9 @@ it("Full Life Cycle Test 9 - Issuance with 10mb of data", async () => {
     symbol,
     2
   );
-  const issueTxid =
-    await utils.utils.utils.broadcastWithRetryWithRetryWithRetry(issueHex);
+  const issueTxid = await utils.utils.utils.broadcastWithRetryWithRetry(
+    issueHex
+  );
   console.log(`Issue TX:     ${issueTxid}`);
   const issueTx = await getTransaction(issueTxid);
   const tokenId = await utils.getToken(issueTxid);
@@ -116,8 +118,9 @@ it("Full Life Cycle Test 9 - Issuance with 10mb of data", async () => {
     utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
     fundingPrivateKey
   );
-  const transferTxid =
-    await utils.utils.utils.broadcastWithRetryWithRetryWithRetry(transferHex);
+  const transferTxid = await utils.utils.utils.broadcastWithRetryWithRetry(
+    transferHex
+  );
   console.log(`Transfer TX:     ${transferTxid}`);
   const transferTx = await getTransaction(transferTxid);
   expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003);
@@ -144,8 +147,9 @@ it("Full Life Cycle Test 9 - Issuance with 10mb of data", async () => {
     utils.getUtxo(transferTxid, transferTx, 1),
     fundingPrivateKey
   );
-  const splitTxid =
-    await utils.utils.utils.broadcastWithRetryWithRetryWithRetry(splitHex);
+  const splitTxid = await utils.utils.utils.broadcastWithRetryWithRetry(
+    splitHex
+  );
   console.log(`Split TX:        ${splitTxid}`);
   const splitTx = await getTransaction(splitTxid);
   expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000015);
@@ -169,8 +173,9 @@ it("Full Life Cycle Test 9 - Issuance with 10mb of data", async () => {
     fundingPrivateKey
   );
   console.log(mergeHex);
-  const mergeTxid =
-    await utils.utils.utils.broadcastWithRetryWithRetryWithRetry(mergeHex);
+  const mergeTxid = await utils.utils.utils.broadcastWithRetryWithRetry(
+    mergeHex
+  );
   console.log(`Merge TX:        ${mergeTxid}`);
   const mergeTx = await getTransaction(mergeTxid);
   expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00003);
@@ -200,8 +205,9 @@ it("Full Life Cycle Test 9 - Issuance with 10mb of data", async () => {
     utils.getUtxo(mergeTxid, mergeTx, 1),
     fundingPrivateKey
   );
-  const splitTxid2 =
-    await utils.utils.utils.broadcastWithRetryWithRetryWithRetry(splitHex2);
+  const splitTxid2 = await utils.utils.utils.broadcastWithRetryWithRetry(
+    splitHex2
+  );
   console.log(`Split TX2:       ${splitTxid2}`);
   const splitTx2 = await getTransaction(splitTxid2);
   expect(await utils.getVoutAmount(splitTxid2, 0)).to.equal(0.000015);
@@ -228,8 +234,9 @@ it("Full Life Cycle Test 9 - Issuance with 10mb of data", async () => {
     fundingPrivateKey
   );
 
-  const mergeSplitTxid =
-    await utils.utils.utils.broadcastWithRetryWithRetryWithRetry(mergeSplitHex);
+  const mergeSplitTxid = await utils.utils.utils.broadcastWithRetryWithRetry(
+    mergeSplitHex
+  );
   console.log(`MergeSplit TX:   ${mergeSplitTxid}`);
   const mergeSplitTx = await getTransaction(mergeSplitTxid);
   expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075);
@@ -245,8 +252,9 @@ it("Full Life Cycle Test 9 - Issuance with 10mb of data", async () => {
     utils.getUtxo(mergeSplitTxid, mergeSplitTx, 2),
     fundingPrivateKey
   );
-  const redeemTxid =
-    await utils.utils.utils.broadcastWithRetryWithRetryWithRetry(redeemHex);
+  const redeemTxid = await utils.utils.utils.broadcastWithRetryWithRetry(
+    redeemHex
+  );
   console.log(`Redeem TX:       ${redeemTxid}`);
   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.0000075);
   expect(await utils.isTokenBalance(aliceAddr, 7000)).to.equal(7000); // 750 of alice tokens were redeemed
