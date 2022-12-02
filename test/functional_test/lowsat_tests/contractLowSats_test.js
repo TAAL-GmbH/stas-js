@@ -5,7 +5,7 @@ require("dotenv").config();
 
 const { contract, contractWithCallback } = require("../../../index");
 
-const { getFundsFromFaucet, broadcast } = require("../../../index").utils;
+const { getFundsFromFaucet } = require("../../../index").utils;
 
 const ownerSignCallback = async (tx) => {
   tx.sign(issuerPrivateKey);
@@ -39,7 +39,7 @@ describe("Contract Low Sat Tests", () => {
       schema,
       supply
     );
-    const contractTxid = await broadcast(contractHex);
+    const contractTxid = await utils.broadcastWithRetry(contractHex);
     const amount = await utils.getVoutAmount(contractTxid, 0);
     expect(amount).to.equal(supply / 100000000);
   });
@@ -55,7 +55,7 @@ describe("Contract Low Sat Tests", () => {
       schema,
       supply
     );
-    const contractTxid = await broadcast(contractHex);
+    const contractTxid = await utils.broadcastWithRetry(contractHex);
     const amount = await utils.getVoutAmount(contractTxid, 0);
     expect(amount).to.equal(supply / 100000000);
   });
@@ -71,7 +71,7 @@ describe("Contract Low Sat Tests", () => {
       schema,
       supply
     );
-    const contractTxid = await broadcast(contractHex);
+    const contractTxid = await utils.broadcastWithRetry(contractHex);
     const amount = await utils.getVoutAmount(contractTxid, 0);
     expect(amount).to.equal(supply / 100000000);
   });
@@ -87,7 +87,7 @@ describe("Contract Low Sat Tests", () => {
       schema,
       supply
     );
-    const contractTxid = await broadcast(contractHex);
+    const contractTxid = await utils.broadcastWithRetry(contractHex);
     const amount = await utils.getVoutAmount(contractTxid, 0);
     expect(amount).to.equal(supply / 100000000);
   });
@@ -105,7 +105,7 @@ describe("Contract Low Sat Tests", () => {
       ownerSignCallback,
       paymentSignCallback
     );
-    const contractTxid = await broadcast(contractHex);
+    const contractTxid = await utils.broadcastWithRetry(contractHex);
     const amount = await utils.getVoutAmount(contractTxid, 0);
     expect(amount).to.equal(supply / 100000000);
   });

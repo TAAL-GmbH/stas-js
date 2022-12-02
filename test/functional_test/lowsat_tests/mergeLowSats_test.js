@@ -11,7 +11,7 @@ const {
   mergeWithCallback,
 } = require("../../../index");
 
-const { bitcoinToSatoshis, getTransaction, getFundsFromFaucet, broadcast } =
+const { bitcoinToSatoshis, getTransaction, getFundsFromFaucet } =
   require("../../../index").utils;
 
 const { sighash } = require("../../../lib/stas");
@@ -58,7 +58,7 @@ describe("Merge Low Sat Tests", () => {
       utils.getUtxo(splitTxid, splitTx, 2),
       fundingPrivateKey
     );
-    const mergeTxid = await broadcast(mergeHex);
+    const mergeTxid = await utils.broadcastWithRetry(mergeHex);
     await new Promise((resolve) => setTimeout(resolve, wait));
     const tokenIdMerge = await utils.getToken(mergeTxid);
     const response = await utils.getTokenResponse(tokenIdMerge);
@@ -76,7 +76,7 @@ describe("Merge Low Sat Tests", () => {
       utils.getUtxo(splitTxid, splitTx, 2),
       fundingPrivateKey
     );
-    const mergeTxid = await broadcast(mergeHex);
+    const mergeTxid = await utils.broadcastWithRetry(mergeHex);
     await new Promise((resolve) => setTimeout(resolve, wait));
     const tokenIdMerge = await utils.getToken(mergeTxid);
     const response = await utils.getTokenResponse(tokenIdMerge);
@@ -94,7 +94,7 @@ describe("Merge Low Sat Tests", () => {
       utils.getUtxo(splitTxid, splitTx, 2),
       fundingPrivateKey
     );
-    const mergeTxid = await broadcast(mergeHex);
+    const mergeTxid = await utils.broadcastWithRetry(mergeHex);
     await new Promise((resolve) => setTimeout(resolve, wait));
     const tokenIdMerge = await utils.getToken(mergeTxid);
     const response = await utils.getTokenResponse(tokenIdMerge);
@@ -112,7 +112,7 @@ describe("Merge Low Sat Tests", () => {
       utils.getUtxo(splitTxid, splitTx, 2),
       fundingPrivateKey
     );
-    const mergeTxid = await broadcast(mergeHex);
+    const mergeTxid = await utils.broadcastWithRetry(mergeHex);
     await new Promise((resolve) => setTimeout(resolve, wait));
     const tokenIdMerge = await utils.getToken(mergeTxid);
     const response = await utils.getTokenResponse(tokenIdMerge);
@@ -132,7 +132,7 @@ describe("Merge Low Sat Tests", () => {
       bobSignatureCallback,
       paymentSignatureCallback
     );
-    const mergeTxid = await broadcast(mergeHex);
+    const mergeTxid = await utils.broadcastWithRetry(mergeHex);
     await new Promise((resolve) => setTimeout(resolve, wait));
     const tokenIdMerge = await utils.getToken(mergeTxid);
     const response = await utils.getTokenResponse(tokenIdMerge);
@@ -170,7 +170,7 @@ async function setup(satSupply) {
     schema,
     supply
   );
-  contractTxid = await broadcast(contractHex);
+  contractTxid = await utils.broadcastWithRetry(contractHex);
   contractTx = await getTransaction(contractTxid);
 
   const issueHex = await issue(
@@ -189,7 +189,7 @@ async function setup(satSupply) {
     symbol,
     2
   );
-  issueTxid = await broadcast(issueHex);
+  issueTxid = await utils.broadcastWithRetry(issueHex);
   issueTx = await getTransaction(issueTxid);
 
   const issueOutFundingVout = issueTx.vout.length - 1;
@@ -213,7 +213,7 @@ async function setup(satSupply) {
     utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
     fundingPrivateKey
   );
-  splitTxid = await broadcast(splitHex);
+  splitTxid = await utils.broadcastWithRetry(splitHex);
   splitTx = await getTransaction(splitTxid);
   splitTxObj = new bsv.Transaction(splitHex);
 }

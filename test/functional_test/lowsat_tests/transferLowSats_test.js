@@ -10,8 +10,7 @@ const {
   transferWithCallback,
 } = require("../../../index");
 
-const { getTransaction, getFundsFromFaucet, broadcast } =
-  require("../../../index").utils;
+const { getTransaction, getFundsFromFaucet } = require("../../../index").utils;
 
 const { sighash } = require("../../../lib/stas");
 
@@ -51,7 +50,7 @@ describe("Transfer Low Sat Tests", () => {
       utils.getUtxo(issueTxid, issueTx, 1),
       fundingPrivateKey
     );
-    const transferTxid = await broadcast(transferHex);
+    const transferTxid = await utils.broadcastWithRetry(transferHex);
     expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.0000002);
     await utils.isTokenBalance(bobAddr, 20);
   });
@@ -65,7 +64,7 @@ describe("Transfer Low Sat Tests", () => {
       utils.getUtxo(issueTxid, issueTx, 1),
       fundingPrivateKey
     );
-    const transferTxid = await broadcast(transferHex);
+    const transferTxid = await utils.broadcastWithRetry(transferHex);
     expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.0000001);
     await utils.isTokenBalance(bobAddr, 10);
   });
@@ -79,7 +78,7 @@ describe("Transfer Low Sat Tests", () => {
       utils.getUtxo(issueTxid, issueTx, 1),
       fundingPrivateKey
     );
-    const transferTxid = await broadcast(transferHex);
+    const transferTxid = await utils.broadcastWithRetry(transferHex);
     expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00000005);
     await utils.isTokenBalance(bobAddr, 5);
   });
@@ -93,7 +92,7 @@ describe("Transfer Low Sat Tests", () => {
       utils.getUtxo(issueTxid, issueTx, 1),
       fundingPrivateKey
     );
-    const transferTxid = await broadcast(transferHex);
+    const transferTxid = await utils.broadcastWithRetry(transferHex);
     expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00000001);
     await utils.isTokenBalance(bobAddr, 1);
   });
@@ -109,7 +108,7 @@ describe("Transfer Low Sat Tests", () => {
       aliceSignatureCallback,
       paymentSignatureCallback
     );
-    const transferTxid = await broadcast(transferHex);
+    const transferTxid = await utils.broadcastWithRetry(transferHex);
     expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00000001);
     await utils.isTokenBalance(bobAddr, 1);
   });
@@ -143,7 +142,7 @@ async function setup(satSupply) {
     schema,
     satSupply
   );
-  const contractTxid = await broadcast(contractHex);
+  const contractTxid = await utils.broadcastWithRetry(contractHex);
   const contractTx = await getTransaction(contractTxid);
 
   const issueHex = await issue(
@@ -161,6 +160,6 @@ async function setup(satSupply) {
     symbol,
     2
   );
-  issueTxid = await broadcast(issueHex);
+  issueTxid = await utils.broadcastWithRetry(issueHex);
   issueTx = await getTransaction(issueTxid);
 }

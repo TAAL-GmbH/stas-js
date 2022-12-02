@@ -5,8 +5,7 @@ require("dotenv").config();
 
 const { contract, issue, issueWithCallback } = require("../../../index");
 
-const { getTransaction, getFundsFromFaucet, broadcast } =
-  require("../../../index").utils;
+const { getTransaction, getFundsFromFaucet } = require("../../../index").utils;
 
 const { sighash } = require("../../../lib/stas");
 
@@ -54,7 +53,7 @@ describe("Issue Low Sat Tests", () => {
       true,
       symbol
     );
-    const issueTxid = await broadcast(issueHex);
+    const issueTxid = await utils.broadcastWithRetry(issueHex);
     const tokenId = await utils.getToken(issueTxid);
     await new Promise((resolve) => setTimeout(resolve, wait));
     const response = await utils.getTokenResponse(tokenId);
@@ -81,7 +80,7 @@ describe("Issue Low Sat Tests", () => {
       true,
       symbol
     );
-    const issueTxid = await broadcast(issueHex);
+    const issueTxid = await utils.broadcastWithRetry(issueHex);
     const tokenId = await utils.getToken(issueTxid);
     await new Promise((resolve) => setTimeout(resolve, wait));
     const response = await utils.getTokenResponse(tokenId);
@@ -107,7 +106,7 @@ describe("Issue Low Sat Tests", () => {
       true,
       symbol
     );
-    const issueTxid = await broadcast(issueHex);
+    const issueTxid = await utils.broadcastWithRetry(issueHex);
     const tokenId = await utils.getToken(issueTxid);
     await new Promise((resolve) => setTimeout(resolve, wait));
     const response = await utils.getTokenResponse(tokenId);
@@ -134,7 +133,7 @@ describe("Issue Low Sat Tests", () => {
       true,
       symbol
     );
-    const issueTxid = await broadcast(issueHex);
+    const issueTxid = await utils.broadcastWithRetry(issueHex);
     const tokenId = await utils.getToken(issueTxid);
     await new Promise((resolve) => setTimeout(resolve, wait));
     const response = await utils.getTokenResponse(tokenId);
@@ -162,7 +161,7 @@ describe("Issue Low Sat Tests", () => {
       issuerSignatureCallback,
       paymentSignatureCallback
     );
-    const issueTxid = await broadcast(issueHex);
+    const issueTxid = await utils.broadcastWithRetry(issueHex);
     const tokenId = await utils.getToken(issueTxid);
     await new Promise((resolve) => setTimeout(resolve, wait));
     const response = await utils.getTokenResponse(tokenId);
@@ -197,6 +196,6 @@ async function setup(satSupply) {
     schema,
     satSupply
   );
-  contractTxid = await broadcast(contractHex);
+  contractTxid = await utils.broadcastWithRetry(contractHex);
   contractTx = await getTransaction(contractTxid);
 }

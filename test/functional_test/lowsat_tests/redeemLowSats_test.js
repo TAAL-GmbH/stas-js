@@ -10,8 +10,7 @@ const {
   redeemWithCallback,
 } = require("../../../index");
 
-const { getTransaction, getFundsFromFaucet, broadcast } =
-  require("../../../index").utils;
+const { getTransaction, getFundsFromFaucet } = require("../../../index").utils;
 
 const { sighash } = require("../../../lib/stas");
 
@@ -50,7 +49,8 @@ describe("Redeem Low Sat Tests", () => {
       utils.getUtxo(issueTxid, issueTx, 1),
       fundingPrivateKey
     );
-    const redeemTxid = await broadcast(redeemHex);
+    const redeemTxid =
+      await utils.utils.utils.broadcastWithRetryWithRetryWithRetry(redeemHex);
     expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.0000002);
     await utils.isTokenBalance(aliceAddr, 0);
   });
@@ -64,7 +64,8 @@ describe("Redeem Low Sat Tests", () => {
       utils.getUtxo(issueTxid, issueTx, 1),
       fundingPrivateKey
     );
-    const redeemTxid = await broadcast(redeemHex);
+    const redeemTxid =
+      await utils.utils.utils.broadcastWithRetryWithRetryWithRetry(redeemHex);
     expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.0000001);
     await utils.isTokenBalance(aliceAddr, 0);
   });
@@ -78,7 +79,8 @@ describe("Redeem Low Sat Tests", () => {
       utils.getUtxo(issueTxid, issueTx, 1),
       fundingPrivateKey
     );
-    const redeemTxid = await broadcast(redeemHex);
+    const redeemTxid =
+      await utils.utils.utils.broadcastWithRetryWithRetryWithRetry(redeemHex);
     expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00000005);
     await utils.isTokenBalance(aliceAddr, 0);
   });
@@ -92,7 +94,8 @@ describe("Redeem Low Sat Tests", () => {
       utils.getUtxo(issueTxid, issueTx, 1),
       fundingPrivateKey
     );
-    const redeemTxid = await broadcast(redeemHex);
+    const redeemTxid =
+      await utils.utils.utils.broadcastWithRetryWithRetryWithRetry(redeemHex);
     expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00000001);
     await utils.isTokenBalance(aliceAddr, 0);
   });
@@ -108,7 +111,8 @@ describe("Redeem Low Sat Tests", () => {
       aliceSignatureCallback,
       paymentSignatureCallback
     );
-    const redeemTxid = await broadcast(redeemHex);
+    const redeemTxid =
+      await utils.utils.utils.broadcastWithRetryWithRetryWithRetry(redeemHex);
     expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00000001);
     await utils.isTokenBalance(aliceAddr, 0);
   });
@@ -138,7 +142,8 @@ async function setup(satSupply) {
     schema,
     satSupply
   );
-  const contractTxid = await broadcast(contractHex);
+  const contractTxid =
+    await utils.utils.utils.broadcastWithRetryWithRetryWithRetry(contractHex);
   const contractTx = await getTransaction(contractTxid);
 
   const issueHex = await issue(
@@ -156,6 +161,8 @@ async function setup(satSupply) {
     symbol,
     2
   );
-  issueTxid = await broadcast(issueHex);
+  issueTxid = await utils.utils.utils.broadcastWithRetryWithRetryWithRetry(
+    issueHex
+  );
   issueTx = await getTransaction(issueTxid);
 }

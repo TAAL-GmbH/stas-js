@@ -10,7 +10,7 @@ const {
   redeemSplitWithCallback,
 } = require("../../../index");
 
-const { bitcoinToSatoshis, getTransaction, getFundsFromFaucet, broadcast } =
+const { bitcoinToSatoshis, getTransaction, getFundsFromFaucet } =
   require("../../../index").utils;
 
 const { sighash } = require("../../../lib/stas");
@@ -57,7 +57,7 @@ describe("RedeemSplit Low Sat Tests", () => {
       fundingPrivateKey
     );
 
-    const redeemTxid = await broadcast(redeemSplitHex);
+    const redeemTxid = await utils.broadcastWithRetry(redeemSplitHex);
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00000001); // first utxo goes to redemption address
     expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.0000001);
     expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.0000001);
@@ -80,7 +80,7 @@ describe("RedeemSplit Low Sat Tests", () => {
       fundingPrivateKey
     );
 
-    const redeemTxid = await broadcast(redeemSplitHex);
+    const redeemTxid = await utils.broadcastWithRetry(redeemSplitHex);
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00000001); // first utxo goes to redemption address
     expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.00000005);
     expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.00000005);
@@ -103,7 +103,7 @@ describe("RedeemSplit Low Sat Tests", () => {
       fundingPrivateKey
     );
 
-    const redeemTxid = await broadcast(redeemSplitHex);
+    const redeemTxid = await utils.broadcastWithRetry(redeemSplitHex);
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00000001); // first utxo goes to redemption address
     expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.00000002);
     expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.00000003);
@@ -126,7 +126,7 @@ describe("RedeemSplit Low Sat Tests", () => {
       fundingPrivateKey
     );
 
-    const redeemTxid = await broadcast(redeemSplitHex);
+    const redeemTxid = await utils.broadcastWithRetry(redeemSplitHex);
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00000001); // first utxo goes to redemption address
     expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.00000001);
     expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.00000001);
@@ -157,7 +157,7 @@ describe("RedeemSplit Low Sat Tests", () => {
       paymentSignatureCallback
     );
     console.log(redeemSplitHex);
-    const redeemTxid = await broadcast(redeemSplitHex);
+    const redeemTxid = await utils.broadcastWithRetry(redeemSplitHex);
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00000001); // first utxo goes to redemption address
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00000001); // first utxo goes to redemption address
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00000001); // first utxo goes to redemption address
@@ -192,7 +192,7 @@ async function setup(satSupply) {
     schema,
     satSupply
   );
-  const contractTxid = await broadcast(contractHex);
+  const contractTxid = await utils.broadcastWithRetry(contractHex);
   const contractTx = await getTransaction(contractTxid);
 
   const issueHex = await issue(
@@ -210,6 +210,6 @@ async function setup(satSupply) {
     symbol,
     2
   );
-  issueTxid = await broadcast(issueHex);
+  issueTxid = await utils.broadcastWithRetry(issueHex);
   issueTx = await getTransaction(issueTxid);
 }

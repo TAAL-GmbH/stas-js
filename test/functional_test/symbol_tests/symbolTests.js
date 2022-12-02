@@ -6,8 +6,7 @@ require("dotenv").config();
 
 const { contract, issue } = require("../../../index");
 
-const { getTransaction, getFundsFromFaucet, broadcast } =
-  require("../../../index").utils;
+const { getTransaction, getFundsFromFaucet } = require("../../../index").utils;
 
 describe("Symbol Tests", () => {
   it("Changed Symbol in issue functions", async () => {
@@ -42,7 +41,7 @@ describe("Symbol Tests", () => {
       schema,
       supply
     );
-    const contractTxid = await broadcast(contractHex);
+    const contractTxid = await utils.broadcastWithRetry(contractHex);
     console.log(`Contract TX:     ${contractTxid}`);
     const contractTx = await getTransaction(contractTxid);
     try {
@@ -98,7 +97,7 @@ describe("Symbol Tests", () => {
       schema,
       supply
     );
-    const contractTxid = await broadcast(contractHex);
+    const contractTxid = await utils.broadcastWithRetry(contractHex);
     console.log(`Contract TX:     ${contractTxid}`);
     const contractTx = await getTransaction(contractTxid);
 
@@ -112,7 +111,7 @@ describe("Symbol Tests", () => {
       symbol,
       2
     );
-    const issueTxid = await broadcast(issueHex);
+    const issueTxid = await utils.broadcastWithRetry(issueHex);
     const tokenId = await utils.getToken(issueTxid);
     console.log(`Token ID:        ${tokenId}`);
     const response = await utils.getTokenResponse(tokenId, symbol);
@@ -155,7 +154,7 @@ describe("Symbol Tests", () => {
       schema,
       supply
     );
-    const contractTxid = await broadcast(contractHex);
+    const contractTxid = await utils.broadcastWithRetry(contractHex);
     console.log(`Contract TX:     ${contractTxid}`);
     const contractTx = await getTransaction(contractTxid);
 
@@ -169,7 +168,7 @@ describe("Symbol Tests", () => {
       symbol,
       2
     );
-    const issueTxid = await broadcast(issueHex);
+    const issueTxid = await utils.broadcastWithRetry(issueHex);
     const tokenId = await utils.getToken(issueTxid);
     console.log(`Token ID:        ${tokenId}`);
     const response = await utils.getTokenResponse(tokenId, symbol);

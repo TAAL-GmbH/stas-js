@@ -5,7 +5,7 @@ require("dotenv").config();
 
 const { contract, issue, split, splitWithCallback } = require("../../../index");
 
-const { bitcoinToSatoshis, getTransaction, getFundsFromFaucet, broadcast } =
+const { bitcoinToSatoshis, getTransaction, getFundsFromFaucet } =
   require("../../../index").utils;
 
 const { sighash } = require("../../../lib/stas");
@@ -58,7 +58,7 @@ describe("Split Low Sat Tests", () => {
       utils.getUtxo(issueTxid, issueTx, 1),
       fundingPrivateKey
     );
-    const splitTxid = await broadcast(splitHex);
+    const splitTxid = await utils.broadcastWithRetry(splitHex);
     expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.0000002);
     await utils.isTokenBalance(bobAddr, 20);
   });
@@ -84,7 +84,7 @@ describe("Split Low Sat Tests", () => {
       utils.getUtxo(issueTxid, issueTx, 1),
       fundingPrivateKey
     );
-    const splitTxid = await broadcast(splitHex);
+    const splitTxid = await utils.broadcastWithRetry(splitHex);
     expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.0000001);
     await utils.isTokenBalance(bobAddr, 10);
   });
@@ -110,7 +110,7 @@ describe("Split Low Sat Tests", () => {
       utils.getUtxo(issueTxid, issueTx, 1),
       fundingPrivateKey
     );
-    const splitTxid = await broadcast(splitHex);
+    const splitTxid = await utils.broadcastWithRetry(splitHex);
     expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.00000005);
     await utils.isTokenBalance(bobAddr, 5);
   });
@@ -136,7 +136,7 @@ describe("Split Low Sat Tests", () => {
       utils.getUtxo(issueTxid, issueTx, 1),
       fundingPrivateKey
     );
-    const splitTxid = await broadcast(splitHex);
+    const splitTxid = await utils.broadcastWithRetry(splitHex);
     expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.00000001);
     await utils.isTokenBalance(aliceAddr, 1);
     await utils.isTokenBalance(bobAddr, 1);
@@ -165,7 +165,7 @@ describe("Split Low Sat Tests", () => {
       aliceSignatureCallback,
       paymentSignatureCallback
     );
-    const splitTxid = await broadcast(splitHex);
+    const splitTxid = await utils.broadcastWithRetry(splitHex);
     expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.00000001);
     expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.00000001);
     await utils.isTokenBalance(aliceAddr, 1);
@@ -199,7 +199,7 @@ async function setup(satSupply) {
     schema,
     satSupply
   );
-  const contractTxid = await broadcast(contractHex);
+  const contractTxid = await utils.broadcastWithRetry(contractHex);
   const contractTx = await getTransaction(contractTxid);
 
   const issueHex = await issue(
@@ -217,6 +217,6 @@ async function setup(satSupply) {
     symbol,
     2
   );
-  issueTxid = await broadcast(issueHex);
+  issueTxid = await utils.broadcastWithRetry(issueHex);
   issueTx = await getTransaction(issueTxid);
 }
