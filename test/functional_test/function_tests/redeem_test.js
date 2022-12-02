@@ -56,7 +56,7 @@ describe("Redeem Functional test", () => {
       utils.getUtxo(issueTxid, issueTx, 2),
       fundingPrivateKey
     );
-    const redeemTxid = await broadcast(redeemHex);
+    const redeemTxid = await utils.broadcastWithRetry(redeemHex);
     expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007);
     await utils.isTokenBalance(aliceAddr, 0);
     await utils.isTokenBalance(bobAddr, 3000);
@@ -70,7 +70,7 @@ describe("Redeem Functional test", () => {
       utils.getUtxo(issueTxid, issueTx, 2),
       fundingPrivateKey
     );
-    const redeemTxid = await broadcast(redeemHex);
+    const redeemTxid = await utils.broadcastWithRetry(redeemHex);
     expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00003);
     await utils.isTokenBalance(aliceAddr, 7000);
     await utils.isTokenBalance(bobAddr, 0);
@@ -84,7 +84,7 @@ describe("Redeem Functional test", () => {
       null,
       null
     );
-    const redeemTxid = await broadcast(redeemHex);
+    const redeemTxid = await utils.broadcastWithRetry(redeemHex);
     expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007);
     await utils.isTokenBalance(aliceAddr, 0);
     await utils.isTokenBalance(bobAddr, 3000);
@@ -100,7 +100,7 @@ describe("Redeem Functional test", () => {
       aliceSignatureCallback,
       paymentSignatureCallback
     );
-    const redeemTxid = await broadcast(redeemHex);
+    const redeemTxid = await utils.broadcastWithRetry(redeemHex);
     expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007);
     await utils.isTokenBalance(aliceAddr, 0);
     await utils.isTokenBalance(bobAddr, 3000);
@@ -116,7 +116,7 @@ describe("Redeem Functional test", () => {
       aliceSignatureCallback,
       null
     );
-    const redeemTxid = await broadcast(redeemHex);
+    const redeemTxid = await utils.broadcastWithRetry(redeemHex);
     expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007);
     await utils.isTokenBalance(aliceAddr, 0);
     await utils.isTokenBalance(bobAddr, 3000);
@@ -132,7 +132,7 @@ describe("Redeem Functional test", () => {
     );
     const redeemTx = bsv.Transaction(unsignedRedeemReturn.hex);
     utils.signScriptWithUnlocking(unsignedRedeemReturn, redeemTx, keyMap);
-    const redeemTxid = await broadcast(redeemTx.serialize(true));
+    const redeemTxid = await utils.broadcastWithRetry(redeemTx.serialize(true));
     expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007);
     await utils.isTokenBalance(aliceAddr, 0);
     await utils.isTokenBalance(bobAddr, 3000);
@@ -148,7 +148,7 @@ describe("Redeem Functional test", () => {
     );
     const redeemTx = bsv.Transaction(unsignedRedeemReturn.hex);
     utils.signScriptWithUnlocking(unsignedRedeemReturn, redeemTx, keyMap);
-    const redeemTxid = await broadcast(redeemTx.serialize(true));
+    const redeemTxid = await utils.broadcastWithRetry(redeemTx.serialize(true));
     expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007);
     await utils.isTokenBalance(aliceAddr, 0);
     await utils.isTokenBalance(bobAddr, 3000);
@@ -298,7 +298,7 @@ async function setup() {
     schema,
     supply
   );
-  const contractTxid = await broadcast(contractHex);
+  const contractTxid = await utils.broadcastWithRetry(contractHex);
   const contractTx = await getTransaction(contractTxid);
 
   const issueHex = await issue(
@@ -311,6 +311,6 @@ async function setup() {
     symbol,
     2
   );
-  issueTxid = await broadcast(issueHex);
+  issueTxid = await utils.broadcastWithRetry(issueHex);
   issueTx = await getTransaction(issueTxid);
 }

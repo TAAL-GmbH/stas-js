@@ -17,7 +17,6 @@ const {
   bitcoinToSatoshis,
   getTransaction,
   getFundsFromFaucet,
-  broadcast,
   getRawTransaction,
 } = require("../../../index").utils;
 
@@ -108,7 +107,7 @@ describe("Swap With Less than 2k sats", function () {
       fundingPrivateKey
     );
 
-    const swapTxid = await broadcast(fullySignedSwapHex);
+    const swapTxid = await utils.broadcastWithRetry(fullySignedSwapHex);
     console.log("swaptxid", swapTxid);
 
     const tokenId = await utils.getToken(swapTxid, 1);
@@ -172,7 +171,7 @@ describe("Swap With Less than 2k sats", function () {
 
     // console.log('fullySignedSwapHex', fullySignedSwapHex)
 
-    const swapTxid = await broadcast(fullySignedSwapHex);
+    const swapTxid = await utils.broadcastWithRetry(fullySignedSwapHex);
     console.log("swaptxid: ", swapTxid);
     expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.000019);
     expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.01);
@@ -229,7 +228,7 @@ describe("Swap With Less than 2k sats", function () {
       paymentPublicKeyHash,
       fundingUTXO
     );
-    const swapTxid = await broadcast(fullySignedSwapHex);
+    const swapTxid = await utils.broadcastWithRetry(fullySignedSwapHex);
     expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.000019);
     expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.000019);
     await utils.isTokenBalance(aliceAddr, 1900);
@@ -291,7 +290,7 @@ describe("Swap With Less than 2k sats", function () {
       paymentPublicKeyHash,
       fundingUTXO
     );
-    const swapTxid = await broadcast(fullySignedSwapHex);
+    const swapTxid = await utils.broadcastWithRetry(fullySignedSwapHex);
     console.log("swaptxid", swapTxid);
     expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.01);
     expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.000019);
@@ -348,7 +347,7 @@ describe("Swap With Less than 2k sats", function () {
       fundingUTXO
     );
 
-    const swapTxid = await broadcast(fullySignedSwapHex);
+    const swapTxid = await utils.broadcastWithRetry(fullySignedSwapHex);
     console.log("swaptxid ", swapTxid);
     console.log(aliceAddr);
     console.log(bobAddr);
@@ -413,7 +412,7 @@ async function setup() {
     tokenASchema,
     tokenASupply
   );
-  const tokenAContractTxid = await broadcast(tokenAContractHex);
+  const tokenAContractTxid = await utils.broadcastWithRetry(tokenAContractHex);
   const tokenAContractTx = await getTransaction(tokenAContractTxid);
 
   tokenAIssueHex = await issue(
@@ -432,7 +431,7 @@ async function setup() {
     tokenASymbol,
     2
   );
-  await broadcast(tokenAIssueHex);
+  await utils.broadcastWithRetry(tokenAIssueHex);
   tokenAObj = new bsv.Transaction(tokenAIssueHex);
 
   // Token B
@@ -451,7 +450,7 @@ async function setup() {
     tokenBSchema,
     tokenBSupply
   );
-  const tokenBContractTxid = await broadcast(tokenBContractHex);
+  const tokenBContractTxid = await utils.broadcastWithRetry(tokenBContractHex);
   const tokenBContractTx = await getTransaction(tokenBContractTxid);
 
   tokenBIssueHex = await issue(
@@ -470,7 +469,7 @@ async function setup() {
     tokenBSymbol,
     2
   );
-  tokenBIssueTxid = await broadcast(tokenBIssueHex);
+  tokenBIssueTxid = await utils.broadcastWithRetry(tokenBIssueHex);
   tokenBIssueTx = await getTransaction(tokenBIssueTxid);
   tokenBObj = new bsv.Transaction(tokenBIssueHex);
   fundingUTXO = {

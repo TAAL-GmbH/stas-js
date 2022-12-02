@@ -59,7 +59,7 @@ describe("Issue Functional Tests", () => {
       true,
       symbol
     );
-    const issueTxid = await broadcast(issueHex);
+    const issueTxid = await utils.broadcastWithRetry(issueHex);
     const tokenId = await utils.getToken(issueTxid);
     await new Promise((resolve) => setTimeout(resolve, wait));
     const response = await utils.getTokenResponse(tokenId);
@@ -87,7 +87,7 @@ describe("Issue Functional Tests", () => {
       true,
       symbol
     );
-    const issueTxid = await broadcast(issueHex);
+    const issueTxid = await utils.broadcastWithRetry(issueHex);
     const tokenId = await utils.getToken(issueTxid);
     await new Promise((resolve) => setTimeout(resolve, wait));
     const response = await utils.getTokenResponse(tokenId);
@@ -126,7 +126,7 @@ describe("Issue Functional Tests", () => {
       true,
       symbol
     );
-    const issueTxid = await broadcast(issueHex);
+    const issueTxid = await utils.broadcastWithRetry(issueHex);
     const tokenId = await utils.getToken(issueTxid);
     console.log("token  " + tokenId);
     await new Promise((resolve) => setTimeout(resolve, wait));
@@ -176,7 +176,7 @@ describe("Issue Functional Tests", () => {
       true,
       symbol
     );
-    const issueTxid = await broadcast(issueHex);
+    const issueTxid = await utils.broadcastWithRetry(issueHex);
     const tokenId = await utils.getToken(issueTxid);
     await new Promise((resolve) => setTimeout(resolve, wait));
     const response = await utils.getTokenResponse(tokenId);
@@ -201,7 +201,7 @@ describe("Issue Functional Tests", () => {
       true,
       symbol
     );
-    const issueTxid = await broadcast(issueHex);
+    const issueTxid = await utils.broadcastWithRetry(issueHex);
     const tokenId = await utils.getToken(issueTxid);
     await new Promise((resolve) => setTimeout(resolve, wait));
     const response = await utils.getTokenResponse(tokenId);
@@ -221,7 +221,7 @@ describe("Issue Functional Tests", () => {
       true,
       symbol
     );
-    const issueTxid = await broadcast(issueHex);
+    const issueTxid = await utils.broadcastWithRetry(issueHex);
     const tokenId = await utils.getToken(issueTxid);
     const response = await utils.getTokenResponse(tokenId);
     await new Promise((resolve) => setTimeout(resolve, wait));
@@ -242,7 +242,7 @@ describe("Issue Functional Tests", () => {
       false,
       symbol
     );
-    const issueTxid = await broadcast(issueHex);
+    const issueTxid = await utils.broadcastWithRetry(issueHex);
     const tokenId = await utils.getToken(issueTxid);
     const response = await utils.getTokenResponse(tokenId);
     expect(response.symbol).to.equal(symbol);
@@ -262,7 +262,7 @@ describe("Issue Functional Tests", () => {
       true,
       symbol
     );
-    const issueTxid = await broadcast(issueHex);
+    const issueTxid = await utils.broadcastWithRetry(issueHex);
     const tokenId = await utils.getToken(issueTxid);
     const response = await utils.getTokenResponse(tokenId);
     expect(response.symbol).to.equal(symbol);
@@ -282,7 +282,7 @@ describe("Issue Functional Tests", () => {
       true,
       symbol
     );
-    const issueTxid = await broadcast(issueHex);
+    const issueTxid = await utils.broadcastWithRetry(issueHex);
     const tokenId = await utils.getToken(issueTxid);
     const response = await utils.getTokenResponse(tokenId);
     expect(response.symbol).to.equal(symbol);
@@ -304,7 +304,7 @@ describe("Issue Functional Tests", () => {
       issuerSignatureCallback,
       paymentSignatureCallback
     );
-    const issueTxid = await broadcast(issueHex);
+    const issueTxid = await utils.broadcastWithRetry(issueHex);
     const tokenId = await utils.getToken(issueTxid);
     await new Promise((resolve) => setTimeout(resolve, wait));
     const response = await utils.getTokenResponse(tokenId);
@@ -327,12 +327,7 @@ describe("Issue Functional Tests", () => {
       issuerSignatureCallback,
       null
     );
-    let issueTxid;
-    try {
-      issueTxid = await broadcast(issueHex);
-    } catch (e) {
-      console.log(e);
-    }
+    const issueTxid = await utils.broadcastWithRetry(issueHex);
     const tokenId = await utils.getToken(issueTxid);
     const response = await utils.getTokenResponse(tokenId);
     expect(response.symbol).to.equal(symbol);
@@ -380,7 +375,7 @@ describe("Issue Functional Tests", () => {
       true,
       "TAALT"
     );
-    const issueTxid = await broadcast(issueHex);
+    const issueTxid = await utils.broadcastWithRetry(issueHex);
     const tokenId = await utils.getToken(issueTxid);
     await new Promise((resolve) => setTimeout(resolve, 10000));
     const response = await utils.getTokenResponse(tokenId);
@@ -405,7 +400,7 @@ describe("Issue Functional Tests", () => {
     );
     const issueTx = new bsv.Transaction(issueHex.hex);
     utils.signScript(issueHex, issueTx, keyMap);
-    const issueTxid = await broadcast(issueTx.serialize(true));
+    const issueTxid = await utils.broadcastWithRetry(issueTx.serialize(true));
     const tokenId = await utils.getToken(issueTxid);
     await new Promise((resolve) => setTimeout(resolve, wait));
     const response = await utils.getTokenResponse(tokenId);
@@ -416,7 +411,7 @@ describe("Issue Functional Tests", () => {
     await utils.isTokenBalance(bobAddr, 3000);
   });
 
-  it("Issue - Successful Issue Token With Unsigned & No", async () => {
+  it("Issue - Successful Issue Token With Unsigned & NoFee", async () => {
     const issueHex = await unsignedIssue(
       issuerPrivateKey.publicKey,
       utils.getIssueInfo(aliceAddr, 7000, bobAddr, 3000),
@@ -428,7 +423,7 @@ describe("Issue Functional Tests", () => {
     );
     const issueTx = new bsv.Transaction(issueHex.hex);
     utils.signScript(issueHex, issueTx, keyMap);
-    const issueTxid = await broadcast(issueTx.serialize(true));
+    const issueTxid = await utils.broadcastWithRetry(issueTx.serialize(true));
     const tokenId = await utils.getToken(issueTxid);
     await new Promise((resolve) => setTimeout(resolve, wait));
     const response = await utils.getTokenResponse(tokenId);
@@ -519,6 +514,6 @@ async function setup() {
     schema,
     supply
   );
-  contractTxid = await broadcast(contractHex);
+  contractTxid = await utils.broadcastWithRetry(contractHex);
   contractTx = await getTransaction(contractTxid);
 }

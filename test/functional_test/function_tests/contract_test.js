@@ -43,7 +43,7 @@ describe("Contract Functional Tests", () => {
       schema,
       supply
     );
-    const contractTxid = await broadcast(contractHex);
+    const contractTxid = await utils.broadcastWithRetry(contractHex);
     const amount = await utils.getVoutAmount(contractTxid, 0);
     expect(amount).to.equal(supply / 100000000);
   });
@@ -57,7 +57,7 @@ describe("Contract Functional Tests", () => {
       schema,
       supply
     );
-    const contractTxid = await broadcast(contractHex);
+    const contractTxid = await utils.broadcastWithRetry(contractHex);
     const amount = await utils.getVoutAmount(contractTxid, 0);
     expect(amount).to.equal(supply / 100000000);
   });
@@ -71,7 +71,7 @@ describe("Contract Functional Tests", () => {
       schema,
       supply
     );
-    const contractTxid = await broadcast(contractHex);
+    const contractTxid = await utils.broadcastWithRetry(contractHex);
     const amount = await utils.getVoutAmount(contractTxid, 0);
     expect(amount).to.equal(supply / 100000000);
   });
@@ -87,7 +87,7 @@ describe("Contract Functional Tests", () => {
       ownerSignCallback,
       paymentSignCallback
     );
-    const contractTxid = await broadcast(contractHex);
+    const contractTxid = await utils.broadcastWithRetry(contractHex);
     const amount = await utils.getVoutAmount(contractTxid, 0);
     expect(amount).to.equal(supply / 100000000);
   });
@@ -103,7 +103,7 @@ describe("Contract Functional Tests", () => {
       ownerSignCallback,
       null
     );
-    const contractTxid = await broadcast(contractHex);
+    const contractTxid = await utils.broadcastWithRetry(contractHex);
     const amount = await utils.getVoutAmount(contractTxid, 0);
     expect(amount).to.equal(supply / 100000000);
   });
@@ -121,7 +121,9 @@ describe("Contract Functional Tests", () => {
     const contractTx = new bsv.Transaction(contractTxJson);
     let signedContract = contractTx.sign(issuerPrivateKey);
     signedContract = contractTx.sign(fundingPrivateKey);
-    const contractTxid = await broadcast(signedContract.serialize(true));
+    const contractTxid = await utils.broadcastWithRetry(
+      signedContract.serialize(true)
+    );
     const amount = await utils.getVoutAmount(contractTxid, 0);
     expect(amount).to.equal(supply / 100000000);
   });
@@ -138,7 +140,9 @@ describe("Contract Functional Tests", () => {
     const contractTxJson = JSON.parse(contractHex.json);
     const contractTx = new bsv.Transaction(contractTxJson);
     const signedContract = contractTx.sign(issuerPrivateKey);
-    const contractTxid = await broadcast(signedContract.serialize(true));
+    const contractTxid = await utils.broadcastWithRetry(
+      signedContract.serialize(true)
+    );
     const amount = await utils.getVoutAmount(contractTxid, 0);
     expect(amount).to.equal(supply / 100000000);
   });

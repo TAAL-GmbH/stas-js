@@ -11,7 +11,7 @@ const {
   mergeSplit,
 } = require("../../../index");
 
-const { getTransaction, getFundsFromFaucet, broadcast, bitcoinToSatoshis } =
+const { getTransaction, getFundsFromFaucet, bitcoinToSatoshis } =
   require("../../../index").utils;
 
 it("Attempting Merge With A Fee UTXO Index > 16 Throws Error", async () => {
@@ -53,7 +53,7 @@ it("Attempting Merge With A Fee UTXO Index > 16 Throws Error", async () => {
     schema,
     supply
   );
-  const contractTxid = await broadcast(contractHex);
+  const contractTxid = await utils.broadcastWithRetry(contractHex);
   console.log(`Contract TX:     ${contractTxid}`);
   const contractTx = await getTransaction(contractTxid);
 
@@ -65,7 +65,7 @@ it("Attempting Merge With A Fee UTXO Index > 16 Throws Error", async () => {
     schema,
     supply
   );
-  const contractTxid2 = await broadcast(contractHex2);
+  const contractTxid2 = await utils.broadcastWithRetry(contractHex2);
   console.log(`Contract TX2:     ${contractTxid2}`);
   const contractTx2 = await getTransaction(contractTxid2);
 
@@ -79,7 +79,7 @@ it("Attempting Merge With A Fee UTXO Index > 16 Throws Error", async () => {
     symbol,
     2
   );
-  const issueTxid = await broadcast(issueHex);
+  const issueTxid = await utils.broadcastWithRetry(issueHex);
   console.log(`Issue TX:     ${issueTxid}`);
   const issueTx = await getTransaction(issueTxid);
   console.log(issueTx);
@@ -97,7 +97,7 @@ it("Attempting Merge With A Fee UTXO Index > 16 Throws Error", async () => {
     utils.getUtxo(contractTxid2, contractTx2, 1),
     fundingPrivateKey
   );
-  const transferTxid = await broadcast(transferHex);
+  const transferTxid = await utils.broadcastWithRetry(transferHex);
   console.log(`Transfer TX:     ${transferTxid}`);
   const transferTx = await getTransaction(transferTxid);
 
@@ -120,7 +120,7 @@ it("Attempting Merge With A Fee UTXO Index > 16 Throws Error", async () => {
     utils.getUtxo(transferTxid, transferTx, 1),
     fundingPrivateKey
   );
-  const splitTxid = await broadcast(splitHex);
+  const splitTxid = await utils.broadcastWithRetry(splitHex);
   console.log(`Split TX:        ${splitTxid}`);
   const splitTx = await getTransaction(splitTxid);
 
@@ -143,7 +143,7 @@ it("Attempting Merge With A Fee UTXO Index > 16 Throws Error", async () => {
     utils.getUtxo(issueTxid, issueTx, 17),
     fundingPrivateKey
   );
-  const mergeTxid = await broadcast(mergeHex);
+  const mergeTxid = await utils.broadcastWithRetry(mergeHex);
   console.log(`Merge TX:        ${mergeTxid}`);
 });
 

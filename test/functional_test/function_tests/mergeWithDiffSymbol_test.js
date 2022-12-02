@@ -85,7 +85,7 @@ it("MergeSplit - Attempt To Merge With Different Symbol", async () => {
     fundingPrivateKey
   );
   try {
-    await broadcast(mergeHex);
+    await utils.broadcast(mergeHex);
   } catch (e) {
     expect(e).to.be.instanceOf(Error);
     expect(e.response.data).to.eql(
@@ -137,7 +137,7 @@ async function setup() {
     schema,
     supply
   );
-  contractTxid = await broadcast(contractHex);
+  contractTxid = await utils.broadcastWithRetry(contractHex);
   contractTx = await getTransaction(contractTxid);
 
   const issueHex = await issue(
@@ -150,7 +150,7 @@ async function setup() {
     symbol,
     2
   );
-  issueTxid = await broadcast(issueHex);
+  issueTxid = await utils.broadcastWithRetry(issueHex);
   issueTx = await getTransaction(issueTxid);
 
   const issueOutFundingVout = issueTx.vout.length - 1;
@@ -174,7 +174,7 @@ async function setup() {
     utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
     fundingPrivateKey
   );
-  splitTxid = await broadcast(splitHex);
+  splitTxid = await utils.broadcastWithRetry(splitHex);
   splitTxObj = new bsv.Transaction(splitHex);
 
   // issue token with different symbol
@@ -186,7 +186,7 @@ async function setup() {
     schema2,
     supply
   );
-  const contractTxid2 = await broadcast(contractHex2);
+  const contractTxid2 = await utils.broadcastWithRetry(contractHex2);
   const contractTx2 = await getTransaction(contractTxid2);
 
   const issueHex2 = await issue(
@@ -199,7 +199,7 @@ async function setup() {
     symbol2,
     2
   );
-  const issueTxid2 = await broadcast(issueHex2);
+  const issueTxid2 = await utils.broadcastWithRetry(issueHex2);
   const issueTx2 = await getTransaction(issueTxid2);
 
   const amount = issueTx.vout[0].value / 2;
@@ -220,7 +220,7 @@ async function setup() {
     utils.getUtxo(issueTxid2, issueTx2, issueOutFundingVout),
     fundingPrivateKey
   );
-  splitTxid2 = await broadcast(splitHex2);
+  splitTxid2 = await utils.broadcastWithRetry(splitHex2);
   splitTx2 = await getTransaction(splitTxid);
   splitTxObj2 = new bsv.Transaction(splitHex);
 }

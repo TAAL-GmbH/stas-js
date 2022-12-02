@@ -46,7 +46,7 @@ describe("Symbol Size 128 Bytes test", () => {
       symbol,
       2
     );
-    const issueTxid = await broadcast(issueHex);
+    const issueTxid = await utils.broadcastWithRetry(issueHex);
     const tokenId = await utils.getToken(issueTxid);
     console.log(`issueTxid:        ${issueTxid}`);
     console.log(`Token ID:        ${tokenId}`);
@@ -62,7 +62,7 @@ describe("Symbol Size 128 Bytes test", () => {
       utils.getUtxo(issueTxid, issueTx, 1),
       fundingPrivateKey
     );
-    const redeemTxid = await broadcast(redeemHex);
+    const redeemTxid = await utils.broadcastWithRetry(redeemHex);
     console.log(`Redeem TX:       ${redeemTxid}`);
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.0001);
 
@@ -89,7 +89,7 @@ describe("Symbol Size 128 Bytes test", () => {
       symbol,
       2
     );
-    const issueTxid = await broadcast(issueHex);
+    const issueTxid = await utils.broadcastWithRetry(issueHex);
     const tokenId = await utils.getToken(issueTxid);
     console.log(`issueTxid:        ${issueTxid}`);
     console.log(`Token ID:        ${tokenId}`);
@@ -105,7 +105,7 @@ describe("Symbol Size 128 Bytes test", () => {
       utils.getUtxo(issueTxid, issueTx, 1),
       fundingPrivateKey
     );
-    const redeemTxid = await broadcast(redeemHex);
+    const redeemTxid = await utils.broadcastWithRetry(redeemHex);
     console.log(`Redeem TX:       ${redeemTxid}`);
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.0001);
     await utils.isTokenBalance(aliceAddr, 0);
@@ -132,7 +132,7 @@ describe("Symbol Size 128 Bytes test", () => {
       symbol,
       2
     );
-    const issueTxid = await broadcast(issueHex);
+    const issueTxid = await utils.broadcastWithRetry(issueHex);
     const tokenId = await utils.getToken(issueTxid);
     console.log(`issueTxid:        ${issueTxid}`);
     console.log(`Token ID:        ${tokenId}`);
@@ -148,7 +148,7 @@ describe("Symbol Size 128 Bytes test", () => {
       utils.getUtxo(issueTxid, issueTx, 1),
       fundingPrivateKey
     );
-    const redeemTxid = await broadcast(redeemHex);
+    const redeemTxid = await utils.broadcastWithRetry(redeemHex);
     console.log(`Redeem TX:       ${redeemTxid}`);
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.0001);
     await utils.isTokenBalance(aliceAddr, 0);
@@ -175,7 +175,7 @@ describe("Symbol Size 128 Bytes test", () => {
       symbol,
       2
     );
-    const issueTxid = await broadcast(issueHex);
+    const issueTxid = await utils.broadcastWithRetry(issueHex);
     const tokenId = await utils.getToken(issueTxid);
     console.log(`issueTxid:        ${issueTxid}`);
     console.log(`Token ID:        ${tokenId}`);
@@ -191,7 +191,7 @@ describe("Symbol Size 128 Bytes test", () => {
       utils.getUtxo(issueTxid, issueTx, 1),
       fundingPrivateKey
     );
-    const redeemTxid = await broadcast(redeemHex);
+    const redeemTxid = await utils.broadcastWithRetry(redeemHex);
     console.log(`Redeem TX:       ${redeemTxid}`);
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.0001);
     await utils.isTokenBalance(aliceAddr, 0);
@@ -218,7 +218,7 @@ describe("Symbol Size 128 Bytes test", () => {
       symbol,
       2
     );
-    const issueTxid = await broadcast(issueHex);
+    const issueTxid = await utils.broadcastWithRetry(issueHex);
     const tokenId = await utils.getToken(issueTxid);
     console.log(`issueTxid:        ${issueTxid}`);
     console.log(`Token ID:        ${tokenId}`);
@@ -234,7 +234,7 @@ describe("Symbol Size 128 Bytes test", () => {
       utils.getUtxo(issueTxid, issueTx, 1),
       fundingPrivateKey
     );
-    const redeemTxid = await broadcast(redeemHex);
+    const redeemTxid = await utils.broadcastWithRetry(redeemHex);
     console.log(`Redeem TX:       ${redeemTxid}`);
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.0001);
     await utils.isTokenBalance(aliceAddr, 0);
@@ -259,7 +259,7 @@ describe("Symbol Size 128 Bytes test", () => {
       symbol,
       2
     );
-    const issueTxid = await broadcast(issueHex);
+    const issueTxid = await utils.broadcastWithRetry(issueHex);
     const tokenId = await utils.getToken(issueTxid);
     console.log(`issueTxid:        ${issueTxid}`);
     console.log(`Token ID:        ${tokenId}`);
@@ -275,7 +275,7 @@ describe("Symbol Size 128 Bytes test", () => {
       utils.getUtxo(issueTxid, issueTx, 1),
       fundingPrivateKey
     );
-    const redeemTxid = await broadcast(redeemHex);
+    const redeemTxid = await utils.broadcastWithRetry(redeemHex);
     console.log(`Redeem TX:       ${redeemTxid}`);
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.0001);
     await utils.isTokenBalance(aliceAddr, 0);
@@ -301,7 +301,7 @@ describe("Symbol Size 128 Bytes test", () => {
       symbol,
       2
     );
-    const issueTxid = await broadcast(issueHex);
+    const issueTxid = await utils.broadcastWithRetry(issueHex);
     const tokenId = await utils.getToken(issueTxid);
     console.log(`issueTxid:        ${issueTxid}`);
     console.log(`Token ID:        ${tokenId}`);
@@ -317,7 +317,7 @@ describe("Symbol Size 128 Bytes test", () => {
       utils.getUtxo(issueTxid, issueTx, 1),
       fundingPrivateKey
     );
-    const redeemTxid = await broadcast(redeemHex);
+    const redeemTxid = await utils.broadcastWithRetry(redeemHex);
     console.log(`Redeem TX:       ${redeemTxid}`);
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.0001);
     await utils.isTokenBalance(aliceAddr, 0);
@@ -343,7 +343,7 @@ describe("Symbol Size 128 Bytes test", () => {
       symbol,
       2
     );
-    const issueTxid = await broadcast(issueHex);
+    const issueTxid = await utils.broadcastWithRetry(issueHex);
     const tokenId = await utils.getToken(issueTxid);
     console.log(`issueTxid:        ${issueTxid}`);
     console.log(`Token ID:        ${tokenId}`);
@@ -359,7 +359,7 @@ describe("Symbol Size 128 Bytes test", () => {
       utils.getUtxo(issueTxid, issueTx, 1),
       fundingPrivateKey
     );
-    const redeemTxid = await broadcast(redeemHex);
+    const redeemTxid = await utils.broadcastWithRetry(redeemHex);
     console.log(`Redeem TX:       ${redeemTxid}`);
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.0001);
     await utils.isTokenBalance(aliceAddr, 0);
@@ -391,6 +391,6 @@ async function setup() {
     schema,
     supply
   );
-  contractTxid = await broadcast(contractHex);
+  contractTxid = await utils.broadcastWithRetry(contractHex);
   contractTx = await getTransaction(contractTxid);
 }

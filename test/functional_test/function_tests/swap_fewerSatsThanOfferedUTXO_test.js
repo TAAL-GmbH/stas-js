@@ -18,7 +18,6 @@ const {
   getTransaction,
   getRawTransaction,
   getFundsFromFaucet,
-  broadcast,
 } = require("../../../index").utils;
 
 const { contract, issue } = require("../../../index");
@@ -114,7 +113,7 @@ describe("Swap With Fewer sats than in offered utxo", function () {
     console.log("fullySignedSwapHex", fullySignedSwapHex);
     // Script failed an OP_NUMEQUALVERIFY operation
 
-    const swapTxid = await broadcast(fullySignedSwapHex);
+    const swapTxid = await utils.broadcastWithRetry(fullySignedSwapHex);
     console.log("swaptxid", swapTxid);
 
     const tokenId = await utils.getToken(swapTxid, 1);
@@ -181,7 +180,7 @@ describe("Swap With Fewer sats than in offered utxo", function () {
     console.log("fullySignedSwapHex", fullySignedSwapHex);
     // Script failed an OP_NUMEQUALVERIFY operation
 
-    const swapTxid = await broadcast(fullySignedSwapHex);
+    const swapTxid = await utils.broadcastWithRetry(fullySignedSwapHex);
     console.log("swaptxid ", swapTxid);
     console.log("tokenA", tokenASymbol);
     const tokenId = await utils.getToken(swapTxid, 0);
@@ -250,7 +249,7 @@ describe("Swap With Fewer sats than in offered utxo", function () {
     console.log("fullySignedSwapHex", fullySignedSwapHex);
     // Script failed an OP_NUMEQUALVERIFY operation
 
-    const swapTxid = await broadcast(fullySignedSwapHex);
+    const swapTxid = await utils.broadcastWithRetry(fullySignedSwapHex);
     console.log("swaptxid", swapTxid);
     const tokenId = await utils.getToken(swapTxid, 1);
     const response = await utils.getTokenResponse(tokenId, tokenBSymbol);
@@ -311,7 +310,7 @@ describe("Swap With Fewer sats than in offered utxo", function () {
     console.log("fullySignedSwapHex", fullySignedSwapHex);
     // Script failed an OP_NUMEQUALVERIFY operation
 
-    const swapTxid = await broadcast(fullySignedSwapHex);
+    const swapTxid = await utils.broadcastWithRetry(fullySignedSwapHex);
     console.log("swaptxid ", swapTxid);
     const tokenId = await utils.getToken(swapTxid, 0);
     const response = await utils.getTokenResponse(tokenId, tokenASymbol);
@@ -375,7 +374,7 @@ async function setup() {
     tokenASchema,
     tokenASupply
   );
-  const tokenAContractTxid = await broadcast(tokenAContractHex);
+  const tokenAContractTxid = await utils.broadcastWithRetry(tokenAContractHex);
   const tokenAContractTx = await getTransaction(tokenAContractTxid);
 
   tokenAIssueHex = await issue(
@@ -394,7 +393,7 @@ async function setup() {
     tokenASymbol,
     2
   );
-  tokenAIssueTxid = await broadcast(tokenAIssueHex);
+  tokenAIssueTxid = await utils.broadcastWithRetry(tokenAIssueHex);
   tokenAObj = new bsv.Transaction(tokenAIssueHex);
 
   // Token B
@@ -413,7 +412,7 @@ async function setup() {
     tokenBSchema,
     tokenBSupply
   );
-  const tokenBContractTxid = await broadcast(tokenBContractHex);
+  const tokenBContractTxid = await utils.broadcastWithRetry(tokenBContractHex);
   const tokenBContractTx = await getTransaction(tokenBContractTxid);
 
   tokenBIssueHex = await issue(
@@ -432,7 +431,7 @@ async function setup() {
     tokenBSymbol,
     2
   );
-  tokenBIssueTxid = await broadcast(tokenBIssueHex);
+  tokenBIssueTxid = await utils.broadcastWithRetry(tokenBIssueHex);
   tokenBIssueTx = await getTransaction(tokenBIssueTxid);
   tokenBObj = new bsv.Transaction(tokenBIssueHex);
   fundingUTXO = {

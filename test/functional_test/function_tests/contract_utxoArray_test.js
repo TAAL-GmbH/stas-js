@@ -51,7 +51,7 @@ describe("Contract Multiple UTXO tests", () => {
       schema,
       supply
     );
-    const contractTxid = await broadcast(contractHex);
+    const contractTxid = await utils.broadcastWithRetry(contractHex);
     console.log(`Contract TX:     ${contractTxid}`);
     const amountIndex0 = await utils.getVoutAmount(contractTxid, 0);
     const amountIndex1 = await utils.getVoutAmount(contractTxid, 1);
@@ -104,7 +104,7 @@ describe("Contract Multiple UTXO tests", () => {
       schema,
       supply
     );
-    const contractTxid = await broadcast(contractHex);
+    const contractTxid = await utils.broadcastWithRetry(contractHex);
     console.log(`Contract TX:     ${contractTxid}`);
     const amountIndex0 = await utils.getVoutAmount(contractTxid, 0);
     const amountIndex1 = await utils.getVoutAmount(contractTxid, 1);

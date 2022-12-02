@@ -59,7 +59,7 @@ describe("Transfer Functional Tests", () => {
       utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
       fundingPrivateKey
     );
-    const transferTxid = await broadcast(transferHex);
+    const transferTxid = await utils.broadcastWithRetry(transferHex);
     expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003);
     await utils.isTokenBalance(aliceAddr, 10000);
     await utils.isTokenBalance(bobAddr, 0);
@@ -73,7 +73,7 @@ describe("Transfer Functional Tests", () => {
       utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
       fundingPrivateKey
     );
-    const transferTxid = await broadcast(transferHex);
+    const transferTxid = await utils.broadcastWithRetry(transferHex);
     expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00007);
     await utils.isTokenBalance(aliceAddr, 0);
     await utils.isTokenBalance(bobAddr, 10000);
@@ -89,7 +89,7 @@ describe("Transfer Functional Tests", () => {
       utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
       fundingPrivateKey
     );
-    const transferTxid = await broadcast(transferHex);
+    const transferTxid = await utils.broadcastWithRetry(transferHex);
     expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003);
     await utils.isTokenBalance(aliceAddr, 7000);
     await utils.isTokenBalance(bobAddr, 0);
@@ -104,7 +104,7 @@ describe("Transfer Functional Tests", () => {
       utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
       fundingPrivateKey
     );
-    const transferTxid = await broadcast(transferHex);
+    const transferTxid = await utils.broadcastWithRetry(transferHex);
     expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003);
     await utils.isTokenBalance(aliceAddr, 7000);
     await utils.isTokenBalance(bobAddr, 3000);
@@ -118,7 +118,7 @@ describe("Transfer Functional Tests", () => {
       utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
       fundingPrivateKey
     );
-    const transferTxid = await broadcast(transferHex);
+    const transferTxid = await utils.broadcastWithRetry(transferHex);
     expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003);
     await utils.isTokenBalance(aliceAddr, 7000);
     await utils.isTokenBalance(fundingAddress, 3000);
@@ -132,7 +132,7 @@ describe("Transfer Functional Tests", () => {
       null,
       null
     );
-    const transferTxid = await broadcast(transferHex);
+    const transferTxid = await utils.broadcastWithRetry(transferHex);
     expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003);
     await utils.isTokenBalance(aliceAddr, 10000);
     await utils.isTokenBalance(bobAddr, 0);
@@ -148,7 +148,7 @@ describe("Transfer Functional Tests", () => {
       bobSignatureCallback,
       null
     );
-    const transferTxid = await broadcast(transferHex);
+    const transferTxid = await utils.broadcastWithRetry(transferHex);
     expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003);
     await utils.isTokenBalance(aliceAddr, 10000);
     await utils.isTokenBalance(bobAddr, 0);
@@ -164,7 +164,7 @@ describe("Transfer Functional Tests", () => {
       bobSignatureCallback,
       paymentSignatureCallback
     );
-    const transferTxid = await broadcast(transferHex);
+    const transferTxid = await utils.broadcastWithRetry(transferHex);
     expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003);
     await utils.isTokenBalance(bobAddr, 3000);
     await utils.isTokenBalance(aliceAddr, 7000);
@@ -180,7 +180,9 @@ describe("Transfer Functional Tests", () => {
     );
     const transferTx = bsv.Transaction(unsignedTransferReturn.hex);
     utils.signScriptWithUnlocking(unsignedTransferReturn, transferTx, keyMap);
-    const transferTxid = await broadcast(transferTx.serialize(true));
+    const transferTxid = await utils.broadcastWithRetry(
+      transferTx.serialize(true)
+    );
     expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003);
     await utils.isTokenBalance(aliceAddr, 10000);
     await utils.isTokenBalance(bobAddr, 0);
@@ -196,7 +198,9 @@ describe("Transfer Functional Tests", () => {
     );
     const transferTx = bsv.Transaction(unsignedTransferReturn.hex);
     utils.signScriptWithUnlocking(unsignedTransferReturn, transferTx, keyMap);
-    const transferTxid = await broadcast(transferTx.serialize(true));
+    const transferTxid = await utils.broadcastWithRetry(
+      transferTx.serialize(true)
+    );
     expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003);
     await utils.isTokenBalance(aliceAddr, 10000);
     await utils.isTokenBalance(bobAddr, 0);
@@ -300,7 +304,7 @@ async function setup() {
     schema,
     supply
   );
-  const contractTxid = await broadcast(contractHex);
+  const contractTxid = await utils.broadcastWithRetry(contractHex);
   const contractTx = await getTransaction(contractTxid);
 
   const issueHex = await issue(
@@ -313,6 +317,6 @@ async function setup() {
     symbol,
     2
   );
-  issueTxid = await broadcast(issueHex);
+  issueTxid = await utils.broadcastWithRetry(issueHex);
   issueTx = await getTransaction(issueTxid);
 }

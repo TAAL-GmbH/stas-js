@@ -13,7 +13,7 @@ const {
   redeem,
 } = require("../../../index");
 
-const { bitcoinToSatoshis, getTransaction, getFundsFromFaucet, broadcast } =
+const { bitcoinToSatoshis, getTransaction, getFundsFromFaucet } =
   require("../../../index").utils;
 
 it("Full Life Cycle Test With 3 Issuance Addresses", async () => {
@@ -52,7 +52,7 @@ it("Full Life Cycle Test With 3 Issuance Addresses", async () => {
     schema,
     supply
   );
-  const contractTxid = await broadcast(contractHex);
+  const contractTxid = await utils.broadcastWithRetry(contractHex);
   console.log(`Contract TX:     ${contractTxid}`);
   const contractTx = await getTransaction(contractTxid);
 
@@ -84,7 +84,7 @@ it("Full Life Cycle Test With 3 Issuance Addresses", async () => {
     symbol,
     2
   );
-  const issueTxid = await broadcast(issueHex);
+  const issueTxid = await utils.broadcastWithRetry(issueHex);
   await new Promise((resolve) => setTimeout(resolve, wait));
   const issueTx = await getTransaction(issueTxid);
   const tokenId = await utils.getToken(issueTxid);
@@ -107,7 +107,7 @@ it("Full Life Cycle Test With 3 Issuance Addresses", async () => {
     utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
     fundingPrivateKey
   );
-  const transferTxid = await broadcast(transferHex);
+  const transferTxid = await utils.broadcastWithRetry(transferHex);
   console.log(`Transfer TX:     ${transferTxid}`);
   const transferTx = await getTransaction(transferTxid);
   expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003);
@@ -135,7 +135,7 @@ it("Full Life Cycle Test With 3 Issuance Addresses", async () => {
     utils.getUtxo(transferTxid, transferTx, 1),
     fundingPrivateKey
   );
-  const splitTxid = await broadcast(splitHex);
+  const splitTxid = await utils.broadcastWithRetry(splitHex);
   console.log(`Split TX:        ${splitTxid}`);
   const splitTx = await getTransaction(splitTxid);
   expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000015);
@@ -155,7 +155,7 @@ it("Full Life Cycle Test With 3 Issuance Addresses", async () => {
     fundingPrivateKey
   );
 
-  const mergeTxid = await broadcast(mergeHex);
+  const mergeTxid = await utils.broadcastWithRetry(mergeHex);
   console.log(`Merge TX:        ${mergeTxid}`);
   const mergeTx = await getTransaction(mergeTxid);
   expect(await utils.getVoutAmount(mergeTxid, 0)).to.equal(0.00003);
@@ -180,7 +180,7 @@ it("Full Life Cycle Test With 3 Issuance Addresses", async () => {
     utils.getUtxo(mergeTxid, mergeTx, 1),
     fundingPrivateKey
   );
-  const splitTxid2 = await broadcast(splitHex2);
+  const splitTxid2 = await utils.broadcastWithRetry(splitHex2);
   console.log(`Split TX2:       ${splitTxid2}`);
   const splitTx2 = await getTransaction(splitTxid2);
   expect(await utils.getVoutAmount(splitTxid2, 0)).to.equal(0.000015);
@@ -209,7 +209,7 @@ it("Full Life Cycle Test With 3 Issuance Addresses", async () => {
     fundingPrivateKey
   );
 
-  const mergeSplitTxid = await broadcast(mergeSplitHex);
+  const mergeSplitTxid = await utils.broadcastWithRetry(mergeSplitHex);
   console.log(`MergeSplit TX:   ${mergeSplitTxid}`);
   const mergeSplitTx = await getTransaction(mergeSplitTxid);
   expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000075);
@@ -226,7 +226,7 @@ it("Full Life Cycle Test With 3 Issuance Addresses", async () => {
     utils.getUtxo(mergeSplitTxid, mergeSplitTx, 2),
     fundingPrivateKey
   );
-  const redeemTxid = await broadcast(redeemHex);
+  const redeemTxid = await utils.broadcastWithRetry(redeemHex);
   console.log(`Redeem TX:       ${redeemTxid}`);
   expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.0000075);
   await utils.isTokenBalance(aliceAddr, 5000);

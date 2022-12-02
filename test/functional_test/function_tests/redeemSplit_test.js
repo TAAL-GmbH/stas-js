@@ -63,7 +63,7 @@ describe("RedeemSplit Functional Test", () => {
       utils.getUtxo(issueTxid, issueTx, 2),
       fundingPrivateKey
     );
-    const redeemTxid = await broadcast(redeemSplitHex);
+    const redeemTxid = await utils.broadcastWithRetry(redeemSplitHex);
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000035); // first utxo goes to redemption address
     expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000035);
     await utils.isTokenBalance(aliceAddr, 0);
@@ -90,7 +90,7 @@ describe("RedeemSplit Functional Test", () => {
       utils.getUtxo(issueTxid, issueTx, 2),
       fundingPrivateKey
     );
-    const redeemTxid = await broadcast(redeemSplitHex);
+    const redeemTxid = await utils.broadcastWithRetry(redeemSplitHex);
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000042); // first utxo goes to redemption address
     expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000014);
     expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.000014);
@@ -124,7 +124,7 @@ describe("RedeemSplit Functional Test", () => {
       utils.getUtxo(issueTxid, issueTx, 2),
       fundingPrivateKey
     );
-    const redeemTxid = await broadcast(redeemSplitHex);
+    const redeemTxid = await utils.broadcastWithRetry(redeemSplitHex);
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000049);
     expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000007);
     expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.000007);
@@ -155,7 +155,7 @@ describe("RedeemSplit Functional Test", () => {
       null,
       null
     );
-    const redeemTxid = await broadcast(redeemSplitHex);
+    const redeemTxid = await utils.broadcastWithRetry(redeemSplitHex);
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.00002334);
     expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.00002333);
     expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.00002333);
@@ -179,7 +179,7 @@ describe("RedeemSplit Functional Test", () => {
       utils.getUtxo(issueTxid, issueTx, 2),
       fundingPrivateKey
     );
-    const redeemTxid = await broadcast(redeemSplitHex);
+    const redeemTxid = await utils.broadcastWithRetry(redeemSplitHex);
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000035);
     await utils.isTokenBalance(aliceAddr, 0);
     await utils.isTokenBalance(bobAddr, 6500);
@@ -207,7 +207,7 @@ describe("RedeemSplit Functional Test", () => {
       aliceSignatureCallback,
       paymentSignatureCallback
     );
-    const redeemTxid = await broadcast(redeemSplitHex);
+    const redeemTxid = await utils.broadcastWithRetry(redeemSplitHex);
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000042); // first utxo goes to redemption address
     expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000014);
     expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.000014);
@@ -237,7 +237,7 @@ describe("RedeemSplit Functional Test", () => {
       aliceSignatureCallback,
       null
     );
-    const redeemTxid = await broadcast(redeemSplitHex);
+    const redeemTxid = await utils.broadcastWithRetry(redeemSplitHex);
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000042); // first utxo goes to redemption address
     expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000014);
     expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.000014);
@@ -271,7 +271,9 @@ describe("RedeemSplit Functional Test", () => {
       redeemSplitTx,
       keyMap
     );
-    const redeemTxid = await broadcast(redeemSplitTx.serialize(true));
+    const redeemTxid = await utils.broadcastWithRetry(
+      redeemSplitTx.serialize(true)
+    );
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000042); // first utxo goes to redemption address
     expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000014);
     expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.000014);
@@ -305,7 +307,9 @@ describe("RedeemSplit Functional Test", () => {
       redeemSplitTx,
       keyMap
     );
-    const redeemTxid = await broadcast(redeemSplitTx.serialize(true));
+    const redeemTxid = await utils.broadcastWithRetry(
+      redeemSplitTx.serialize(true)
+    );
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000042); // first utxo goes to redemption address
     expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000014);
     expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.000014);
@@ -453,7 +457,7 @@ async function setup() {
     schema,
     supply
   );
-  const contractTxid = await broadcast(contractHex);
+  const contractTxid = await utils.broadcastWithRetry(contractHex);
   const contractTx = await getTransaction(contractTxid);
 
   const issueHex = await issue(
@@ -466,6 +470,6 @@ async function setup() {
     symbol,
     2
   );
-  issueTxid = await broadcast(issueHex);
+  issueTxid = await utils.broadcastWithRetry(issueHex);
   issueTx = await getTransaction(issueTxid);
 }

@@ -19,7 +19,6 @@ const {
   getTransaction,
   getRawTransaction,
   getFundsFromFaucet,
-  broadcast,
 } = require("../../../index").utils;
 
 const { contract, issue, transfer, redeem } = require("../../../index");
@@ -112,7 +111,7 @@ describe("Swap LifeCycle Tests", () => {
       fundingPrivateKey
     );
 
-    const swapTxid = await broadcast(fullySignedSwapHex);
+    const swapTxid = await utils.broadcastWithRetry(fullySignedSwapHex);
     console.log("swaptxid", swapTxid);
     console.log(aliceAddr);
     console.log(bobAddr);
@@ -134,7 +133,7 @@ describe("Swap LifeCycle Tests", () => {
       utils.getUtxo(swapTxid, swapTx, 2),
       fundingPrivateKey
     );
-    const transferTxid = await broadcast(transferHex);
+    const transferTxid = await utils.broadcastWithRetry(transferHex);
     console.log("TransferTxId: ", transferTxid);
     const transferTx = await getTransaction(transferTxid);
     await utils.isTokenBalance(aliceAddr, 3000);
@@ -147,7 +146,7 @@ describe("Swap LifeCycle Tests", () => {
       utils.getUtxo(transferTxid, transferTx, 1),
       fundingPrivateKey
     );
-    const redeemTxid = await broadcast(redeemHex);
+    const redeemTxid = await utils.broadcastWithRetry(redeemHex);
     console.log("redeemTxid:", redeemTxid);
     await utils.isTokenBalance(aliceAddr, 0);
     await utils.isTokenBalance(bobAddr, 6000);
@@ -205,7 +204,7 @@ describe("Swap LifeCycle Tests", () => {
 
     // console.log('fullySignedSwapHex', fullySignedSwapHex)
 
-    const swapTxid = await broadcast(fullySignedSwapHex);
+    const swapTxid = await utils.broadcastWithRetry(fullySignedSwapHex);
     const swapTx = await getTransaction(swapTxid);
     console.log("swaptxid: ", swapTxid);
     console.log("tokenA", tokenASymbol);
@@ -226,7 +225,7 @@ describe("Swap LifeCycle Tests", () => {
       utils.getUtxo(swapTxid, swapTx, 2),
       fundingPrivateKey
     );
-    const transferTxid = await broadcast(transferHex);
+    const transferTxid = await utils.broadcastWithRetry(transferHex);
     console.log("TransferTxId: ", transferTxid);
     const transferTx = await getTransaction(transferTxid);
     console.log(aliceAddr);
@@ -241,7 +240,7 @@ describe("Swap LifeCycle Tests", () => {
       utils.getUtxo(transferTxid, transferTx, 1),
       fundingPrivateKey
     );
-    const redeemTxid = await broadcast(redeemHex);
+    const redeemTxid = await utils.broadcastWithRetry(redeemHex);
     console.log("redeemTxid:", redeemTxid);
     await utils.isTokenBalance(aliceAddr, 3000);
     await utils.isTokenBalance(bobAddr, 0);
@@ -296,7 +295,7 @@ describe("Swap LifeCycle Tests", () => {
       paymentPublicKeyHash,
       fundingUTXO
     );
-    const swapTxid = await broadcast(fullySignedSwapHex);
+    const swapTxid = await utils.broadcastWithRetry(fullySignedSwapHex);
     const swapTx = await getTransaction(swapTxid);
     console.log("swaptxid ", swapTxid);
     const tokenId = await utils.getToken(swapTxid, 0);
@@ -317,7 +316,7 @@ describe("Swap LifeCycle Tests", () => {
       utils.getUtxo(swapTxid, swapTx, 2),
       fundingPrivateKey
     );
-    const transferTxid = await broadcast(transferHex);
+    const transferTxid = await utils.broadcastWithRetry(transferHex);
     console.log("TransferTxId: ", transferTxid);
     const transferTx = await getTransaction(transferTxid);
     await utils.isTokenBalance(aliceAddr, 0);
@@ -330,7 +329,7 @@ describe("Swap LifeCycle Tests", () => {
       utils.getUtxo(transferTxid, transferTx, 1),
       fundingPrivateKey
     );
-    const redeemTxid = await broadcast(redeemHex);
+    const redeemTxid = await utils.broadcastWithRetry(redeemHex);
     console.log("redeemTxid:", redeemTxid);
     await utils.isTokenBalance(aliceAddr, 0);
     await utils.isTokenBalance(bobAddr, 0);
@@ -392,7 +391,7 @@ describe("Swap LifeCycle Tests", () => {
       paymentPublicKeyHash,
       fundingUTXO
     );
-    const swapTxid = await broadcast(fullySignedSwapHex);
+    const swapTxid = await utils.broadcastWithRetry(fullySignedSwapHex);
     const swapTx = await getTransaction(swapTxid);
     console.log("swaptxid", swapTxid);
 
@@ -414,7 +413,7 @@ describe("Swap LifeCycle Tests", () => {
       fundingPrivateKey
     );
 
-    const transferTxid = await broadcast(transferHex);
+    const transferTxid = await utils.broadcastWithRetry(transferHex);
     console.log("TransferTxId: ", transferTxid);
     const transferTx = await getTransaction(transferTxid);
     await utils.isTokenBalance(bobAddr, 6000);
@@ -427,7 +426,7 @@ describe("Swap LifeCycle Tests", () => {
       utils.getUtxo(transferTxid, transferTx, 1),
       fundingPrivateKey
     );
-    const redeemTxid = await broadcast(redeemHex);
+    const redeemTxid = await utils.broadcastWithRetry(redeemHex);
     console.log("redeemTxid:", redeemTxid);
     await utils.isTokenBalance(aliceAddr, 0);
     await utils.isTokenBalance(bobAddr, 6000);
@@ -483,7 +482,7 @@ describe("Swap LifeCycle Tests", () => {
       fundingUTXO
     );
 
-    const swapTxid = await broadcast(fullySignedSwapHex);
+    const swapTxid = await utils.broadcastWithRetry(fullySignedSwapHex);
     const swapTx = await getTransaction(swapTxid);
     console.log("swaptxid ", swapTxid);
     const tokenId = await utils.getToken(swapTxid, 0);
@@ -505,7 +504,7 @@ describe("Swap LifeCycle Tests", () => {
       utils.getUtxo(swapTxid, swapTx, 2),
       fundingPrivateKey
     );
-    const transferTxid = await broadcast(transferHex);
+    const transferTxid = await utils.broadcastWithRetry(transferHex);
     console.log("TransferTxId: ", transferTxid);
     const transferTx = await getTransaction(transferTxid);
     await utils.isTokenBalanceTwoTokens(aliceAddr, 3000);
@@ -518,7 +517,7 @@ describe("Swap LifeCycle Tests", () => {
       utils.getUtxo(transferTxid, transferTx, 1),
       fundingPrivateKey
     );
-    const redeemTxid = await broadcast(redeemHex);
+    const redeemTxid = await utils.broadcastWithRetry(redeemHex);
     console.log("redeemTxid:", redeemTxid);
     await utils.isTokenBalance(aliceAddr, 3000);
     await utils.isTokenBalance(bobAddr, 0);
@@ -578,7 +577,9 @@ describe("Swap LifeCycle Tests", () => {
       tokenASchema,
       tokenASupply
     );
-    const tokenAContractTxid = await broadcast(tokenAContractHex);
+    const tokenAContractTxid = await utils.broadcastWithRetry(
+      tokenAContractHex
+    );
     const tokenAContractTx = await getTransaction(tokenAContractTxid);
 
     tokenAIssueHex = await issue(
@@ -597,7 +598,7 @@ describe("Swap LifeCycle Tests", () => {
       tokenASymbol,
       2
     );
-    tokenAIssueTxid = await broadcast(tokenAIssueHex);
+    tokenAIssueTxid = await utils.broadcastWithRetry(tokenAIssueHex);
     tokenAObj = new bsv.Transaction(tokenAIssueHex);
 
     // Token B
@@ -616,7 +617,9 @@ describe("Swap LifeCycle Tests", () => {
       tokenBSchema,
       tokenBSupply
     );
-    const tokenBContractTxid = await broadcast(tokenBContractHex);
+    const tokenBContractTxid = await utils.broadcastWithRetry(
+      tokenBContractHex
+    );
     const tokenBContractTx = await getTransaction(tokenBContractTxid);
 
     tokenBIssueHex = await issue(
@@ -635,7 +638,7 @@ describe("Swap LifeCycle Tests", () => {
       tokenBSymbol,
       2
     );
-    tokenBIssueTxid = await broadcast(tokenBIssueHex);
+    tokenBIssueTxid = await utils.broadcastWithRetry(tokenBIssueHex);
     tokenBIssueTx = await getTransaction(tokenBIssueTxid);
     tokenBObj = new bsv.Transaction(tokenBIssueHex);
     fundingUTXO = {

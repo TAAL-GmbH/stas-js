@@ -6,8 +6,6 @@ require("dotenv").config();
 const {
   contract,
   issue,
-  transfer,
-  split,
   mergeSplit,
   mergeSplitWithCallback,
   unsignedMergeSplit,
@@ -67,7 +65,7 @@ describe("MergeSplit Functional Tests", () => {
       utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
       fundingPrivateKey
     );
-    const mergeSplitTxid = await broadcast(mergeSplitHex);
+    const mergeSplitTxid = await utils.broadcastWithRetry(mergeSplitHex);
     expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.000015);
     expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.000035);
     await utils.isTokenBalance(aliceAddr, 1500);
@@ -92,7 +90,7 @@ describe("MergeSplit Functional Tests", () => {
       utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
       fundingPrivateKey
     );
-    const mergeSplitTxid = await broadcast(mergeSplitHex);
+    const mergeSplitTxid = await utils.broadcastWithRetry(mergeSplitHex);
     expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.000015);
     expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.000035);
     await utils.isTokenBalance(aliceAddr, 10000);
@@ -116,7 +114,7 @@ describe("MergeSplit Functional Tests", () => {
       null,
       null
     );
-    const mergeSplitTxid = await broadcast(mergeSplitHex);
+    const mergeSplitTxid = await utils.broadcastWithRetry(mergeSplitHex);
     expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.000015);
     expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.000035);
     await utils.isTokenBalance(aliceAddr, 6500);
@@ -144,7 +142,7 @@ describe("MergeSplit Functional Tests", () => {
       bobSignatureCallback,
       paymentSignatureCallback
     );
-    const mergeSplitTxid = await broadcast(mergeSplitHex);
+    const mergeSplitTxid = await utils.broadcastWithRetry(mergeSplitHex);
     expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.000015);
     expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.000035);
     await utils.isTokenBalance(aliceAddr, 6500);
@@ -170,7 +168,7 @@ describe("MergeSplit Functional Tests", () => {
       bobSignatureCallback,
       null
     );
-    const mergeSplitTxid = await broadcast(mergeSplitHex);
+    const mergeSplitTxid = await utils.broadcastWithRetry(mergeSplitHex);
     expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.000015);
     expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.000035);
     await utils.isTokenBalance(aliceAddr, 6500);
@@ -202,7 +200,9 @@ describe("MergeSplit Functional Tests", () => {
       mergeSplitTx,
       keyMap
     );
-    const mergeSplitTxid = await broadcast(mergeSplitTx.serialize(true));
+    const mergeSplitTxid = await utils.broadcastWithRetry(
+      mergeSplitTx.serialize(true)
+    );
     expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.000015);
     expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.000035);
     await utils.isTokenBalance(aliceAddr, 6500);
@@ -232,7 +232,9 @@ describe("MergeSplit Functional Tests", () => {
       mergeSplitTx,
       keyMap
     );
-    const mergeSplitTxid = await broadcast(mergeSplitTx.serialize(true));
+    const mergeSplitTxid = await utils.broadcastWithRetry(
+      mergeSplitTx.serialize(true)
+    );
     expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.000015);
     expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.000035);
     await utils.isTokenBalance(aliceAddr, 6500);
@@ -379,7 +381,7 @@ async function setup() {
     schema,
     supply
   );
-  const contractTxid = await broadcast(contractHex);
+  const contractTxid = await utils.broadcastWithRetry(contractHex);
   const contractTx = await getTransaction(contractTxid);
 
   const issueHex = await issue(
@@ -410,7 +412,7 @@ async function setup() {
     2
   );
   console.log(issueHex);
-  issueTxid = await broadcast(issueHex);
+  issueTxid = await utils.broadcastWithRetry(issueHex);
   issueTx = await getTransaction(issueTxid);
   issueOutFundingVout = issueTx.vout.length - 1;
 

@@ -13,8 +13,7 @@ const {
   redeem,
 } = require("../../../index");
 
-const { getTransaction, getFundsFromFaucet, broadcast, bitcoinToSatoshis } =
-  require("../../../index").utils;
+const { getTransaction, getFundsFromFaucet } = require("../../../index").utils;
 
 it("Full Life Cycle Test with same issuer & funder", async () => {
   const issuerAndFundingPrivateKey = bsv.PrivateKey();
@@ -49,7 +48,9 @@ it("Full Life Cycle Test with same issuer & funder", async () => {
     schema,
     supply
   );
-  const contractTxid = await broadcast(contractHex);
+  const contractTxid = await utils.utils.broadcastWithRetryWithRetry(
+    contractHex
+  );
   console.log(`Contract TX:     ${contractTxid}`);
   const contractTx = await getTransaction(contractTxid);
   console.log(utils.getUtxo(contractTxid, contractTx, 1));
@@ -63,7 +64,7 @@ it("Full Life Cycle Test with same issuer & funder", async () => {
     symbol,
     2
   );
-  const issueTxid = await broadcast(issueHex);
+  const issueTxid = await utils.utils.broadcastWithRetryWithRetry(issueHex);
   console.log(`Issue TX:     ${issueTxid}`);
   const issueTx = await getTransaction(issueTxid);
   const tokenId = await utils.getToken(issueTxid);
@@ -84,7 +85,9 @@ it("Full Life Cycle Test with same issuer & funder", async () => {
     utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
     issuerAndFundingPrivateKey
   );
-  const transferTxid = await broadcast(transferHex);
+  const transferTxid = await utils.utils.broadcastWithRetryWithRetry(
+    transferHex
+  );
   console.log(`Transfer TX:     ${transferTxid}`);
   const transferTx = await getTransaction(transferTxid);
   expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003);

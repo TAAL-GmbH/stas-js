@@ -69,7 +69,7 @@ describe("Split Functional Test", () => {
       utils.getUtxo(issueTxid, issueTx, 2),
       fundingPrivateKey
     );
-    const splitTxid = await broadcast(splitHex);
+    const splitTxid = await utils.broadcastWithRetry(splitHex);
     expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035);
     expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000035);
     await utils.isTokenBalance(aliceAddr, 3500);
@@ -102,7 +102,7 @@ describe("Split Functional Test", () => {
       utils.getUtxo(issueTxid, issueTx, 2),
       fundingPrivateKey
     );
-    const splitTxid = await broadcast(splitHex);
+    const splitTxid = await utils.broadcastWithRetry(splitHex);
     expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035);
     expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.0000175);
     expect(await utils.getVoutAmount(splitTxid, 2)).to.equal(0.0000175);
@@ -138,7 +138,7 @@ describe("Split Functional Test", () => {
       utils.getUtxo(issueTxid, issueTx, 2),
       fundingPrivateKey
     );
-    const splitTxid = await broadcast(splitHex);
+    const splitTxid = await utils.broadcastWithRetry(splitHex);
     expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.0000175);
     expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.0000175);
     expect(await utils.getVoutAmount(splitTxid, 2)).to.equal(0.0000175);
@@ -179,7 +179,7 @@ describe("Split Functional Test", () => {
       utils.getUtxo(issueTxid, issueTx, 2),
       fundingPrivateKey
     );
-    const splitTxid = await broadcast(splitHex);
+    const splitTxid = await utils.broadcastWithRetry(splitHex);
     await new Promise((resolve) => setTimeout(resolve, wait));
     expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.0000175);
     expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.0000175);
@@ -206,7 +206,7 @@ describe("Split Functional Test", () => {
       utils.getUtxo(issueTxid, issueTx, 2),
       fundingPrivateKey
     );
-    const splitTxid = await broadcast(splitHex);
+    const splitTxid = await utils.broadcastWithRetry(splitHex);
     expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.00007);
     await utils.isTokenBalance(bobAddr, 10000);
   });
@@ -232,7 +232,7 @@ describe("Split Functional Test", () => {
       null,
       null
     );
-    const splitTxid = await broadcast(splitHex);
+    const splitTxid = await utils.broadcastWithRetry(splitHex);
     expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035);
     expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000035);
     await utils.isTokenBalance(aliceAddr, 3500);
@@ -264,7 +264,7 @@ describe("Split Functional Test", () => {
       aliceSignatureCallback,
       paymentSignatureCallback
     );
-    const splitTxid = await broadcast(splitHex);
+    const splitTxid = await utils.broadcastWithRetry(splitHex);
     expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035);
     expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000035);
     await utils.isTokenBalance(aliceAddr, 3500);
@@ -294,7 +294,7 @@ describe("Split Functional Test", () => {
       aliceSignatureCallback,
       null
     );
-    const splitTxid = await broadcast(splitHex);
+    const splitTxid = await utils.broadcastWithRetry(splitHex);
     expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035);
     expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000035);
     await utils.isTokenBalance(aliceAddr, 3500);
@@ -325,7 +325,7 @@ describe("Split Functional Test", () => {
     console.log(unsignedSplitReturn.hex);
     const splitTx = bsv.Transaction(unsignedSplitReturn.hex);
     utils.signScriptWithUnlocking(unsignedSplitReturn, splitTx, keyMap);
-    const splitTxid = await broadcast(splitTx.serialize(true));
+    const splitTxid = await utils.broadcastWithRetry(splitTx.serialize(true));
     expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035);
     expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000035);
     await utils.isTokenBalance(aliceAddr, 3500);
@@ -355,7 +355,7 @@ describe("Split Functional Test", () => {
     );
     const splitTx = bsv.Transaction(unsignedSplitReturn.hex);
     utils.signScriptWithUnlocking(unsignedSplitReturn, splitTx, keyMap);
-    const splitTxid = await broadcast(splitTx.serialize(true));
+    const splitTxid = await utils.broadcastWithRetry(splitTx.serialize(true));
     expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035);
     expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000035);
     await utils.isTokenBalance(aliceAddr, 3500);
@@ -492,7 +492,7 @@ async function setup() {
     schema,
     supply
   );
-  const contractTxid = await broadcast(contractHex);
+  const contractTxid = await utils.broadcastWithRetry(contractHex);
   const contractTx = await getTransaction(contractTxid);
 
   const issueHex = await issue(
@@ -505,6 +505,6 @@ async function setup() {
     symbol,
     2
   );
-  issueTxid = await broadcast(issueHex);
+  issueTxid = await utils.broadcastWithRetry(issueHex);
   issueTx = await getTransaction(issueTxid);
 }

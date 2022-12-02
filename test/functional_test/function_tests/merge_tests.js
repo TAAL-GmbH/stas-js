@@ -26,7 +26,6 @@ let aliceAddr;
 let contractUtxos;
 let fundingUtxos;
 let publicKeyHash;
-let contractTxid;
 let contractTx;
 let issueTx;
 let issueTxid;
@@ -60,7 +59,7 @@ describe("Merge Funcional Tests", () => {
       utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
       fundingPrivateKey
     );
-    const mergeTxid = await broadcast(mergeHex);
+    const mergeTxid = await utils.broadcastWithRetry(mergeHex);
     await new Promise((resolve) => setTimeout(resolve, wait));
     const tokenIdMerge = await utils.getToken(mergeTxid);
     const response = await utils.getTokenResponse(tokenIdMerge);
@@ -78,7 +77,7 @@ describe("Merge Funcional Tests", () => {
       utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
       fundingPrivateKey
     );
-    const mergeTxid = await broadcast(mergeHex);
+    const mergeTxid = await utils.broadcastWithRetry(mergeHex);
     await new Promise((resolve) => setTimeout(resolve, wait));
     const tokenIdMerge = await utils.getToken(mergeTxid);
     const response = await utils.getTokenResponse(tokenIdMerge);
@@ -96,7 +95,7 @@ describe("Merge Funcional Tests", () => {
       null,
       null
     );
-    const mergeTxid = await broadcast(mergeHex);
+    const mergeTxid = await utils.broadcastWithRetry(mergeHex);
     const tokenIdMerge = await utils.getToken(mergeTxid);
     await new Promise((resolve) => setTimeout(resolve, wait));
     const response = await utils.getTokenResponse(tokenIdMerge);
@@ -116,7 +115,7 @@ describe("Merge Funcional Tests", () => {
       bobSignatureCallback,
       paymentSignatureCallback
     );
-    const mergeTxid = await broadcast(mergeHex);
+    const mergeTxid = await utils.broadcastWithRetry(mergeHex);
     await new Promise((resolve) => setTimeout(resolve, wait));
     const tokenIdMerge = await utils.getToken(mergeTxid);
     const response = await utils.getTokenResponse(tokenIdMerge);
@@ -136,7 +135,7 @@ describe("Merge Funcional Tests", () => {
       bobSignatureCallback,
       null
     );
-    const mergeTxid = await broadcast(mergeHex);
+    const mergeTxid = await utils.broadcastWithRetry(mergeHex);
     const tokenIdMerge = await utils.getToken(mergeTxid);
     await new Promise((resolve) => setTimeout(resolve, wait));
     const response = await utils.getTokenResponse(tokenIdMerge);
@@ -156,7 +155,7 @@ describe("Merge Funcional Tests", () => {
     );
     const mergeTx = bsv.Transaction(unsignedMergeReturn.hex);
     utils.signScriptWithUnlocking(unsignedMergeReturn, mergeTx, keyMap);
-    const mergeTxid = await broadcast(mergeTx.serialize(true));
+    const mergeTxid = await utils.broadcastWithRetry(mergeTx.serialize(true));
     await new Promise((resolve) => setTimeout(resolve, wait));
     const tokenIdMerge = await utils.getToken(mergeTxid);
     const response = await utils.getTokenResponse(tokenIdMerge);
@@ -176,7 +175,7 @@ describe("Merge Funcional Tests", () => {
     );
     const mergeTx = bsv.Transaction(unsignedMergeReturn.hex);
     utils.signScriptWithUnlocking(unsignedMergeReturn, mergeTx, keyMap);
-    const mergeTxid = await broadcast(mergeTx.serialize(true));
+    const mergeTxid = await utils.broadcastWithRetry(mergeTx.serialize(true));
     await new Promise((resolve) => setTimeout(resolve, wait));
     const tokenIdMerge = await utils.getToken(mergeTxid);
     const response = await utils.getTokenResponse(tokenIdMerge);
@@ -261,7 +260,7 @@ async function setup() {
     schema,
     supply
   );
-  contractTxid = await broadcast(contractHex);
+  const contractTxid = await utils.broadcastWithRetry(contractHex);
   contractTx = await getTransaction(contractTxid);
 
   const issueHex = await issue(
@@ -291,7 +290,7 @@ async function setup() {
     symbol,
     2
   );
-  issueTxid = await broadcast(issueHex);
+  issueTxid = await utils.broadcastWithRetry(issueHex);
   issueTx = await getTransaction(issueTxid);
   mergeObj = bsv.Transaction(issueHex);
   issueOutFundingVout = issueTx.vout.length - 1;
