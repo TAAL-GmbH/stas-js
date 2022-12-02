@@ -115,7 +115,7 @@ describe("Smoke Test 2", () => {
       utils.getUtxo(splitTxid, splitTx, issueOutFundingVout),
       fundingPrivateKey
     );
-    const mergeSplitTxid = await broadcast(mergeSplitHex);
+    const mergeSplitTxid = await utils.broadcastWithRetry(mergeSplitHex);
     await new Promise((resolve) => setTimeout(resolve, wait));
     expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000175);
     expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000525);
@@ -146,7 +146,7 @@ describe("Smoke Test 2", () => {
       bobSignatureCallback,
       paymentSignatureCallback
     );
-    const mergeSplitTxid = await broadcast(mergeSplitHex);
+    const mergeSplitTxid = await utils.broadcastWithRetry(mergeSplitHex);
     await new Promise((resolve) => setTimeout(resolve, wait));
     expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000175);
     expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000525);
@@ -180,7 +180,9 @@ describe("Smoke Test 2", () => {
       mergeSplitTx,
       keyMap
     );
-    const mergeSplitTxid = await broadcast(mergeSplitTx.serialize(true));
+    const mergeSplitTxid = await utils.broadcastWithRetry(
+      mergeSplitTx.serialize(true)
+    );
     expect(await utils.getVoutAmount(mergeSplitTxid, 0)).to.equal(0.0000175);
     expect(await utils.getVoutAmount(mergeSplitTxid, 1)).to.equal(0.0000525);
     await utils.isTokenBalance(aliceAddr, 1750);
@@ -196,7 +198,7 @@ describe("Smoke Test 2", () => {
       utils.getUtxo(issueTxid, issueTx, 2),
       fundingPrivateKey
     );
-    const redeemTxid = await broadcast(redeemHex);
+    const redeemTxid = await utils.broadcastWithRetry(redeemHex);
     expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007);
     await utils.isTokenBalance(aliceAddr, 0);
     await utils.isTokenBalance(bobAddr, 3000);
@@ -213,7 +215,7 @@ describe("Smoke Test 2", () => {
       aliceSignatureCallback,
       paymentSignatureCallback
     );
-    const redeemTxid = await broadcast(redeemHex);
+    const redeemTxid = await utils.broadcastWithRetry(redeemHex);
     expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007);
     await utils.isTokenBalance(aliceAddr, 0);
     await utils.isTokenBalance(bobAddr, 3000);
@@ -230,7 +232,7 @@ describe("Smoke Test 2", () => {
     );
     const redeemTx = bsv.Transaction(unsignedRedeemReturn.hex);
     utils.signScriptWithUnlocking(unsignedRedeemReturn, redeemTx, keyMap);
-    const redeemTxid = await broadcast(redeemTx.serialize(true));
+    const redeemTxid = await utils.broadcastWithRetry(redeemTx.serialize(true));
     expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00007);
     await utils.isTokenBalance(aliceAddr, 0);
     await utils.isTokenBalance(bobAddr, 3000);
@@ -258,7 +260,7 @@ describe("Smoke Test 2", () => {
       utils.getUtxo(issueTxid, issueTx, 2),
       fundingPrivateKey
     );
-    const splitTxid = await broadcast(splitHex);
+    const splitTxid = await utils.broadcastWithRetry(splitHex);
     expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035);
     expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000035);
     await utils.isTokenBalance(aliceAddr, 3500);
@@ -286,7 +288,7 @@ describe("Smoke Test 2", () => {
       utils.getUtxo(issueTxid, issueTx, 2),
       fundingPrivateKey
     );
-    const redeemTxid = await broadcast(redeemSplitHex);
+    const redeemTxid = await utils.broadcastWithRetry(redeemSplitHex);
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000042); // first utxo goes to redemption address
     expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000014);
     expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.000014);
@@ -321,7 +323,9 @@ describe("Smoke Test 2", () => {
       redeemSplitTx,
       keyMap
     );
-    const redeemTxid = await broadcast(redeemSplitTx.serialize(true));
+    const redeemTxid = await utils.broadcastWithRetry(
+      redeemSplitTx.serialize(true)
+    );
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000042); // first utxo goes to redemption address
     expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000014);
     expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.000014);
@@ -352,7 +356,7 @@ describe("Smoke Test 2", () => {
       aliceSignatureCallback,
       paymentSignatureCallback
     );
-    const redeemTxid = await broadcast(redeemSplitHex);
+    const redeemTxid = await utils.broadcastWithRetry(redeemSplitHex);
     expect(await utils.getVoutAmount(redeemTxid, 0)).to.equal(0.000042); // first utxo goes to redemption address
     expect(await utils.getVoutAmount(redeemTxid, 1)).to.equal(0.000014);
     expect(await utils.getVoutAmount(redeemTxid, 2)).to.equal(0.000014);
@@ -386,7 +390,7 @@ describe("Smoke Test 2", () => {
       aliceSignatureCallback,
       paymentSignatureCallback
     );
-    const splitTxid = await broadcast(splitHex);
+    const splitTxid = await utils.broadcastWithRetry(splitHex);
     expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035);
     expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000035);
     await utils.isTokenBalance(aliceAddr, 3500);
@@ -417,7 +421,7 @@ describe("Smoke Test 2", () => {
     );
     const splitTx = bsv.Transaction(unsignedSplitReturn.hex);
     utils.signScriptWithUnlocking(unsignedSplitReturn, splitTx, keyMap);
-    const splitTxid = await broadcast(splitTx.serialize(true));
+    const splitTxid = await utils.broadcastWithRetry(splitTx.serialize(true));
     expect(await utils.getVoutAmount(splitTxid, 0)).to.equal(0.000035);
     expect(await utils.getVoutAmount(splitTxid, 1)).to.equal(0.000035);
     await utils.isTokenBalance(aliceAddr, 3500);
@@ -433,7 +437,7 @@ describe("Smoke Test 2", () => {
       utils.getUtxo(issueTxid, issueTx, 2),
       fundingPrivateKey
     );
-    const transferTxid = await broadcast(transferHex);
+    const transferTxid = await utils.broadcastWithRetry(transferHex);
     expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003);
     await utils.isTokenBalance(aliceAddr, 10000);
     await utils.isTokenBalance(bobAddr, 0);
@@ -450,7 +454,7 @@ describe("Smoke Test 2", () => {
       bobSignatureCallback,
       paymentSignatureCallback
     );
-    const transferTxid = await broadcast(transferHex);
+    const transferTxid = await utils.broadcastWithRetry(transferHex);
     expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003);
     await utils.isTokenBalance(bobAddr, 3000);
     await utils.isTokenBalance(aliceAddr, 7000);
@@ -467,7 +471,9 @@ describe("Smoke Test 2", () => {
     );
     const transferTx = bsv.Transaction(unsignedTransferReturn.hex);
     utils.signScriptWithUnlocking(unsignedTransferReturn, transferTx, keyMap);
-    const transferTxid = await broadcast(transferTx.serialize(true));
+    const transferTxid = await utils.broadcastWithRetry(
+      transferTx.serialize(true)
+    );
     expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003);
     await utils.isTokenBalance(aliceAddr, 10000);
     await utils.isTokenBalance(bobAddr, 0);
@@ -537,8 +543,7 @@ describe("Smoke Test 2", () => {
       fundingUTXO,
       fundingPrivateKey
     );
-
-    const swapTxid = await broadcast(fullySignedSwapHex);
+    const swapTxid = await utils.broadcastWithRetry(fullySignedSwapHex);
     console.log("swaptxid", swapTxid);
 
     const tokenId = await utils.getToken(swapTxid, 1);
@@ -599,7 +604,7 @@ describe("Smoke Test 2", () => {
       paymentPublicKeyHash,
       fundingUTXO
     );
-    const swapTxid = await broadcast(fullySignedSwapHex);
+    const swapTxid = await utils.broadcastWithRetry(fullySignedSwapHex);
     console.log("swaptxid ", swapTxid);
 
     const tokenId = await utils.getToken(swapTxid, 0);

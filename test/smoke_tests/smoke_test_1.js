@@ -79,7 +79,7 @@ describe("Smoke Test 1", () => {
       schema,
       supply
     );
-    const contractTxid = await broadcast(contractHex);
+    const contractTxid = await utils.broadcastWithRetry(contractHex);
     const amount = await utils.getVoutAmount(contractTxid, 0);
     expect(amount).to.equal(supply / 100000000);
   });
@@ -96,7 +96,7 @@ describe("Smoke Test 1", () => {
       ownerSignCallback,
       paymentSignCallback
     );
-    const contractTxid = await broadcast(contractHex);
+    const contractTxid = await utils.broadcastWithRetry(contractHex);
     const amount = await utils.getVoutAmount(contractTxid, 0);
     expect(amount).to.equal(supply / 100000000);
   });
@@ -115,7 +115,9 @@ describe("Smoke Test 1", () => {
     const contractTx = new bsv.Transaction(contractTxJson);
     let signedContract = contractTx.sign(issuerPrivateKey);
     signedContract = contractTx.sign(fundingPrivateKey);
-    const contractTxid = await broadcast(signedContract.serialize(true));
+    const contractTxid = await utils.broadcastWithRetry(
+      signedContract.serialize(true)
+    );
     const amount = await utils.getVoutAmount(contractTxid, 0);
     expect(amount).to.equal(supply / 100000000);
   });
@@ -131,7 +133,7 @@ describe("Smoke Test 1", () => {
       true,
       symbol
     );
-    const issueTxid = await broadcast(issueHex);
+    const issueTxid = await utils.broadcastWithRetry(issueHex);
     const tokenId = await utils.getToken(issueTxid);
     await new Promise((resolve) => setTimeout(resolve, wait));
     const response = await utils.getTokenResponse(tokenId);
@@ -160,7 +162,7 @@ describe("Smoke Test 1", () => {
       true,
       symbol
     );
-    const issueTxid = await broadcast(issueHex);
+    const issueTxid = await utils.broadcastWithRetry(issueHex);
     const tokenId = await utils.getToken(issueTxid);
     await new Promise((resolve) => setTimeout(resolve, wait));
     const response = await utils.getTokenResponse(tokenId);
@@ -182,7 +184,7 @@ describe("Smoke Test 1", () => {
       issuerSignatureCallback,
       paymentSignatureCallback
     );
-    const issueTxid = await broadcast(issueHex);
+    const issueTxid = await utils.broadcastWithRetry(issueHex);
     const tokenId = await utils.getToken(issueTxid);
     await new Promise((resolve) => setTimeout(resolve, wait));
     const response = await utils.getTokenResponse(tokenId);
@@ -206,7 +208,7 @@ describe("Smoke Test 1", () => {
     );
     const issueTx = new bsv.Transaction(issueHex.hex);
     utils.signScript(issueHex, issueTx, keyMap);
-    const issueTxid = await broadcast(issueTx.serialize(true));
+    const issueTxid = await utils.broadcastWithRetry(issueTx.serialize(true));
     const tokenId = await utils.getToken(issueTxid);
     await new Promise((resolve) => setTimeout(resolve, wait));
     const response = await utils.getTokenResponse(tokenId);
@@ -226,7 +228,7 @@ describe("Smoke Test 1", () => {
       utils.getUtxo(splitTxid, splitTx, 2),
       fundingPrivateKey
     );
-    const mergeTxid = await broadcast(mergeHex);
+    const mergeTxid = await utils.broadcastWithRetry(mergeHex);
     await new Promise((resolve) => setTimeout(resolve, wait));
     const tokenIdMerge = await utils.getToken(mergeTxid);
     const response = await utils.getTokenResponse(tokenIdMerge);
@@ -247,7 +249,7 @@ describe("Smoke Test 1", () => {
       bobSignatureCallback,
       paymentSignatureCallback
     );
-    const mergeTxid = await broadcast(mergeHex);
+    const mergeTxid = await utils.broadcastWithRetry(mergeHex);
     await new Promise((resolve) => setTimeout(resolve, wait));
     const tokenIdMerge = await utils.getToken(mergeTxid);
     const response = await utils.getTokenResponse(tokenIdMerge);

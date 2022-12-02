@@ -3,7 +3,7 @@ const expect = require("chai").expect;
 const axiosRetry = require("axios-retry");
 const bsv = require("bsv");
 require("dotenv").config();
-const { bitcoinToSatoshis, finaliseSTASUnlockingScript } =
+const { bitcoinToSatoshis, finaliseSTASUnlockingScript, broadcast } =
   require("../../index").utils;
 
 function schema(publicKeyHash, symbol, supply) {
@@ -46,6 +46,17 @@ function schema(publicKeyHash, symbol, supply) {
     },
   };
   return schema;
+}
+
+async function broadcastWithRetry(hex) {
+  let txid;
+  try {
+    txid = await broadcast(hex);
+  } catch (err) {
+    console.log("retrying: ", err.message);
+    txid = await broadcast(hex);
+  }
+  return txid;
 }
 
 function getIssueInfo(addr1, sat1, addr2, sat2) {
@@ -198,7 +209,7 @@ async function getVoutAmount(txid, vout) {
   const url = `https://api.whatsonchain.com/v1/bsv/test/tx/hash/${txid}`;
   const response = await axios({
     method: "get",
-    url
+    url,
   });
   return response.data.vout[vout].value;
 }
@@ -209,7 +220,7 @@ async function getBsvBalance(address, expectedBalance) {
     const url = `https://api.whatsonchain.com/v1/bsv/test/address/${address}/balance`;
     response = await axios({
       method: "get",
-      url
+      url,
     });
     let balance;
     try {
@@ -243,7 +254,7 @@ async function getToken(txid, vout) {
   const url = `https://api.whatsonchain.com/v1/bsv/test/tx/hash/${txid}`;
   const response = await axios({
     method: "get",
-    url
+    url,
   });
 
   const temp = response.data.vout[vout].scriptPubKey.asm;
@@ -273,8 +284,8 @@ async function getTokenResponse(tokenId, symbol) {
   try {
     url = `https://api.whatsonchain.com/v1/bsv/test/token/${tokenId}/${symbol}`;
     response = await axios({
-      method: 'get',
-      url
+      method: "get",
+      url,
     });
   } catch (e) {
     console.log("Token Not Found: " + e, " ", url);
@@ -290,7 +301,7 @@ async function getTokenWithSymbol(txid, symbol, vout) {
   try {
     response = await axios({
       method: "get",
-      url
+      url,
     });
   } catch (e) {
     console.log("Token Not Found: " + e);
@@ -309,7 +320,7 @@ async function isTokenBalance(address, expectedBalance) {
     const url = `https://api.whatsonchain.com/v1/bsv/test/address/${address}/tokens`;
     response = await axios({
       method: "get",
-      url
+      url,
     });
     let balance;
     try {
@@ -335,7 +346,7 @@ async function isTokenBalanceTwoTokens(address, expectedBalance) {
     const url = `https://api.whatsonchain.com/v1/bsv/test/address/${address}/tokens`;
     response = await axios({
       method: "get",
-      url
+      url,
     });
     let balance;
     try {
@@ -351,8 +362,8 @@ async function isTokenBalanceTwoTokens(address, expectedBalance) {
   }
   console.log(
     "Incorrect balance, actual balance is " +
-    response.data.tokens[0].balance +
-    response.data.tokens[1].balance
+      response.data.tokens[0].balance +
+      response.data.tokens[1].balance
   );
   expect(false).to.true();
 }
@@ -361,7 +372,7 @@ async function getAmount(txid, vout) {
   const url = `https://api.whatsonchain.com/v1/bsv/test/tx/hash/${txid}`;
   const response = await axios({
     method: "get",
-    url
+    url,
   });
   console.log(response.data.vout[vout].value);
   const amount = response.data.vout[vout].value;
@@ -753,4 +764,5 @@ module.exports = {
   signScriptWithUnlocking,
   getBsvBalance,
   isTokenBalanceTwoTokens,
+  broadcastWithRetry,
 };
