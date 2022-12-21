@@ -80,6 +80,7 @@ describe("atomic swap functional Tests", function () {
     );
 
     const swapTxid = await utils.broadcastWithRetry(allInOneSwapHex);
+    await new Promise((resolve) => setTimeout(resolve, 5000));
     console.log("swaptxid", swapTxid);
     expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.00006);
     expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.00003);
@@ -150,6 +151,7 @@ describe("atomic swap functional Tests", function () {
     );
 
     const swapTxid = await utils.broadcastWithRetry(fullySignedSwapHex);
+    await new Promise((resolve) => setTimeout(resolve, 5000));
     console.log("swaptxid", swapTxid);
 
     const tokenId = await utils.getToken(swapTxid, 1);
@@ -215,6 +217,7 @@ describe("atomic swap functional Tests", function () {
     // console.log('fullySignedSwapHex', fullySignedSwapHex)
 
     const swapTxid = await utils.broadcastWithRetry(fullySignedSwapHex);
+    await new Promise((resolve) => setTimeout(resolve, 5000));
     console.log("swaptxid: ", swapTxid);
     console.log("tokenA", tokenASymbol);
     const tokenId = await utils.getToken(swapTxid, 0);
@@ -275,6 +278,7 @@ describe("atomic swap functional Tests", function () {
       fundingUTXO
     );
     const swapTxid = await utils.broadcastWithRetry(fullySignedSwapHex);
+    await new Promise((resolve) => setTimeout(resolve, 5000));
     console.log("swaptxid ", swapTxid);
 
     const tokenId = await utils.getToken(swapTxid, 0);
@@ -344,6 +348,7 @@ describe("atomic swap functional Tests", function () {
       fundingUTXO
     );
     const swapTxid = await utils.broadcastWithRetry(fullySignedSwapHex);
+    await new Promise((resolve) => setTimeout(resolve, 5000));
     console.log("swaptxid", swapTxid);
     const tokenId = await utils.getToken(swapTxid, 1);
     const response = await utils.getTokenResponse(tokenId, tokenBSymbol);
@@ -401,14 +406,14 @@ describe("atomic swap functional Tests", function () {
       paymentPublicKeyHash,
       fundingUTXO
     );
-
     const swapTxid = await utils.broadcastWithRetry(fullySignedSwapHex);
+    await new Promise((resolve) => setTimeout(resolve, 5000));
     console.log("swaptxid ", swapTxid);
     const tokenId = await utils.getToken(swapTxid, 0);
     const response = await utils.getTokenResponse(tokenId, tokenASymbol);
     expect(response.symbol).to.equal(tokenASymbol);
     expect(await utils.getVoutAmount(swapTxid, 0)).to.equal(0.00006);
-    expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.01);
+    expect(await utils.getVoutAmount(swapTxid, 1)).to.equal(0.01); //
   });
 });
 
