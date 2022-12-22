@@ -59,6 +59,52 @@ async function broadcastWithRetry(hex) {
   return txid;
 }
 
+// tapi required for scriptsize > 10mb
+async function tapiBroadcast(tx) {
+  if (Buffer.isBuffer(tx)) {
+    tx = tx.toString("hex");
+  }
+  const url = "https://api.taal.com/api/v1/broadcast";
+  let response;
+  try {
+    response = await axios({
+      method: "post",
+      maxContentLength: Infinity,
+      maxBodyLength: Infinity,
+      url,
+      headers: {
+        Authorization: `Bearer testnet_e9a87f7c901067539fd032ebd7c1bb34`,
+      },
+      data: {
+        rawTx: tx,
+      },
+    });
+  } catch (err) {
+    console.log(err);
+    throw new Error("Broadcast failed: ", err);
+  }
+  let txid = response.data;
+
+  if (txid[0] === '"') {
+    txid = txid.slice(1);
+  }
+
+  if (txid.slice(-1) === "\n") {
+    txid = txid.slice(0, -1);
+  }
+
+  if (txid.slice(-1) === '"') {
+    txid = txid.slice(0, -1);
+  }
+
+  // Check this is a valid hex string
+  if (!txid.match(/^[0-9a-fA-F]{64}$/)) {
+    throw new Error(`Failed to broadcast: ${txid}`);
+  }
+
+  return txid;
+}
+
 function getIssueInfo(addr1, sat1, addr2, sat2) {
   return [
     {
@@ -765,4 +811,5 @@ module.exports = {
   getBsvBalance,
   isTokenBalanceTwoTokens,
   broadcastWithRetry,
+  tapiBroadcast,
 };
