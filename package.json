@@ -1,6 +1,6 @@
 {
   "name": "stas-js",
-  "version": "3.0.1",
+  "version": "3.0.3",
   "description": "This library will create various types of STAS token transactions that add token functionality to the BSV blockchain.",
   "main": "index.js",
   "module": "dist/index",
