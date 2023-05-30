@@ -17,7 +17,7 @@ function schema(publicKeyHash, symbol, supply) {
       "https://www.taal.com/wp-content/themes/taal_v2/img/favicon/favicon-96x96.png",
     totalSupply: supply,
     decimals: 0,
-    satsPerToken: 1,
+    satsPerToken: 2,
     properties: {
       legal: {
         terms:
@@ -255,6 +255,10 @@ async function getVoutAmount(txid, vout) {
   const url = `https://api.whatsonchain.com/v1/bsv/test/tx/hash/${txid}`;
   const response = await axios({
     method: "get",
+    headers: {
+      "content-type": "application/json",
+      Authorization: "testnet_100115ff2255a0fe05116746aa1b9546",
+    },
     url,
   });
   return response.data.vout[vout].value;
@@ -266,6 +270,10 @@ async function getBsvBalance(address, expectedBalance) {
     const url = `https://api.whatsonchain.com/v1/bsv/test/address/${address}/balance`;
     response = await axios({
       method: "get",
+      headers: {
+        "content-type": "application/json",
+        Authorization: "testnet_100115ff2255a0fe05116746aa1b9546",
+      },
       url,
     });
     let balance;
@@ -300,6 +308,10 @@ async function getToken(txid, vout) {
   const url = `https://api.whatsonchain.com/v1/bsv/test/tx/hash/${txid}`;
   const response = await axios({
     method: "get",
+    headers: {
+      "content-type": "application/json",
+      Authorization: "testnet_100115ff2255a0fe05116746aa1b9546",
+    },
     url,
   });
 
@@ -331,6 +343,10 @@ async function getTokenResponse(tokenId, symbol) {
     url = `https://api.whatsonchain.com/v1/bsv/test/token/${tokenId}/${symbol}`;
     response = await axios({
       method: "get",
+      headers: {
+        "content-type": "application/json",
+        Authorization: "testnet_100115ff2255a0fe05116746aa1b9546",
+      },
       url,
     });
   } catch (e) {
@@ -347,6 +363,10 @@ async function getTokenWithSymbol(txid, symbol, vout) {
   try {
     response = await axios({
       method: "get",
+      headers: {
+        "content-type": "application/json",
+        Authorization: "testnet_100115ff2255a0fe05116746aa1b9546",
+      },
       url,
     });
   } catch (e) {
@@ -366,6 +386,10 @@ async function isTokenBalance(address, expectedBalance) {
     const url = `https://api.whatsonchain.com/v1/bsv/test/address/${address}/tokens`;
     response = await axios({
       method: "get",
+      headers: {
+        "content-type": "application/json",
+        Authorization: "testnet_100115ff2255a0fe05116746aa1b9546",
+      },
       url,
     });
     let balance;
@@ -392,6 +416,10 @@ async function isTokenBalanceTwoTokens(address, expectedBalance) {
     const url = `https://api.whatsonchain.com/v1/bsv/test/address/${address}/tokens`;
     response = await axios({
       method: "get",
+      headers: {
+        "content-type": "application/json",
+        Authorization: "testnet_100115ff2255a0fe05116746aa1b9546",
+      },
       url,
     });
     let balance;
@@ -418,6 +446,10 @@ async function getAmount(txid, vout) {
   const url = `https://api.whatsonchain.com/v1/bsv/test/tx/hash/${txid}`;
   const response = await axios({
     method: "get",
+    headers: {
+      "content-type": "application/json",
+      Authorization: "testnet_100115ff2255a0fe05116746aa1b9546",
+    },
     url,
   });
   console.log(response.data.vout[vout].value);
