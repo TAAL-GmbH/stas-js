@@ -89,7 +89,7 @@ describe("Redeem Low Sat Tests", () => {
       utils.getUtxo(issueTxid, issueTx, 1),
       fundingPrivateKey
     );
-    const redeemTxid = await utils.utils.utils.broadcastWithRetry(redeemHex);
+    const redeemTxid = await utils.broadcastWithRetry(redeemHex);
     expect(await utils.getAmount(redeemTxid, 0)).to.equal(0.00000001);
     await utils.isTokenBalance(aliceAddr, 0);
   });

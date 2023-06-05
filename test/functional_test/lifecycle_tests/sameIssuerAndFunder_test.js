@@ -48,7 +48,7 @@ it("Full Life Cycle Test with same issuer & funder", async () => {
     schema,
     supply
   );
-  const contractTxid = await utils.utils.broadcastWithRetry(contractHex);
+  const contractTxid = await utils.broadcastWithRetry(contractHex);
   console.log(`Contract TX:     ${contractTxid}`);
   const contractTx = await getTransaction(contractTxid);
   console.log(utils.getUtxo(contractTxid, contractTx, 1));
@@ -62,7 +62,7 @@ it("Full Life Cycle Test with same issuer & funder", async () => {
     symbol,
     2
   );
-  const issueTxid = await utils.utils.broadcastWithRetry(issueHex);
+  const issueTxid = await broadcastWithRetry(issueHex);
   console.log(`Issue TX:     ${issueTxid}`);
   const issueTx = await getTransaction(issueTxid);
   const tokenId = await utils.getToken(issueTxid);
@@ -83,7 +83,7 @@ it("Full Life Cycle Test with same issuer & funder", async () => {
     utils.getUtxo(issueTxid, issueTx, issueOutFundingVout),
     issuerAndFundingPrivateKey
   );
-  const transferTxid = await utils.utils.broadcastWithRetry(transferHex);
+  const transferTxid = await utils.broadcastWithRetry(transferHex);
   console.log(`Transfer TX:     ${transferTxid}`);
   const transferTx = await getTransaction(transferTxid);
   expect(await utils.getVoutAmount(transferTxid, 0)).to.equal(0.00003);
