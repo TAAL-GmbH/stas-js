@@ -17,7 +17,7 @@ function schema(publicKeyHash, symbol, supply) {
       "https://www.taal.com/wp-content/themes/taal_v2/img/favicon/favicon-96x96.png",
     totalSupply: supply,
     decimals: 0,
-    satsPerToken: 2,
+    satsPerToken: 1,
     properties: {
       legal: {
         terms:
