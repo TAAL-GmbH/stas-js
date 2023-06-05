@@ -62,7 +62,7 @@ it("Full Life Cycle Test with same issuer & funder", async () => {
     symbol,
     2
   );
-  const issueTxid = await broadcastWithRetry(issueHex);
+  const issueTxid = await utils.broadcastWithRetry(issueHex);
   console.log(`Issue TX:     ${issueTxid}`);
   const issueTx = await getTransaction(issueTxid);
   const tokenId = await utils.getToken(issueTxid);

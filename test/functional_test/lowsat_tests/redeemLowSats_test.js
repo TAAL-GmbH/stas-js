@@ -153,6 +153,6 @@ async function setup(satSupply) {
     symbol,
     2
   );
-  issueTxid = await utils.broadcastWithRetryWithRetry(issueHex);
+  issueTxid = await utils.broadcastWithRetry(issueHex);
   issueTx = await getTransaction(issueTxid);
 }
