@@ -31,6 +31,7 @@ beforeEach(async () => {
   await setup();
 });
 
+// needs fixed - wrong error - setup is wrong, check the last splitHex/obj
 it("Merge - Attempt To Merge With Different Symbol", async () => {
   const mergeHex = await merge(
     bobPrivateKey,
